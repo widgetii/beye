@@ -727,7 +727,7 @@ static unsigned long __FASTCALL__ disSearch(TWindow *pwnd, unsigned long start,
   unsigned long tsize, retval, flen, dfpos, cfpos, sfpos; /* If search have no result */
   char *disSearchBuff;
   unsigned len, lw, proc, pproc, pmult;
-  int cache[UCHAR_MAX];
+  int cache[UCHAR_MAX+1];
   cfpos = sfpos = BMGetCurrFilePos();
   flen = BMGetFLength();
   retval = ULONG_MAX;
