@@ -27,7 +27,7 @@ static void (*old_alrm)(int) = SIG_DFL;
 static void my_alarm_handler( int signo )
 {
   if(user_func) (*user_func)();
-  (void) signo;
+  UNUSED(signo);
 }
 
 unsigned  __FASTCALL__ __OsSetTimerCallBack(unsigned ms,timer_callback func)
