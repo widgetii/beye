@@ -135,28 +135,28 @@
 [ Programming ]
   BadExpr      = Red:Blue
   <Comments>
-    base       = Black:LightGray
-    extended   = Black:Gray
+    base       = Black:Gray
+    extended   = Black:Blue
     reserved   = Black:Brown
-    alt        = Black:Blue
+    alt        = Black:Green
   <Keyword>
-    base       = Black:Yellow
-    extended   = Black:LightRed
-    reserved   = Black:Red
-    alt        = Black:White
+    base       = Black:Blue
+    extended   = Black:Red
+    reserved   = Black:Brown
+    alt        = Black:LightGray
   <Constant>
-    base       = Black:LightGreen
-    extended   = Black:LightBlue
+    base       = Black:Green
+    extended   = Black:Blue
     reserved   = Black:Green
-    alt        = Black:LightMagenta
+    alt        = Black:Magenta
   <Operator>
-    base       = Black:White
-    extended   = Black:LightBlue
-    reserved   = Black:LightGreen
-    alt        = Black:LightRed
+    base       = Black:LightGray
+    extended   = Black:Blue
+    reserved   = Black:Green
+    alt        = Black:Red
   <Preproc>
-    base       = Black:LightRed
-    extended   = Black:LightMagenta
+    base       = Black:Red
+    extended   = Black:Magenta
     reserved   = Black:Blue
     alt        = Black:Brown
 [ Error ] ; Error message box
