@@ -277,6 +277,7 @@ static tCompare __FASTCALL__ vamap_comp_phys(const void __HUGE__ *v1,const void 
 static unsigned long __FASTCALL__ elfVA2PA(unsigned long va)
 {
   unsigned long i;
+  if(va_map_virt)
   for(i = 0; i < va_map_virt->nItems;i++)
   {
     struct tag_elfVAMap __HUGE__ *evm;
@@ -1551,6 +1552,7 @@ static void __FASTCALL__ ELFinit( void )
    __elfReadSegments(&va_map_virt,True);
    __elfReadSegments(&va_map_phys,False);
    /** Find min value of virtual address */
+   if(va_map_virt)
    for(i = 0; i < va_map_virt->nItems;i++)
    {
      struct tag_elfVAMap __HUGE__ *evm;

@@ -614,8 +614,11 @@ void  __FASTCALL__ la_IterDestroy(linearArray *obj,void (__FASTCALL__ *del_it)(v
 
 void  __FASTCALL__ la_Destroy(linearArray *obj)
 {
-  PHFREE(obj->data);
-  PFREE(obj);
+  if(obj)
+  {
+    PHFREE(obj->data);
+    PFREE(obj);
+  }
 }
 
 #define LST_STEP 16
