@@ -75,7 +75,7 @@ endif
 ifeq ($(TARGET_OS),beos)
  HOST=beos
  CDEFOS=-D__BEOS__ -D__UNIX__ -D__OS_NAME__='"BeOS"' -D_VT100_ -D__OS__="beos" -Ubeos -D__DISABLE_MMF
- CDEFOS+=-DHAVE_TERMINAL_OUT=1 -DDATADIR="/boot/home/config/lib"
+ CDEFOS+=-DHAVE_TERMINAL_OUT=1 -DDATADIR='"/boot/home/config/lib"'
  OSLDEF=
  OS_LIBS=
 endif
