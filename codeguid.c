@@ -182,11 +182,12 @@ extern tBool DisasmPrepareMode;
 void __FASTCALL__ GidAddGoAddress(char *str,unsigned long addr)
 {
   tAbsCoord width = twGetClientWidth(MainWnd);
+  unsigned bytecodes=activeDisasm->max_insn_len()*2;
   int len,where;
   if(DisasmPrepareMode) return;
   len = strlen((char *)str);
   where = (disPanelMode == PANMOD_FULL ? width :
-           disPanelMode == PANMOD_MEDIUM ? width-10 : width-41) - 5;
+           disPanelMode == PANMOD_MEDIUM ? width-10 : width-11-bytecodes) - 5;
   if(Alarm)
   {
      int i;
