@@ -19,19 +19,11 @@
 /**   English release for all messages */
 
 const char msgAboutText[] =
-#ifdef INT64_C
 "   File viewer with built-in Athlon64/\n"
 "   Pentium-4/K7-Athlon/Cyrix-M2 disassembler\n"
 "   Supports multiple executable structures\n"
 "  Written by Nick Kurshev. Kazan. Tatarstan.\n"
 "                    Russia.";
-#else
-"          File viewer with built-in\n"
-"   Pentium-4/K7-Athlon/Cyrix-M2 disassembler\n"
-"   Supports multiple executable structures\n"
-"  Written by Nick Kurshev. Kazan. Tatarstan.\n"
-"                    Russia.";
-#endif
 const char * BiewPicture[] = {
  "‹‹‹‹  ‹‹‹ ‹‹‹‹ ‹‹‹   ‹‹‹",
  " ‹  ‹  ‹  ‹  ‹  ‹     ‹",

@@ -50,7 +50,7 @@ const char * ix86_CrxRegs[]  = { "cr0", "cr1", "cr2", "cr3", "cr4", "cr5", "cr6"
 const char * ix86_DrxRegs[]  = { "dr0", "dr1", "dr2", "dr3", "dr4", "dr5", "dr6", "dr7" };
 const char * ix86_TrxRegs[]  = { "tr0", "tr1", "tr2", "tr3", "tr4", "tr5", "tr6", "tr7" };
 const char * ix86_XrxRegs[]  = { "?r0", "?r1", "?r2", "?r3", "?r4", "?r5", "?r6", "?r7" };
-#ifdef INT64_C
+#ifdef IX86_64
 const char * k86_ByteRegs[] = { "al", "cl", "dl", "bl", "sil", "dil", "bpl", "spl", "r8b", "r9b", "r10b", "r11b", "r12b", "r13b", "r14b", "r15b" };
 const char * k86_WordRegs[] = { "ax", "cx", "dx", "bx", "sp", "bp", "si", "di", "r8w", "r9w", "r10w", "r11w", "r12w", "r13w", "r14w", "r15w" };
 const char * k86_DWordRegs[]= { "eax", "ecx", "edx", "ebx", "esp", "ebp", "esi", "edi", "r8d", "r9d", "r10d", "r11d", "r12d", "r13d", "r14d", "r15d" };
@@ -78,7 +78,7 @@ int has_REX; /* is required for accessing to ah-dh registers */
 tBool has67_in64;
 #endif
 
-#ifdef INT64_C
+#ifdef IX86_64
 #define DECLARE_BASE_INSN(n16, n32, n64, func, func64, flags, flags64)\
 { n16, n32, n64, func, flags, func64, flags64 }
 #else
@@ -196,10 +196,10 @@ ix86_Opcodes ix86_table[256] =
   /*0x69*/ DECLARE_BASE_INSN("imul","imul","imul",ix86_ArgRegRMDigit,ix86_ArgRegRMDigit,IX86_CPU186,K64_ATHLON),
   /*0x6A*/ DECLARE_BASE_INSN("push","push","push",ix86_ArgSInt,ix86_ArgSInt,IX86_CPU186,K64_ATHLON),
   /*0x6B*/ DECLARE_BASE_INSN("imul","imul","imul",ix86_ArgRegRMDigit,ix86_ArgRegRMDigit,IX86_CPU186,K64_ATHLON),
-  /*0x6C*/ DECLARE_BASE_INSN("insb","insb","insb",NULL,NULL,IX86_CPU186,K64_ATHLON),
-  /*0x6D*/ DECLARE_BASE_INSN("insw","insd","insd",NULL,NULL,IX86_CPU186,K64_ATHLON),
-  /*0x6E*/ DECLARE_BASE_INSN("outsb","outsb","outsb",NULL,NULL,IX86_CPU186,K64_ATHLON),
-  /*0x6F*/ DECLARE_BASE_INSN("outsw","outsd","outsd",NULL,NULL,IX86_CPU186,K64_ATHLON),
+  /*0x6C*/ DECLARE_BASE_INSN("insb","insb","insb",NULL,NULL,IX86_CPU186|IX86_CPL0,K64_ATHLON|K64_CPL0),
+  /*0x6D*/ DECLARE_BASE_INSN("insw","insd","insd",NULL,NULL,IX86_CPU186|IX86_CPL0,K64_ATHLON|K64_CPL0),
+  /*0x6E*/ DECLARE_BASE_INSN("outsb","outsb","outsb",NULL,NULL,IX86_CPU186|IX86_CPL0,K64_ATHLON|K64_CPL0),
+  /*0x6F*/ DECLARE_BASE_INSN("outsw","outsd","outsd",NULL,NULL,IX86_CPU186|IX86_CPL0,K64_ATHLON|K64_CPL0),
   /*0x70*/ DECLARE_BASE_INSN("jo","jo","jo",ix86_ArgShort,ix86_ArgShort,IX86_CPU086,K64_ATHLON),
   /*0x71*/ DECLARE_BASE_INSN("jno","jno","jno",ix86_ArgShort,ix86_ArgShort,IX86_CPU086,K64_ATHLON),
   /*0x72*/ DECLARE_BASE_INSN("jc","jc","jc",ix86_ArgShort,ix86_ArgShort,IX86_CPU086,K64_ATHLON),
@@ -245,7 +245,7 @@ ix86_Opcodes ix86_table[256] =
   /*0x9A*/ DECLARE_BASE_INSN("callf16","callf32","???",ix86_ArgFar,ix86_ArgFar,IX86_CPU086,K64_ATHLON),
   /*0x9B*/ DECLARE_BASE_INSN("wait","wait","wait",NULL,NULL,IX86_CPU086,K64_ATHLON),
   /*0x9C*/ DECLARE_BASE_INSN("pushfw","pushfd","pushfq",NULL,NULL,IX86_CPU086,K64_ATHLON|K64_NOCOMPAT),
-  /*0x9D*/ DECLARE_BASE_INSN("popfw","popfd","popfq",NULL,NULL,IX86_CPU086,K64_ATHLON|K64_NOCOMPAT),
+  /*0x9D*/ DECLARE_BASE_INSN("popfw","popfd","popfq",NULL,NULL,IX86_CPU086|IX86_CPL0,K64_ATHLON|K64_NOCOMPAT|K64_CPL0),
   /*0x9E*/ DECLARE_BASE_INSN("sahf","sahf","???",NULL,NULL,IX86_CPU086,K64_ATHLON),
   /*0x9F*/ DECLARE_BASE_INSN("lahf","lahf","???",NULL,NULL,IX86_CPU086,K64_ATHLON),
   /*0xA0*/ DECLARE_BASE_INSN("mov","mov","mov",ix86_ArgAXMem,ix86_ArgAXMem,IX86_CPU086,K64_ATHLON),
@@ -292,10 +292,10 @@ ix86_Opcodes ix86_table[256] =
   /*0xC9*/ DECLARE_BASE_INSN("leave","leave","leave",NULL,NULL,IX86_CPU186,K64_ATHLON),
   /*0xCA*/ DECLARE_BASE_INSN("retf16","retf32","retf32",ix86_ArgWord,ix86_ArgWord,IX86_CPU086,K64_ATHLON),
   /*0xCB*/ DECLARE_BASE_INSN("retf16","retf32","retf32",NULL,NULL,IX86_CPU086,K64_ATHLON),
-  /*0xCC*/ DECLARE_BASE_INSN("int3","int3","int3",NULL,NULL,IX86_CPU086,K64_ATHLON),
+  /*0xCC*/ DECLARE_BASE_INSN("int3","int3","int3",NULL,NULL,IX86_CPU086|IX86_CPL0,K64_ATHLON|K64_CPL0),
   /*0xCD*/ DECLARE_BASE_INSN("int","int","int",ix86_ArgByte,ix86_ArgByte,IX86_CPU086,K64_ATHLON),
-  /*0xCE*/ DECLARE_BASE_INSN("into16","into32","???",NULL,NULL,IX86_CPU086,K64_ATHLON),
-  /*0xCF*/ DECLARE_BASE_INSN("iret16","iret32","iretq",NULL,NULL,IX86_CPU086,K64_ATHLON),
+  /*0xCE*/ DECLARE_BASE_INSN("into16","into32","???",NULL,NULL,IX86_CPU086|IX86_CPL0,K64_ATHLON|K64_CPL0),
+  /*0xCF*/ DECLARE_BASE_INSN("iret16","iret32","iretq",NULL,NULL,IX86_CPU086|IX86_CPL0,K64_ATHLON|K64_CPL0),
   /*0xD0*/ DECLARE_BASE_INSN("!!!","!!!","!!!",ix86_ShOp1,ix86_ShOp1,IX86_CPU086,K64_ATHLON),
   /*0xD1*/ DECLARE_BASE_INSN("!!!","!!!","!!!",ix86_ShOp1,ix86_ShOp1,IX86_CPU086,K64_ATHLON),
   /*0xD2*/ DECLARE_BASE_INSN("!!!","!!!","!!!",ix86_ShOpCL,ix86_ShOpCL,IX86_CPU086,K64_ATHLON),
@@ -332,21 +332,21 @@ ix86_Opcodes ix86_table[256] =
   /*0xF1*/ DECLARE_BASE_INSN("icebp","icebp","icebp",NULL,NULL,IX86_CPU386,K64_ATHLON),
   /*0xF2*/ DECLARE_BASE_INSN("repne","repne","repne",NULL,NULL,IX86_CPU086,K64_ATHLON),
   /*0xF3*/ DECLARE_BASE_INSN("rep","rep","rep",NULL,NULL,IX86_CPU086,K64_ATHLON),
-  /*0xF4*/ DECLARE_BASE_INSN("hlt","hlt","hlt",NULL,NULL,IX86_CPU086,K64_ATHLON),
+  /*0xF4*/ DECLARE_BASE_INSN("hlt","hlt","hlt",NULL,NULL,IX86_CPU086|IX86_CPL0,K64_ATHLON|K64_CPL0),
   /*0xF5*/ DECLARE_BASE_INSN("cmc","cmc","cmc",NULL,NULL,IX86_CPU086,K64_ATHLON),
   /*0xF6*/ DECLARE_BASE_INSN("!!!","!!!","!!!",ix86_ArgGrp1,ix86_ArgGrp1,IX86_CPU086,K64_ATHLON),
   /*0xF7*/ DECLARE_BASE_INSN("!!!","!!!","!!!",ix86_ArgGrp1,ix86_ArgGrp1,IX86_CPU086,K64_ATHLON),
   /*0xF8*/ DECLARE_BASE_INSN("clc","clc","clc",NULL,NULL,IX86_CPU086,K64_ATHLON),
   /*0xF9*/ DECLARE_BASE_INSN("stc","stc","stc",NULL,NULL,IX86_CPU086,K64_ATHLON),
-  /*0xFA*/ DECLARE_BASE_INSN("cli","cli","cli",NULL,NULL,IX86_CPU086,K64_ATHLON),
-  /*0xFB*/ DECLARE_BASE_INSN("sti","sti","sti",NULL,NULL,IX86_CPU086,K64_ATHLON),
+  /*0xFA*/ DECLARE_BASE_INSN("cli","cli","cli",NULL,NULL,IX86_CPU086|IX86_CPL0,K64_ATHLON|K64_CPL0),
+  /*0xFB*/ DECLARE_BASE_INSN("sti","sti","sti",NULL,NULL,IX86_CPU086|IX86_CPL0,K64_ATHLON|K64_CPL0),
   /*0xFC*/ DECLARE_BASE_INSN("cld","cld","cld",NULL,NULL,IX86_CPU086,K64_ATHLON),
   /*0xFD*/ DECLARE_BASE_INSN("std","std","std",NULL,NULL,IX86_CPU086,K64_ATHLON),
   /*0xFE*/ DECLARE_BASE_INSN("!!!","!!!","!!!",ix86_ArgGrp2,ix86_ArgGrp2,IX86_CPU086,K64_ATHLON),
   /*0xFF*/ DECLARE_BASE_INSN("!!!","!!!","!!!",ix86_ArgGrp2,ix86_ArgGrp2,IX86_CPU086,K64_ATHLON)
 };
 
-#ifdef INT64_C
+#ifdef IX86_64
 #define DECLARE_EX_INSN(n32, n64, func, func64, flags, flags64)\
 { n32, n64, func, func64, flags64, flags }
 #else
@@ -355,20 +355,20 @@ ix86_Opcodes ix86_table[256] =
 #endif
 ix86_ExOpcodes ix86_extable[256] = /* for 0FH leading */
 {
-  /*0x00*/ DECLARE_EX_INSN("!!!","!!!",ix86_ArgExGr0,ix86_ArgExGr0,IX86_CPU286,K64_ATHLON),
-  /*0x01*/ DECLARE_EX_INSN("!!!","!!!",ix86_ArgExGr1,ix86_ArgExGr1,IX86_CPU286,K64_ATHLON),
-  /*0x02*/ DECLARE_EX_INSN("lar","lar",ix86_ArgModRMDW,ix86_ArgModRMDW,IX86_CPU286,K64_ATHLON),
-  /*0x03*/ DECLARE_EX_INSN("lsl","lsl",ix86_ArgModRMDW,ix86_ArgModRMDW,IX86_CPU286,K64_ATHLON),
+  /*0x00*/ DECLARE_EX_INSN("!!!","!!!",ix86_ArgExGr0,ix86_ArgExGr0,IX86_CPU286,K64_ATHLON|K64_CPL0),
+  /*0x01*/ DECLARE_EX_INSN("!!!","!!!",ix86_ArgExGr1,ix86_ArgExGr1,IX86_CPU286|IX86_CPL0,K64_ATHLON|K64_CPL0),
+  /*0x02*/ DECLARE_EX_INSN("lar","lar",ix86_ArgModRMDW,ix86_ArgModRMDW,IX86_CPU286|IX86_CPL0,K64_ATHLON|K64_CPL0),
+  /*0x03*/ DECLARE_EX_INSN("lsl","lsl",ix86_ArgModRMDW,ix86_ArgModRMDW,IX86_CPU286|IX86_CPL0,K64_ATHLON|K64_CPL0),
   /*0x04*/ DECLARE_EX_INSN("???","???",NULL,NULL,IX86_UNKCPU,K64_ATHLON),
-  /*0x05*/ DECLARE_EX_INSN("syscall","syscall",NULL,NULL,IX86_K6,K64_ATHLON),
-  /*0x06*/ DECLARE_EX_INSN("clts","clts",NULL,NULL,IX86_CPU286,K64_ATHLON),
-  /*0x07*/ DECLARE_EX_INSN("sysret","sysret",NULL,NULL,IX86_K6,K64_ATHLON),
-  /*0x08*/ DECLARE_EX_INSN("invd","invd",NULL,NULL,IX86_CPU486,K64_ATHLON),
-  /*0x09*/ DECLARE_EX_INSN("wbinvd","wbinvd",NULL,NULL,IX86_CPU486,K64_ATHLON),
+  /*0x05*/ DECLARE_EX_INSN("syscall","syscall",NULL,NULL,IX86_K6|IX86_CPL0,K64_ATHLON|K64_CPL0),
+  /*0x06*/ DECLARE_EX_INSN("clts","clts",NULL,NULL,IX86_CPU286|IX86_CPL0,K64_ATHLON|K64_CPL0),
+  /*0x07*/ DECLARE_EX_INSN("sysret","sysret",NULL,NULL,IX86_K6|IX86_CPL0,K64_ATHLON|K64_CPL0),
+  /*0x08*/ DECLARE_EX_INSN("invd","invd",NULL,NULL,IX86_CPU486|IX86_CPL0,K64_ATHLON|K64_CPL0),
+  /*0x09*/ DECLARE_EX_INSN("wbinvd","wbinvd",NULL,NULL,IX86_CPU486|IX86_CPL0,K64_ATHLON|K64_CPL0),
   /*0x0A*/ DECLARE_EX_INSN("???","???",NULL,NULL,IX86_UNKCPU,K64_ATHLON),
   /*0x0B*/ DECLARE_EX_INSN("ud","ud",NULL,NULL,IX86_CPU686,K64_ATHLON),
   /*0x0C*/ DECLARE_EX_INSN("???","???",NULL,NULL,IX86_UNKCPU,K64_ATHLON),
-  /*0x0D*/ DECLARE_EX_INSN("!!!","!!!",ix86_3dNowPrefetchGrp,ix86_3dNowPrefetchGrp,IX86_3DNOW,K64_ATHLON|K64_MMX),
+  /*0x0D*/ DECLARE_EX_INSN("!!!","!!!",ix86_3dNowPrefetchGrp,ix86_3dNowPrefetchGrp,IX86_3DNOW,K64_ATHLON),
   /*0x0E*/ DECLARE_EX_INSN("femms","femms",NULL,NULL,IX86_3DNOW,K64_ATHLON),
   /*0x0F*/ DECLARE_EX_INSN("!!!","!!!",ix86_3dNowOpCodes,ix86_3dNowOpCodes,IX86_3DNOW,K64_ATHLON|K64_MMX),
   /*0x10*/ DECLARE_EX_INSN("movups","movups",ix86_ArgXMMXnD,ix86_ArgXMMXnD,IX86_P3MMX,K64_ATHLON|K64_SSE),
@@ -379,7 +379,7 @@ ix86_ExOpcodes ix86_extable[256] = /* for 0FH leading */
   /*0x15*/ DECLARE_EX_INSN("unpckhps","unpckhps",ix86_ArgXMMXnD,ix86_ArgXMMXnD,IX86_P3MMX,K64_ATHLON|K64_SSE),
   /*0x16*/ DECLARE_EX_INSN("movhps","movhps",ix86_ArgXMMXnD,ix86_ArgXMMXnD,IX86_P3MMX,K64_ATHLON|K64_SSE),
   /*0x17*/ DECLARE_EX_INSN("movhps","movhps",ix86_ArgXMMXD,ix86_ArgXMMXD,IX86_P3MMX,K64_ATHLON|K64_SSE),
-  /*0x18*/ DECLARE_EX_INSN("!!!","!!!",ix86_ArgKatmaiGrp2,ix86_ArgKatmaiGrp2,IX86_P3,K64_ATHLON|K64_SSE),
+  /*0x18*/ DECLARE_EX_INSN("!!!","!!!",ix86_ArgKatmaiGrp2,ix86_ArgKatmaiGrp2,IX86_P3,K64_ATHLON),
   /*0x19*/ DECLARE_EX_INSN("???","???",NULL,NULL,IX86_UNKCPU,K64_ATHLON),
   /*0x1A*/ DECLARE_EX_INSN("???","???",NULL,NULL,IX86_UNKCPU,K64_ATHLON),
   /*0x1B*/ DECLARE_EX_INSN("???","???",NULL,NULL,IX86_UNKCPU,K64_ATHLON),
@@ -387,14 +387,14 @@ ix86_ExOpcodes ix86_extable[256] = /* for 0FH leading */
   /*0x1D*/ DECLARE_EX_INSN("???","???",NULL,NULL,IX86_UNKCPU,K64_ATHLON),
   /*0x1E*/ DECLARE_EX_INSN("???","???",NULL,NULL,IX86_UNKCPU,K64_ATHLON),
   /*0x1F*/ DECLARE_EX_INSN("???","???",NULL,NULL,IX86_UNKCPU,K64_ATHLON),
-  /*0x20*/ DECLARE_EX_INSN("mov","mov",ix86_ArgMovXRY,ix86_ArgMovXRY,IX86_CPU386,K64_ATHLON),
-  /*0x21*/ DECLARE_EX_INSN("mov","mov",ix86_ArgMovXRY,ix86_ArgMovXRY,IX86_CPU386,K64_ATHLON),
-  /*0x22*/ DECLARE_EX_INSN("mov","mov",ix86_ArgMovXRY,ix86_ArgMovXRY,IX86_CPU386,K64_ATHLON),
-  /*0x23*/ DECLARE_EX_INSN("mov","mov",ix86_ArgMovXRY,ix86_ArgMovXRY,IX86_CPU386,K64_ATHLON),
-  /*0x24*/ DECLARE_EX_INSN("mov","mov",ix86_ArgMovXRY,ix86_ArgMovXRY,IX86_CPU386,K64_ATHLON),
-  /*0x25*/ DECLARE_EX_INSN("mov","mov",ix86_ArgMovXRY,ix86_ArgMovXRY,IX86_CPU386,K64_ATHLON),
-  /*0x26*/ DECLARE_EX_INSN("mov","mov",ix86_ArgMovXRY,ix86_ArgMovXRY,IX86_CPU386,K64_ATHLON),
-  /*0x27*/ DECLARE_EX_INSN("mov","mov",ix86_ArgMovXRY,ix86_ArgMovXRY,IX86_CPU386,K64_ATHLON),
+  /*0x20*/ DECLARE_EX_INSN("mov","mov",ix86_ArgMovXRY,ix86_ArgMovXRY,IX86_CPU386|IX86_CPL0,K64_ATHLON|K64_CPL0),
+  /*0x21*/ DECLARE_EX_INSN("mov","mov",ix86_ArgMovXRY,ix86_ArgMovXRY,IX86_CPU386|IX86_CPL0,K64_ATHLON|K64_CPL0),
+  /*0x22*/ DECLARE_EX_INSN("mov","mov",ix86_ArgMovXRY,ix86_ArgMovXRY,IX86_CPU386|IX86_CPL0,K64_ATHLON|K64_CPL0),
+  /*0x23*/ DECLARE_EX_INSN("mov","mov",ix86_ArgMovXRY,ix86_ArgMovXRY,IX86_CPU386|IX86_CPL0,K64_ATHLON|K64_CPL0),
+  /*0x24*/ DECLARE_EX_INSN("mov","mov",ix86_ArgMovXRY,ix86_ArgMovXRY,IX86_CPU386|IX86_CPL0,K64_ATHLON|K64_CPL0),
+  /*0x25*/ DECLARE_EX_INSN("mov","mov",ix86_ArgMovXRY,ix86_ArgMovXRY,IX86_CPU386|IX86_CPL0,K64_ATHLON|K64_CPL0),
+  /*0x26*/ DECLARE_EX_INSN("mov","mov",ix86_ArgMovXRY,ix86_ArgMovXRY,IX86_CPU386|IX86_CPL0,K64_ATHLON|K64_CPL0),
+  /*0x27*/ DECLARE_EX_INSN("mov","mov",ix86_ArgMovXRY,ix86_ArgMovXRY,IX86_CPU386|IX86_CPL0,K64_ATHLON|K64_CPL0),
   /*0x28*/ DECLARE_EX_INSN("movaps","movaps",ix86_ArgXMMXnD,ix86_ArgXMMXnD,IX86_P3MMX,K64_ATHLON|K64_SSE),
   /*0x29*/ DECLARE_EX_INSN("movaps","movaps",ix86_ArgXMMXD,ix86_ArgXMMXD,IX86_P3MMX,K64_ATHLON|K64_SSE),
   /*0x2A*/ DECLARE_EX_INSN("cvtpi2ps","cvtpi2ps",ix86_ArgXMMXMMnD,ix86_ArgXMMXMMnD,IX86_P3MMX,K64_ATHLON|K64_SSE),
@@ -403,12 +403,12 @@ ix86_ExOpcodes ix86_extable[256] = /* for 0FH leading */
   /*0x2D*/ DECLARE_EX_INSN("cvtps2pi","cvtps2pi",ix86_ArgMMXMMXnD,ix86_ArgMMXMMXnD,IX86_P3MMX,K64_ATHLON|K64_SSE),
   /*0x2E*/ DECLARE_EX_INSN("ucomiss","ucomiss",ix86_ArgXMMXnD,ix86_ArgXMMXnD,IX86_P3MMX,K64_ATHLON|K64_SSE),
   /*0x2F*/ DECLARE_EX_INSN("comiss","comiss",ix86_ArgXMMXnD,ix86_ArgXMMXnD,IX86_P3MMX,K64_ATHLON|K64_SSE),
-  /*0x30*/ DECLARE_EX_INSN("wrmsr","wrmsr",NULL,NULL,IX86_CPU586,K64_ATHLON),
-  /*0x31*/ DECLARE_EX_INSN("rdtsc","rdtsc",NULL,NULL,IX86_CPU586,K64_ATHLON),
-  /*0x32*/ DECLARE_EX_INSN("rdmsr","rdmsr",NULL,NULL,IX86_CPU586,K64_ATHLON),
-  /*0x33*/ DECLARE_EX_INSN("rdpmc","rdpmc",NULL,NULL,IX86_CPU686,K64_ATHLON),
-  /*0x34*/ DECLARE_EX_INSN("sysenter","???",NULL,NULL,IX86_P2,K64_ATHLON),
-  /*0x35*/ DECLARE_EX_INSN("sysexit","???",NULL,NULL,IX86_P2,K64_ATHLON),
+  /*0x30*/ DECLARE_EX_INSN("wrmsr","wrmsr",NULL,NULL,IX86_CPU586|IX86_CPL0,K64_ATHLON|K64_CPL0),
+  /*0x31*/ DECLARE_EX_INSN("rdtsc","rdtsc",NULL,NULL,IX86_CPU586|IX86_CPL0,K64_ATHLON|K64_CPL0),
+  /*0x32*/ DECLARE_EX_INSN("rdmsr","rdmsr",NULL,NULL,IX86_CPU586|IX86_CPL0,K64_ATHLON|K64_CPL0),
+  /*0x33*/ DECLARE_EX_INSN("rdpmc","rdpmc",NULL,NULL,IX86_CPU686|IX86_CPL0,K64_ATHLON|K64_CPL0),
+  /*0x34*/ DECLARE_EX_INSN("sysenter","???",NULL,NULL,IX86_P2|IX86_CPL0,K64_ATHLON),
+  /*0x35*/ DECLARE_EX_INSN("sysexit","???",NULL,NULL,IX86_P2|IX86_CPL0,K64_ATHLON),
   /*0x36*/ DECLARE_EX_INSN("rdshr","???",NULL,NULL,IX86_CYRIX686,K64_ATHLON),
   /*0x37*/ DECLARE_EX_INSN("wrshr","???",NULL,NULL,IX86_CYRIX686,K64_ATHLON),
   /*0x38*/ DECLARE_EX_INSN("smint","???",NULL,NULL,IX86_CYRIX686,K64_ATHLON),
@@ -525,7 +525,7 @@ ix86_ExOpcodes ix86_extable[256] = /* for 0FH leading */
   /*0xA7*/ DECLARE_EX_INSN("???","???",NULL,NULL,IX86_UNKCPU,K64_ATHLON),
   /*0xA8*/ DECLARE_EX_INSN("push","push",ix86_ArgGS,ix86_ArgGS,IX86_CPU386,K64_ATHLON),
   /*0xA9*/ DECLARE_EX_INSN("pop","pop",ix86_ArgGS,ix86_ArgGS,IX86_CPU386,K64_ATHLON),
-  /*0xAA*/ DECLARE_EX_INSN("rsm","rsm",NULL,NULL,IX86_CPU586,K64_ATHLON),
+  /*0xAA*/ DECLARE_EX_INSN("rsm","rsm",NULL,NULL,IX86_CPU586|IX86_CPL0,K64_ATHLON|K64_CPL0),
   /*0xAB*/ DECLARE_EX_INSN("bts","bts",ix86_ArgModRMnDW,ix86_ArgModRMnDW,IX86_CPU386,K64_ATHLON),
   /*0xAC*/ DECLARE_EX_INSN("shrd","shrd",ix86_DblShift,ix86_DblShift,IX86_CPU386,K64_ATHLON),
   /*0xAD*/ DECLARE_EX_INSN("shrd","shrd",ix86_DblShift,ix86_DblShift,IX86_CPU386,K64_ATHLON),
@@ -540,7 +540,7 @@ ix86_ExOpcodes ix86_extable[256] = /* for 0FH leading */
   /*0xB6*/ DECLARE_EX_INSN("movzx","movzx",ix86_ArgMovYX,ix86_ArgMovYX,IX86_CPU386,K64_ATHLON),
   /*0xB7*/ DECLARE_EX_INSN("movzx","movzx",ix86_ArgMovYX,ix86_ArgMovYX,IX86_CPU386,K64_ATHLON),
   /*0xB8*/ DECLARE_EX_INSN("???","???",NULL,NULL,IX86_UNKCPU,K64_ATHLON),
-  /*0xB9*/ DECLARE_EX_INSN("ud2","ud2",NULL,NULL,IX86_CPU686,K64_ATHLON),
+  /*0xB9*/ DECLARE_EX_INSN("ud2","ud2",NULL,NULL,IX86_CPU686,K64_ATHLON|K64_CPL0),
   /*0xBA*/ DECLARE_EX_INSN("!!!","!!!",ix86_BitGrp,ix86_BitGrp,IX86_CPU386,K64_ATHLON),
   /*0xBB*/ DECLARE_EX_INSN("btc","btc",ix86_ArgModRMnDW,ix86_ArgModRMnDW,IX86_CPU386,K64_ATHLON),
   /*0xBC*/ DECLARE_EX_INSN("bsf","bsf",ix86_ArgModRMDW,ix86_ArgModRMDW,IX86_CPU386,K64_ATHLON),
@@ -1962,19 +1962,19 @@ static void ix86_gettype(DisasmRet *dret,ix86Param *_DisP)
 {
  MBuffer insn;
  char ua,ud,up,has_lock,has_rep,has_seg;
-#ifdef INT64_C
+#ifdef IX86_64
  char has_rex;
 #endif
  insn = &_DisP->RealCmd[0];
  dret->pro_clone = __INSNT_ORDINAL;
  has_lock = has_rep = has_seg = 0;
  up = ua = ud = 0;
-#ifdef INT64_C
+#ifdef IX86_64
  has_rex=0;
  k86_REX=0;
 #endif
  RepeateByPrefix:
-#ifdef INT64_C
+#ifdef IX86_64
  if(x86_Bitness == DAB_USE64)
  {
    if(ua+ud+has_seg+has_rep+has_lock>4) goto get_type;
@@ -1985,7 +1985,7 @@ static void ix86_gettype(DisasmRet *dret,ix86Param *_DisP)
  /** do prefixes loop */
  switch(insn[0])
  {
-#ifdef INT64_C
+#ifdef IX86_64
    case 0x40:
    case 0x41:
    case 0x42:
@@ -2049,7 +2049,7 @@ static void ix86_gettype(DisasmRet *dret,ix86Param *_DisP)
               goto RepeateByPrefix;
  }
  get_type:
-#ifdef INT64_C
+#ifdef IX86_64
   if(x86_Bitness == DAB_USE64)
   {
     Use32Addr=1;
@@ -2146,7 +2146,7 @@ static DisasmRet __FASTCALL__ ix86Disassembler(unsigned long ulShift,
  ix86Param DisP;
  char ua,ud,up,has_lock,has_rep,has_seg;
 
-#ifdef INT64_C
+#ifdef IX86_64
  if(x86_Bitness == DAB_USE64) DisP.pro_clone=K64_ATHLON;
  else
 #endif
@@ -2179,7 +2179,7 @@ static DisasmRet __FASTCALL__ ix86Disassembler(unsigned long ulShift,
  else x86_Bitness = BITNESS;
 
  if(x86_Bitness == DAB_USE32
-#ifdef INT64_C
+#ifdef IX86_64
    || x86_Bitness == DAB_USE64
 #endif
    )
@@ -2189,13 +2189,13 @@ static DisasmRet __FASTCALL__ ix86Disassembler(unsigned long ulShift,
  }
  Ret.str = ix86_voidstr;
  Ret.str[0] = 0;
-#ifdef INT64_C
+#ifdef IX86_64
  has_REX=0;
  k86_REX=0;
  Use64 = 0;
 #endif
  RepeateByPrefix:
-#ifdef INT64_C
+#ifdef IX86_64
  if(x86_Bitness == DAB_USE64)
  {
    if(ua+ud+has_seg+has_rep+has_lock>4) goto bad_prefixes;
@@ -2212,7 +2212,7 @@ static DisasmRet __FASTCALL__ ix86Disassembler(unsigned long ulShift,
  /** do prefixes loop */
  switch(code)
  {
-#ifdef INT64_C
+#ifdef IX86_64
    case 0x40:
    case 0x41:
    case 0x42:
@@ -2239,7 +2239,7 @@ static DisasmRet __FASTCALL__ ix86Disassembler(unsigned long ulShift,
 #endif
    case 0x26:
               if(has_seg) break;
-#ifdef INT64_C
+#ifdef IX86_64
 	      if(x86_Bitness < DAB_USE64)
 	      /*in 64-bit mode, the CS,DS,ES,SS segment overrides are ignored*/
 #endif
@@ -2248,7 +2248,7 @@ static DisasmRet __FASTCALL__ ix86Disassembler(unsigned long ulShift,
               goto MakePref;
    case 0x2E:
               if(has_seg) break;
-#ifdef INT64_C
+#ifdef IX86_64
 	      if(x86_Bitness < DAB_USE64)
 	      /*in 64-bit mode, the CS,DS,ES,SS segment overrides are ignored*/
 #endif
@@ -2257,7 +2257,7 @@ static DisasmRet __FASTCALL__ ix86Disassembler(unsigned long ulShift,
               goto MakePref;
    case 0x36:
               if(has_seg) break;
-#ifdef INT64_C
+#ifdef IX86_64
 	      if(x86_Bitness < DAB_USE64)
 	      /*in 64-bit mode, the CS,DS,ES,SS segment overrides are ignored*/
 #endif
@@ -2266,7 +2266,7 @@ static DisasmRet __FASTCALL__ ix86Disassembler(unsigned long ulShift,
               goto MakePref;
    case 0x3E:
               if(has_seg) break;
-#ifdef INT64_C
+#ifdef IX86_64
 	      if(x86_Bitness < DAB_USE64)
 	      /*in 64-bit mode, the CS,DS,ES,SS segment overrides are ignored*/
 #endif
@@ -2293,7 +2293,7 @@ static DisasmRet __FASTCALL__ ix86Disassembler(unsigned long ulShift,
                 DisP.RealCmd = &DisP.RealCmd[2];
                 code = DisP.RealCmd[0];
                 DisP.codelen++;
-#ifdef INT64_C
+#ifdef IX86_64
 		if(x86_Bitness == DAB_USE64) DisP.pro_clone = K64_ATHLON|K64_SSE;
 		else
 #endif
@@ -2329,7 +2329,7 @@ static DisasmRet __FASTCALL__ ix86Disassembler(unsigned long ulShift,
                 DisP.RealCmd = &DisP.RealCmd[2];
                 code = DisP.RealCmd[0];
                 DisP.codelen++;
-#ifdef INT64_C
+#ifdef IX86_64
 		if(x86_Bitness == DAB_USE64) DisP.pro_clone = K64_ATHLON|K64_SSE;
 		else
 #endif
@@ -2355,7 +2355,7 @@ static DisasmRet __FASTCALL__ ix86Disassembler(unsigned long ulShift,
                 DisP.RealCmd = &DisP.RealCmd[2];
                 code = DisP.RealCmd[0];
                 DisP.codelen++;
-#ifdef INT64_C
+#ifdef IX86_64
 		if(x86_Bitness == DAB_USE64) DisP.pro_clone = K64_ATHLON|K64_SSE;
 		else
 #endif
@@ -2390,13 +2390,13 @@ static DisasmRet __FASTCALL__ ix86Disassembler(unsigned long ulShift,
               up++;
               goto RepeateByPrefix;
  }
-#ifdef INT64_C
+#ifdef IX86_64
  /* Let it be overwritten later */
  if(x86_Bitness == DAB_USE64) DisP.pro_clone = ix86_table[code].flags64;
  else
 #endif
  DisP.pro_clone = ix86_table[code].pro_clone;
-#ifdef INT64_C
+#ifdef IX86_64
  if(x86_Bitness == DAB_USE64)
  {
    has67_in64 = (Use32Addr == 0);
@@ -2417,7 +2417,7 @@ static DisasmRet __FASTCALL__ ix86Disassembler(unsigned long ulShift,
  else
 #endif
  strcpy(Ret.str,Use32Data ? ix86_table[code].name32 : ix86_table[code].name16);
-#ifdef INT64_C
+#ifdef IX86_64
  if(x86_Bitness == DAB_USE64)
  {
    if(ix86_table[code].method64)
@@ -2475,7 +2475,7 @@ static DisasmRet __FASTCALL__ ix86Disassembler(unsigned long ulShift,
  if(ix86_da_out[0]) TabSpace(ix86_da_out,TAB_POS);
  strcat(ix86_da_out,Ret.str);
  Ret.str = ix86_da_out;
-#ifdef INT64_C
+#ifdef IX86_64
  if(x86_Bitness < DAB_USE64)
 #endif
  if(Use32Data || Use32Addr || x86_Bitness == DAB_USE32)
@@ -2533,7 +2533,7 @@ static const char * MMXNames[] =
   " ???  "
 };
 
-#ifdef INT64_C
+#ifdef IX86_64
 static const char * CPU64Names[] =
 {
   " K86-64 ",
@@ -2551,7 +2551,7 @@ static const char * CPU64Names[] =
 
 static ColorAttr  __FASTCALL__ ix86GetAsmColor(unsigned long clone)
 {
-#ifdef INT64_C
+#ifdef IX86_64
      if(x86_Bitness == DAB_USE64)
      {
 	if((clone & K64_SSE) == K64_SSE) return disasm_cset.cpu_cset[2].clone[clone & K64_CLONEMASK];
@@ -2568,6 +2568,16 @@ static ColorAttr  __FASTCALL__ ix86GetAsmColor(unsigned long clone)
        else                      return disasm_cset.cpu_cset[0].clone[clone & 0xFF];
 }
 
+static ColorAttr  __FASTCALL__ ix86GetOpcodeColor(unsigned long clone)
+{
+#ifdef IX86_64
+   if(x86_Bitness == DAB_USE64)
+	return ((clone & K64_CPL0) == K64_CPL0)?disasm_cset.opcodes0:disasm_cset.opcodes;
+   else
+#endif
+  return ((clone & IX86_CPL0) == IX86_CPL0)?disasm_cset.opcodes0:disasm_cset.opcodes;
+}
+
 static tBool __FASTCALL__ x86AsmRef( void )
 {
   hlpDisplay(20000);
@@ -2582,7 +2592,7 @@ static void __FASTCALL__ ix86HelpAsm( void )
  unsigned long nstrs;
  TWindow * hwnd;
  if(!hlpOpen(True)) return;
-#ifdef INT64_C
+#ifdef IX86_64
  size = (unsigned)hlpGetItemSize(x86_Bitness == DAB_USE64 ? 20002:20001);
 #else
  size = (unsigned)hlpGetItemSize(20001);
@@ -2595,7 +2605,7 @@ static void __FASTCALL__ ix86HelpAsm( void )
    MemOutBox(" Help Display ");
    goto ix86hlp_bye;
  }
-#ifdef INT64_C
+#ifdef IX86_64
  if(!hlpLoadItem(x86_Bitness == DAB_USE64 ? 20002:20001,msgAsmText))
 #else
  if(!hlpLoadItem(20001,msgAsmText))
@@ -2625,7 +2635,7 @@ static void __FASTCALL__ ix86HelpAsm( void )
  }
  PFree(msgAsmText);
  twGotoXY(5,3);
-#ifdef INT64_C
+#ifdef IX86_64
  if(x86_Bitness == DAB_USE64)
  {
    twGotoXY(5,4);
@@ -2682,7 +2692,7 @@ static const char *use_names[] =
 {
    "Use1~6",
    "Use~32",
-#ifdef INT64_C
+#ifdef IX86_64
    "Use6~4",
 #endif
    "~Auto"
@@ -2707,7 +2717,7 @@ static tBool __FASTCALL__ x86Select_Bitness( void )
 
 static int __FASTCALL__ ix86MaxInsnLen( void ) { return MAX_IX86_INSN_LEN; }
 static int __FASTCALL__ ix86GetBitness( void ) { return BITNESS; }
-static char __FASTCALL__ ix86GetClone(unsigned long clone) { if(x86_Bitness == DAB_USE64) return 'a'; else return ix86CloneSNames[(clone >> 24) & 0xFF]; }
+static char __FASTCALL__ ix86GetClone(unsigned long clone) { if(x86_Bitness == DAB_USE64) return 'a'; else return ix86CloneSNames[(clone >> 24) & 0x0F]; }
 
 extern char *ix86_Katmai_buff;
 extern char *ix86_appstr;
@@ -2778,6 +2788,7 @@ REGISTRY_DISASM ix86_Disasm =
   ix86HelpAsm,
   ix86MaxInsnLen,
   ix86GetAsmColor,
+  ix86GetOpcodeColor, 
   ix86GetBitness,
   ix86GetClone,
   ix86Init,

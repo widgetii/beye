@@ -17,6 +17,8 @@
 #ifndef ____DISASM_H
 #define ____DISASM_H
 
+#define IX86_64 1 /* enable athlon64 disassembler by default */
+
 #include "plugins/disasm.h"
 
 #ifndef __BIEWLIB_H
@@ -90,7 +92,9 @@ typedef void (__FASTCALL__*ix86_method)(char *encode_str,ix86Param *);
 #define IX86_INTEL     0x00000000UL
 #define IX86_AMD       0x01000000UL
 #define IX86_CYRIX     0x02000000UL
-#define IX86_CLONEMASK 0xFF000000UL
+#define IX86_CLONEMASK 0x0F000000UL
+
+#define IX86_CPL0      0x10000000UL
 
 #define IX86_P2        IX86_CPU686
 
@@ -126,17 +130,18 @@ typedef void (__FASTCALL__*ix86_method)(char *encode_str,ix86Param *);
 #define K64_SSE         0x03000000UL /* insn works with sse registers */
 #define K64_NOCOMPAT	0x04000000UL /* means insns has no 16 or 32 bit forms */
 #define K64_DEF32	0x08000000UL /* means insns size depends on default data size but not address size */
+#define K64_CPL0	0x10000000UL /* means insns requires cpl0 privilegies to be executed */
 
 typedef struct tag_ix86opcodes
 {
   const char *  name16;
   const char *  name32;
-#ifdef INT64_C
+#ifdef IX86_64
   const char *  name64;
 #endif
   ix86_method   method;
   unsigned long pro_clone;
-#ifdef INT64_C
+#ifdef IX86_64
   ix86_method   method64;
   unsigned long flags64;
 #endif
@@ -145,11 +150,11 @@ typedef struct tag_ix86opcodes
 typedef struct tag_ix86ExOpcodes
 {
   const char *  name;
-#ifdef INT64_C
+#ifdef IX86_64
   const char *  name64;
 #endif
   ix86_method   method;
-#ifdef INT64_C
+#ifdef IX86_64
   ix86_method   method64;
   unsigned long flags64;
 #endif
@@ -185,7 +190,7 @@ extern const char * ix86_WordRegs[];
 extern const char * ix86_DWordRegs[];
 extern const char * ix86_MMXRegs[];
 extern const char * ix86_XMMXRegs[];
-#ifdef INT64_C
+#ifdef IX86_64
 extern const char * k86_ByteRegs[];
 extern const char * k86_WordRegs[];
 extern const char * k86_DWordRegs[];

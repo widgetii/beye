@@ -279,7 +279,7 @@ void __FASTCALL__ ix86_FPUCmd(char * str,ix86Param *DisP)
  unsigned char code = DisP->RealCmd[0],code1 = DisP->RealCmd[1];
  unsigned char rm = ( code1 & 0x38 ) >> 3;
  DisP->codelen = 2;
-#ifdef INT64_C
+#ifdef IX86_64
  DisP->pro_clone = x86_Bitness==DAB_USE64?K64_ATHLON|K64_FPU:IX86_FPU087;
 #else
  DisP->pro_clone = IX86_FPU087;
@@ -303,7 +303,7 @@ void __FASTCALL__ ix86_FPUCmd(char * str,ix86Param *DisP)
                 if(code1 == 0xF6 || code1 == 0xF7) strcpy(str,D9Fx[code1 & 0x0F]);
                 else    FPUcmdst0(str,D9Fx[code1 & 0x0F]);
                 if(code1 == 0xF5 || code1 == 0xFB || code1 == 0xFE || code1 == 0xFF)
-#ifdef INT64_C
+#ifdef IX86_64
 		if(x86_Bitness != DAB_USE64)
 #endif
 			DisP->pro_clone = IX86_FPU387;
@@ -317,7 +317,7 @@ void __FASTCALL__ ix86_FPUCmd(char * str,ix86Param *DisP)
    case 0xDA :
             if(code1 == 0xE9) 
 	    {
-#ifdef INT64_C
+#ifdef IX86_64
 		if(x86_Bitness != DAB_USE64)
 #endif
               DisP->pro_clone = IX86_FPU387;
@@ -326,7 +326,7 @@ void __FASTCALL__ ix86_FPUCmd(char * str,ix86Param *DisP)
             else
               if((code1 & 0xC0) == 0xC0)
               {
-#ifdef INT64_C
+#ifdef IX86_64
 		if(x86_Bitness != DAB_USE64)
 #endif
                  DisP->pro_clone = IX86_FPU687;
@@ -339,13 +339,13 @@ void __FASTCALL__ ix86_FPUCmd(char * str,ix86Param *DisP)
            switch(code1)
            {
              case 0xFC:  
-#ifdef INT64_C
+#ifdef IX86_64
 		if(x86_Bitness != DAB_USE64)
 		{
 #endif
                           strcpy(str,SC("frint2","st(0)"));
                           DisP->pro_clone = IX86_FPU487 | IX86_CYRIX;
-#ifdef INT64_C
+#ifdef IX86_64
 		}
 		else strcpy(str,"f???");
 #endif
@@ -357,7 +357,7 @@ void __FASTCALL__ ix86_FPUCmd(char * str,ix86Param *DisP)
                {
                   unsigned char _index = code1 & 0x07;
                   strcpy(str,DBEx[_index]);
-#ifdef INT64_C
+#ifdef IX86_64
 		  if(x86_Bitness != DAB_USE64)
 #endif
                   if(_index == 4) DisP->pro_clone = IX86_FPU287;
@@ -370,7 +370,7 @@ void __FASTCALL__ ix86_FPUCmd(char * str,ix86Param *DisP)
                if((code1 & 0xC0) == 0xC0)
                {
                   XC0:
-#ifdef INT64_C
+#ifdef IX86_64
 		  if(x86_Bitness != DAB_USE64)
 #endif
                   DisP->pro_clone = IX86_FPU387;
@@ -391,13 +391,13 @@ void __FASTCALL__ ix86_FPUCmd(char * str,ix86Param *DisP)
             switch(code1)
             {
               case 0xFC:  
-#ifdef INT64_C
+#ifdef IX86_64
 		if(x86_Bitness != DAB_USE64)
                 {
 #endif
                           strcpy(str,SC("frichop","st(0)"));
                           DisP->pro_clone = IX86_FPU487 | IX86_CYRIX;
-#ifdef INT64_C
+#ifdef IX86_64
 		}
                 else strcpy(str, "f???");
 #endif
@@ -409,7 +409,7 @@ void __FASTCALL__ ix86_FPUCmd(char * str,ix86Param *DisP)
                 else
                   if((code1 & 0xF0) == 0xE0) 
                   {
-#ifdef INT64_C
+#ifdef IX86_64
 		    if(x86_Bitness != DAB_USE64)
 #endif
                      DisP->pro_clone = IX86_FPU387;
@@ -434,25 +434,25 @@ void __FASTCALL__ ix86_FPUCmd(char * str,ix86Param *DisP)
              case 0xE0:  strcpy(str,SC("fstsw","ax"));
                          break;
              case 0xE1:  strcpy(str,SC("fnstdw","ax"));
-#ifdef INT64_C
+#ifdef IX86_64
 		         if(x86_Bitness != DAB_USE64)
 #endif
                          DisP->pro_clone = IX86_FPU387;
                          break;
              case 0xE2:  strcpy(str,SC("fnstsg","ax"));
-#ifdef INT64_C
+#ifdef IX86_64
 			 if(x86_Bitness != DAB_USE64)
 #endif
                          DisP->pro_clone = IX86_FPU387;
                          break;
              case 0xFC:  
-#ifdef INT64_C
+#ifdef IX86_64
 			 if(x86_Bitness != DAB_USE64)
 			 {
 #endif
                          strcpy(str,SC("frinear","st(0)"));
                          DisP->pro_clone = IX86_FPU487 | IX86_CYRIX;
-#ifdef INT64_C
+#ifdef IX86_64
 			 }
 			 else strcpy(str,"f???");
 #endif
@@ -461,7 +461,7 @@ void __FASTCALL__ ix86_FPUCmd(char * str,ix86Param *DisP)
               {
                 if((code1 & 0xE0) == 0xE0)
                 {
-#ifdef INT64_C
+#ifdef IX86_64
 		  if(x86_Bitness != DAB_USE64)
 #endif
                   DisP->pro_clone = IX86_FPU687;
@@ -470,7 +470,7 @@ void __FASTCALL__ ix86_FPUCmd(char * str,ix86Param *DisP)
                 else
                 if((code1 & 0xC0) == 0xC0)
                 {
-#ifdef INT64_C
+#ifdef IX86_64
 		 if(x86_Bitness != DAB_USE64)
 #endif
                   DisP->pro_clone = IX86_FPU387;

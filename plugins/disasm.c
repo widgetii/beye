@@ -281,13 +281,17 @@ static unsigned __FASTCALL__ drawAsm( unsigned keycode, unsigned textshift )
        if(disPanelMode < PANMOD_MEDIUM)
        {
          unsigned full_off,med_off,tmp_off;
+         ColorAttr opc;
          med_off = disMaxCodeLen*2+1;
          full_off = med_off+10;
          for(j = 0;j < dret.codelen;j++,len+=2)
             memcpy(&outstr[len],Get2Digit(disCodeBuffer[j]),2);
          tmp_off = disPanelMode < PANMOD_FULL ? full_off : med_off;
          if(len < tmp_off) len = tmp_off;
-         twSetColorAttr(disasm_cset.opcodes);
+         if(activeDisasm->GetOpcodeColor) 
+		opc = HiLight ? activeDisasm->GetOpcodeColor(dret.pro_clone) : disasm_cset.opcodes;
+	 else	opc = disasm_cset.opcodes;
+         twSetColorAttr(opc);
          twDirectWrite(disPanelMode < PANMOD_FULL ? 11 : 1,
                        i + 1,
                        &outstr[10],
@@ -968,8 +972,12 @@ int __FASTCALL__ disAppendDigits(char *str,unsigned long ulShift,int flags,
     {
      switch(dig_type)
      {
+      case DISARG_LLONG: 
 #ifdef INT64_C
-      case DISARG_LLONG:  appstr = Get16SignDig(*(tInt64 *)defval);
+			 appstr = Get16SignDig(*(tInt64 *)defval);
+#else
+			 appstr = Get16SignDig(((tInt32 *)defval)[0],((tInt32 *)defval)[1]);
+#endif
                          if(type & DISARG_IMM &&
                             disNeedRef >= NEEDREF_PREDICT &&
                             dis_severity < DISCOMSEV_STRING &&
@@ -991,7 +999,6 @@ int __FASTCALL__ disAppendDigits(char *str,unsigned long ulShift,int flags,
                                             ,((unsigned char *)defval)[6]
                                             ,((unsigned char *)defval)[7]);
                          break;
-#endif
       case DISARG_LONG:  appstr = Get8SignDig(*(long *)defval);
                          if(type & DISARG_IMM &&
                             disNeedRef >= NEEDREF_PREDICT &&
@@ -1055,8 +1062,12 @@ int __FASTCALL__ disAppendDigits(char *str,unsigned long ulShift,int flags,
                                             ,((unsigned char *)defval)[2]
                                             ,((unsigned char *)defval)[3]);
                          break;
+      case DISARG_QWORD:
 #ifdef INT64_C
-      case DISARG_QWORD: appstr = Get16Digit(*(tUInt64 *)defval);
+			 appstr = Get16Digit(*(tUInt64 *)defval);
+#else
+			 appstr = Get16Digit(((tUInt32 *)defval)[0],((tUInt32 *)defval)[1]);
+#endif
                          if(type & DISARG_IMM &&
                             disNeedRef >= NEEDREF_PREDICT &&
                             dis_severity < DISCOMSEV_STRING &&
@@ -1078,7 +1089,6 @@ int __FASTCALL__ disAppendDigits(char *str,unsigned long ulShift,int flags,
                                             ,((unsigned char *)defval)[6]
                                             ,((unsigned char *)defval)[7]);
                          break;
-#endif
     }
     strcat(str,appstr);
    }

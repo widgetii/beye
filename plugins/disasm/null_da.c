@@ -33,10 +33,8 @@ static const char *width_names[] =
 {
    "~Byte",
    "~Word",
-   "~Double word" 
-#ifdef INT64_C
-   , "~Quad word"
-#endif
+   "~Double word", 
+   "~Quad word"
 };
 
 static tBool __FASTCALL__ nulSelect_width( void )
@@ -81,12 +79,10 @@ static DisasmRet __FASTCALL__ nulDisassembler(unsigned long ulShift,
               type = DISARG_DWORD;
               cl = 4;
               break;
-#ifdef INT64_C
       case 3: preface = "dq ";
               type = DISARG_QWORD;
               cl = 8;
               break;
-#endif
     }
     ret.codelen = cl;
     strcpy(outstr,preface);
@@ -166,6 +162,7 @@ REGISTRY_DISASM Null_Disasm =
   nulHelpAsm,
   nulMaxInsnLen,
   nulGetAsmColor,
+  NULL, 
   nulGetBitness,
   nulGetClone,
   nulInit,

@@ -107,6 +107,7 @@ typedef struct tag_REGISTRY_DISASM
   void         __FASTCALL__ (*ShowShortHelp)(void); /**< displays short help */
   int          __FASTCALL__ (*max_insn_len)(void); /**< Max length of 1 disasm instruction */
   ColorAttr    __FASTCALL__ (*GetInsnColor)(unsigned long clone); /**< returns color of instruction */
+  ColorAttr    __FASTCALL__ (*GetOpcodeColor)(unsigned long clone); /**< returns color of instruction */
   int          __FASTCALL__ (*GetDefBitness)(void);               /**< returns currently ised bitness */
   char         __FASTCALL__ (*CloneShortName)(unsigned long clone); /**< returns short clone name of instruction */
   void         __FASTCALL__ (*init)(void);     /**< initializing of plugin */

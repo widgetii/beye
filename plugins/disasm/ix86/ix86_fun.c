@@ -41,13 +41,13 @@ char *ix86_Katmai_buff;
 #define getSREG(sreg) (ix86_SegRegs[(unsigned char)sreg])
 #define getTile(DisP) __getTile(DisP,DisP->RealCmd[0] & 0x01,DisP->RealCmd[0] & 0x02)
 
-#ifdef INT64_C
+#ifdef IX86_64
 #define REX_reg(rex,reg) (reg|((rex&1)<<3))
 #endif
 
 static const char * __FASTCALL__ k86_getREG(unsigned char reg,tBool w,tBool rex, tBool use64)
 {
-#ifdef INT64_C
+#ifdef IX86_64
  if(UseXMMXSet) return x86_Bitness==DAB_USE64?k86_XMMXRegs[REX_reg(rex,reg)]:ix86_XMMXRegs[reg];
  else
    if(UseMMXSet)  return ix86_MMXRegs[reg];
@@ -86,7 +86,7 @@ static char * __NEAR__ __FASTCALL__ GetDigitsApp(unsigned char loc_off,
 #define Get4SignDigApp(loc_off,DisP) GetDigitsApp(loc_off,DisP,2,DISARG_SHORT)
 #define Get8DigitApp(loc_off,DisP)   GetDigitsApp(loc_off,DisP,4,DISARG_DWORD)
 #define Get8SignDigApp(loc_off,DisP) GetDigitsApp(loc_off,DisP,4,DISARG_LONG)
-#ifdef INT64_C
+#ifdef IX86_64
 #define Get16DigitApp(loc_off,DisP)   GetDigitsApp(loc_off,DisP,8,DISARG_QWORD)
 #define Get16SignDigApp(loc_off,DisP) GetDigitsApp(loc_off,DisP,8,DISARG_LLONG)
 #endif
@@ -138,7 +138,7 @@ static char * __NEAR__ __FASTCALL__ Get8SquareDig(unsigned char loc_off,ix86Para
   return ix86_apistr;
 }
 
-#ifdef INT64_C
+#ifdef IX86_64
 static char * __NEAR__ __FASTCALL__ Get16SquareDig(unsigned char loc_off,ix86Param *DisP,tBool as_sign,tBool is_disponly)
 {
   char *ptr = ix86_apistr;
@@ -244,14 +244,14 @@ static char * __FASTCALL__ ix86_GetDigitTile(ix86Param* DisP,char wrd,char sgn,u
   int cl,type;
   int do_64;
   do_64 = 0;
-#ifdef INT64_C
+#ifdef IX86_64
   if(x86_Bitness == DAB_USE64 && wrd == -1) /* special case for */
     do_64 = 1;
 #endif
   cl = do_64 ? 8 : wrd ? ( Use32Data ? 4 : 2 ) : 1;
   if(!((DisP->flags & __DISF_SIZEONLY) == __DISF_SIZEONLY))
   {
-#ifdef INT64_C
+#ifdef IX86_64
     if(do_64)
       type = sgn ? DISARG_LLONG : DISARG_QWORD;
     else
@@ -338,7 +338,7 @@ static void __NEAR__ __FASTCALL__ getSIBRegs(char * base,char * scale,char * _in
   else 
   {
 
-#ifdef INT64_C
+#ifdef IX86_64
      if(x86_Bitness == DAB_USE64)
      {
          use64 = has67_in64?0:1;
@@ -350,7 +350,7 @@ static void __NEAR__ __FASTCALL__ getSIBRegs(char * base,char * scale,char * _in
   if(bas == 5 && *mod == 0) { base[0] = 0; *mod = 2; }
   else
   {
-#ifdef INT64_C
+#ifdef IX86_64
      if(x86_Bitness == DAB_USE64)
      {
          use64 = has67_in64?0:1;
@@ -399,7 +399,7 @@ char * __FASTCALL__ ix86_getModRM(tBool w,unsigned char mod,unsigned char rm,ix8
  if(rm == 4 && Use32Addr) cptr = ConstrSibMod(ret1,base,_index,scale,DisP->RealCmd[2],&new_mode);
  else
  {
-#ifdef INT64_C
+#ifdef IX86_64
    if(x86_Bitness == DAB_USE64)
    {
       cptr = !has67_in64 ? k86_QWordRegs[REX_reg(k86_REX&1,rm)] : k86_DWordRegs[REX_reg(k86_REX&1,rm)];
@@ -465,7 +465,7 @@ char * __FASTCALL__ ix86_getModRM(tBool w,unsigned char mod,unsigned char rm,ix8
        case 2:
             {
               disp_long:
-#ifdef INT64_C
+#ifdef IX86_64
 		 if(x86_Bitness == DAB_USE64 && is_disponly)
 		 {
 		   strcat(ix86_modrm_ret,"rip");
@@ -495,7 +495,7 @@ char * __FASTCALL__ ix86_getModRM(tBool w,unsigned char mod,unsigned char rm,ix8
               tBool brex, use64;
               clen = 0;
               brex = use64 = 0;
-#ifdef INT64_C
+#ifdef IX86_64
 	      if(x86_Bitness == DAB_USE64)
               {
                 brex = k86_REX&1;
@@ -529,7 +529,7 @@ static char * __NEAR__ __FASTCALL__ __getTile(ix86Param *DisP,tBool w,tBool d)
  const char *regs,* modrm;
  tBool brex, use64;
  brex = use64 = 0;
-#ifdef INT64_C
+#ifdef IX86_64
  if(x86_Bitness == DAB_USE64)
  {
    brex = (k86_REX&4)>>2;
@@ -537,7 +537,7 @@ static char * __NEAR__ __FASTCALL__ __getTile(ix86Param *DisP,tBool w,tBool d)
  }
 #endif
  regs = k86_getREG(reg,w,brex,use64);
-#ifdef INT64_C
+#ifdef IX86_64
  if(x86_Bitness == DAB_USE64) brex = k86_REX&1;
 #endif
  if(mod == 3) modrm = k86_getREG(rm,w,brex,use64);
@@ -632,7 +632,7 @@ void __FASTCALL__ ix86_SMov(char * str,ix86Param *DisP)
   tileptr = ix86_getModRM(True,mod,reg,DisP);
   if(sreg > 3)
     if((DisP->pro_clone & IX86_CPUMASK) < 3)
-#ifdef INT64_C
+#ifdef IX86_64
 	if(x86_Bitness != DAB_USE64)
 #endif
       DisP->pro_clone = IX86_CPU386;
@@ -655,7 +655,7 @@ void __FASTCALL__ ix86_ArgSegRM(char * str,ix86Param *DisP)
   tileptr = ix86_getModRM(True,mod,reg,DisP);
   if(sreg > 3)
     if((DisP->pro_clone & IX86_CPUMASK) < 3)
-#ifdef INT64_C
+#ifdef IX86_64
 	if(x86_Bitness != DAB_USE64)
 #endif
       DisP->pro_clone = IX86_CPU386;
@@ -667,7 +667,7 @@ void __FASTCALL__ ix86_ArgAXDigit(char * str,ix86Param *DisP)
 {
   char w = DisP->RealCmd[0] & 0x01;
   tBool use64=0;
-#ifdef INT64_C
+#ifdef IX86_64
   if(x86_Bitness == DAB_USE64) use64 = Use64;
   /* I guess that K9 will support "OP rax, imm64" forms
      same as "OP rrx, imm64" since they are not longer
@@ -698,7 +698,7 @@ void __FASTCALL__ ix86_ArgIRegDigit(char * str,ix86Param *DisP)
   char reg = (DisP->RealCmd[0]) & 0x07;
   tBool brex,use64;
   brex = use64 = 0;
-#ifdef INT64_C
+#ifdef IX86_64
   if(x86_Bitness == DAB_USE64)
   {
     brex = k86_REX&1;
@@ -706,7 +706,7 @@ void __FASTCALL__ ix86_ArgIRegDigit(char * str,ix86Param *DisP)
   }
 #endif
   strcat(str,k86_getREG(reg,w,brex,use64));
-#ifdef INT64_C
+#ifdef IX86_64
   if(x86_Bitness == DAB_USE64 && Use64 && w) w = -1;
 #endif
   ix86_CStile(str,ix86_GetDigitTile(DisP,w,0,1));
@@ -716,7 +716,7 @@ void __FASTCALL__ ix86_ArgIReg(char *str,ix86Param *DisP)
 {
   tBool brex,use64;
   brex = use64 = 0;
-#ifdef INT64_C
+#ifdef IX86_64
   if(x86_Bitness == DAB_USE64)
   {
     brex = k86_REX&1;
@@ -730,7 +730,7 @@ void __FASTCALL__ ix86_ArgAXIReg(char *str,ix86Param *DisP)
 {
   tBool brex,use64;
   brex = use64 = 0;
-#ifdef INT64_C
+#ifdef IX86_64
   if(x86_Bitness == DAB_USE64)
   {
     brex = k86_REX&1;
@@ -754,7 +754,7 @@ void __FASTCALL__ ix86_ArgInt(char *str,ix86Param *DisP)
 {
   tBool use64;
   use64 = 0;
-#ifdef INT64_C
+#ifdef IX86_64
   if(x86_Bitness == DAB_USE64) use64 = Use64;
 #endif
   use64 ? ix86_ArgQWord(str,DisP) : Use32Data ? ix86_ArgDWord(str,DisP) : ix86_ArgWord(str,DisP);
@@ -895,6 +895,11 @@ void __FASTCALL__ ix86_ArgGrp2(char *str,ix86Param *DisP)
    else
    {
      wrd = code2 == 0x06 || code2 == 0x07 ? 0 : wrd; /** push / pop; */
+#ifdef IX86_64
+     if(x86_Bitness == DAB_USE64)
+	      sizptr = k86_REX & 0x08 ? QWORD_PTR : DWORD_PTR;
+     else
+#endif
      if(!wrd) sizptr = Use32Data ? DWORD_PTR : WORD_PTR;
      else     sizptr = Use32Data ? PWORD_PTR : DWORD_PTR;
      ix86_setModifier(str,ix86_sizes[sizptr]);
@@ -908,12 +913,12 @@ void __FASTCALL__ ix86_ArgAXMem(char *str,ix86Param *DisP)
   unsigned char d = DisP->RealCmd[0] & 0x02;
   const char *mem,*reg;
   tBool use64;
-#ifdef INT64_C
+#ifdef IX86_64
   unsigned char sav_REX;
   sav_REX = k86_REX;
 #endif
   use64 = 0;
-#ifdef INT64_C
+#ifdef IX86_64
   if(x86_Bitness == DAB_USE64 && Use64)
   {
     use64 = Use64;
@@ -927,14 +932,14 @@ void __FASTCALL__ ix86_ArgAXMem(char *str,ix86Param *DisP)
   strcat(ix86_appstr,"[");
   strcat(ix86_appstr,mem);
   strcat(ix86_appstr,"]");
-#ifdef INT64_C
+#ifdef IX86_64
   if(x86_Bitness == DAB_USE64 && Use64) k86_REX=0;
 #endif
   reg = k86_getREG(0,DisP->RealCmd[0] & 0x01,0,use64);
-#ifdef INT64_C
+#ifdef IX86_64
   if(x86_Bitness == DAB_USE64 && Use64) k86_REX=sav_REX;
 #endif
-#ifdef INT64_C
+#ifdef IX86_64
   if(x86_Bitness == DAB_USE64 && Use64)
     DisP->codelen = 9;
   else
@@ -976,7 +981,7 @@ void  __FASTCALL__ ix86_ExOpCodes(char *str,ix86Param *DisP)
  DisP->CodeAddress++;
  code = DisP->RealCmd[0];
  DisP->codelen++;
-#ifdef INT64_C
+#ifdef IX86_64
  if(x86_Bitness == DAB_USE64)
  {
     strcpy(str,ix86_extable[code].name64);
@@ -984,7 +989,7 @@ void  __FASTCALL__ ix86_ExOpCodes(char *str,ix86Param *DisP)
  else
 #endif
  strcpy(str,ix86_extable[code].name);
-#ifdef INT64_C
+#ifdef IX86_64
  if(x86_Bitness == DAB_USE64)
  {
    if(ix86_extable[code].method64)
@@ -1000,7 +1005,7 @@ void  __FASTCALL__ ix86_ExOpCodes(char *str,ix86Param *DisP)
    TabSpace(str,TAB_POS);
    ix86_extable[code].method(str,DisP);
  }
-#ifdef INT64_C
+#ifdef IX86_64
  if(x86_Bitness == DAB_USE64) DisP->pro_clone = ix86_extable[code].flags64;
  else
 #endif
@@ -1017,6 +1022,10 @@ void  __FASTCALL__ ix86_ArgExGr0(char *str,ix86Param *DisP)
     DisP->codelen++;
     ix86_setModifier(str,ix86_sizes[WORD_PTR]);
     strcat(str,ix86_getModRM(True,mod,reg,DisP));
+#ifdef IX86_64
+ if(x86_Bitness != DAB_USE64)
+#endif
+ if(rm < 4) DisP->pro_clone |= IX86_CPL0;
 }
 
 void  __FASTCALL__ ix86_ArgExGr1(char *str,ix86Param *DisP)
@@ -1026,13 +1035,16 @@ void  __FASTCALL__ ix86_ArgExGr1(char *str,ix86Param *DisP)
     unsigned char mod = (DisP->RealCmd[1] & 0xC0) >> 6;
     unsigned char buf,ptr;
     tBool word;
-#ifdef INT64_C
+#ifdef IX86_64
     if(x86_Bitness == DAB_USE64)
     {
       if(DisP->RealCmd[1] == 0xF8)
-      strcpy(str,"swapgs");
-      DisP->codelen++;
-      return;
+      {
+        strcpy(str,"swapgs");
+        DisP->codelen++;
+	DisP->pro_clone |= K64_CPL0;
+        return;
+      }
     }
 #endif
     strcpy(str,ix86_ExGrp1[rm]);
@@ -1044,7 +1056,7 @@ void  __FASTCALL__ ix86_ArgExGr1(char *str,ix86Param *DisP)
     if(rm == 7)
     {
       word = False;
-#ifdef INT64_C
+#ifdef IX86_64
       if(x86_Bitness != DAB_USE64)
 #endif
       DisP->pro_clone = IX86_CPU486;
@@ -1067,7 +1079,7 @@ void  __FASTCALL__ ix86_ArgMovXRY(char *str,ix86Param *DisP)
     unsigned char d = (code >> 1) & 0x01;
     tBool brex,use64;
     brex = use64 = 0;
-#ifdef INT64_C
+#ifdef IX86_64
     if(x86_Bitness == DAB_USE64)
     {
        brex = k86_REX & 1;
@@ -1108,7 +1120,7 @@ static void __NEAR__ __FASTCALL__ ix86_ArgxMM(char *str,ix86Param *DisP,tBool di
       const char *mmx,*exx;
       tBool brex,use64;
       brex = use64 = 0;
-#ifdef INT64_C
+#ifdef IX86_64
       if(x86_Bitness == DAB_USE64)
       {
          brex = (k86_REX&4)>>2;
@@ -1119,7 +1131,7 @@ static void __NEAR__ __FASTCALL__ ix86_ArgxMM(char *str,ix86Param *DisP,tBool di
       mmx = k86_getREG((DisP->RealCmd[1] >> 3) & 0x07,True,brex,use64);
       if(as_xmmx) UseXMMXSet = False;
       else        UseMMXSet = False;
-#ifdef INT64_C
+#ifdef IX86_64
       if(x86_Bitness == DAB_USE64) brex = k86_REX&1;
 #endif
       exx = k86_getREG(DisP->RealCmd[1] & 0x07,True,brex,use64);
@@ -1145,7 +1157,7 @@ static void __NEAR__ __FASTCALL__ ix86_ArgxMMRev(char *str,ix86Param *DisP,tBool
       const char *mmx,*exx;
       tBool brex,use64;
       brex = use64 = 0;
-#ifdef INT64_C
+#ifdef IX86_64
       if(x86_Bitness == DAB_USE64)
       {
          brex = k86_REX&1;
@@ -1156,7 +1168,7 @@ static void __NEAR__ __FASTCALL__ ix86_ArgxMMRev(char *str,ix86Param *DisP,tBool
       mmx = k86_getREG(DisP->RealCmd[1] & 0x07,True,brex,use64);
       if(as_xmmx) UseXMMXSet = False;
       else        UseMMXSet = False;
-#ifdef INT64_C
+#ifdef IX86_64
       if(x86_Bitness == DAB_USE64) brex = (k86_REX&4)>>2;
 #endif
       exx = k86_getREG((DisP->RealCmd[1] >> 3) & 0x07,True,brex,use64);
@@ -1171,7 +1183,7 @@ static void __NEAR__ __FASTCALL__ ix86_ArgxMMXGroup(char *str,const char *name,i
 {
   tBool brex,use64;
   brex = use64 = 0;
-#ifdef INT64_C
+#ifdef IX86_64
   if(x86_Bitness == DAB_USE64)
   {
     brex = k86_REX&1;
@@ -1207,7 +1219,7 @@ static void __NEAR__ __FASTCALL__ ix86_ArgRXMM(char *str,ix86Param *DisP,tBool d
       const char *mmx,*exx;
       tBool brex,use64;
       brex = use64 = 0;
-#ifdef INT64_C
+#ifdef IX86_64
       if(x86_Bitness == DAB_USE64)
       {
         brex = (k86_REX&4)>>2;
@@ -1216,7 +1228,7 @@ static void __NEAR__ __FASTCALL__ ix86_ArgRXMM(char *str,ix86Param *DisP,tBool d
 #endif
       mmx = k86_getREG((DisP->RealCmd[1] >> 3) & 0x07,True,brex,use64);
       UseXMMXSet = False;
-#ifdef INT64_C
+#ifdef IX86_64
       if(x86_Bitness == DAB_USE64) brex = k86_REX&1;
 #endif
       exx = k86_getREG(DisP->RealCmd[1] & 0x07,True,brex,use64);
@@ -1238,7 +1250,7 @@ static void __NEAR__ __FASTCALL__ ix86_ArgRxMMRev(char *str,ix86Param *DisP,tBoo
       const char *mmx,*exx;
       tBool brex,use64;
       brex = use64 = 0;
-#ifdef INT64_C
+#ifdef IX86_64
       if(x86_Bitness == DAB_USE64)
       {
         brex = k86_REX&1;
@@ -1251,7 +1263,7 @@ static void __NEAR__ __FASTCALL__ ix86_ArgRxMMRev(char *str,ix86Param *DisP,tBoo
       mmx = k86_getREG(DisP->RealCmd[1] & 0x07,True,brex,True);
       if(as_xmmx) UseXMMXSet = False;
       else        UseMMXSet = False;
-#ifdef INT64_C
+#ifdef IX86_64
       if(x86_Bitness == DAB_USE64) brex = (k86_REX&4)>>2;
 #endif
       exx = k86_getREG((DisP->RealCmd[1] >> 3) & 0x07,True,brex,use64);
@@ -1277,7 +1289,7 @@ static void __NEAR__ __FASTCALL__ ix86_ArgxMMxMM(char *str,ix86Param *DisP,tBool
       const char *mmx,*exx;
       tBool brex,use64;
       brex = use64 = 0;
-#ifdef INT64_C
+#ifdef IX86_64
       if(x86_Bitness == DAB_USE64)
       {
         brex = (k86_REX&4)>>2;
@@ -1296,7 +1308,7 @@ static void __NEAR__ __FASTCALL__ ix86_ArgxMMxMM(char *str,ix86Param *DisP,tBool
         UseXMMXSet = True;
         UseMMXSet = False;
       }
-#ifdef INT64_C
+#ifdef IX86_64
       if(x86_Bitness == DAB_USE64) brex = k86_REX&1;
 #endif
       exx = k86_getREG(DisP->RealCmd[1] & 0x07,True,brex,use64);
@@ -1445,7 +1457,7 @@ void __FASTCALL__ ix86_ArgMovYX(char *str,ix86Param *DisP)
       tBool u32data;
       tBool brex,use64;
       brex = use64 = 0;
-#ifdef INT64_C
+#ifdef IX86_64
       if(x86_Bitness == DAB_USE64)
       {
         brex = (k86_REX&4)>>2;
@@ -1489,7 +1501,7 @@ void __FASTCALL__ ix86_ArgKatmaiGrp1(char *str,ix86Param *DisP)
    }
    else DisP->codelen++;
    if(code2 == 5 || code2 == 6)
-#ifdef INT64_C
+#ifdef IX86_64
 	if(x86_Bitness != DAB_USE64)
 #endif
       DisP->pro_clone = IX86_P4MMX;
@@ -1500,7 +1512,7 @@ void __FASTCALL__ ix86_ArgKatmaiGrp2(char *str,ix86Param *DisP)
    unsigned char code2 = ( DisP->RealCmd[1] & 0x38 ) >> 3;
    strcpy(str,ix86_KatmaiGr2Names[code2]);
    TabSpace(str,TAB_POS);
-   ix86_ArgMod(str,DisP);
+   ix86_ArgModB(str,DisP);
 }
 
 void __FASTCALL__  ix86_ArgXMMRMDigit(char *str,ix86Param *DisP)
@@ -1598,7 +1610,7 @@ void __FASTCALL__ ix86_3dNowOpCodes( char *str,ix86Param *DisP)
  strcpy(str,ix86_3dNowtable[code].name);
  TabSpace(str,TAB_POS);
  strcat(str,ix86_Katmai_buff);
-#ifdef INT64_C
+#ifdef IX86_64
    if(x86_Bitness == DAB_USE64) DisP->pro_clone = K64_ATHLON|K64_MMX;
    else
 #endif
@@ -1610,7 +1622,7 @@ void __FASTCALL__ ix86_3dNowPrefetchGrp(char *str,ix86Param *DisP)
    unsigned char mod = ( DisP->RealCmd[1] & 0x38 ) >> 3;
    strcpy(str,ix86_3dPrefetchGrp[mod]);
    TabSpace(str,TAB_POS);
-   ix86_ArgMod(str,DisP);
+   ix86_ArgModB(str,DisP);
 }
 
 

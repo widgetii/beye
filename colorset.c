@@ -169,6 +169,12 @@ tBool csetReadIniFile(const char *ini_name)
   has_err |= readColorPair(cset,"Text","","StrikeThrough",&text_cset.strikethrough);
   has_err |= readColorPair(cset,"Disasm","","FamilyId",&disasm_cset.family_id);
   has_err |= readColorPair(cset,"Disasm","","Opcodes",&disasm_cset.opcodes);
+  has_err |= readColorPair(cset,"Disasm","","Opcodes0",&disasm_cset.opcodes0);
+  has_err |= readColorPair(cset,"Disasm","","Opcodes1",&disasm_cset.opcodes1);
+  has_err |= readColorPair(cset,"Disasm","","Opcodes2",&disasm_cset.opcodes2);
+  has_err |= readColorPair(cset,"Disasm","","Opcodes3",&disasm_cset.opcodes3);
+  has_err |= readColorPair(cset,"Disasm","","Opcodes4",&disasm_cset.opcodes4);
+  has_err |= readColorPair(cset,"Disasm","","Opcodes5",&disasm_cset.opcodes5);
   has_err |= readColorPair(cset,"Disasm","","Comments",&disasm_cset.comments);
   for(j = 0;j < sizeof(disasm_cset.cpu_cset)/sizeof(CPUCSet);j++)
   {
@@ -300,6 +306,12 @@ DisasmCSet disasm_cset =
 {
   LOGFB_TO_PHYS(LightBlue, Blue),
   LOGFB_TO_PHYS(LightCyan, Blue),
+  LOGFB_TO_PHYS(White, Blue),
+  LOGFB_TO_PHYS(LightGreen, Blue),
+  LOGFB_TO_PHYS(LightRed, Blue),
+  LOGFB_TO_PHYS(LightMagenta, Blue),
+  LOGFB_TO_PHYS(Yellow, Blue),
+  LOGFB_TO_PHYS(LightBlue, Blue),
   LOGFB_TO_PHYS(Yellow, Blue),
   {
    {

@@ -57,6 +57,12 @@
 [ Disasm ] ; HighLight disassembler support
   FamilyId     = Black:LightCyan
   Opcodes      = Black:Green
+  Opcodes0     = Black:LightGray
+  Opcodes1     = Black:Cyan
+  Opcodes2     = Black:Red
+  Opcodes3     = Black:Magenta
+  Opcodes4     = Black:Brown
+  Opcodes5     = Black:Blue
   Comments     = Black:Cyan
  < Processor0 > ; Main processor (or Central Processor Unit)
     Clone1       = Black:LightCyan

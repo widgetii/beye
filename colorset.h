@@ -116,6 +116,12 @@ typedef struct tag_DisasmCSet
 {
   ColorAttr family_id;
   ColorAttr opcodes;
+  ColorAttr opcodes0;
+  ColorAttr opcodes1;
+  ColorAttr opcodes2;
+  ColorAttr opcodes3;
+  ColorAttr opcodes4;
+  ColorAttr opcodes5;
   ColorAttr comments;
   CPUCSet   cpu_cset[4];
 }DisasmCSet;

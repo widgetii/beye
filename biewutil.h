@@ -69,6 +69,9 @@ extern char * __FASTCALL__ Get8SignDig(tInt32);
 #ifdef INT64_C
 extern char * __FASTCALL__ Get16Digit(tUInt64);
 extern char * __FASTCALL__ Get16SignDig(tInt64);
+#else
+extern char * __FASTCALL__ Get16Digit(tUInt32 low,tUInt32 high);
+extern char * __FASTCALL__ Get16SignDig(tInt32 low,tInt32 high);
 #endif
 extern char * __FASTCALL__ GetBinary(char val);
 
