@@ -10,8 +10,8 @@
 €≤±∞                 ‹‹  ‹‹  ‹‹   ‹‹  ‹   ‹ ‹ ‹ ‹                     ∞±≤€
 €≤±∞                ‹‹‹‹‹‹  ‹‹‹‹ ‹‹‹‹‹‹    ‹   ‹                      ∞±≤€
 €≤±∞                                                                  ∞±≤€
-€≤±∞                           Ver 5.3.1                              ∞±≤€
-€≤±∞                          23 dec 2001.                            ∞±≤€
+€≤±∞                           Ver 5.3.2                              ∞±≤€
+€≤±∞                          21 apr 2002.                            ∞±≤€
 €≤±∞                                                                  ∞±≤€
 €≤±∞    Made in Kazan.Tatarstan.Russia. Written By Nick Kurshev.      ∞±≤€
 €≤±∞                                                                  ∞±≤€
@@ -1055,6 +1055,18 @@ v5.0.2        ! Changes:
                     is relative to the visible window.
                   + Fixed MSVC debug compilation
                 * Few cosmetic changes in unix related stuff by K. Boldyshev
+5.3.2         ! Changes:
+21 apr 2002     * A lots of *nix related improvements
+                * extensive proofreading. very extensive indeed. 
+                  I killed a whole day :) (by K. Boldyshev)
+                + New prediction type: PIC (position independed code)
+                  Example: .i386: jmp [ebx + name@GOT]
+                  Only elf386 currently support that.
+                + preliminary 64-bit ELF support
+                * Found workaround for Matrox BIOS bug thanks to
+                  Robert Riebisch <riebisch@bercom-berlin.de>
+                * Fixed computing of indirect address for SSE(2)
+                  insns in SIB mode
 []======================================================================[]
 []  Thank you for your interest.                                        []
 []  Nick Kurshev.                                                       []

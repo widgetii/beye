@@ -31,7 +31,6 @@
 #else
 #pragma link_option(case=>on,pack=>off,share_const=>on,smart_method=>on)
 #endif
-#pragma debug(vid=>full)
 
 #include biew.pi
 
