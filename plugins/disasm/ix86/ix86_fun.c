@@ -1050,7 +1050,6 @@ void  __FASTCALL__ ix86_ArgExGr1(char *str,ix86Param *DisP)
         return;
       }
     }
-    else
 #endif
     {
       if(DisP->RealCmd[1] == 0xC8)
