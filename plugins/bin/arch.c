@@ -102,9 +102,8 @@ static tBool __NEAR__ __FASTCALL__ archReadModList(memArray *obj,unsigned nnames
 static __filesize_t __FASTCALL__ archModLst( void )
 {
    memArray *obj;
-   __filesize_t *addr;
+   unsigned long rnames,bnames,*addr;
    unsigned nnames;
-   unsigned long rnames,bnames;
    __filesize_t fpos,flen;
    fpos = BMGetCurrFilePos();
    flen = bmGetFLength();

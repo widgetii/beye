@@ -374,9 +374,9 @@ static tBool __NEAR__ __FASTCALL__ __ReadObjectsPE(BGLOBAL handle,memArray * obj
 
 static __filesize_t __FASTCALL__ ShowObjectsPE( void )
 {
+ __filesize_t fpos;
  BGLOBAL handle;
  unsigned nnames;
- __filesize_t fpos;
  memArray * obj;
  fpos = BMGetCurrFilePos();
  nnames = pe.peObjects;
@@ -571,8 +571,8 @@ static inline void writeExportVA(__filesize_t va, BGLOBAL handle, char *buf, uns
 
 static tBool __FASTCALL__ PEExportReadItems(BGLOBAL handle,memArray * obj,unsigned nnames)
 {
-  __filesize_t nameaddr;
-  __filesize_t expaddr,nameptr,*addr;
+  __filesize_t nameaddr,expaddr,nameptr;
+  unsigned long *addr;
   unsigned i,ord;
   char buff[80];
 
