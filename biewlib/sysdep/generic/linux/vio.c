@@ -201,6 +201,8 @@ void __FASTCALL__ __vioWriteBuff(tAbsCoord x, tAbsCoord y, const tvioBuff *buff,
 	gotoxy(x, y);
 
 	dpb=pb;
+	memset(pb, 0, LEN(len));
+
 	for (i = 0; i < len; i++) {
 	    c = buff->chars[i];
 #define cp buff->oem_pg[i]
