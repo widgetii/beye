@@ -29,7 +29,7 @@
 #include "biewlib/kbd_code.h"
 #include "biewlib/pmalloc.h"
 
-long edit_cp = 0;
+__fileoff_t edit_cp = 0;
 struct tag_emem EditorMem;
 
 int edit_x,edit_y;
@@ -80,7 +80,7 @@ void __FASTCALL__ PaintETitle( int shift,tBool use_shift )
 
 tBool __FASTCALL__ editInitBuffs(unsigned width,unsigned char *buff,unsigned size)
 {
- unsigned long flen,cfp,ssize;
+ __filesize_t flen,cfp,ssize;
  unsigned i,msize;
  msize = tvioWidth*tvioHeight;
  EditorMem.buff = PMalloc(msize);
@@ -106,7 +106,7 @@ tBool __FASTCALL__ editInitBuffs(unsigned width,unsigned char *buff,unsigned siz
  }
  else
  {
-    EditorMem.size = (unsigned)((unsigned long)msize > (flen-cfp) ? (flen-cfp) : msize);
+    EditorMem.size = (unsigned)((__filesize_t)msize > (flen-cfp) ? (flen-cfp) : msize);
     BMReadBufferEx(EditorMem.buff,EditorMem.size,cfp,BM_SEEK_SET);
     BMSeek(cfp,BM_SEEK_SET);
  }

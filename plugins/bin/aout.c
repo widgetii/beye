@@ -43,10 +43,10 @@ static const char * __NEAR__ __FASTCALL__ aout_encode_hdr(unsigned long info)
    }
 }
 
-static unsigned long __FASTCALL__ ShowAOutHeader( void )
+static __filesize_t __FASTCALL__ ShowAOutHeader( void )
 {
   struct external_exec aout;
-  unsigned long fpos;
+  __filesize_t fpos;
   unsigned keycode;
   TWindow *w;
   fpos = BMGetCurrFilePos();
@@ -91,13 +91,13 @@ static tBool __FASTCALL__ aout_check_fmt( void )
 static void __FASTCALL__ aout_init_fmt( void ) {}
 static void __FASTCALL__ aout_destroy_fmt( void ) {}
 
-static int __FASTCALL__ aout_bitness(unsigned long off)
+static int __FASTCALL__ aout_bitness(__filesize_t off)
 {
    UNUSED(off);
    return DAB_USE32;
 }
 
-static tBool __FASTCALL__ aout_AddrResolv(char *addr,unsigned long fpos)
+static tBool __FASTCALL__ aout_AddrResolv(char *addr,__filesize_t fpos)
 {
  /* Since this function is used in references resolving of disassembler
     it must be seriously optimized for speed. */
@@ -111,7 +111,7 @@ static tBool __FASTCALL__ aout_AddrResolv(char *addr,unsigned long fpos)
   return bret;
 }
 
-static unsigned long __FASTCALL__ aout_help( void )
+static __filesize_t __FASTCALL__ aout_help( void )
 {
   hlpDisplay(10000);
   return BMGetCurrFilePos();

@@ -35,10 +35,10 @@
 #define BACK_ADDR_SIZE 256
 #define GO_ADDR_SIZE   37
 
-static unsigned long *BackAddr;
+static __filesize_t *BackAddr=NULL;
 static int BackAddrPtr = -1;
-static unsigned long *GoAddr;
-static unsigned int  *GoLineNums;
+static __filesize_t *GoAddr=NULL;
+static unsigned int  *GoLineNums=NULL;
 static int GoAddrPtr = -1;
 static unsigned char Alarm = 0;
 
@@ -49,14 +49,14 @@ char codeguid_image[] = "=>[X]";
 tBool __FASTCALL__ initCodeGuider( void )
 {
   tBool ret = False;
-  BackAddr = PMalloc(sizeof(unsigned long)*BACK_ADDR_SIZE);
+  BackAddr = PMalloc(sizeof(__filesize_t)*BACK_ADDR_SIZE);
   if(BackAddr)
   {
-    GoAddr = PMalloc(sizeof(unsigned long)*GO_ADDR_SIZE);
+    GoAddr = PMalloc(sizeof(__filesize_t)*GO_ADDR_SIZE);
     if(!GoAddr) PFree(BackAddr);
     else
     {
-      GoLineNums = PMalloc(sizeof(unsigned long)*GO_ADDR_SIZE);
+      GoLineNums = PMalloc(sizeof(unsigned int)*GO_ADDR_SIZE);
       if(!GoLineNums) { PFree(BackAddr); PFree(GoAddr); }
       else ret = True;
     }
@@ -81,7 +81,7 @@ static char __FASTCALL__ gidGetAddressKey( unsigned index )
   int i,j;
   char key;
   tBool found;
-  unsigned long addr1,addr2;
+  __filesize_t addr1,addr2;
   key = 0;
   addr1 = GoAddr[index];
   for (i = 0;i <= GoAddrPtr;i++)
@@ -107,7 +107,7 @@ static int __FASTCALL__ gidGetKeyIndex( char key )
 {
   int res,i,j,index;
   tBool found;
-  unsigned long addr;
+  __filesize_t addr;
   if (key > 'Z') key = key - 'z' + 'Z';
   key = key > '9' ? key - 'A' + 10 : key - '0';
   res = GoAddrPtr + 1;
@@ -151,7 +151,7 @@ void __FASTCALL__ GidResetGoAddress( int keycode )
     {
       if(GoLineNums[0] == 0)
       {
-        memmove(GoAddr,&GoAddr[1],GoAddrPtr*sizeof(unsigned long));
+        memmove(GoAddr,&GoAddr[1],GoAddrPtr*sizeof(__filesize_t));
         memmove(GoLineNums,&GoLineNums[1],GoAddrPtr*sizeof(unsigned int));
         GoAddrPtr--;
       }
@@ -179,7 +179,7 @@ void __FASTCALL__ GidResetGoAddress( int keycode )
 
 extern tBool DisasmPrepareMode;
 
-void __FASTCALL__ GidAddGoAddress(char *str,unsigned long addr)
+void __FASTCALL__ GidAddGoAddress(char *str,__filesize_t addr)
 {
   tAbsCoord width = twGetClientWidth(MainWnd);
   unsigned bytecodes=activeDisasm->max_insn_len()*2;
@@ -187,7 +187,7 @@ void __FASTCALL__ GidAddGoAddress(char *str,unsigned long addr)
   if(DisasmPrepareMode) return;
   len = strlen((char *)str);
   where = (disPanelMode == PANMOD_FULL ? width :
-           disPanelMode == PANMOD_MEDIUM ? width-10 : width-11-bytecodes) - 5;
+           disPanelMode == PANMOD_MEDIUM ? width-HA_LEN : width-(HA_LEN+1)-bytecodes) - 5;
   if(Alarm)
   {
      int i;
@@ -236,9 +236,9 @@ void __FASTCALL__ GidAddBackAddress( void )
   BackAddr[BackAddrPtr] = BMGetCurrFilePos();
 }
 
-unsigned long __FASTCALL__ GidGetGoAddress(unsigned keycode)
+__filesize_t __FASTCALL__ GidGetGoAddress(unsigned keycode)
 {
-  unsigned long ret;
+  __filesize_t ret;
   if(keycode == KE_BKSPACE)
        ret = BackAddrPtr >= 0 ? BackAddr[BackAddrPtr--] : BMGetCurrFilePos();
   else
@@ -257,10 +257,14 @@ unsigned long __FASTCALL__ GidGetGoAddress(unsigned keycode)
   return ret;
 }
 
-char * __FASTCALL__ GidEncodeAddress(unsigned long cfpos,tBool AddressDetail)
+char * __FASTCALL__ GidEncodeAddress(__filesize_t cfpos,tBool AddressDetail)
 {
   static char addr[11];
+#if __WORDSIZE >= 32
+  strcpy(addr,((BMFileFlags&BMFF_USE64)?Get16Digit(cfpos):Get8Digit(cfpos)));
+#else
   strcpy(addr,Get8Digit(cfpos));
+#endif
   if(AddressDetail && detectedFormat->AddressResolving)
        detectedFormat->AddressResolving(addr,cfpos);
   strcat(addr,": ");

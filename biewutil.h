@@ -34,11 +34,11 @@ extern "C" {
 #endif
 
 extern char legalchars[];
-extern unsigned long headshift;
+extern __filesize_t headshift;
 extern tBool DumpMode;
 extern tBool EditMode;
 
-extern unsigned long lastbyte;
+extern __filesize_t lastbyte;
 extern char * ini_name;
 
 extern int   __FASTCALL__ GetBool(tBool _bool);
@@ -58,7 +58,7 @@ extern tBool              isValidIniArgs( void );
 
 extern tBool              NewSource( void );
 extern tBool              FileUtils( void );
-extern unsigned long      IsNewExe(void);
+extern __filesize_t       IsNewExe(void);
 
 extern char * __FASTCALL__ Get2Digit(tUInt8);
 extern char * __FASTCALL__ Get2SignDig(tInt8);
@@ -95,7 +95,7 @@ extern void   drawPrompt( void );
 extern int    MainActionFromMenu(void);
 extern void   About( void );
 
-extern unsigned long __FASTCALL__ WhereAMI(unsigned long ctrl_pos);
+extern __filesize_t __FASTCALL__ WhereAMI(__filesize_t ctrl_pos);
 
 #define RAPREF_NONE            0 /**< means reference is not appended */
 #define RAPREF_DONE    ULONG_MAX /**< means reference is appended */
@@ -110,16 +110,16 @@ extern unsigned long __FASTCALL__ WhereAMI(unsigned long ctrl_pos);
                                            offset of target which is applied to
                                            fixing field.
                     **/
-extern unsigned long __FASTCALL__ AppendAsmRef(char *str,unsigned long ulShift,
+extern unsigned long __FASTCALL__ AppendAsmRef(char *str,__filesize_t ulShift,
                                                int mode,char codelen,
-                                               unsigned long r_shift);
+                                               __filesize_t r_shift);
 
 
 extern void  ShowSysInfo( void );
 extern void  PaintTitle( void );
 extern void  MainLoop( void );
 
-extern int  __FASTCALL__ isHOnLine(unsigned long cp,int width);
+extern int  __FASTCALL__ isHOnLine(__filesize_t cp,int width);
 
 #define HLS_NORMAL               0x0000
 #define HLS_USE_DOUBLE_WIDTH     0x0001
@@ -131,7 +131,7 @@ typedef union tag_HLInfo
   tvioBuff        buff;
 }HLInfo;
 
-extern void __FASTCALL__ HiLightSearch(TWindow *out,unsigned long cfp,tRelCoord minx,
+extern void __FASTCALL__ HiLightSearch(TWindow *out,__filesize_t cfp,tRelCoord minx,
                           tRelCoord maxx,tRelCoord y,HLInfo *buff,unsigned flags);
 
 /** Class memory array */

@@ -40,8 +40,12 @@ extern tBool fioUseMMF;
 
 static tBool ChSize( void )
 {
- long psize,tile = 0;
+ __fileoff_t psize,tile = 0;
+#if __WORDSIZE >= 32
+ if(Get16DigitDlg(" Change size of file ","Num. of bytes (+-dec):",3,(__fileoff_t *)&tile))
+#else
  if(Get8DigitDlg(" Change size of file ","Num. of bytes (+-dec):",3,(unsigned long *)&tile))
+#endif
  {
   if(tile != 0)
   {
@@ -73,10 +77,10 @@ static tBool ChSize( void )
  return False;
 }
 
-static tBool __NEAR__ __FASTCALL__ InsBlock(BGLOBAL bHandle,unsigned long start,long psize)
+static tBool __NEAR__ __FASTCALL__ InsBlock(BGLOBAL bHandle,__filesize_t start,__fileoff_t psize)
 {
    char *buffer;
-   unsigned long tile,oflen,flen,crpos,cwpos;
+   __filesize_t tile,oflen,flen,crpos,cwpos;
    unsigned numtowrite;
    oflen = bioFLength(bHandle);
    flen = oflen + psize;
@@ -108,7 +112,7 @@ static tBool __NEAR__ __FASTCALL__ InsBlock(BGLOBAL bHandle,unsigned long start,
    memset(buffer,0,51200U);
    while(psize)
    {
-     numtowrite = (unsigned)min((unsigned long)psize,51200U);
+     numtowrite = (unsigned)min((__filesize_t)psize,51200U);
      bioSeek(bHandle,cwpos,BIO_SEEK_SET);
      bioWriteBuffer(bHandle,buffer,numtowrite);
      psize -= numtowrite;
@@ -118,10 +122,10 @@ static tBool __NEAR__ __FASTCALL__ InsBlock(BGLOBAL bHandle,unsigned long start,
    return True;
 }
 
-static tBool __NEAR__ __FASTCALL__ DelBlock(BGLOBAL bHandle,unsigned long start,long psize)
+static tBool __NEAR__ __FASTCALL__ DelBlock(BGLOBAL bHandle,__filesize_t start,__fileoff_t psize)
 {
    char *buffer;
-   unsigned long tile,oflen,crpos,cwpos;
+   __filesize_t tile,oflen,crpos,cwpos;
    unsigned numtowrite;
    oflen = bioFLength(bHandle);
    tile = oflen - start;
@@ -151,13 +155,13 @@ static tBool __NEAR__ __FASTCALL__ DelBlock(BGLOBAL bHandle,unsigned long start,
 
 static tBool InsDelBlock( void )
 {
- unsigned long start;
- static long psize;
+ __filesize_t start;
+ static __fileoff_t psize;
  tBool ret = False;
  start = BMGetCurrFilePos();
  if(GetInsDelBlkDlg(" Insert or delete block to/from file ",&start,&psize))
  {
-    unsigned long fpos;
+    __filesize_t fpos;
     BGLOBAL bHandle;
     char *fname;
     fpos = BMGetCurrFilePos();
@@ -184,9 +188,9 @@ static tBool InsDelBlock( void )
 
 static char ff_fname[FILENAME_MAX+1] = "biew.$$$";
 static char xlat_fname[FILENAME_MAX+1];
-static unsigned long ff_startpos = 0L,ff_len = 0L;
+static __filesize_t ff_startpos = 0L,ff_len = 0L;
 
-static void __NEAR__ __FASTCALL__ printObject(FILE *fout,unsigned obj_num,char *oname,int oclass,int obitness,unsigned long size)
+static void __NEAR__ __FASTCALL__ printObject(FILE *fout,unsigned obj_num,char *oname,int oclass,int obitness,__filesize_t size)
 {
   const char *name,*btn;
   char onumname[30];
@@ -254,7 +258,7 @@ extern REGISTRY_MODE disMode;
 
 #define GET_FUNC_CLASS(x) x == SC_LOCAL ? "private" : "public"
 
-static void __NEAR__ __FASTCALL__ make_addr_column(char *buff,unsigned long offset)
+static void __NEAR__ __FASTCALL__ make_addr_column(char *buff,__filesize_t offset)
 {
    if(hexAddressResolv && detectedFormat->AddressResolving)
    {
@@ -267,9 +271,9 @@ static void __NEAR__ __FASTCALL__ make_addr_column(char *buff,unsigned long offs
 
 static tBool FStore( void )
 {
- unsigned long flags;
+ __filesize_t flags;
  char *tmp_buff;
- unsigned long endpos,cpos;
+ __filesize_t endpos,cpos;
  tmp_buff = PMalloc(0x1000);
  if(!tmp_buff)
  {
@@ -294,7 +298,7 @@ static tBool FStore( void )
    {
      BGLOBAL _bioHandle;
      int handle;
-     unsigned long wsize,crpos,pwsize,awsize;
+     __filesize_t wsize,crpos,pwsize,awsize;
      unsigned rem;
      wsize = endpos - ff_startpos;
      if(__IsFileExists(ff_fname) == False) handle = __OsCreate(ff_fname);
@@ -355,12 +359,12 @@ static tBool FStore( void )
      char *file_cache = NULL,*tmp_buff2 = NULL;
      unsigned MaxInsnLen;
      char func_name[300],obj_name[300],data_dis[300];
-     unsigned long func_pa,stop;
+     __filesize_t func_pa,stop;
      unsigned func_class;
-     unsigned long awsize,pwsize;
+     __filesize_t awsize,pwsize;
      tBool has_string;
 
-     unsigned long obj_start,obj_end;
+     __filesize_t obj_start,obj_end;
      int obj_class,obj_bitness;
      unsigned obj_num;
 
@@ -462,8 +466,12 @@ static tBool FStore( void )
           }
           if(obj_class == OC_NOOBJECT)
           {
-            unsigned long diff;
+            __filesize_t diff;
+#if __WORDSIZE >= 32
+            fprintf(fout,"; L%016llXH-L%016llXH - no object\n",obj_start,obj_end);
+#else
             fprintf(fout,"; L%08lXH-L%08lXH - no object\n",obj_start,obj_end);
+#endif
             dret.codelen = min(UCHAR_MAX,obj_end - ff_startpos);
             /** some functions can placed in virtual area of objects
                 mean at end of true data, but before next object */
@@ -661,13 +669,14 @@ static tBool FStore( void )
 
 static tBool FRestore( void )
 {
- unsigned long endpos,cpos,flags;
+ __filesize_t endpos,cpos;
+ unsigned long flags;
  tBool ret;
  ret = False;
  flags = FSDLG_NOMODES;
  if(GetFStoreDlg(" Restore information from file ",ff_fname,&flags,&ff_startpos,&ff_len,FILE_PRMT))
  {
-   unsigned long flen,lval;
+   __filesize_t flen,lval;
    int handle;
    BGLOBAL bHandle;
    char *fname;
@@ -682,7 +691,7 @@ static tBool FRestore( void )
    endpos = endpos > BMGetFLength() ? BMGetFLength() : endpos;
    if(endpos > ff_startpos)
    {
-     unsigned long wsize,cwpos;
+     __filesize_t wsize,cwpos;
      unsigned remaind;
      void *tmp_buff;
      handle = __OsOpen(ff_fname,FO_READONLY | SO_DENYNONE);
@@ -785,7 +794,8 @@ static void __NEAR__ __FASTCALL__ CryptFunc(char * buff,unsigned len,char *pass)
 
 static tBool CryptBlock( void )
 {
- unsigned long endpos,cpos,flags;
+ __filesize_t endpos,cpos;
+ unsigned long flags;
  char pass[81];
  tBool ret;
  ret = False;
@@ -795,7 +805,7 @@ static tBool CryptBlock( void )
  flags = FSDLG_NOMODES;
  if(GetFStoreDlg(" (De)Crypt block of file ",pass,&flags,&ff_startpos,&ff_len,"Input password (WARNING! password will displayed):"))
  {
-   unsigned long flen,lval;
+   __filesize_t flen,lval;
    endpos = ff_startpos + ff_len;
    flen = BMGetFLength();
    lval = endpos - ff_startpos;
@@ -804,7 +814,7 @@ static tBool CryptBlock( void )
    if(!pass[0]) { ErrMessageBox("Password can't be empty",NULL); return False; }
    if(endpos > ff_startpos)
    {
-     unsigned long wsize,cwpos;
+     __filesize_t wsize,cwpos;
      unsigned remaind;
      char *fname;
      BGLOBAL bHandle;
@@ -897,7 +907,8 @@ static void __NEAR__ __FASTCALL__ EndianifyBlock(char * buff,unsigned len, int t
 
 static tBool ReverseBlock( void )
 {
- unsigned long endpos,cpos,flags;
+ __filesize_t endpos,cpos;
+ unsigned long flags;
  tBool ret;
  ret = False;
  ff_startpos = BMGetCurrFilePos();
@@ -905,7 +916,7 @@ static tBool ReverseBlock( void )
  flags = FSDLG_USEBITNS;
  if(GetFStoreDlg(" Endianify block of file ",NULL,&flags,&ff_startpos,&ff_len,NULL))
  {
-   unsigned long flen,lval;
+   __filesize_t flen,lval;
    endpos = ff_startpos + ff_len;
    flen = BMGetFLength();
    lval = endpos - ff_startpos;
@@ -913,7 +924,7 @@ static tBool ReverseBlock( void )
    endpos = endpos > BMGetFLength() ? BMGetFLength() : endpos;
    if(endpos > ff_startpos)
    {
-     unsigned long wsize,cwpos;
+     __filesize_t wsize,cwpos;
      unsigned remaind;
      char *fname;
      BGLOBAL bHandle;
@@ -978,7 +989,8 @@ static void __NEAR__ __FASTCALL__ TranslateBlock(char * buff,unsigned len, const
 static tBool XLatBlock( void )
 {
  unsigned char xlt[256];
- unsigned long endpos,cpos,flags;
+ __filesize_t endpos,cpos;
+ unsigned long flags;
  tBool ret;
  ret = False;
  ff_startpos = BMGetCurrFilePos();
@@ -991,7 +1003,7 @@ static tBool XLatBlock( void )
  }
  if(GetFStoreDlg(" Table Look-up Translation ",xlat_fname,&flags,&ff_startpos,&ff_len,XLAT_PRMT))
  {
-   unsigned long flen,lval;
+   __filesize_t flen,lval;
    endpos = ff_startpos + ff_len;
    flen = BMGetFLength();
    lval = endpos - ff_startpos;
@@ -999,7 +1011,7 @@ static tBool XLatBlock( void )
    endpos = endpos > BMGetFLength() ? BMGetFLength() : endpos;
    if(endpos > ff_startpos)
    {
-     unsigned long wsize,cwpos;
+     __filesize_t wsize,cwpos;
      unsigned remaind;
      char *fname;
      BGLOBAL bHandle, xHandle;
@@ -1151,7 +1163,11 @@ static tBool FileInfo( void )
   strcpy(stimes[2],ctime(&statbuf.st_atime));
   twPrintF("Name                          = %s\n"
            "Type                          = %s\n"
+#if __WORDSIZE >= 32
+           "Length                        = %llu bytes\n"
+#else
            "Length                        = %lu bytes\n"
+#endif
            "Attributes                    = %s\n"
            "                                TUGVOwnGrpOth\n"
            "Creation time                 = %s"

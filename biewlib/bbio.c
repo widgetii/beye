@@ -56,24 +56,24 @@ struct tagBFILE bNull =
 /* notes: all function with prefix=>__ assume, that buffer present */
 
 #define __isOutOfBuffer(obj,pos)\
-        (int)(((unsigned long)pos < ((BFILE *)obj)->b.vfb.FBufStart ||\
-               (unsigned long)pos >= ((BFILE *)obj)->b.vfb.FBufStart +\
+        (int)(((__filesize_t)pos < ((BFILE *)obj)->b.vfb.FBufStart ||\
+               (__filesize_t)pos >= ((BFILE *)obj)->b.vfb.FBufStart +\
                ((BFILE *)obj)->b.vfb.MBufSize) && !((BFILE *)obj)->is_mmf)
 
 #define __isOutOfContents(obj,pos)\
-        (int)(((unsigned long)pos < ((BFILE *)obj)->b.vfb.FBufStart ||\
-               (unsigned long)pos >= ((BFILE *)obj)->b.vfb.FBufStart +\
+        (int)(((__filesize_t)pos < ((BFILE *)obj)->b.vfb.FBufStart ||\
+               (__filesize_t)pos >= ((BFILE *)obj)->b.vfb.FBufStart +\
                ((BFILE *)obj)->b.vfb.MBufLen) && !((BFILE *)obj)->is_mmf)
 
 #define MMF_HANDLE (-2)
 
-static tBool __NEAR__ __FASTCALL__ __fill(BFILE  *obj,long pos)
+static tBool __NEAR__ __FASTCALL__ __fill(BFILE  *obj,__fileoff_t pos)
 {
   void * mbuff;
-  unsigned long remaind;
+  __filesize_t remaind;
   tBool ret;
   if(pos < 0) pos = 0;
-  if((unsigned)pos > obj->FLength)
+  if((__filesize_t)pos > obj->FLength)
   {
      pos = obj->FLength;
      obj->b.vfb.MBufLen = 0;
@@ -83,7 +83,7 @@ static tBool __NEAR__ __FASTCALL__ __fill(BFILE  *obj,long pos)
   {
     obj->b.vfb.FBufStart = pos;
     remaind = obj->FLength - pos;
-    obj->b.vfb.MBufLen = (unsigned long)obj->b.vfb.MBufSize < remaind ?
+    obj->b.vfb.MBufLen = (__filesize_t)obj->b.vfb.MBufSize < remaind ?
                                      obj->b.vfb.MBufSize : (unsigned)remaind;
     mbuff = MK_FPTR(obj->b.vfb.MBuffer);
     __OsSeek(obj->b.vfb.handle,pos,SEEKF_START);
@@ -114,7 +114,7 @@ static tBool __NEAR__ __FASTCALL__ __flush(BFILE  *obj)
   /* so we must add special checks for it but no for read-write mode */\
   /* Special case: FLength == 0. When file is being created pos == FLength.*/\
  if(obj->FLength && !IS_WRITEABLE(obj->openmode)\
-    && (unsigned long)pos >= (unsigned long)obj->FLength)\
+    && (__filesize_t)pos >= (__filesize_t)obj->FLength)\
  {\
     pos = ((BFILE *)obj)->FLength-1;\
     ret = False;\
@@ -134,7 +134,7 @@ static tBool __NEAR__ __FASTCALL__ __flush(BFILE  *obj)
  CHK_EOF(obj,pos)\
 }
 
-static tBool __NEAR__ __FASTCALL__ __seek(BFILE  *obj,long pos,int origin)
+static tBool __NEAR__ __FASTCALL__ __seek(BFILE  *obj,__fileoff_t pos,int origin)
 {
  tBool ret,rret;
  SEEK_FPTR(ret,obj,pos,origin);
@@ -423,7 +423,7 @@ tBool  __FASTCALL__ bioClose(BGLOBAL handle)
   return True;
 }
 
-tBool   __FASTCALL__ bioSeek(BGLOBAL bioFile,long pos,int orig)
+tBool   __FASTCALL__ bioSeek(BGLOBAL bioFile,__fileoff_t pos,int orig)
 {
  BFILE  *obj =MK_FPTR(bioFile);
  tBool ret;
@@ -444,7 +444,7 @@ tBool   __FASTCALL__ bioSeek(BGLOBAL bioFile,long pos,int orig)
  return ret;
 }
 
-unsigned long  __FASTCALL__ bioTell(BGLOBAL bioFile)
+__filesize_t  __FASTCALL__ bioTell(BGLOBAL bioFile)
 {
   BFILE  *obj = MK_FPTR(bioFile);
   return (IS_CACHE_VALID(obj) || obj->is_mmf) ? obj->FilePos : __OsTell(obj->b.vfb.handle);
@@ -545,7 +545,7 @@ tBool __FASTCALL__  bioFlush(BGLOBAL bioFile)
 
 tBool __FASTCALL__  bioReRead(BGLOBAL bioFile)
 {
-  unsigned long fpos;
+  __filesize_t fpos;
   BFILE  * obj = MK_FPTR(bioFile);
   tBool ret = True;
   if(obj->is_mmf)
@@ -570,15 +570,15 @@ tBool __FASTCALL__  bioReRead(BGLOBAL bioFile)
   return ret;
 }
 
-unsigned long  __FASTCALL__  bioFLength(BGLOBAL bioFile)
+__filesize_t  __FASTCALL__  bioFLength(BGLOBAL bioFile)
 {
   BFILE  * bFile = MK_FPTR(bioFile);
   return bFile->FLength;
 }
 
-tBool __FASTCALL__  bioChSize(BGLOBAL bioFile,unsigned long newsize)
+tBool __FASTCALL__  bioChSize(BGLOBAL bioFile,__filesize_t newsize)
 {
-    unsigned long length, fillsize;
+    __filesize_t length, fillsize;
     char * buf;
     BFILE  *obj = MK_FPTR(bioFile);
     unsigned  bufsize, numtowrite;

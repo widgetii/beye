@@ -42,15 +42,15 @@ static AOUTHDR coff386ahdr;
 static SCNHDR *coff386so;
 static tUIntFast16 nsections;
 static BGLOBAL coff_cache;
-static unsigned long strings_ptr;
+static __filesize_t strings_ptr;
 
 static void __FASTCALL__ coff_ReadPubNameList(BGLOBAL handle,void (__FASTCALL__ *mem_out)(const char *));
 static void __FASTCALL__ coff_ReadPubName(BGLOBAL b_cache,const struct PubName *it,
                            char *buff,unsigned cb_buff);
-static unsigned __FASTCALL__ coff386_GetObjAttr(unsigned long pa,char *name,unsigned cb_name,
-                             unsigned long *start,unsigned long *end,int *_class,int *bitness);
+static unsigned __FASTCALL__ coff386_GetObjAttr(__filesize_t pa,char *name,unsigned cb_name,
+                             __filesize_t *start,__filesize_t *end,int *_class,int *bitness);
 
-static tBool __NEAR__ __FASTCALL__ FindPubName(char *buff,unsigned cb_buff,unsigned long pa)
+static tBool __NEAR__ __FASTCALL__ FindPubName(char *buff,unsigned cb_buff,__filesize_t pa)
 {
   return fmtFindPubName(coff_cache,buff,cb_buff,pa,
                         coff_ReadPubNameList,
@@ -58,11 +58,11 @@ static tBool __NEAR__ __FASTCALL__ FindPubName(char *buff,unsigned cb_buff,unsig
 }
 
 
-static void __NEAR__ __FASTCALL__ coffReadLongName(BGLOBAL handle,unsigned long offset,
+static void __NEAR__ __FASTCALL__ coffReadLongName(BGLOBAL handle,__filesize_t offset,
                                       char *str, unsigned slen)
 {
   unsigned i;
-  unsigned long fpos;
+  __filesize_t fpos;
    fpos = bioTell(handle);
    bioSeek(handle,offset+strings_ptr,BIO_SEEK_SET);
    for(i = 0;i < slen;i++)
@@ -76,7 +76,7 @@ static void __NEAR__ __FASTCALL__ coffReadLongName(BGLOBAL handle,unsigned long 
    bioSeek(handle,fpos,BIO_SEEK_SET);
 }
 
-static unsigned long __FASTCALL__ coff386_VA2PA(unsigned long va)
+static __filesize_t __FASTCALL__ coff386_VA2PA(__filesize_t va)
 {
   tUIntFast16 i;
   for(i = 0;i < nsections;i++)
@@ -89,7 +89,7 @@ static unsigned long __FASTCALL__ coff386_VA2PA(unsigned long va)
   return 0L;
 }
 
-static unsigned long __FASTCALL__ coff386_PA2VA(unsigned long pa)
+static __filesize_t __FASTCALL__ coff386_PA2VA(__filesize_t pa)
 {
   tUIntFast16 i;
   for(i = 0;i < nsections;i++)
@@ -158,11 +158,11 @@ static tBool __NEAR__ __FASTCALL__ __coffReadObjects(BGLOBAL handle,memArray * o
   return True;
 }
 
-static unsigned long __FASTCALL__ coffShowObjects( void )
+static __filesize_t __FASTCALL__ coffShowObjects( void )
 {
  BGLOBAL handle;
  unsigned nnames;
- unsigned long fpos,off;
+ __filesize_t fpos,off;
  memArray * obj;
  fpos = BMGetCurrFilePos();
  nnames = COFF_WORD(coff386hdr.f_nscns);
@@ -194,16 +194,16 @@ static const char * __NEAR__ __FASTCALL__ coff386_encode_hdr(unsigned info)
    }
 }
 
-static unsigned long __FASTCALL__ ShowCoff386Header( void )
+static __filesize_t __FASTCALL__ ShowCoff386Header( void )
 {
-  unsigned long fpos,entry,v_entry;
+  __filesize_t fpos,entry,v_entry;
   unsigned keycode;
   TWindow * w;
   fpos = BMGetCurrFilePos();
   v_entry = entry = 0L;
   if(*(unsigned short *)coff386ahdr.magic == ZMAGIC)
   {
-    v_entry = entry = *(unsigned long *)&coff386ahdr.entry;
+    v_entry = entry = *(__filesize_t *)&coff386ahdr.entry;
     entry = coff386_VA2PA(v_entry);
   }
   w = CrtDlgWndnls(coff386_encode_hdr(COFF_WORD(coff386hdr.f_magic)),54,12);
@@ -352,11 +352,11 @@ static tBool  __FASTCALL__ coffSymTabReadItems(BGLOBAL handle,memArray * obj,uns
  return True;
 }
 
-static unsigned long __NEAR__ __FASTCALL__ CalcEntryCoff(unsigned long idx,tBool display_msg)
+static __filesize_t __NEAR__ __FASTCALL__ CalcEntryCoff(unsigned long idx,tBool display_msg)
 {
   struct external_syment cse;
   tUIntFast16 sec_num;
-  unsigned long fpos;
+  __filesize_t fpos;
   fpos = 0L;
   bmSeek(COFF_DWORD(coff386hdr.f_symptr)+idx*sizeof(struct external_syment),BM_SEEK_SET);
   bmReadBuffer(&cse,sizeof(struct external_syment));
@@ -376,9 +376,9 @@ static unsigned long __NEAR__ __FASTCALL__ CalcEntryCoff(unsigned long idx,tBool
   return fpos;
 }
 
-static unsigned long __FASTCALL__ coffShowSymTab( void )
+static __filesize_t __FASTCALL__ coffShowSymTab( void )
 {
-  unsigned long fpos = BMGetCurrFilePos();
+  __filesize_t fpos = BMGetCurrFilePos();
   int ret;
   ret = fmtShowList(coffSymTabNumItems,coffSymTabReadItems,
                     "Symbol Table",
@@ -451,7 +451,7 @@ static void __NEAR__ __FASTCALL__ BuildRelocCoff386( void )
 static tBool  __NEAR__ __FASTCALL__ coffSymTabReadItemsIdx(BGLOBAL handle,unsigned long idx,
                                             char *name,unsigned cb_name,
                                             unsigned *secnum,
-                                            unsigned long *offset)
+                                            __filesize_t *offset)
 {
  struct external_syment cse;
  if(idx >= COFF_DWORD(coff386hdr.f_nsyms)) return False;
@@ -470,9 +470,10 @@ static tBool  __NEAR__ __FASTCALL__ coffSymTabReadItemsIdx(BGLOBAL handle,unsign
  return True;
 }
 
-static unsigned long __NEAR__ __FASTCALL__ BuildReferStrCoff386(char *str,RELOC_COFF386 *rne,int flags)
+static __filesize_t __NEAR__ __FASTCALL__ BuildReferStrCoff386(char *str,RELOC_COFF386 *rne,int flags)
 {
-  unsigned long val,offset,s,e,retval;
+  __filesize_t offset,retval,s,e;
+  unsigned long val;
   tUIntFast16 secnum;
   tBool is_idx,val_assigned;
   int c,b;
@@ -524,10 +525,10 @@ static unsigned long __NEAR__ __FASTCALL__ BuildReferStrCoff386(char *str,RELOC_
   return retval;
 }
 
-static unsigned long __FASTCALL__ coff386_AppendRef(char *str,unsigned long ulShift,int flags,int codelen,unsigned long r_sh)
+static unsigned long __FASTCALL__ coff386_AppendRef(char *str,__filesize_t ulShift,int flags,int codelen,__filesize_t r_sh)
 {
   RELOC_COFF386 *rcoff386,key;
-  unsigned long ret;
+  __filesize_t ret;
   char buff[400];
   ret = RAPREF_NONE;
   if(flags & APREF_TRY_PIC) return RAPREF_NONE;
@@ -561,7 +562,7 @@ static tBool __FASTCALL__ coff386_check_fmt( void )
 static void __FASTCALL__ coff386_init_fmt( void )
 {
   BGLOBAL main_handle;
-  unsigned long s_off = sizeof(coff386hdr);
+  __filesize_t s_off = sizeof(coff386hdr);
   tUIntFast16 i;
   bmReadBufferEx(&coff386hdr,sizeof(struct external_filehdr),0,SEEKF_START);
   if(COFF_WORD(coff386hdr.f_opthdr)) bmReadBuffer(&coff386ahdr,sizeof(AOUTHDR));
@@ -591,13 +592,13 @@ static void __FASTCALL__ coff386_destroy_fmt( void )
   if(coff_cache != &bNull && coff_cache != main_handle) bioClose(coff_cache);
 }
 
-static int __FASTCALL__ coff386_bitness(unsigned long off)
+static int __FASTCALL__ coff386_bitness(__filesize_t off)
 {
   UNUSED(off);
   return DAB_USE32;
 }
 
-static tBool __FASTCALL__ coff386_AddrResolv(char *addr,unsigned long cfpos)
+static tBool __FASTCALL__ coff386_AddrResolv(char *addr,__filesize_t cfpos)
 {
  /* Since this function is used in references resolving of disassembler
     it must be seriously optimized for speed. */
@@ -618,7 +619,7 @@ static tBool __FASTCALL__ coff386_AddrResolv(char *addr,unsigned long cfpos)
   return bret;
 }
 
-static unsigned long __FASTCALL__ coff386Help( void )
+static __filesize_t __FASTCALL__ coff386Help( void )
 {
   hlpDisplay(10002);
   return BMGetCurrFilePos();
@@ -648,7 +649,7 @@ static void __FASTCALL__ coff_ReadPubNameList(BGLOBAL handle,
  for(i = 0;i < nnames;i++)
  {
    struct external_syment cse;
-   unsigned long where;
+   __filesize_t where;
    tUIntFast16 sec_num;
    where = bioTell(handle);
    bioReadBuffer(handle,&cse,sizeof(struct external_syment));
@@ -679,16 +680,16 @@ static void __FASTCALL__ coff_ReadPubNameList(BGLOBAL handle,
  la_Sort(PubNames,fmtComparePubNames);
 }
 
-static unsigned long __FASTCALL__ coff386_GetPubSym(char *str,unsigned cb_str,unsigned *func_class,
-                          unsigned long pa,tBool as_prev)
+static __filesize_t __FASTCALL__ coff386_GetPubSym(char *str,unsigned cb_str,unsigned *func_class,
+                          __filesize_t pa,tBool as_prev)
 {
   return fmtGetPubSym(coff_cache,str,cb_str,func_class,pa,as_prev,
                       coff_ReadPubNameList,
                       coff_ReadPubName);
 }
 
-static unsigned __FASTCALL__ coff386_GetObjAttr(unsigned long pa,char *name,unsigned cb_name,
-                            unsigned long *start,unsigned long *end,int *_class,int *bitness)
+static unsigned __FASTCALL__ coff386_GetObjAttr(__filesize_t pa,char *name,unsigned cb_name,
+                            __filesize_t *start,__filesize_t *end,int *_class,int *bitness)
 {
   unsigned ret;
   tUIntFast16 i;

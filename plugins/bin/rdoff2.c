@@ -25,10 +25,10 @@
 #include "biewhelp.h"
 #include "biewlib/kbd_code.h"
 
-static unsigned long __FASTCALL__ rdoff2_ShowHeader( void )
+static __filesize_t __FASTCALL__ rdoff2_ShowHeader( void )
 {
   int endian;
-  unsigned long fpos;
+  __filesize_t fpos;
   unsigned long hs_len,im_len;
   TWindow *w;
   fpos = BMGetCurrFilePos();
@@ -62,7 +62,7 @@ static unsigned long __FASTCALL__ rdoff2_ShowHeader( void )
   return fpos;
 }
 
-static unsigned long __FASTCALL__ rdoff2_Help( void )
+static __filesize_t __FASTCALL__ rdoff2_Help( void )
 {
   hlpDisplay(10012);
   return BMGetCurrFilePos();

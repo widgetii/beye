@@ -74,6 +74,16 @@ extern void __FASTCALL__ memlwr(void *buffer,unsigned cb_buffer);
                     **/
 extern char *        ltoa(long _value, char *_s, int _radix);
 #endif
+#if defined( DJGPP ) || (defined( __GNUC__ ) && defined(__WIN32__))
+#ifdef atoll
+#undef atoll
+#endif
+#define atoll(s) strtoll(s, NULL, 10) /* temporal workaround */
+#endif
+#if defined( __GNUC__ ) && defined(__WIN32__)
+extern long long strtoll(const char *nptr, char **endptr, int base);
+unsigned long long strtoull(const char *nptr, char **endptr, int base);
+#endif
 #ifdef __GNUC__
 #define atoul atoi /**< Ugly alias. Must be removed in future. */
 
@@ -85,6 +95,10 @@ extern char *        ltoa(long _value, char *_s, int _radix);
                      * @see                   ltoa
                     **/
 extern char *        ultoa(unsigned long _value, char *_s, int _radix);
+#endif
+#if __WORDSIZE >= 32
+extern char *        lltoa(long long int _value, char *_s, int _radix);
+extern char *        ulltoa(unsigned long long int _value, char *_s, int _radix);
 #endif
 
 #if __BYTE_ORDER == __LITTLE_ENDIAN

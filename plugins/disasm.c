@@ -96,9 +96,9 @@ static tBool __FASTCALL__ disSelect_Disasm( void )
   return False;
 }
 
-static void __FASTCALL__ FillPrevAsmPage(unsigned long bound,unsigned predist)
+static void __FASTCALL__ FillPrevAsmPage(__filesize_t bound,unsigned predist)
 {
-  unsigned long distin,addr;
+  __filesize_t distin,addr;
   unsigned j;
   unsigned totallen;
   tAbsCoord height = twGetClientHeight(MainWnd);
@@ -136,7 +136,7 @@ static void __FASTCALL__ FillPrevAsmPage(unsigned long bound,unsigned predist)
   hexAddressResolv = addrdet;
 }
 
-static void __FASTCALL__ PrepareAsmLines(int keycode,unsigned long cfpos)
+static void __FASTCALL__ PrepareAsmLines(int keycode,__filesize_t cfpos)
 {
   tAbsCoord height = twGetClientHeight(MainWnd);
   switch(keycode)
@@ -153,7 +153,7 @@ static void __FASTCALL__ PrepareAsmLines(int keycode,unsigned long cfpos)
                     {
                       size_t i;
                       unsigned size;
-                      unsigned long prevpos;
+                      __filesize_t prevpos;
                       size = Summ(CurrStrLenBuff,height);
                       prevpos = cfpos - size;
                       size = 0;
@@ -190,11 +190,11 @@ static void __FASTCALL__ PrepareAsmLines(int keycode,unsigned long cfpos)
 static unsigned __FASTCALL__ drawAsm( unsigned keycode, unsigned textshift )
 {
  int i,I,Limit,dir,orig_commpos,orig_commoff;
- size_t j,len;
- unsigned long cfpos,flen,TopCFPos;
- static unsigned long amocpos = 0L;
+ size_t j,len,len_64;
+ __filesize_t cfpos,flen,TopCFPos;
+ static __filesize_t amocpos = 0L;
  char outstr[__TVIO_MAXSCREENWIDTH];
- char savstring[10];
+ char savstring[20];
  HLInfo hli;
  ColorAttr cattr;
  flen = BMGetFLength();
@@ -267,18 +267,19 @@ static unsigned __FASTCALL__ drawAsm( unsigned keycode, unsigned textshift )
        if(i == 0) CurrStrLen = dret.codelen;
        CurrStrLenBuff[i] = dret.codelen;
        twSetColorAttr(browser_cset.main);
-       memcpy(outstr,GidEncodeAddress(cfpos,hexAddressResolv),10);
+       len_64=HA_LEN;
+       memcpy(outstr,GidEncodeAddress(cfpos,hexAddressResolv),len_64);
        len = 0;
        if(disPanelMode < PANMOD_FULL)
        {
          static char _clone;
-         twDirectWrite(1,i + 1,outstr,10);
-         len = 10;
+         len = len_64;
+         twDirectWrite(1,i + 1,outstr,len);
          if(!hexAddressResolv)
          {
            twSetColorAttr(disasm_cset.family_id);
            _clone = activeDisasm->CloneShortName(dret.pro_clone);
-           twDirectWrite(10,i + 1,&_clone,1);
+           twDirectWrite(len_64,i + 1,&_clone,1);
            twSetColorAttr(browser_cset.main);
          }
        }
@@ -287,7 +288,7 @@ static unsigned __FASTCALL__ drawAsm( unsigned keycode, unsigned textshift )
          unsigned full_off,med_off,tmp_off;
          ColorAttr opc;
          med_off = disMaxCodeLen*2+1;
-         full_off = med_off+10;
+         full_off = med_off+len_64;
          for(j = 0;j < dret.codelen;j++,len+=2)
             memcpy(&outstr[len],Get2Digit(disCodeBuffer[j]),2);
          tmp_off = disPanelMode < PANMOD_FULL ? full_off : med_off;
@@ -296,14 +297,14 @@ static unsigned __FASTCALL__ drawAsm( unsigned keycode, unsigned textshift )
 		opc = HiLight ? activeDisasm->GetOpcodeColor(dret.pro_clone) : disasm_cset.opcodes;
 	 else	opc = disasm_cset.opcodes;
          twSetColorAttr(opc);
-         twDirectWrite(disPanelMode < PANMOD_FULL ? 11 : 1,
+         twDirectWrite(disPanelMode < PANMOD_FULL ? len_64+1 : 1,
                        i + 1,
-                       &outstr[10],
-                       disPanelMode < PANMOD_FULL ? len - 11 : len - 1);
+                       &outstr[len_64],
+                       disPanelMode < PANMOD_FULL ? len - (len_64+1) : len - 1);
          if(isHOnLine(cfpos,dret.codelen))
          {
-            hli.text = &outstr[10];
-            HiLightSearch(MainWnd,cfpos,10,dret.codelen,i,&hli,HLS_USE_DOUBLE_WIDTH);
+            hli.text = &outstr[len_64];
+            HiLightSearch(MainWnd,cfpos,len_64,dret.codelen,i,&hli,HLS_USE_DOUBLE_WIDTH);
          }
        }
        twSetColorAttr(browser_cset.main);
@@ -474,9 +475,9 @@ static tBool __FASTCALL__ DefAsmAction(int _lastbyte,int start)
   return redraw;
 }
 
-static void __FASTCALL__ DisasmScreen(TWindow* ewnd,unsigned long cp,unsigned long flen,int st,int stop,int start)
+static void __FASTCALL__ DisasmScreen(TWindow* ewnd,__filesize_t cp,__filesize_t flen,int st,int stop,int start)
 {
- int i,j,len,lim;
+ int i,j,len,lim,len_64;
  char outstr[__TVIO_MAXSCREENWIDTH+1],outstr1[__TVIO_MAXSCREENWIDTH+1];
  tAbsCoord width = twGetClientWidth(MainWnd);
  DisasmRet dret;
@@ -485,10 +486,11 @@ static void __FASTCALL__ DisasmScreen(TWindow* ewnd,unsigned long cp,unsigned lo
  {
   if(start + cp < flen)
   {
-   memcpy(outstr,GidEncodeAddress(cp + start,hexAddressResolv),10);
+   len_64=HA_LEN;
+   memcpy(outstr,GidEncodeAddress(cp + start,hexAddressResolv),len_64);
    twUseWin(MainWnd);
    twSetColorAttr(browser_cset.main);
-   twDirectWrite(1,i + 1,outstr,9);
+   twDirectWrite(1,i + 1,outstr,len_64-1);
    dret = Disassembler(cp + start,&EditorMem.buff[start],__DISF_NORMAL);
    EditorMem.alen[i] = dret.codelen;
    memset(outstr,TWC_DEF_FILLER,width);
@@ -507,7 +509,7 @@ static void __FASTCALL__ DisasmScreen(TWindow* ewnd,unsigned long cp,unsigned lo
    memcpy(outstr,dret.str,len);
    twUseWin(MainWnd);
    twSetColorAttr(browser_cset.main);
-   lim = disMaxCodeLen*2+11;
+   lim = disMaxCodeLen*2+len_64+1;
    twDirectWrite(lim+1,i + 1,outstr,width-lim);
    start += EditorMem.alen[i];
   }
@@ -529,7 +531,7 @@ static int __NEAR__ __FASTCALL__ FullAsmEdit(TWindow * ewnd)
 {
  int j,_lastbyte,start;
  unsigned rlen,len,flags;
- unsigned long flen;
+ __filesize_t flen;
  unsigned max_buff_size = disMaxCodeLen*tvioHeight;
  tAbsCoord height = twGetClientHeight(MainWnd);
  tBool redraw = False;
@@ -626,9 +628,11 @@ static int __NEAR__ __FASTCALL__ FullAsmEdit(TWindow * ewnd)
 
 static void __FASTCALL__ disEdit( void )
 {
+ unsigned len_64;
  TWindow * ewnd;
+ len_64=HA_LEN;
  if(!BMGetFLength()) { ErrMessageBox(NOTHING_EDIT,NULL); return; }
- ewnd = WindowOpen(11,2,disMaxCodeLen*2+11,tvioHeight-1,TWS_CURSORABLE);
+ ewnd = WindowOpen(len_64+1,2,disMaxCodeLen*2+len_64+1,tvioHeight-1,TWS_CURSORABLE);
  twSetColorAttr(browser_cset.edit.main); twClearWin();
  edit_x = edit_y = 0;
  EditMode = EditMode ? False : True;
@@ -718,7 +722,7 @@ static void __FASTCALL__ disSaveIni( hIniProfile *ini )
   if(activeDisasm->save_ini) activeDisasm->save_ini(ini);
 }
 
-DisasmRet Disassembler(unsigned long ulShift,MBuffer buffer,unsigned flags)
+DisasmRet Disassembler(__filesize_t ulShift,MBuffer buffer,unsigned flags)
 {
   dis_comments[0] = 0;
   dis_severity = DISCOMSEV_NONE;
@@ -727,18 +731,18 @@ DisasmRet Disassembler(unsigned long ulShift,MBuffer buffer,unsigned flags)
 
 static unsigned __FASTCALL__ disCharSize( void ) { return 1; }
 
-static unsigned long __FASTCALL__ disSearch(TWindow *pwnd, unsigned long start,
-                                            unsigned long *slen, unsigned flags,
+static __filesize_t __FASTCALL__ disSearch(TWindow *pwnd, __filesize_t start,
+                                            __filesize_t *slen, unsigned flags,
                                             tBool is_continue, tBool *is_found)
 {
   DisasmRet dret;
-  unsigned long tsize, retval, flen, dfpos, cfpos, sfpos; /* If search have no result */
+  __filesize_t tsize, retval, flen, dfpos, cfpos, sfpos; /* If search have no result */
   char *disSearchBuff;
   unsigned len, lw, proc, pproc, pmult;
   int cache[UCHAR_MAX+1];
   cfpos = sfpos = BMGetCurrFilePos();
   flen = BMGetFLength();
-  retval = ULONG_MAX;
+  retval = FILESIZE_MAX;
   disSearchBuff  = PMalloc(1002+DISCOM_SIZE);
   DumpMode = True;
   if(!disSearchBuff)
@@ -749,7 +753,7 @@ static unsigned long __FASTCALL__ disSearch(TWindow *pwnd, unsigned long start,
   cfpos = start;
   tsize = flen;
   pmult = 100;
-  if(tsize > ULONG_MAX/100) { tsize /= 100; pmult = 1; }
+  if(tsize > FILESIZE_MAX/100) { tsize /= 100; pmult = 1; }
   pproc = proc = 0;
   /* Attempt to balance disassembler output */
   PrepareAsmLines(KE_SUPERKEY, cfpos);
@@ -884,14 +888,14 @@ void  __FASTCALL__ disSetModifier(char *str,const char *modf)
   if(i+mlen > len) { str[i+mlen] = TWC_DEF_FILLER; str[i+mlen+1] = 0; }
 }
 
-int __FASTCALL__ disAppendDigits(char *str,unsigned long ulShift,int flags,
+int __FASTCALL__ disAppendDigits(char *str,__filesize_t ulShift,int flags,
                      char codelen,void *defval,unsigned type)
 {
  unsigned long app;
  char comments[DISCOM_SIZE];
  const char *appstr;
  unsigned dig_type;
- unsigned long fpos;
+ __filesize_t fpos;
  fpos = bmGetCurrFilePos();
 #ifndef NDEBUG
   if(ulShift >= BMGetFLength()-codelen)
@@ -920,12 +924,12 @@ int __FASTCALL__ disAppendDigits(char *str,unsigned long ulShift,int flags,
        dig_type == DISARG_DWORD &&       /* Only if size of reference is 4-byte */
        disNeedRef >= NEEDREF_PREDICT)    /* Only when reference prediction is on */
     {
-      if(*(unsigned long *)defval)         /* Do not perform operation on NULL */
+      if(*(__filesize_t *)defval)         /* Do not perform operation on NULL */
       {
-      unsigned long pa,psym;
+      __filesize_t pa,psym;
       unsigned _class;
-      if(!app) pa = detectedFormat->va2pa ? detectedFormat->va2pa(*(unsigned long *)defval) :
-                                           *(unsigned long *)defval;
+      if(!app) pa = detectedFormat->va2pa ? detectedFormat->va2pa(*(__filesize_t *)defval) :
+                                           *(__filesize_t *)defval;
       else pa = app;
       if(pa)
       {
@@ -1106,10 +1110,10 @@ int __FASTCALL__ disAppendDigits(char *str,unsigned long ulShift,int flags,
   return app;
 }
 
-int __FASTCALL__ disAppendFAddr(char * str,long ulShift,long distin,unsigned long r_sh,char type,unsigned seg,char codelen)
+int __FASTCALL__ disAppendFAddr(char * str,__fileoff_t ulShift,__fileoff_t distin,__filesize_t r_sh,char type,unsigned seg,char codelen)
 {
  int needref;
- unsigned long fpos;
+ __filesize_t fpos;
  char *modif_to;
  DisasmRet dret;
  int appended = RAPREF_NONE;
@@ -1196,9 +1200,14 @@ int __FASTCALL__ disAppendFAddr(char * str,long ulShift,long distin,unsigned lon
      if(r_sh <= BMGetFLength())
      {
        const char * cptr;
-       char lbuf[10];
+       char lbuf[20];
        cptr = DumpMode ? "L" : "file:";
        strcat(str,cptr);
+#if __WORDSIZE >= 32
+	if((BMFileFlags&BMFF_USE64))
+	    sprintf(lbuf,"%016llX",r_sh);
+	else
+#endif
        sprintf(lbuf,"%08lX",r_sh);
        strcat(str,lbuf);
        appended = RAPREF_DONE;

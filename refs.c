@@ -23,7 +23,7 @@
 #include "bconsole.h"
 
 extern REGISTRY_BIN binTable;
-unsigned long __FASTCALL__ AppendAsmRef(char *str,unsigned long ulShift,int mode,char codelen,unsigned long r_sh)
+unsigned long __FASTCALL__ AppendAsmRef(char *str,__filesize_t ulShift,int mode,char codelen,__filesize_t r_sh)
 {
   static tBool warn_displayed = False;
   unsigned long ret = RAPREF_NONE;

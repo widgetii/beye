@@ -339,6 +339,18 @@ extern unsigned  __FASTCALL__ __OsSetTimerCallBack(unsigned ms,timer_callback *f
                     **/
 extern void      __FASTCALL__ __OsRestoreTimer(void);
 
+#if __WORDSIZE >= 32
+#define __fileoff_t  tInt64
+#define __filesize_t tUInt64
+#define FILEOFF_MAX INT64_MAX
+#define FILESIZE_MAX UINT64_MAX
+#else
+#define __fileoff_t  tInt32
+#define __filesize_t tUInt32
+#define FILEOFF_MAX LONG_MAX
+#define FILESIZE_MAX ULONG_MAX
+#endif
+
                    /** Closes opened stream
                      * @return                none
                      * @param handle          handle of opened stream
@@ -355,7 +367,7 @@ extern void      __FASTCALL__ __OsClose(int handle);
                      *                        end of the file are lost.
                      * @see                   __OsTruncFile
                     **/
-extern int       __FASTCALL__ __OsChSize(int handle, long size);
+extern int       __FASTCALL__ __OsChSize(int handle, __fileoff_t size);
 
                    /** Creates new file and return handle of opened stream associated with file
                      * @return                handle of opened stream if successful, -1 otherwise
@@ -410,7 +422,7 @@ extern tBool  __FASTCALL__    __IsFileExists(const char *name);
                      * @return                length of file if successful; 0 - otherwise
                      * @param handle          handle of opened stream
                     **/
-extern long   __FASTCALL__    __FileLength(int handle);
+extern __fileoff_t   __FASTCALL__    __FileLength(int handle);
 
 #define SEEKF_START           (int)0  /**< Defines references location of computing file offset from beginning of file */
 #define SEEKF_CUR             (int)1  /**< Defines references location of computing file offset from current position */
@@ -423,14 +435,14 @@ extern long   __FASTCALL__    __FileLength(int handle);
                      * @param origin          indicates reference location from which an offset will be computed
                      * @see                   __OsTell
                     **/
-extern long   __FASTCALL__    __OsSeek(int handle, long newpos, int origin);
+extern __fileoff_t   __FASTCALL__    __OsSeek(int handle, __fileoff_t newpos, int origin);
 
                    /** Returns current file position
                      * @return                offset from beginning of file to file position in bytes
                      * @param handle          handle of opened stream
                      * @see                   __OsSeek
                     **/
-extern long   __FASTCALL__    __OsTell(int handle);
+extern __fileoff_t   __FASTCALL__    __OsTell(int handle);
 
                    /** Truncates of opened file
                      * @return                0 if operation was succesfully performed
@@ -441,7 +453,7 @@ extern long   __FASTCALL__    __OsTell(int handle);
                      *                        and in many case it undocumented
                      * @see                   __OsChSize
                     **/
-extern int       __FASTCALL__ __OsTruncFile(int handle, unsigned long newsize);
+extern int       __FASTCALL__ __OsTruncFile(int handle, __filesize_t newsize);
 
                    /** Changes name of specified file or directory
                      * @return                0 if operation was succesfully performed

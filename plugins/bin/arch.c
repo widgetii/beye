@@ -34,9 +34,9 @@
 
 ar_hdr arch;
 
-static unsigned long __FASTCALL__ ShowARCHHeader( void )
+static __filesize_t __FASTCALL__ ShowARCHHeader( void )
 {
-  unsigned long fpos,ldat;
+  __filesize_t fpos,ldat;
   unsigned evt;
   TWindow * w;
   struct tm * tm;
@@ -74,9 +74,9 @@ static unsigned long __FASTCALL__ ShowARCHHeader( void )
   return fpos;
 }
 
-static tBool __NEAR__ __FASTCALL__ archReadModList(memArray *obj,unsigned nnames,unsigned long *addr)
+static tBool __NEAR__ __FASTCALL__ archReadModList(memArray *obj,unsigned nnames,__filesize_t *addr)
 {
-  unsigned long foff,flen;
+  __filesize_t foff,flen;
   unsigned i;
   char stmp[80];
   flen = bmGetFLength();
@@ -99,13 +99,13 @@ static tBool __NEAR__ __FASTCALL__ archReadModList(memArray *obj,unsigned nnames
   return True;
 }
 
-static unsigned long __FASTCALL__ archModLst( void )
+static __filesize_t __FASTCALL__ archModLst( void )
 {
    memArray *obj;
-   unsigned long *addr;
+   __filesize_t *addr;
    unsigned nnames;
    unsigned long rnames,bnames;
-   unsigned long fpos,flen;
+   __filesize_t fpos,flen;
    fpos = BMGetCurrFilePos();
    flen = bmGetFLength();
    rnames = bmReadDWordEx(sizeof(ar_hdr),BM_SEEK_SET);
@@ -160,7 +160,7 @@ static void __FASTCALL__ ArchDestroy( void )
 {
 }
 
-static tBool __FASTCALL__ archAddrResolv(char *addr,unsigned long cfpos)
+static tBool __FASTCALL__ archAddrResolv(char *addr,__filesize_t cfpos)
 {
  /* Since this function is used in references resolving of disassembler
     it must be seriously optimized for speed. */
@@ -174,7 +174,7 @@ static tBool __FASTCALL__ archAddrResolv(char *addr,unsigned long cfpos)
   return bret;
 }
 
-static unsigned long __FASTCALL__ archHelp( void )
+static __filesize_t __FASTCALL__ archHelp( void )
 {
   hlpDisplay(10001);
   return BMGetCurrFilePos();

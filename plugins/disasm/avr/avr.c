@@ -270,7 +270,7 @@ static int avr_operand( unsigned int insn,
 
 static char *outstr;
 
-static DisasmRet __FASTCALL__ AVRDisassembler( unsigned long ulShift,
+static DisasmRet __FASTCALL__ AVRDisassembler( __filesize_t ulShift,
 					       MBuffer buffer,
 					       unsigned flags )
 {

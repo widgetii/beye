@@ -34,7 +34,7 @@
 
 extern BGLOBAL lx_cache;
 
-static unsigned long __FASTCALL__ ShowNewHeaderLE( void )
+static __filesize_t __FASTCALL__ ShowNewHeaderLE( void )
 {
   return ShowNewHeaderLX();
 }
@@ -55,10 +55,10 @@ static tBool __FASTCALL__ __ReadMapTblLE(BGLOBAL handle,memArray * obj,unsigned 
   return True;
 }
 
-static unsigned long __NEAR__ __FASTCALL__ __calcPageEntryLE(LE_PAGE *mt,unsigned long idx)
+static __filesize_t __NEAR__ __FASTCALL__ __calcPageEntryLE(LE_PAGE *mt,unsigned long idx)
 {
-  unsigned long ret;
-  unsigned long dataoff;
+  __filesize_t ret;
+  __filesize_t dataoff;
   dataoff = idx*lxe.le.lePageSize;
   if(mt->flags == 1 || mt->flags == 5) ret = lxe.le.leObjectIterDataMapOffset + dataoff;
   else
@@ -67,7 +67,7 @@ static unsigned long __NEAR__ __FASTCALL__ __calcPageEntryLE(LE_PAGE *mt,unsigne
   return ret;
 }
 
-unsigned long __FASTCALL__ CalcPageEntryLE(unsigned long pageidx)
+__filesize_t __FASTCALL__ CalcPageEntryLE(unsigned long pageidx)
 {
   BGLOBAL handle;
   tBool found;
@@ -91,10 +91,11 @@ unsigned long __FASTCALL__ CalcPageEntryLE(unsigned long pageidx)
   else      return BMGetCurrFilePos();
 }
 
-unsigned long __FASTCALL__ CalcEntryPointLE(unsigned long objnum,unsigned long _offset)
+__filesize_t __FASTCALL__ CalcEntryPointLE(unsigned long objnum,__filesize_t _offset)
 {
   BGLOBAL handle;
-  unsigned long i,start,ret,pageoff,pidx,j;
+  unsigned long i,start,pidx,j;
+  __filesize_t ret,pageoff;
   LX_OBJECT lo;
   LE_PAGE mt;
   if(!objnum) return -1;
@@ -133,9 +134,9 @@ unsigned long __FASTCALL__ CalcEntryPointLE(unsigned long objnum,unsigned long _
   return ret;
 }
 
-unsigned long __FASTCALL__ CalcEntryLE(const LX_ENTRY *lxent)
+__filesize_t __FASTCALL__ CalcEntryLE(const LX_ENTRY *lxent)
 {
-  unsigned long ret;
+  __filesize_t ret;
   ret = BMGetCurrFilePos();
       switch(lxent->b32_type)
       {
@@ -152,7 +153,7 @@ unsigned long __FASTCALL__ CalcEntryLE(const LX_ENTRY *lxent)
   return ret;
 }
 
-static unsigned long __NEAR__ __FASTCALL__ CalcEntryBungleLE(unsigned ordinal,tBool dispmsg)
+static __filesize_t __NEAR__ __FASTCALL__ CalcEntryBungleLE(unsigned ordinal,tBool dispmsg)
 {
   BGLOBAL handle;
   tBool found;
@@ -161,7 +162,7 @@ static unsigned long __NEAR__ __FASTCALL__ CalcEntryBungleLE(unsigned ordinal,tB
   unsigned char cnt,type;
   tUIntFast16 numobj = 0;
   LX_ENTRY lxent;
-  unsigned long ret;
+  __filesize_t ret;
   ret = BMGetCurrFilePos();
   handle = lx_cache;
   bioSeek(handle,lxe.le.leEntryTableOffset + headshift,SEEK_SET);
@@ -215,9 +216,9 @@ static unsigned __FASTCALL__ leMapTblNumEntries(BGLOBAL handle)
   return (unsigned)lxe.le.lePageCount;
 }
 
-static unsigned long __FASTCALL__ ShowMapTableLE( void )
+static __filesize_t __FASTCALL__ ShowMapTableLE( void )
 {
- unsigned long fpos;
+ __filesize_t fpos;
  int ret;
  fpos = BMGetCurrFilePos();
  ret = fmtShowList(leMapTblNumEntries,__ReadMapTblLE,
@@ -229,9 +230,9 @@ static unsigned long __FASTCALL__ ShowMapTableLE( void )
  return fpos;
 }
 
-static unsigned long __FASTCALL__ ShowResNamLE( void )
+static __filesize_t __FASTCALL__ ShowResNamLE( void )
 {
-  unsigned long fpos = BMGetCurrFilePos();
+  __filesize_t fpos = BMGetCurrFilePos();
   int ret;
   unsigned ordinal;
   ret = fmtShowList(LXRNamesNumItems,LXRNamesReadItems,
@@ -244,9 +245,9 @@ static unsigned long __FASTCALL__ ShowResNamLE( void )
   return fpos;
 }
 
-static unsigned long __FASTCALL__ ShowNResNmLE( void )
+static __filesize_t __FASTCALL__ ShowNResNmLE( void )
 {
-  unsigned long fpos;
+  __filesize_t fpos;
   fpos = BMGetCurrFilePos();
   {
     int ret;
@@ -290,13 +291,13 @@ static void __FASTCALL__ LEdestroy( void )
    if(lx_cache != &bNull && lx_cache != main_handle) bioClose(lx_cache);
 }
 
-static unsigned long __FASTCALL__ LEHelp( void )
+static __filesize_t __FASTCALL__ LEHelp( void )
 {
   hlpDisplay(10004);
   return BMGetCurrFilePos();
 }
 
-static tBool __FASTCALL__ leAddressResolv(char *addr,unsigned long cfpos)
+static tBool __FASTCALL__ leAddressResolv(char *addr,__filesize_t cfpos)
 {
  /* Since this function is used in references resolving of disassembler
     it must be seriously optimized for speed. */

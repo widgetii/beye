@@ -46,7 +46,7 @@ tCompare __FASTCALL__ fmtComparePubNames(const void __HUGE__ *v1,const void __HU
 }
 
 tBool __FASTCALL__ fmtFindPubName(BGLOBAL fmt_cache,char *buff,unsigned cb_buff,
-                   unsigned long pa,
+                   __filesize_t pa,
                    ReadPubNameList fmt_readlist,
                    ReadPubName fmt_readpub)
 {
@@ -62,12 +62,12 @@ tBool __FASTCALL__ fmtFindPubName(BGLOBAL fmt_cache,char *buff,unsigned cb_buff,
   return False;
 }
 
-unsigned long __FASTCALL__ fmtGetPubSym(BGLOBAL fmt_cache,char *str,unsigned cb_str,
-                           unsigned *func_class,unsigned long pa,tBool as_prev,
+__filesize_t __FASTCALL__ fmtGetPubSym(BGLOBAL fmt_cache,char *str,unsigned cb_str,
+                           unsigned *func_class,__filesize_t pa,tBool as_prev,
                            ReadPubNameList fmt_readlist,
                            ReadPubName fmt_readpub)
 {
-  unsigned long cfpos,ret_addr,cur_addr;
+  __filesize_t cfpos,ret_addr,cur_addr;
   unsigned long i,idx,nitems;
   struct PubName key,*it;
   cfpos = bmGetCurrFilePos();
@@ -117,7 +117,7 @@ unsigned long __FASTCALL__ fmtGetPubSym(BGLOBAL fmt_cache,char *str,unsigned cb_
   return ret_addr;
 }
 
-static BGLOBAL __NEAR__ __FASTCALL__ ReopenSeek(unsigned long dist)
+static BGLOBAL __NEAR__ __FASTCALL__ ReopenSeek(__filesize_t dist)
 {
  BGLOBAL handle;
  handle = bioDupEx(bmbioHandle(),BBIO_SMALL_CACHE_SIZE);

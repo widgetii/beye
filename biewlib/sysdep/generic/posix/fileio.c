@@ -14,13 +14,16 @@
  * @since       1999
  * @note        Development, fixes and improvements
 **/
+//#define  __USE_ISOC99 1
+#include <limits.h>
 #include <errno.h>
-#include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#define  __USE_FILE_OFFSET64 1
+#define  __USE_LARGEFILE64 1
 #include <unistd.h>
-#include <limits.h>
+#include <fcntl.h>
 #ifndef __UTIME_INCLUDED
 #include <utime.h>
 #endif
@@ -74,16 +77,15 @@ int __FASTCALL__ __OsOpen(const char *fname,int mode)
 
   if (stat(fname,&st)) return -1;
   if (S_ISDIR(st.st_mode)) { errno = EISDIR; return -1; }
-
   return open(fname,flags);
 }
 
-long __FASTCALL__ __OsSeek(int handle,long offset,int origin)
+__fileoff_t __FASTCALL__ __OsSeek(int handle,__fileoff_t offset,int origin)
 {
   return lseek(handle,offset,origin);
 }
 
-int __FASTCALL__ __OsTruncFile( int handle, unsigned long newsize)
+int __FASTCALL__ __OsTruncFile( int handle, __filesize_t newsize)
 {
   return ftruncate(handle,newsize);
 }
@@ -100,9 +102,9 @@ int __FASTCALL__ __OsWrite(int handle,const void *buffer, unsigned count)
 
 #define BLKSIZE 32767
 
-int __FASTCALL__ __OsChSize(int handle, long size)
+int __FASTCALL__ __OsChSize(int handle, __fileoff_t size)
 {
-    long length, fillsize;
+    __fileoff_t length, fillsize;
     char *buf;
     int  bufsize, numtowrite;
 
@@ -132,11 +134,11 @@ int __FASTCALL__ __OsChSize(int handle, long size)
     return 0;
 }
 
-long __FASTCALL__ __FileLength(int handle)
+__fileoff_t __FASTCALL__ __FileLength(int handle)
 {
   struct stat statbuf;
   int stat_ret;
-  long retval;
+  __fileoff_t retval;
   memset(&statbuf,0,sizeof(struct stat));
   stat_ret = fstat(handle,&statbuf);
   retval = 0;
@@ -147,10 +149,11 @@ long __FASTCALL__ __FileLength(int handle)
   }
   if(!retval)
   {
+        __filesize_t min,max,off;
+	unsigned i;
         unsigned char ch;
-        unsigned long min,max,off,i;
 	min = 0UL;
-	max = LONG_MAX;
+	max = FILEOFF_MAX;
         retval = 0UL;
 	while(1)
 	{
@@ -166,7 +169,7 @@ long __FASTCALL__ __FileLength(int handle)
 	     {
 	        if(read(handle,&ch,1) == 1) retval++;
 		else goto loop_end;
-		if(retval > LONG_MAX-2) break;
+		if(retval > FILEOFF_MAX-2) break;
 	     }
 	     goto loop_end;
            }
@@ -176,7 +179,7 @@ long __FASTCALL__ __FileLength(int handle)
   return retval;
 }
 
-long __FASTCALL__ __OsTell(int handle)
+__fileoff_t __FASTCALL__ __OsTell(int handle)
 {
   return __OsSeek(handle,0L,SEEKF_CUR);
 }

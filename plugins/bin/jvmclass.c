@@ -64,16 +64,16 @@ typedef struct ClassFile_s
     tUInt16	attributes_count;
 /*    attribute_info attributes[attributes_count]; */
 /* private data: */
-    unsigned long header_length;
-    unsigned long constants_offset;
-    unsigned long interfaces_offset;
-    unsigned long fields_offset;
-    unsigned long methods_offset;
-    unsigned long attributes_offset;
+    __filesize_t header_length;
+    __filesize_t constants_offset;
+    __filesize_t interfaces_offset;
+    __filesize_t fields_offset;
+    __filesize_t methods_offset;
+    __filesize_t attributes_offset;
 /* meta data: */
-    unsigned long data_offset;
-    unsigned long code_offset;
-    unsigned long attrcode_offset;
+    __filesize_t data_offset;
+    __filesize_t code_offset;
+    __filesize_t attrcode_offset;
 }ClassFile_t;
 
 ClassFile_t jvm_header;
@@ -181,7 +181,7 @@ static void __NEAR__ __FASTCALL__ skip_attributes(BGLOBAL handle,unsigned nitems
 static void __NEAR__ __FASTCALL__ skip_fields(unsigned nitems,int attr)
 {
     unsigned i;
-    unsigned long fpos;
+    __filesize_t fpos;
     for(i=0;i<nitems;i++)
     {
 	unsigned short sval;
@@ -191,7 +191,7 @@ static void __NEAR__ __FASTCALL__ skip_fields(unsigned nitems,int attr)
 	fpos=bmGetCurrFilePos();
 	if(i==0)
 	{
-	    unsigned long lval;
+	    __filesize_t lval;
 	    lval=sval?fpos+6:fpos;
 	    if(attr) jvm_header.code_offset=lval;
 	    else jvm_header.data_offset=lval;
@@ -203,7 +203,7 @@ static void __NEAR__ __FASTCALL__ skip_fields(unsigned nitems,int attr)
 static tBool __FASTCALL__ jvm_read_interfaces(BGLOBAL handle,memArray * names,unsigned nnames)
 {
     unsigned i;
-    unsigned long fpos;
+    __filesize_t fpos;
     unsigned short id;
     char str[80];
     bioSeek(handle,jvm_header.interfaces_offset,BM_SEEK_SET);
@@ -226,9 +226,9 @@ static unsigned __FASTCALL__ jvm_get_num_interfaces(BGLOBAL handle)
 }
 
 
-static unsigned long __FASTCALL__ ShowInterfaces(void)
+static __filesize_t __FASTCALL__ ShowInterfaces(void)
 {
-  unsigned long fpos;
+  __filesize_t fpos;
   fpos = BMGetCurrFilePos();
   fmtShowList(jvm_get_num_interfaces,jvm_read_interfaces,
                     " interfaces ",
@@ -239,7 +239,7 @@ static unsigned long __FASTCALL__ ShowInterfaces(void)
 static tBool __FASTCALL__ jvm_read_attributes(BGLOBAL handle,memArray * names,unsigned nnames)
 {
     unsigned i;
-    unsigned long fpos;
+    __filesize_t fpos;
     unsigned long len;
     char str[80],sout[100];
     bioSeek(handle,jvm_header.attributes_offset,BM_SEEK_SET);
@@ -264,9 +264,9 @@ static unsigned __FASTCALL__ jvm_get_num_attributes(BGLOBAL handle)
 }
 
 
-static unsigned long __NEAR__ __FASTCALL__ __ShowAttributes(const char *title)
+static __filesize_t __NEAR__ __FASTCALL__ __ShowAttributes(const char *title)
 {
-  unsigned long fpos;
+  __filesize_t fpos;
   int ret;
   fpos = BMGetCurrFilePos();
   ret=fmtShowList(jvm_get_num_attributes,jvm_read_attributes,
@@ -290,7 +290,7 @@ static unsigned long __NEAR__ __FASTCALL__ __ShowAttributes(const char *title)
   return fpos;
 }
 
-static unsigned long __FASTCALL__ ShowAttributes(void)
+static __filesize_t __FASTCALL__ ShowAttributes(void)
 {
     return __ShowAttributes(" length   attributes ");
 }
@@ -298,7 +298,7 @@ static unsigned long __FASTCALL__ ShowAttributes(void)
 static tBool __FASTCALL__ jvm_read_methods(BGLOBAL handle,memArray * names,unsigned nnames)
 {
     unsigned i;
-    unsigned long fpos;
+    __filesize_t fpos;
     unsigned short flg,sval,acount;
     char str[80],str2[80],sout[256];
     bioSeek(handle,jvm_header.methods_offset,BM_SEEK_SET);
@@ -326,9 +326,9 @@ static unsigned __FASTCALL__ jvm_get_num_methods(BGLOBAL handle)
     return jvm_header.methods_count;
 }
 
-static unsigned long __FASTCALL__ ShowMethods(void)
+static __filesize_t __FASTCALL__ ShowMethods(void)
 {
-  unsigned long fpos;
+  __filesize_t fpos;
   int ret;
   fpos = BMGetCurrFilePos();
   ret=fmtShowList(jvm_get_num_methods,jvm_read_methods,
@@ -353,7 +353,7 @@ static unsigned long __FASTCALL__ ShowMethods(void)
     fpos += 6;
     if(acount>1)
     {
-	unsigned long a_offset;
+	__filesize_t a_offset;
 	unsigned short a_count;
 	a_offset = jvm_header.attributes_offset;
 	a_count = jvm_header.attributes_count;
@@ -372,7 +372,7 @@ static unsigned long __FASTCALL__ ShowMethods(void)
 static tBool __FASTCALL__ jvm_read_fields(BGLOBAL handle,memArray * names,unsigned nnames)
 {
     unsigned i;
-    unsigned long fpos;
+    __filesize_t fpos;
     unsigned short flg,sval,acount;
     char str[80],str2[80],sout[256];
     bioSeek(handle,jvm_header.fields_offset,BM_SEEK_SET);
@@ -400,9 +400,9 @@ static unsigned __FASTCALL__ jvm_get_num_fields(BGLOBAL handle)
     return jvm_header.fields_count;
 }
 
-static unsigned long __FASTCALL__ ShowFields(void)
+static __filesize_t __FASTCALL__ ShowFields(void)
 {
-  unsigned long fpos;
+  __filesize_t fpos;
   int ret;
   fpos = BMGetCurrFilePos();
   ret=fmtShowList(jvm_get_num_fields,jvm_read_fields,
@@ -427,7 +427,7 @@ static unsigned long __FASTCALL__ ShowFields(void)
     fpos += 6;
     if(acount>1)
     {
-	unsigned long a_offset;
+	__filesize_t a_offset;
 	unsigned short a_count;
 	a_offset = jvm_header.attributes_offset;
 	a_count = jvm_header.attributes_count;
@@ -444,8 +444,9 @@ static unsigned long __FASTCALL__ ShowFields(void)
 
 static tBool __FASTCALL__ jvm_read_pool(BGLOBAL handle,memArray * names,unsigned nnames)
 {
+    __filesize_t fpos;
+    unsigned long lval,lval2;
     unsigned i;
-    unsigned long fpos,lval,lval2;
     unsigned short flg,sval,slen;
     unsigned char utag;
     char str[80],str2[80],sout[256];
@@ -525,9 +526,9 @@ static unsigned __FASTCALL__ jvm_get_num_pools(BGLOBAL handle)
     return jvm_header.constant_pool_count;
 }
 
-static unsigned long __FASTCALL__ ShowPool(void)
+static __filesize_t __FASTCALL__ ShowPool(void)
 {
-  unsigned long fpos;
+  __filesize_t fpos;
   fpos = BMGetCurrFilePos();
   fmtShowList(jvm_get_num_pools,jvm_read_pool,
                     " Constant pool ",
@@ -537,7 +538,7 @@ static unsigned long __FASTCALL__ ShowPool(void)
 
 static void __FASTCALL__ jvm_init_fmt( void )
 {
-    unsigned long fpos;
+    __filesize_t fpos;
     unsigned short sval;
     jvm_header.magic=0xCAFEBABE;
     jvm_header.attrcode_offset=-1;
@@ -601,9 +602,9 @@ static void __NEAR__ __FASTCALL__ decode_acc_flags(unsigned flags, char *str)
     strcat(str," ");
 }
 
-static unsigned long __FASTCALL__ ShowJvmHeader( void )
+static __filesize_t __FASTCALL__ ShowJvmHeader( void )
 {
-    unsigned long entry;
+    __filesize_t entry;
     TWindow * hwnd;
     unsigned keycode;
     char sinfo[70],sinfo2[70],sinfo3[70];
@@ -647,17 +648,17 @@ static unsigned long __FASTCALL__ ShowJvmHeader( void )
     return entry;
 }
 
-static unsigned long __FASTCALL__ jvm_VA2PA(unsigned long va)
+static __filesize_t __FASTCALL__ jvm_VA2PA(__filesize_t va)
 {
   return  va + jvm_header.code_offset;
 }
 
-static unsigned long __FASTCALL__ jvm_PA2VA(unsigned long pa)
+static __filesize_t __FASTCALL__ jvm_PA2VA(__filesize_t pa)
 {
   return pa >= jvm_header.code_offset ? pa - jvm_header.code_offset : 0L;
 }
 
-static tBool __FASTCALL__ jvm_AddressResolv(char *addr,unsigned long cfpos)
+static tBool __FASTCALL__ jvm_AddressResolv(char *addr,__filesize_t cfpos)
 {
   tBool bret = True;
   if(cfpos >= jvm_header.methods_offset)
@@ -698,7 +699,7 @@ static void __FASTCALL__ jvm_ReadPubName(BGLOBAL b_cache,const struct PubName *i
 
 static void __FASTCALL__ jvm_ReadPubNameList(BGLOBAL handle,void (__FASTCALL__ *mem_out)(const char *))
 {
- unsigned long fpos,len;
+ __filesize_t fpos,len;
  unsigned i;
  struct PubName jvm_pn;
  unsigned short acount,flg;
@@ -772,16 +773,16 @@ static void __FASTCALL__ jvm_ReadPubNameList(BGLOBAL handle,void (__FASTCALL__ *
  if(PubNames->nItems) la_Sort(PubNames,fmtComparePubNames);
 }
 
-static unsigned long __FASTCALL__ jvm_GetPubSym(char *str,unsigned cb_str,unsigned *func_class,
-                           unsigned long pa,tBool as_prev)
+static __filesize_t __FASTCALL__ jvm_GetPubSym(char *str,unsigned cb_str,unsigned *func_class,
+                           __filesize_t pa,tBool as_prev)
 {
   return fmtGetPubSym(bmbioHandle(),str,cb_str,func_class,pa,as_prev,
                       jvm_ReadPubNameList,
                       jvm_ReadPubName);
 }
 
-static unsigned __FASTCALL__ jvm_GetObjAttr(unsigned long pa,char *name,unsigned cb_name,
-                      unsigned long *start,unsigned long *end,int *_class,int *bitness)
+static unsigned __FASTCALL__ jvm_GetObjAttr(__filesize_t pa,char *name,unsigned cb_name,
+                      __filesize_t *start,__filesize_t *end,int *_class,int *bitness)
 {
   unsigned ret;
   UNUSED(cb_name);
@@ -829,7 +830,8 @@ static unsigned __FASTCALL__ jvm_GetObjAttr(unsigned long pa,char *name,unsigned
     }
     else
     {
-      unsigned long fpos,len;
+      __filesize_t fpos;
+      unsigned long len;
       fpos=bmGetCurrFilePos();
       bmSeek(jvm_header.attributes_offset,BM_SEEK_SET);
       get_name(bmbioHandle(),name,cb_name);
@@ -845,19 +847,20 @@ static unsigned __FASTCALL__ jvm_GetObjAttr(unsigned long pa,char *name,unsigned
   return ret;
 }
 
-static int __FASTCALL__ jvm_bitness(unsigned long off)
+static int __FASTCALL__ jvm_bitness(__filesize_t off)
 {
     UNUSED(off);
     return DAB_USE16;
 }
 
-static unsigned long __FASTCALL__ jvm_AppendRef(char *str,unsigned long ulShift,int flags,int codelen,unsigned long r_sh)
+static unsigned long __FASTCALL__ jvm_AppendRef(char *str,__filesize_t ulShift,int flags,int codelen,__filesize_t r_sh)
 {
  unsigned long  retrf = RAPREF_DONE;
  unsigned slen=1000; /* According on disasm/java/java.c */
     if((flags & APREF_TRY_LABEL)!=APREF_TRY_LABEL)
     {
-	unsigned long lidx,lval,lval2,fpos;
+	__filesize_t fpos;
+	unsigned long lidx,lval,lval2;
 	unsigned sl;
 	unsigned short sval,sval2;
 	unsigned char utag;

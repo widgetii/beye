@@ -30,7 +30,7 @@
 #define extern "C" {
 #endif
 
-typedef unsigned long __FASTCALL__ (*BinFunc)( void );
+typedef __filesize_t  __FASTCALL__ (*BinFunc)( void );
 typedef tBool         __FASTCALL__ (*ModFunc)( void );
 
 #define APREF_NORMAL      0x0000 /**< Append references in short form if it really present in binary */
@@ -48,7 +48,7 @@ typedef tBool         __FASTCALL__ (*ModFunc)( void );
    * @param r_shift      used only if APPREF_TRY_LABEL mode is set, contains real value of field, that required binding
    * @return             one of RAPREF_* constants (see biewutil.h file for detail)
 */
-typedef unsigned long __FASTCALL__ (*AppRefs)(char *str,unsigned long shift,int flags,int codelen,unsigned long r_shift);
+typedef unsigned long __FASTCALL__ (*AppRefs)(char *str,__filesize_t shift,int flags,int codelen,__filesize_t r_shift);
 
 /***************************************************************\
 *  This form registry binary file formats                       *
@@ -118,24 +118,24 @@ typedef struct tag_REGISTRY_BIN
   int     __FASTCALL__ (*query_platform)( void );
 
                          /** Returns DAB_XXX. Quick version for disassembler */
-  int     __FASTCALL__ (*query_bitness)(unsigned long);
+  int     __FASTCALL__ (*query_bitness)(__filesize_t);
 
                          /** For displaying offset within struct in left address column.
                            * @return         False if string is not modified.
                           **/
-  tBool   __FASTCALL__ (*AddressResolving)(char *,unsigned long);
+  tBool   __FASTCALL__ (*AddressResolving)(char *,__filesize_t);
 
                          /** Converts virtual address to physical (means file offset).
                            * @param va       indicates virtual address to be converted
                            * @return         0 if operation meaningless
                           **/
-  unsigned long __FASTCALL__ (*va2pa)(unsigned long va);
+ __filesize_t __FASTCALL__ (*va2pa)(__filesize_t va);
 
                          /** Converts physical address to virtual.
                            * @param pa       indicates physical address to be converted
                            * @note           seg pointer can be NULL
                           **/
-  unsigned long __FASTCALL__ (*pa2va)(unsigned long pa);
+  __filesize_t __FASTCALL__ (*pa2va)(__filesize_t pa);
 
 
 /*-- Below placed functions for 'put structures' method of save as dialog --*/
@@ -151,8 +151,8 @@ typedef struct tag_REGISTRY_BIN
                            *                  physical address of public symbol
                            *                  which is found in given direction
                           **/
-  unsigned long __FASTCALL__ (*GetPubSym)(char *str,unsigned cb_str,unsigned *_class,
-                             unsigned long pa,tBool as_prev);
+  __filesize_t __FASTCALL__ (*GetPubSym)(char *str,unsigned cb_str,unsigned *_class,
+                             __filesize_t pa,tBool as_prev);
 
                          /** Determines attributes of object at given physical file address.
                            * @param pa        indicates physical file offset of object
@@ -172,8 +172,8 @@ typedef struct tag_REGISTRY_BIN
                            *                  = 0, end = begin of first data or
                            *                  code object).
                           **/
-  unsigned    __FASTCALL__ (*GetObjAttr)(unsigned long pa,char *name,unsigned cb_name,
-                              unsigned long *start,unsigned long *end,int *_class,int *bitness);
+  unsigned    __FASTCALL__ (*GetObjAttr)(__filesize_t pa,char *name,unsigned cb_name,
+                              __filesize_t *start,__filesize_t *end,int *_class,int *bitness);
 
                          /** Prepares internal buffers for work file structures.
                            * @param start     indicates start position in the file, that is required for dissasembler
@@ -182,7 +182,7 @@ typedef struct tag_REGISTRY_BIN
                            *                  is occured (sample: out of memory)
                            * @note            It is called before GetPubSym and GetObjAttr
                           **/
-  tBool         __FASTCALL__ (*prepare_structs)(unsigned long start,unsigned long end);
+  tBool         __FASTCALL__ (*prepare_structs)(__filesize_t start,__filesize_t end);
                          /** Cleans internal buffers after stopping of structural disassembler */
   void          __FASTCALL__ (*drop_structs)( void );
 }REGISTRY_BIN;
@@ -244,9 +244,9 @@ typedef struct tag_REGISTRY_MODE
                            * @param is_continue indicates initialization of search
                            *                  If set then search should be continued
                            * @param is_found  on output must contain True if result is really found
-                           * @return          offset of found sequence or ULONG_MAX if not found
+                           * @return          offset of found sequence or ULONG(LONG)_MAX if not found
                           **/
-unsigned long __FASTCALL__ (*search_engine)(TWindow *pwnd, unsigned long start, unsigned long *slen, unsigned flags, tBool is_continue, tBool *is_found);
+__filesize_t __FASTCALL__ (*search_engine)(TWindow *pwnd, __filesize_t start, __filesize_t *slen, unsigned flags, tBool is_continue, tBool *is_found);
 }REGISTRY_MODE;
 
 extern REGISTRY_MODE *activeMode;

@@ -53,7 +53,7 @@ static tBool __FASTCALL__ nulSelect_width( void )
 
 static char *outstr;
 
-static DisasmRet __FASTCALL__ nulDisassembler(unsigned long ulShift,
+static DisasmRet __FASTCALL__ nulDisassembler(__filesize_t ulShift,
                                               MBuffer buffer,
                                               unsigned flags)
 {

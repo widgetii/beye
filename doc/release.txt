@@ -1,4 +1,4 @@
-Release notes for BIEW version 5.6.1
+Release notes for BIEW version 5.6.X
 ====================================
 
   This document contains up-to-date information for end-users and developers.
@@ -11,8 +11,9 @@ Min. screen height:                  3   rows
 Max. screen height:                  unlimited
 Min. colors:                         2
 Max. colors:                         16
-Dynamic resizing of size of screen:  no
-Max. size of viewing file:           2Gb
+Dynamic resizing of screen's size:   no
+Max. size of viewing file:           2Gb (for 32-bit fileaccess)
+                                     8'589'934'592 Gb (for 64-bit fileaccess)
 
 Known problems in this release:
 ===============================

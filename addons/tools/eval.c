@@ -51,6 +51,7 @@
 #include "reg_form.h"
 #include "biewutil.h"
 #include "bconsole.h"
+#include "biewlib/biewlib.h"
 #include "biewlib/kbd_code.h"
 #include "biewlib/pmalloc.h"
 
@@ -97,7 +98,7 @@ static struct operator verbs[] = {
 #define EVAL_STACK_SIZE 256
 
 static char   *op_stack;                        /** Operator stack       */
-static long   *arg_stack;                       /** Argument stack       */
+static tIntMax*arg_stack;                       /** Argument stack       */
 static char   *token;                           /** Token buffer         */
 static int    op_sptr,                          /** op_stack pointer     */
               arg_sptr,                         /** arg_stack pointer    */
@@ -105,7 +106,7 @@ static int    op_sptr,                          /** op_stack pointer     */
               state;                            /** 0 = Awaiting expression
                                                      1 = Awaiting operator
                                                 */
-int                     evaluate(char *, long *,int *);
+int                     evaluate(char *, tIntMax *,int *);
 
 /*
 **  Originally published as part of the MicroFirm Function Library
@@ -136,8 +137,8 @@ static char * __NEAR__ __FASTCALL__ rmallws(char *str)
 static int __NEAR__ __FASTCALL__ do_op(void);
 static int __NEAR__ __FASTCALL__ do_paren(void);
 static void __NEAR__ __FASTCALL__ push_op(char);
-static void __NEAR__ __FASTCALL__ push_arg(long);
-static int __NEAR__ __FASTCALL__ pop_arg(long *);
+static void __NEAR__ __FASTCALL__ push_arg(tIntMax);
+static int __NEAR__ __FASTCALL__ pop_arg(tIntMax *);
 static int __NEAR__ __FASTCALL__ pop_op(int *);
 static char *__NEAR__ __FASTCALL__ get_exp(char *);
 static struct operator * __NEAR__ __FASTCALL__ get_op(char *);
@@ -151,7 +152,7 @@ static int __NEAR__ __FASTCALL__ getTOSprec(void);
 int main(int argc, char *argv[])
 {
       int retval,base;
-      long val;
+      tIntMax val;
       char sout[100];
       if(argc < 2)
       {
@@ -203,15 +204,15 @@ int main(int argc, char *argv[])
 /*                                                                      */
 /************************************************************************/
 
-int evaluate(char *line, long *val,int *result_base)
+int evaluate(char *line, tIntMax *val,int *result_base)
 {
-      long arg;
+      tIntMax arg;
       char *ptr = line, *str, *endptr;
       int ercode;
       int retval;
       struct operator *op;
       op_stack = PMalloc(EVAL_STACK_SIZE*sizeof(char));
-      arg_stack = PMalloc(EVAL_STACK_SIZE*sizeof(long));
+      arg_stack = PMalloc(EVAL_STACK_SIZE*sizeof(tIntMax));
       token = PMalloc(EVAL_STACK_SIZE*sizeof(char));
       if((!op_stack) || (!arg_stack) || (!token))
       {
@@ -279,7 +280,11 @@ int evaluate(char *line, long *val,int *result_base)
                                   base = 2;
                               }
                               else base = 10;
+#if __WORDSIZE >= 32
+                              if (0 == (arg = strtoll(e_num, &endptr,base)) &&
+#else
                               if (0 == (arg = strtol(e_num, &endptr,base)) &&
+#endif
                                     NULL == strchr(num, '0'))
                               {
                                     retval = O_ERROR;
@@ -372,7 +377,7 @@ int evaluate(char *line, long *val,int *result_base)
 
 static int __NEAR__ __FASTCALL__ do_op(void)
 {
-      long arg1, arg2;
+      tIntMax arg1, arg2;
       int op;
 
       if (S_ERROR == pop_op(&op))
@@ -464,12 +469,12 @@ static void __NEAR__ __FASTCALL__ push_op(char op)
       op_stack[op_sptr++] = op;
 }
 
-static void __NEAR__ __FASTCALL__ push_arg(long arg)
+static void __NEAR__ __FASTCALL__ push_arg(tIntMax arg)
 {
       arg_stack[arg_sptr++] = arg;
 }
 
-static int __NEAR__ __FASTCALL__ pop_arg(long *arg)
+static int __NEAR__ __FASTCALL__ pop_arg(tIntMax *arg)
 {
       *arg = arg_stack[--arg_sptr];
       return 0 > arg_sptr ? S_ERROR : SUCCESS;
@@ -602,7 +607,7 @@ static void CalculatorFunc(void)
    else
      if(ret == KE_ENTER)
      {
-       long val;
+       tIntMax val;
        int _ret,base;
        _ret = evaluate(estr,&val,&base);
        if(_ret != SUCCESS)
@@ -622,7 +627,11 @@ static void CalculatorFunc(void)
            case 8:  strcpy(sres,"0"); break;
            default: break;
          }
+#if __WORDSIZE >= 32
+         lltoa(val,&sres[strlen(sres)],base);
+#else
          ltoa(val,&sres[strlen(sres)],base);
+#endif
          switch(base)
          {
            case 2: strcat(sres,"b"); break;

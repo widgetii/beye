@@ -25,13 +25,34 @@
 #include "biewlib/biewlib.h"
 #include "biewlib/kbd_code.h"
 
-static int __NEAR__ __FASTCALL__ GetFullBin(unsigned long value,char * buff)
+static int __NEAR__ __FASTCALL__ GetFullBin(tUIntMax value,char * buff)
 {
  char byte,*b;
  tBool started = False;
  buff[0] = 0;
+#if __WORDSIZE >= 32
+ byte = (value >> 60) & 0x0F;
+ if(byte) { b = GetBinary(byte); strcat(buff,&b[4]); started = True; }
+ byte = (value >> 56) & 0x0F;
+ if(byte || started) { b = GetBinary(byte); strcat(buff,&b[4]); started = True; }
+ byte = (value >> 52) & 0x0F;
+ if(byte || started) { b = GetBinary(byte); strcat(buff,&b[4]); started = True; }
+ byte = (value >> 48) & 0x0F;
+ if(byte || started) { b = GetBinary(byte); strcat(buff,&b[4]); started = True; }
+ byte = (value >> 44) & 0x0F;
+ if(byte || started) { b = GetBinary(byte); strcat(buff,&b[4]); started = True; }
+ byte = (value >> 40) & 0x0F;
+ if(byte || started) { b = GetBinary(byte); strcat(buff,&b[4]); started = True; }
+ byte = (value >> 36) & 0x0F;
+ if(byte || started) { b = GetBinary(byte); strcat(buff,&b[4]); started = True; }
+ byte = (value >> 32) & 0x0F;
+ if(byte || started) { b = GetBinary(byte); strcat(buff,&b[4]); started = True; }
+ byte = (value >> 28) & 0x0F;
+ if(byte || started) { b = GetBinary(byte); strcat(buff,&b[4]); started = True; }
+#else
  byte = (value >> 28) & 0x0F;
  if(byte) { b = GetBinary(byte); strcat(buff,&b[4]); started = True; }
+#endif
  byte = (value >> 24) & 0x0F;
  if(byte || started) { b = GetBinary(byte); strcat(buff,&b[4]); started = True; }
  byte = (value >> 20) & 0x0F;
@@ -49,42 +70,63 @@ static int __NEAR__ __FASTCALL__ GetFullBin(unsigned long value,char * buff)
  return strlen(buff);
 }
 
-static int __NEAR__ __FASTCALL__ Dig2Str(unsigned long value,char * buff,int action)
+static int __NEAR__ __FASTCALL__ Dig2Str(tUIntMax value,char * buff,int action)
 {
+#if __WORDSIZE >= 32
+ if(action == 0) return strlen(ulltoa(value,buff,16));
+ if(action == 1) return strlen(lltoa(value,buff,8));
+ if(action == 2) return strlen(ulltoa(value,buff,10));
+ if(action == 3) return strlen(lltoa(value,buff,10));
+ if(action == 4) return GetFullBin(value,buff);
+ if(action == 5) return strlen(ulltoa(value,buff,2));
+#else
  if(action == 0) return strlen(ultoa(value,buff,16));
  if(action == 1) return strlen(ltoa(value,buff,8));
  if(action == 2) return strlen(ultoa(value,buff,10));
  if(action == 3) return strlen(ltoa(value,buff,10));
  if(action == 4) return GetFullBin(value,buff);
  if(action == 5) return strlen(ultoa(value,buff,2));
+#endif
  return 0;
 }
 
-static unsigned long __NEAR__ __FASTCALL__ Str2Dig(char * buff,int action)
+static tUIntMax __NEAR__ __FASTCALL__ Str2Dig(char * buff,int action)
 {
+#if __WORDSIZE >= 32
+ if(action == 0) return strtoull(buff,NULL,16);
+ if(action == 1) return strtoull(buff,NULL,8);
+ if(action == 2) return strtoull(buff,NULL,10);
+ if(action == 3) return strtoll(buff,NULL,10);
+ if(action == 4) return strtoull(buff,NULL,2);
+#else
  if(action == 0) return strtoul(buff,NULL,16);
  if(action == 1) return strtoul(buff,NULL,8);
  if(action == 2) return strtoul(buff,NULL,10);
  if(action == 3) return strtol(buff,NULL,10);
  if(action == 4) return strtoul(buff,NULL,2);
+#endif
  return 0;
 }
 
-static void __NEAR__ __FASTCALL__ DCStaticPaint(TWindow * wdlg,char * wbuff,long digit)
+static void __NEAR__ __FASTCALL__ DCStaticPaint(TWindow * wdlg,char * wbuff,tIntMax digit,unsigned *mlen)
 {
  int rlen,i;
+ tAbsCoord x1,y1,x2,y2;
+ unsigned w;
  TWindow * using = twUsedWin();
     twUseWin(wdlg);
+    twGetWinPos(wdlg,&x1,&y1,&x2,&y2);
+    w=x2-x1;
     rlen = Dig2Str(digit,wbuff,0);
-    twGotoXY(3,4); twPutS(wbuff); for(i = rlen;i < 8;i++)  twPutChar('±'); twPutS("   [Hex]");
+    twGotoXY(3,4); twPutS(wbuff); for(i = rlen;i < mlen[0];i++)  twPutChar('±'); twPutS("   [Hex]");
     rlen = Dig2Str(digit,wbuff,1);
-    twGotoXY(29,4); twPutS(wbuff); for(i = rlen;i < 11;i++)  twPutChar('±'); twPutS(" [Oct]");
+    twGotoXY(w-11-mlen[0],4); twPutS(wbuff); for(i = rlen;i < mlen[1];i++)  twPutChar('±'); twPutS(" [Oct]");
     rlen = Dig2Str(digit,wbuff,2);
-    twGotoXY(3,6); twPutS(wbuff); for(i = rlen;i < 10;i++)  twPutChar('±'); twPutS(" [Dec]");
+    twGotoXY(3,6); twPutS(wbuff); for(i = rlen;i < mlen[2];i++)  twPutChar('±'); twPutS(" [Dec]");
     rlen = Dig2Str(digit,wbuff,3);
-    twGotoXY(29,6); twPutS(wbuff); for(i = rlen;i < 11;i++) twPutChar('±'); twPutS(" [+-Dec]");
+    twGotoXY(w-11-mlen[0],6); twPutS(wbuff); for(i = rlen;i < mlen[3];i++) twPutChar('±'); twPutS(" [+-Dec]");
     rlen = Dig2Str(digit,wbuff,4);
-    twGotoXY(5,8); twPutS(wbuff); for(i = rlen;i < 32;i++)  twPutChar('±'); twPutS(" [Bin]");
+    twGotoXY(5,8); twPutS(wbuff); for(i = rlen;i < mlen[4];i++)  twPutChar('±'); twPutS(" [Bin]");
     twUseWin(using);
 }
 
@@ -92,15 +134,20 @@ static void DigConv( void )
 {
  tAbsCoord x1,y1,x2,y2;
  tRelCoord X1,Y1,XX1,XX2,YY1,YY2;
+#if __WORDSIZE >= 32
+ TWindow * wdlg = CrtDlgWndnls(" Digital convertor ",78,9);
+ unsigned mlen[5] = { 16, 22, 19, 20, 64 };
+#else
  TWindow * wdlg = CrtDlgWndnls(" Digital convertor ",48,9);
+ unsigned mlen[5] = { 8, 11, 10, 11, 32 };
+#endif
  TWindow * ewnd[5];
  int i,active,oactive,_lastbyte;
- unsigned attr,stx = 0,rlen;
- char wbuff[34];
+ unsigned attr,stx = 0,rlen,w;
+ char wbuff[68];
  tBool redraw;
  char * legal[5];
- unsigned mlen[5] = { 8, 11, 10, 11, 32 };
- unsigned long digit;
+ tUIntMax digit;
  char decleg[13],oleg[9],bleg[3];
  memcpy(decleg,legalchars,12);
  decleg[12] = '\0';
@@ -114,38 +161,39 @@ static void DigConv( void )
  legal[3] = decleg;
  legal[4] = bleg;
  twGetWinPos(wdlg,&x1,&y1,&x2,&y2);
+ w=x2-x1;
  X1 = x1;
  Y1 = y1;
  XX1 = X1 + 3;
  YY1 = Y1 + 4;
- XX2 = XX1 + 7;
+ XX2 = XX1 + (mlen[0]-1);
  YY2 = YY1;
  ewnd[0] = WindowOpen(XX1,YY1,XX2,YY2,TWS_CURSORABLE | TWS_NLSOEM);
  twSetColorAttr(dialog_cset.editor.active);
- XX1 = X1 + 29;
- XX2 = XX1 + 10;
+ XX1 = X1 + (w-11-mlen[0]);
+ XX2 = XX1 + (mlen[1]-1);
  ewnd[1] = WindowOpen(XX1,YY1,XX2,YY2,TWS_CURSORABLE | TWS_NLSOEM);
  twSetColorAttr(dialog_cset.editor.active);
  XX1 = X1 + 3;
  YY1 = Y1 + 6;
- XX2 = XX1 + 9;
+ XX2 = XX1 + (mlen[2]-1);
  YY2 = YY1;
  ewnd[2] = WindowOpen(XX1,YY1,XX2,YY2,TWS_CURSORABLE | TWS_NLSOEM);
  twSetColorAttr(dialog_cset.editor.active);
- XX1 = X1 + 29;
- XX2 = XX1 + 10;
+ XX1 = X1 + (w-11-mlen[0]);
+ XX2 = XX1 + (mlen[3]-1);
  ewnd[3] = WindowOpen(XX1,YY1,XX2,YY2,TWS_CURSORABLE | TWS_NLSOEM);
  twSetColorAttr(dialog_cset.editor.active);
  XX1 = X1 + 5;
  YY1 = Y1 + 8;
- XX2 = XX1 + 31;
+ XX2 = XX1 + (mlen[4]-1);
  YY2 = YY1;
  ewnd[4] = WindowOpen(XX1,YY1,XX2,YY2,TWS_CURSORABLE | TWS_NLSOEM);
  twSetColorAttr(dialog_cset.editor.active);
  twUseWin(wdlg);
  digit = 0;
  twGotoXY(3,2); twPutS("Convert numbers between bases [16, 10, 8, 2]");
- DCStaticPaint(wdlg,wbuff,digit);
+ DCStaticPaint(wdlg,wbuff,digit,mlen);
  oactive = 1;
  active =
  wbuff[0] = 0;
@@ -160,6 +208,10 @@ static void DigConv( void )
      twUseWin(ewnd[active]);
      oactive = active;
      stx = 0;
+   }
+   if(active == 4)
+   {
+     rlen=0;
    }
    rlen = Dig2Str(digit,wbuff,active == 4 ? 5 : active);
    if(stx > rlen) stx = rlen;
@@ -182,7 +234,7 @@ static void DigConv( void )
    }
    if(active < 0) active = 4;
    if(active > 4) active = 0;
-   if(redraw) DCStaticPaint(wdlg,wbuff,digit);
+   if(redraw) DCStaticPaint(wdlg,wbuff,digit,mlen);
  }
  CloseWnd(wdlg);
  for(i = 0;i < 5;i++) CloseWnd(ewnd[i]);
@@ -195,7 +247,3 @@ REGISTRY_TOOL DigitalConvertor =
   NULL,
   NULL
 };
-
-
-
-

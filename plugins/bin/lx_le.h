@@ -272,19 +272,19 @@ typedef struct tagLXResource
 
 
 extern void          __FASTCALL__ ShowFwdModOrdLX(const LX_ENTRY *_lxe);
-extern unsigned long __FASTCALL__ ShowNewHeaderLX( void );
-extern unsigned long __FASTCALL__ ShowObjectsLX( void );
+extern __filesize_t  __FASTCALL__ ShowNewHeaderLX( void );
+extern __filesize_t  __FASTCALL__ ShowObjectsLX( void );
 extern unsigned      __FASTCALL__ LXRNamesNumItems(BGLOBAL);
 extern tBool         __FASTCALL__ LXRNamesReadItems(BGLOBAL,memArray *,unsigned);
-extern unsigned long __FASTCALL__ ShowModRefLX( void );
+extern __filesize_t  __FASTCALL__ ShowModRefLX( void );
 extern unsigned      __FASTCALL__ LXNRNamesNumItems(BGLOBAL);
 extern tBool         __FASTCALL__ LXNRNamesReadItems(BGLOBAL,memArray *,unsigned);
-extern unsigned long __FASTCALL__ ShowImpProcLXLE( void );
-extern unsigned long __FASTCALL__ ShowEntriesLX( void );
+extern __filesize_t  __FASTCALL__ ShowImpProcLXLE( void );
+extern __filesize_t  __FASTCALL__ ShowEntriesLX( void );
 extern const char *  __FASTCALL__ lxeGetMapAttr(unsigned long attr);
-extern unsigned long __FASTCALL__ CalcEntryPointLE(unsigned long objnum,unsigned long _offset);
-extern unsigned long __FASTCALL__ CalcPageEntryLE(unsigned long idx);
-extern unsigned long __FASTCALL__ CalcEntryLE(const LX_ENTRY *);
+extern __filesize_t  __FASTCALL__ CalcEntryPointLE(unsigned long objnum,__filesize_t _offset);
+extern __filesize_t  __FASTCALL__ CalcPageEntryLE(unsigned long idx);
+extern __filesize_t  __FASTCALL__ CalcEntryLE(const LX_ENTRY *);
 
 #define FILE_LX 1
 #define FILE_LE 2

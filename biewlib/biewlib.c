@@ -249,7 +249,62 @@ char *ultoa (unsigned long value, char *string, int radix)
   }
   return string;
 }
+#endif
 
+#if __WORDSIZE >= 32
+char *lltoa (long long int value, char *string, int radix)
+{
+  char *dst;
+
+  dst = string;
+  if (radix < 2 || radix > 36) *dst = 0;
+  else
+  {
+    unsigned long long int x;
+    int i, n;
+    char digits[64];
+    if (radix == 10 && value < 0)
+    {
+      *dst++ = '-';
+      x = -value;
+    }
+    else x = value;
+    i = 0;
+    do
+    {
+      n = x % radix;
+      digits[i++] = n+(n < 10 ? '0' : 'A'-10);
+      x /= radix;
+    } while (x != 0);
+    while (i > 0) *dst++ = digits[--i];
+    *dst = 0;
+  }
+  return string;
+}
+
+char *ulltoa (unsigned long long int value, char *string, int radix)
+{
+  char *dst;
+
+  dst = string;
+  if (radix < 2 || radix > 36) *dst = 0;
+  else
+  {
+    int i;
+    unsigned n;
+    char digits[64];
+    i = 0;
+    do
+    {
+      n = value % radix;
+      digits[i++] = n+(n < 10 ? '0' : 'A'-10);
+      value /= radix;
+    } while (value != 0);
+    while (i > 0) *dst++ = digits[--i];
+    *dst = 0;
+  }
+  return string;
+}
 #endif
 
 /*

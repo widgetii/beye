@@ -47,7 +47,7 @@ char **  ArgVector;
 unsigned ListFileCount;
 static char **ListFile;
 static char *LastOpenFileName;
-unsigned long LastOffset;
+__filesize_t LastOffset;
 static tBool UseIniFile=True;
 char biew_help_name[FILENAME_MAX+1] = "";
 char biew_skin_name[FILENAME_MAX+1] = "";
@@ -61,7 +61,7 @@ unsigned long biew_kbdFlags = 0L;
 tBool iniSettingsAnywhere = False;
 tBool fioUseMMF = False;
 tBool iniPreserveTime = False;
-unsigned long headshift = 0L;
+__filesize_t headshift = 0L;
 char *ini_name;
 
 TWindow * MainWnd = 0,*HelpWnd = 0,*TitleWnd = 0,*ErrorWnd = 0;
@@ -207,9 +207,9 @@ static void __NEAR__ __FASTCALL__ MakeShortName( void )
   __nls_CmdlineToOem((unsigned char *)shortname,strlen(shortname));
 }
 
-unsigned long IsNewExe()
+__filesize_t IsNewExe()
 {
-  unsigned long ret;
+  __filesize_t ret;
   char id[2];
   bmReadBufferEx(id,sizeof(id),0,BM_SEEK_SET);
 #if 0
@@ -228,7 +228,7 @@ unsigned long IsNewExe()
 #endif
    if(!( id[0] == 'M' && id[1] == 'Z' &&
         (ret=bmReadDWordEx(0x3C,BM_SEEK_SET)) > 0x02L)) ret = 0;
-   return ret;
+   return (__filesize_t)ret;
 }
 
 static void __NEAR__ __FASTCALL__ AutoDetectMode( void )
@@ -275,7 +275,7 @@ static int __NEAR__ __FASTCALL__ queryKey(char *arg)
 }
 
 static unsigned int  biew_mode     = UINT_MAX;
-static unsigned long new_file_size = ULONG_MAX;
+static __filesize_t  new_file_size = FILESIZE_MAX;
 
 static void __NEAR__ __FASTCALL__ ParseCmdLine( void )
 {
@@ -292,7 +292,13 @@ static void __NEAR__ __FASTCALL__ ParseCmdLine( void )
        case 2: biew_mode = 3; break;
        case 3: biew_mode = 2; break;
        case 4: biew_mode = 0; break;
-       case 5: new_file_size = strtoul(ArgVector[++i],NULL,10); break;
+       case 5:
+#if __WORDSIZE >= 32
+		new_file_size = strtoull(ArgVector[++i],NULL,10);
+#else
+		new_file_size = strtoul(ArgVector[++i],NULL,10);
+#endif
+		break;
        case 6: UseIniFile = False; break;
        case 7: ListFileCount = 0; return;
        default: ListFile[ListFileCount++] = ArgVector[i];
@@ -304,7 +310,7 @@ static void __NEAR__ __FASTCALL__ ParseCmdLine( void )
 static tBool __NEAR__ __FASTCALL__ LoadInfo( void )
 {
    MakeShortName();
-   if(new_file_size != ULONG_MAX)
+   if(new_file_size != FILESIZE_MAX)
    {
        int handle;
        if(__IsFileExists(ArgVector[1]) == False) handle = __OsCreate(ArgVector[1]);
@@ -397,7 +403,7 @@ tBool isValidIniArgs( void )
 
 static hIniProfile * __NEAR__ __FASTCALL__ load_ini_info( void )
 {
-  char tmp[10];
+  char tmp[20];
   hIniProfile *ini;
   ini_name = getenv("BIEW_INI");
   if(!ini_name) ini_name = __get_ini_name("biew");
@@ -424,7 +430,11 @@ static hIniProfile * __NEAR__ __FASTCALL__ load_ini_info( void )
   biewReadProfileString(ini,"Biew","Browser","LastMode",tmp,tmp,sizeof(tmp));
   LastMode = (size_t)strtoul(tmp,NULL,10);
   biewReadProfileString(ini,"Biew","Browser","Offset","0",tmp,sizeof(tmp));
+#if __WORDSIZE >= 32
+  LastOffset = atoll(tmp);
+#else
   LastOffset = atol(tmp); /** by watcom */
+#endif
   biewReadProfileString(ini,"Biew","Setup","Version","",biew_ini_ver,sizeof(biew_ini_ver));
   biewReadProfileString(ini,"Biew","Setup","DirectConsole","yes",tmp,sizeof(tmp));
   if(stricmp(tmp,"yes") == 0) biew_vioIniFlags = __TVIO_FLG_DIRECT_CONSOLE_ACCESS;
@@ -446,7 +456,7 @@ static hIniProfile * __NEAR__ __FASTCALL__ load_ini_info( void )
 
 static void __NEAR__ __FASTCALL__ save_ini_info( void )
 {
-  char tmp[10];
+  char tmp[20];
   hIniProfile *ini;
   search_buff[search_len] = 0;
   ini = iniOpenFile(ini_name,NULL);
@@ -464,7 +474,11 @@ static void __NEAR__ __FASTCALL__ save_ini_info( void )
   biewWriteProfileString(ini,"Biew","Browser","LastOpen",ArgVector[1]);
   sprintf(tmp,"%u",defMainModeSel);
   biewWriteProfileString(ini,"Biew","Browser","LastMode",tmp);
+#if __WORDSIZE >= 32
+  sprintf(tmp,"%llu",LastOffset);
+#else
   sprintf(tmp,"%lu",LastOffset);
+#endif
   biewWriteProfileString(ini,"Biew","Browser","Offset",tmp);
   strcpy(tmp,biew_vioIniFlags & __TVIO_FLG_DIRECT_CONSOLE_ACCESS ? "yes" : "no");
   biewWriteProfileString(ini,"Biew","Setup","DirectConsole",tmp);

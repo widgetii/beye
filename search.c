@@ -39,7 +39,7 @@ unsigned char search_buff[MAX_SEARCH_SIZE] = "";
 unsigned char search_len = 0;
 unsigned biewSearchFlg = SF_NONE;
 
-unsigned long FoundTextSt = 0,FoundTextEnd = 0;
+__filesize_t FoundTextSt = 0,FoundTextEnd = 0;
 
 tBool __found;
 
@@ -66,7 +66,7 @@ void __FASTCALL__ fillBoyerMooreCache(int *cache, const char *pattern,
                      *                        if global variable __found is True
                      *                        otherwise:
                      *                        0L - if sequence is not found
-                     *                        ULONG_MAX - if sequence can not be
+                     *                        FILESIZE_MAX - if sequence can not be
                      *                        found (EOF is reached)
                      * @param sfrom           indicates string where search must
                      *                        be performed. If NULL then search
@@ -83,17 +83,17 @@ void __FASTCALL__ fillBoyerMooreCache(int *cache, const char *pattern,
                      * @param biewFlg         indicates global flags of Biew
                      *                        search engine.
                     **/
-static unsigned long __NEAR__ __FASTCALL__ ___lfind(const char *sfrom, 
+static __filesize_t __NEAR__ __FASTCALL__  ___lfind(const char *sfrom, 
                                                     unsigned slen, 
                                                     unsigned flags,
-                                                    unsigned long start, 
+                                                    __filesize_t start, 
                                                     const int *scache,
                                                     const char *pattern,
                                                     unsigned pattern_size,
                                                     unsigned biewFlg)
 {
-  unsigned long flen, endscan, orig_start;
-  unsigned long tsize,cpos,findptr = UINT_MAX,retval;
+  __filesize_t flen, endscan, orig_start;
+  __filesize_t tsize,cpos,findptr = FILESIZE_MAX,retval;
   char fbuff[MAX_SEARCH_SIZE*__MAX_SYMBOL_SIZE], nbuff[__MAX_SYMBOL_SIZE];
   unsigned proc,pproc,pmult,bio_opt=0,symb_size;
   int direct,icache[UCHAR_MAX+1];
@@ -120,7 +120,7 @@ static unsigned long __NEAR__ __FASTCALL__ ___lfind(const char *sfrom,
   direct  = biewFlg & SF_REVERSE ? -1 : 1;
   tsize = flen;
   pmult = 100;
-  if(tsize > ULONG_MAX/100) { tsize /= 100; pmult = 1; }
+  if(tsize > FILESIZE_MAX/100) { tsize /= 100; pmult = 1; }
   cond = False;
   pproc = proc = 0;
   /* seek to the last character of pattern by direction */
@@ -140,13 +140,13 @@ static unsigned long __NEAR__ __FASTCALL__ ___lfind(const char *sfrom,
     /* If search direction is forward then start point at the end of pattern */
     if(direct == 1 && start*symb_size > flen)
     {
-      retval = ULONG_MAX;
+      retval = FILESIZE_MAX;
       break;
     }
     /* If search direction is backward then start point at the begin of pattern */
     if(direct == -1 && start < (pattern_size*symb_size))
     {
-      retval = ULONG_MAX;
+      retval = FILESIZE_MAX;
       break;
     }
     proc = (unsigned)((cpos*pmult)/tsize);
@@ -220,17 +220,17 @@ static unsigned long __NEAR__ __FASTCALL__ ___lfind(const char *sfrom,
   return retval;
 }
 
-static unsigned long __NEAR__ __FASTCALL__ ___adv_find(const char *sfrom, 
+static __filesize_t __NEAR__ __FASTCALL__  ___adv_find(const char *sfrom, 
                                                        unsigned sfromlen,
-                                                       unsigned long start,
-                                                       unsigned long *slen,
+                                                       __filesize_t start,
+                                                       __filesize_t *slen,
                                                        const int *scache,
                                                        const char *pattern,
                                                        unsigned pattern_size,
                                                        unsigned biewFlg)
 {
-  unsigned long _found,found_st=ULONG_MAX,prev_found;
-  unsigned long stable_found;
+  __filesize_t _found,found_st=FILESIZE_MAX,prev_found;
+  __filesize_t stable_found;
   unsigned i, orig_i, last_search_len;
   unsigned orig_slen, t_count, flags;
   tBool is_tmpl, has_question;
@@ -251,7 +251,7 @@ static unsigned long __NEAR__ __FASTCALL__ ___adv_find(const char *sfrom,
   prev_found = start;
   flags = __LF_NORMAL;
   has_question = False;
-  stable_found = ULONG_MAX;
+  stable_found = FILESIZE_MAX;
   while(1)
   {
     orig_i = i;
@@ -306,7 +306,7 @@ static unsigned long __NEAR__ __FASTCALL__ ___adv_find(const char *sfrom,
     {
        if(!orig_i) stable_found = _found;
        t_count = 0;
-       if(found_st == ULONG_MAX) found_st = _found;
+       if(found_st == FILESIZE_MAX) found_st = _found;
        if(orig_i)
         if(pattern[orig_i-1] == '?' &&
           prev_found+last_search_len+t_count != _found) /* special case for '?' */
@@ -335,30 +335,30 @@ static unsigned long __NEAR__ __FASTCALL__ ___adv_find(const char *sfrom,
     }
     else
     {
-      if(!has_question || _found == ULONG_MAX)
+      if(!has_question || _found == FILESIZE_MAX)
       {
-        found_st = ULONG_MAX;
+        found_st = FILESIZE_MAX;
         break;
       }
       else /* restarting search engine */
       {
-        if(found_st == ULONG_MAX) break;
+        if(found_st == FILESIZE_MAX) break;
         pattern_size = orig_slen;
         if(orig_direct & SF_REVERSE) biewFlg |= SF_REVERSE;
         else                         biewFlg &= SF_REVERSE;
         start = biewFlg & SF_REVERSE ? stable_found-1 : stable_found+1;
         memcpy(cbuff,pattern,pattern_size);
-        found_st = ULONG_MAX;
+        found_st = FILESIZE_MAX;
         goto restart;
       }
     }
     if(i >= orig_slen) break;
   }
-  if(found_st == ULONG_MAX) found_st = 0;
+  if(found_st == FILESIZE_MAX) found_st = 0;
   /* Special case if last character is wildcard */
   if(cbuff[orig_slen-1] == '?') last_search_len++;
   *slen = _found+last_search_len-found_st;
-  if(cbuff[orig_slen-1] == '*') (*slen) = ULONG_MAX - _found;
+  if(cbuff[orig_slen-1] == '*') (*slen) = FILESIZE_MAX - _found;
 exit:
   pattern_size = orig_slen;
   if(orig_direct & SF_REVERSE) biewFlg &= ~SF_REVERSE;
@@ -372,7 +372,8 @@ char * __FASTCALL__ strFind(const char *str, unsigned str_len,
                             const void *sbuff, unsigned sbuflen,
                             const int *cache, unsigned flg)
 {
- unsigned long lretval, slen;
+ __filesize_t slen;
+ unsigned long lretval;
  lretval = ___adv_find(str, str_len, 0, &slen, cache, sbuff, sbuflen, flg & (~SF_REVERSE));
  return (char *)(__found ? &str[lretval] : 0);
 }
@@ -570,10 +571,10 @@ tBool __FASTCALL__ SearchDialog(int _flags, char * searchbuff,
 
 extern TWindow * ErrorWnd;
 
-unsigned long __FASTCALL__ Search( tBool is_continue )
+__filesize_t __FASTCALL__ Search( tBool is_continue )
 {
-  unsigned long found;
-  unsigned long fmem,lmem,slen, flen;
+  __filesize_t found;
+  __filesize_t fmem,lmem,slen, flen;
   tBool ret;
   fmem = BMGetCurrFilePos();
   flen = BMGetFLength();

@@ -192,13 +192,13 @@ static int __FASTCALL__ lmf_platform(void)
 	return DISASM_CPU_IX86;
 }
 
-static int __FASTCALL__ lmf_bitness(unsigned long pa)
+static int __FASTCALL__ lmf_bitness(__filesize_t pa)
 {
 	if(DEF.cflags&_PCF_32BIT) return DAB_USE32;
 	else return DAB_USE16;
 }
 
-static tBool __FASTCALL__ lmf_AddressResolv(char *addr,unsigned long cfpos)
+static tBool __FASTCALL__ lmf_AddressResolv(char *addr,__filesize_t cfpos)
 {
 	int i;
  /* Since this function is used in references resolving of disassembler
@@ -264,12 +264,12 @@ static tBool __FASTCALL__ lmf_AddressResolv(char *addr,unsigned long cfpos)
 	return False;
 }
 
-static unsigned long __FASTCALL__ lmf_va2pa(unsigned long va)
+static __filesize_t __FASTCALL__ lmf_va2pa(__filesize_t va)
 {
 	int i,j;
 	int seclen;
-	unsigned long addr=0;
-	unsigned long newva=0;
+	__filesize_t addr=0;
+	__filesize_t newva=0;
 	if(DEF.cflags&_PCF_32BIT)
 	{
 		for(i=0;i<seg_num;i++)
@@ -300,11 +300,11 @@ static unsigned long __FASTCALL__ lmf_va2pa(unsigned long va)
 	return addr;
 }
 
-static unsigned long __FASTCALL__ lmf_pa2va(unsigned long pa)
+static __filesize_t __FASTCALL__ lmf_pa2va(__filesize_t pa)
 {
 	int i;
 	int seclen;
-	unsigned long addr=0;
+	__filesize_t addr=0;
 	for(i=1;i<reclast;i++)
 	{
 		seclen=hl[i].header.data_nbytes-DATSIZE;
@@ -384,9 +384,9 @@ static unsigned __FASTCALL__ lmf_SecHdrNumItems(BGLOBAL handle)
 	return reclast+1;
 }
 
-static unsigned long __FASTCALL__ lmf_ShowSecLst(void)
+static __filesize_t __FASTCALL__ lmf_ShowSecLst(void)
 {
-	unsigned long fpos;
+	__filesize_t fpos;
 	int ret;
 	fpos=BMGetCurrFilePos();
 	ret=fmtShowList(lmf_SecHdrNumItems,lmf_ReadSecHdr,
@@ -397,10 +397,10 @@ static unsigned long __FASTCALL__ lmf_ShowSecLst(void)
 	return fpos;
 }
 
-static unsigned long __FASTCALL__ lmf_ShowHeader( void )
+static __filesize_t __FASTCALL__ lmf_ShowHeader( void )
 {
 	int i,j,k;
-	unsigned long fpos;
+	__filesize_t fpos;
 	TWindow *w;
 	char hdr[81];
 	char tmp[30];
@@ -482,7 +482,7 @@ static unsigned long __FASTCALL__ lmf_ShowHeader( void )
 	return fpos;
 }
 
-static unsigned long __FASTCALL__ lmf_LMFHlp( void )
+static __filesize_t __FASTCALL__ lmf_LMFHlp( void )
 {
   hlpDisplay(10015);
   return BMGetCurrFilePos();

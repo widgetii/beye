@@ -15,6 +15,7 @@
  * @since       1995
  * @note        Development, fixes and improvements
 **/
+#include <limits.h>
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
@@ -24,6 +25,7 @@
 #include "tstrings.h"
 #include "biewlib/bbio.h"
 
+unsigned BMFileFlags=0;
 extern tBool fioUseMMF;
 static BGLOBAL file = NULL,sc_file = NULL;
 static char FName[FILENAME_MAX+1];
@@ -63,6 +65,7 @@ int __FASTCALL__ BMOpen(char * fname)
   }
   bioSetOptimization(file,BIO_OPT_RANDOM);
   bioSetOptimization(sc_file,BIO_OPT_RANDOM);
+  if(BMGetFLength() > ULONG_MAX) BMFileFlags |= BMFF_USE64;
   return 0;
 }
 
@@ -84,7 +87,7 @@ void __FASTCALL__ BMClose( void )
   sc_file = &bNull;
 }
 
-void __FASTCALL__ BMSeek(long pos,int RELATION)
+void __FASTCALL__ BMSeek(__fileoff_t pos,int RELATION)
 {
   bioSeek(file,pos,RELATION);
 }
@@ -109,12 +112,12 @@ tUInt32  __FASTCALL__ BMReadDWord( void )
   return bioReadDWord(file);
 }
 
-unsigned long  __FASTCALL__ BMGetCurrFilePos( void )
+__filesize_t  __FASTCALL__ BMGetCurrFilePos( void )
 {
   return bioTell(file);
 }
 
-unsigned long __FASTCALL__ BMGetFLength( void )
+__filesize_t __FASTCALL__ BMGetFLength( void )
 {
   return bioFLength(file);
 }
@@ -124,25 +127,25 @@ tBool __FASTCALL__ BMReadBuffer(void * buffer,unsigned len)
   return bioReadBuffer(file,buffer,len);
 }
 
-tUInt8  __FASTCALL__ BMReadByteEx(long pos,int RELATION)
+tUInt8  __FASTCALL__ BMReadByteEx(__fileoff_t pos,int RELATION)
 {
  bioSeek(file,pos,RELATION);
  return bioReadByte(file);
 }
 
-tUInt16 __FASTCALL__ BMReadWordEx(long pos,int RELATION)
+tUInt16 __FASTCALL__ BMReadWordEx(__fileoff_t pos,int RELATION)
 {
  bioSeek(file,pos,RELATION);
  return bioReadWord(file);
 }
 
-tUInt32  __FASTCALL__ BMReadDWordEx(long pos,int RELATION)
+tUInt32  __FASTCALL__ BMReadDWordEx(__fileoff_t pos,int RELATION)
 {
  bioSeek(file,pos,RELATION);
  return bioReadDWord(file);
 }
 
-tBool __FASTCALL__ BMReadBufferEx(void * buffer,unsigned len,long pos,int RELATION)
+tBool __FASTCALL__ BMReadBufferEx(void * buffer,unsigned len,__fileoff_t pos,int RELATION)
 {
  bioSeek(file,pos,RELATION);
  return bioReadBuffer(file,buffer,len);
@@ -171,25 +174,25 @@ tBool __FASTCALL__ BMWriteBuff(void * buff,unsigned len)
   return ret;
 }
 
-tBool __FASTCALL__ BMWriteByteEx(long pos,int RELATION,tUInt8 byte)
+tBool __FASTCALL__ BMWriteByteEx(__fileoff_t pos,int RELATION,tUInt8 byte)
 {
   bioSeek(file,pos,RELATION);
   return bioWriteByte(file,byte);
 }
 
-tBool __FASTCALL__ BMWriteWordEx(long pos,int RELATION,tUInt16 word)
+tBool __FASTCALL__ BMWriteWordEx(__fileoff_t pos,int RELATION,tUInt16 word)
 {
   bioSeek(file,pos,RELATION);
   return bioWriteWord(file,word);
 }
 
-tBool __FASTCALL__ BMWriteDWordEx(long pos,int RELATION,tUInt32 dword)
+tBool __FASTCALL__ BMWriteDWordEx(__fileoff_t pos,int RELATION,tUInt32 dword)
 {
   bioSeek(file,pos,RELATION);
   return bioWriteDWord(file,dword);
 }
 
-tBool  __FASTCALL__ BMWriteBuffEx(long pos,int RELATION,void * buff,unsigned len)
+tBool  __FASTCALL__ BMWriteBuffEx(__fileoff_t pos,int RELATION,void * buff,unsigned len)
 {
   bioSeek(file,pos,RELATION);
   return bioWriteBuffer(file,buff,len);
@@ -215,7 +218,7 @@ BGLOBAL __FASTCALL__ bmbioHandle( void )
   return sc_file;
 }
 
-void __FASTCALL__ bmSeek(long pos,int RELATION)
+void __FASTCALL__ bmSeek(__fileoff_t pos,int RELATION)
 {
   bioSeek(sc_file,pos,RELATION);
 }
@@ -240,12 +243,12 @@ tUInt32  __FASTCALL__ bmReadDWord( void )
   return bioReadDWord(sc_file);
 }
 
-unsigned long  __FASTCALL__ bmGetCurrFilePos( void )
+__filesize_t  __FASTCALL__ bmGetCurrFilePos( void )
 {
   return bioTell(sc_file);
 }
 
-unsigned long __FASTCALL__ bmGetFLength( void )
+__filesize_t __FASTCALL__ bmGetFLength( void )
 {
   return bioFLength(sc_file);
 }
@@ -255,25 +258,25 @@ tBool __FASTCALL__ bmReadBuffer(void * buffer,unsigned len)
   return bioReadBuffer(sc_file,buffer,len);
 }
 
-tUInt8 __FASTCALL__ bmReadByteEx(long pos,int RELATION)
+tUInt8 __FASTCALL__ bmReadByteEx(__fileoff_t pos,int RELATION)
 {
  bioSeek(sc_file,pos,RELATION);
  return bioReadByte(sc_file);
 }
 
-tUInt16 __FASTCALL__ bmReadWordEx(long pos,int RELATION)
+tUInt16 __FASTCALL__ bmReadWordEx(__fileoff_t pos,int RELATION)
 {
  bioSeek(sc_file,pos,RELATION);
  return bioReadWord(sc_file);
 }
 
-tUInt32 __FASTCALL__ bmReadDWordEx(long pos,int RELATION)
+tUInt32 __FASTCALL__ bmReadDWordEx(__fileoff_t pos,int RELATION)
 {
  bioSeek(sc_file,pos,RELATION);
  return bioReadDWord(sc_file);
 }
 
-tBool __FASTCALL__ bmReadBufferEx(void * buffer,unsigned len,long pos,int RELATION)
+tBool __FASTCALL__ bmReadBufferEx(void * buffer,unsigned len,__fileoff_t pos,int RELATION)
 {
  bioSeek(sc_file,pos,RELATION);
  return bioReadBuffer(sc_file,buffer,len);
@@ -302,25 +305,25 @@ tBool __FASTCALL__ bmWriteBuff(void * buff,unsigned len)
   return ret;
 }
 
-tBool __FASTCALL__ bmWriteByteEx(long pos,int RELATION,tUInt8 byte)
+tBool __FASTCALL__ bmWriteByteEx(__fileoff_t pos,int RELATION,tUInt8 byte)
 {
   bioSeek(sc_file,pos,RELATION);
   return bioWriteByte(sc_file,byte);
 }
 
-tBool __FASTCALL__ bmWriteWordEx(long pos,int RELATION,tUInt16 word)
+tBool __FASTCALL__ bmWriteWordEx(__fileoff_t pos,int RELATION,tUInt16 word)
 {
   bioSeek(sc_file,pos,RELATION);
   return bioWriteWord(sc_file,word);
 }
 
-tBool __FASTCALL__ bmWriteDWordEx(long pos,int RELATION,tUInt32 dword)
+tBool __FASTCALL__ bmWriteDWordEx(__fileoff_t pos,int RELATION,tUInt32 dword)
 {
   bioSeek(sc_file,pos,RELATION);
   return bioWriteDWord(sc_file,dword);
 }
 
-tBool  __FASTCALL__ bmWriteBuffEx(long pos,int RELATION,void * buff,unsigned len)
+tBool  __FASTCALL__ bmWriteBuffEx(__fileoff_t pos,int RELATION,void * buff,unsigned len)
 {
   bioSeek(sc_file,pos,RELATION);
   return bioWriteBuffer(sc_file,buff,len);

@@ -64,9 +64,9 @@ static tBool __FASTCALL__ binSelectMode( void )
 
 static unsigned __FASTCALL__ drawBinary( unsigned keycode,unsigned tshift )
 {
- static unsigned long bmocpos = 0L;
- unsigned long _index;
- unsigned long limit,flen,cfp;
+ static __filesize_t bmocpos = 0L;
+ __filesize_t _index;
+ __filesize_t limit,flen,cfp;
  int len;
  unsigned BWidth,_b_width,count;
  size_t j;
@@ -92,7 +92,7 @@ static unsigned __FASTCALL__ drawBinary( unsigned keycode,unsigned tshift )
    bmocpos = cfp;
    flen = BMGetFLength();
    limit = flen - BWidth;
-   if(flen < (unsigned long)BWidth) BWidth = (int)(limit = flen);
+   if(flen < (__filesize_t)BWidth) BWidth = (int)(limit = flen);
    twFreezeWin(MainWnd);
    for(j = 0;j < height;j++)
    {

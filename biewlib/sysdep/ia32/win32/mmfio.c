@@ -424,31 +424,34 @@ static int __FASTCALL__ mk_access(int mode)
 mmfHandle          __FASTCALL__ __mmfOpen(const char *fname,int mode)
 {
   struct mmfRecord *mret;
+  __fileoff_t length;
   int fhandle;
   fhandle = __OsOpen(fname,mode);
   if(fhandle != -1)
   {
-    mret = PMalloc(sizeof(struct mmfRecord));
-    if(mret)
+    length = __FileLength(fhandle);
+    if(length <= PTRDIFF_MAX)
     {
-      HANDLE fmapping;
-      long length;
-      void *addr;
-      length = __FileLength(fhandle);
-      fmapping = CreateFileMapping((HANDLE)fhandle,NULL,mk_prot(mode),0L,length,NULL);
-      if(fmapping)
+      mret = PMalloc(sizeof(struct mmfRecord));
+      if(mret)
       {
-        addr = MapViewOfFile(fmapping,mk_access(mode),0L,0L,length);
-        if(addr)
+        HANDLE fmapping;
+        void *addr;
+        fmapping = CreateFileMapping((HANDLE)fhandle,NULL,mk_prot(mode),0L,length,NULL);
+        if(fmapping)
         {
-          mret->fhandle = fhandle;
-          mret->fmapping= fmapping;
-          mret->addr    = addr;
-          mret->length  = length;
-          mret->mode    = mode;
-          return mret;
+          addr = MapViewOfFile(fmapping,mk_access(mode),0L,0L,length);
+          if(addr)
+          {
+            mret->fhandle = fhandle;
+            mret->fmapping= fmapping;
+            mret->addr    = addr;
+            mret->length  = length;
+            mret->mode    = mode;
+            return mret;
+          }
+          CloseHandle(fmapping);
         }
-        CloseHandle(fmapping);
       }
       PFree(mret);
     }

@@ -30,12 +30,12 @@
 
 static DOSDRIVER drv;
 
-static unsigned long __FASTCALL__ ShowSysHeader( void )
+static __filesize_t __FASTCALL__ ShowSysHeader( void )
 {
  int keycode;
  TWindow *hwnd;
  tBool charun;
- long fpos;
+ __fileoff_t fpos;
  fpos = BMGetCurrFilePos();
  hwnd = CrtDlgWndnls(" DOS Device Driver Header ",57,13);
  charun = (drv.ddAttribute & 0x8000) == 0x8000;
@@ -97,7 +97,7 @@ static void __FASTCALL__ dossys_init_fmt( void ) {}
 static void __FASTCALL__ dossys_destroy_fmt(void) {}
 static int  __FASTCALL__ dossys_platform( void) { return DISASM_CPU_IX86; }
 
-static tBool __FASTCALL__ dossys_AddressResolv(char *addr,unsigned long cfpos)
+static tBool __FASTCALL__ dossys_AddressResolv(char *addr,__filesize_t cfpos)
 {
   tBool bret = True;
   if(cfpos < sizeof(DOSDRIVER)+4) sprintf(addr,"SYSH:%s",Get4Digit(cfpos));
@@ -105,7 +105,7 @@ static tBool __FASTCALL__ dossys_AddressResolv(char *addr,unsigned long cfpos)
   return bret;
 }
 
-static unsigned long __FASTCALL__ SYSHelp( void )
+static __filesize_t __FASTCALL__ SYSHelp( void )
 {
   hlpDisplay(10014);
   return BMGetCurrFilePos();

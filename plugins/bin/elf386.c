@@ -129,20 +129,20 @@ typedef union
 #define ELF_RELA(e,FIELD) (is_64bit?(((Elf64_External_Rela *)&e.e64)->FIELD):(((Elf386_External_Rela *)&e.e32)->FIELD))
 #define ELF_RELA_SIZE() (is_64bit?sizeof(Elf64_External_Rela):sizeof(Elf386_External_Rela))
 
-static unsigned long active_shtbl = 0;
-static unsigned long elf_min_va = ULONG_MAX;
+static __filesize_t active_shtbl = 0;
+static __filesize_t elf_min_va = FILESIZE_MAX;
 static unsigned long __elfNumSymTab = 0;
-static unsigned long __elfSymShTbl = 0;
+static __filesize_t __elfSymShTbl = 0;
 static unsigned      __elfSymEntSize = 0;
-static unsigned long __elfSymPtr = 0L;
+static __filesize_t __elfSymPtr = 0L;
 
 struct tag_elfVAMap
 {
-  unsigned long va;
-  unsigned long size;
-  unsigned long foff;
-  unsigned long nameoff;
-  unsigned long flags;
+  __filesize_t va;
+  __filesize_t size;
+  __filesize_t foff;
+  __filesize_t nameoff;
+  __filesize_t flags;
 };
 
 
@@ -157,29 +157,29 @@ struct tag_elfVAMap
     each time (if needed) BEFORE calling ELF_HALF and ELF_WORD macros.
 */
 
-static unsigned long elf_struct_base = (unsigned long)&elf + EI_NIDENT;
+static __filesize_t elf_struct_base = (__filesize_t)&elf + EI_NIDENT;
 
-static inline unsigned long elf64_value(unsigned long offset)
+static inline __filesize_t elf64_value(__filesize_t offset)
 {
-    unsigned long *p = (unsigned long *)
+    __filesize_t *p = (__filesize_t *)
 		    (elf_struct_base + ((offset - elf_struct_base) << 1));
     return *p;
 }
 
-static inline unsigned short __elf_half(unsigned long cval, unsigned long addr)
+static inline unsigned short __elf_half(__filesize_t cval, __filesize_t addr)
 {
     return !is_64bit ?	FMT_WORD(cval,is_msbf) :
 			FMT_DWORD(elf64_value(addr), is_msbf);
 }
 
-static inline unsigned long __elf_word(unsigned long cval, unsigned long addr)
+static inline unsigned long __elf_word(__filesize_t cval, __filesize_t addr)
 {
     return !is_64bit ?	FMT_DWORD(cval,is_msbf) :
 			FMT_QWORD(elf64_value(addr), is_msbf);
 }
 
-#define ELF_HALF(cval) __elf_half((unsigned long)cval,(unsigned long)&(cval))
-#define ELF_WORD(cval) __elf_word((unsigned long)cval,(unsigned long)&(cval))
+#define ELF_HALF(cval) __elf_half((__filesize_t)cval,(__filesize_t)&(cval))
+#define ELF_WORD(cval) __elf_word((__filesize_t)cval,(__filesize_t)&(cval))
 
 #else
 
@@ -188,15 +188,15 @@ static inline unsigned long __elf_word(unsigned long cval, unsigned long addr)
 
 #endif
 
-static tBool __NEAR__ __FASTCALL__ FindPubName(char *buff,unsigned cb_buff,unsigned long pa);
+static tBool __NEAR__ __FASTCALL__ FindPubName(char *buff,unsigned cb_buff,__filesize_t pa);
 static void __FASTCALL__ elf_ReadPubNameList(BGLOBAL handle,void (__FASTCALL__ *mem_out)(const char *));
-static unsigned long __FASTCALL__ elfVA2PA(unsigned long va);
-static unsigned long __FASTCALL__ elfPA2VA(unsigned long pa);
+static __filesize_t __FASTCALL__ elfVA2PA(__filesize_t va);
+static __filesize_t __FASTCALL__ elfPA2VA(__filesize_t pa);
 static tBool IsSectionsPresent;
 
-static unsigned long __NEAR__ __FASTCALL__ findPHEntry(unsigned long type,unsigned *nitems)
+static __filesize_t __NEAR__ __FASTCALL__ findPHEntry(unsigned long type,unsigned *nitems)
 {
-  unsigned long fpos,dynptr;
+  __filesize_t fpos,dynptr;
   ElfXX_External_Phdr phdr;
   size_t i,limit;
   fpos = bmGetCurrFilePos();
@@ -218,10 +218,10 @@ static unsigned long __NEAR__ __FASTCALL__ findPHEntry(unsigned long type,unsign
   return dynptr;
 }
 
-static unsigned long __NEAR__ __FASTCALL__ findPHDynEntry(unsigned long type,unsigned long dynptr,unsigned nitems)
+static __filesize_t __NEAR__ __FASTCALL__ findPHDynEntry(unsigned long type,__filesize_t dynptr,unsigned nitems)
 {
   unsigned i;
-  unsigned long fpos;
+  __filesize_t fpos;
   tBool is_found = False;
   ElfXX_External_Dyn dyntab;
   fpos = bmGetCurrFilePos();
@@ -237,9 +237,9 @@ static unsigned long __NEAR__ __FASTCALL__ findPHDynEntry(unsigned long type,uns
   return is_found ? ELF_WORD(ELF_EDYN(dyntab,d_un.d_ptr)) : 0L;
 }
 
-static unsigned long __NEAR__ __FASTCALL__ findPHPubSyms(unsigned *number, unsigned *ent_size, unsigned long *act_shtbl)
+static __filesize_t __NEAR__ __FASTCALL__ findPHPubSyms(unsigned *number, unsigned *ent_size, __filesize_t *act_shtbl)
 {
-  unsigned long fpos, dynptr, dyn_ptr;
+  __filesize_t fpos, dynptr, dyn_ptr;
   unsigned i, nitems;
   fpos = bmGetCurrFilePos();
   *ent_size = UINT_MAX;
@@ -258,7 +258,7 @@ static unsigned long __NEAR__ __FASTCALL__ findPHPubSyms(unsigned *number, unsig
 	   FixME: It dangerous technique. May be there exists most safety way ?
 	*/   
         {
-          unsigned long _fpos,dptr,max_val,cur_ptr;
+          __filesize_t _fpos,dptr,max_val,cur_ptr;
           ElfXX_External_Dyn dyntab;
           _fpos = bmGetCurrFilePos();
 	  dptr = dyn_ptr;
@@ -281,13 +281,13 @@ static unsigned long __NEAR__ __FASTCALL__ findPHPubSyms(unsigned *number, unsig
   return dynptr;
 }
 
-static unsigned long __NEAR__ __FASTCALL__
+static __filesize_t __NEAR__ __FASTCALL__
                      findSHEntry(BGLOBAL b_cache, unsigned long type,
-                                 unsigned long *nitems,unsigned long *link,
+                                 unsigned long *nitems,__filesize_t *link,
                                  unsigned *ent_size)
 {
   ElfXX_External_Shdr shdr;
-  unsigned long fpos, tableptr;
+  __filesize_t fpos, tableptr;
   size_t i, limit;
   fpos = bioTell(b_cache);
   tableptr = 0L;
@@ -332,7 +332,7 @@ static tCompare __FASTCALL__ vamap_comp_phys(const void __HUGE__ *v1,const void 
   return __CmpLong__(pnam1->foff,pnam2->foff);
 }
 
-static unsigned long __FASTCALL__ elfVA2PA(unsigned long va)
+static __filesize_t __FASTCALL__ elfVA2PA(__filesize_t va)
 {
   unsigned long i;
   if(va_map_virt)
@@ -345,9 +345,10 @@ static unsigned long __FASTCALL__ elfVA2PA(unsigned long va)
   return 0L;
 }
 
-static unsigned long __FASTCALL__ elfPA2VA(unsigned long pa)
+static __filesize_t __FASTCALL__ elfPA2VA(__filesize_t pa)
 {
-  unsigned long i,ret;
+  unsigned long i;
+  __filesize_t ret;
   ret = 0L;
   for(i = 0; i < va_map_phys->nItems;i++)
   {
@@ -377,9 +378,9 @@ static tBool __FASTCALL__ elfLowMemFunc( unsigned long need_mem )
   return False;
 }
 
-static void __NEAR__ __FASTCALL__ elf386_readnametable(unsigned long off,char *buf,unsigned blen)
+static void __NEAR__ __FASTCALL__ elf386_readnametable(__filesize_t off,char *buf,unsigned blen)
 {
-  unsigned long foff;
+  __filesize_t foff;
   ElfXX_External_Shdr sh;
   unsigned char ch;
   unsigned freq;
@@ -400,9 +401,9 @@ static void __NEAR__ __FASTCALL__ elf386_readnametable(unsigned long off,char *b
   }
 }
 
-static void __NEAR__ __FASTCALL__ elf386_readnametableex(unsigned long off,char *buf,unsigned blen)
+static void __NEAR__ __FASTCALL__ elf386_readnametableex(__filesize_t off,char *buf,unsigned blen)
 {
-  unsigned long foff;
+  __filesize_t foff;
   ElfXX_External_Shdr sh;
   unsigned char ch;
   unsigned freq;
@@ -539,13 +540,13 @@ static const char *__NEAR__ __FASTCALL__ elf_osabi(unsigned char id)
 }
 
 
-static unsigned long __FASTCALL__ ShowELFHeader( void )
+static __filesize_t __FASTCALL__ ShowELFHeader( void )
 {
-  unsigned long fpos;
+  __filesize_t fpos;
   TWindow *w;
   char hdr[81];
   unsigned keycode;
-  unsigned long entrya;
+  __filesize_t entrya;
   fpos = BMGetCurrFilePos();
   entrya = elfVA2PA(ELF_WORD(ELF_EHDR(elf,e_entry)));
   sprintf(hdr," ELF (Executable and Linking Format) ");
@@ -631,7 +632,7 @@ static tBool __FASTCALL__ __elfReadPrgHdr(BGLOBAL handle,memArray *obj,unsigned 
   bioSeek(handle,ELF_WORD(ELF_EHDR(elf,e_phoff)),SEEKF_START);
   for(i = 0;i < nnames;i++)
   {
-   unsigned long fp;
+   __filesize_t fp;
    char stmp[80];
    ElfXX_External_Phdr phdr;
    if(IsKbdTerminate() || bioEOF(handle)) break;
@@ -691,7 +692,7 @@ static tBool __FASTCALL__ __elfReadSecHdr(BGLOBAL handle,memArray *obj,unsigned 
   {
    ElfXX_External_Shdr shdr;
    char tmp[17];
-   unsigned long fp;
+   __filesize_t fp;
    char stmp[80];
    if(IsKbdTerminate() || bioEOF(handle)) break;
    fp = bioTell(handle);
@@ -783,7 +784,7 @@ static tBool __FASTCALL__ __elfReadSymTab(BGLOBAL handle,memArray *obj,unsigned 
   bioSeek(handle,__elfSymPtr,SEEK_SET);
   for(i = 0;i < nsym;i++)
   {
-   unsigned long fp;
+   __filesize_t fp;
    char stmp[80];
    ElfXX_External_Sym sym;
    if(IsKbdTerminate() || bioEOF(handle)) break;
@@ -806,14 +807,14 @@ static tBool __FASTCALL__ __elfReadSymTab(BGLOBAL handle,memArray *obj,unsigned 
   return True;
 }
 
-static tBool __NEAR__ __FASTCALL__ __elfReadDynTab(BGLOBAL handle,memArray *obj, unsigned ntbl,unsigned long entsize)
+static tBool __NEAR__ __FASTCALL__ __elfReadDynTab(BGLOBAL handle,memArray *obj, unsigned ntbl,__filesize_t entsize)
 {
  size_t i;
  char sout[80];
  unsigned len,rlen;
   for(i = 0;i < ntbl;i++)
   {
-   unsigned long fp;
+   __filesize_t fp;
    char stmp[80];
    ElfXX_External_Dyn pdyn;
    fp = bioTell(handle);
@@ -842,9 +843,9 @@ static unsigned __FASTCALL__ Elf386PrgHdrNumItems(BGLOBAL handle)
    return ELF_HALF(ELF_EHDR(elf,e_phnum));
 }
 
-static unsigned long __FASTCALL__ ShowPrgHdrElf(void)
+static __filesize_t __FASTCALL__ ShowPrgHdrElf(void)
 {
-  unsigned long fpos;
+  __filesize_t fpos;
   int ret;
   fpos = BMGetCurrFilePos();
   ret = fmtShowList(Elf386PrgHdrNumItems,__elfReadPrgHdr,
@@ -866,9 +867,9 @@ static unsigned __FASTCALL__ Elf386SecHdrNumItems(BGLOBAL handle)
   return IsSectionsPresent ? ELF_HALF(ELF_EHDR(elf,e_shnum)) : 0;
 }
 
-static unsigned long __FASTCALL__ ShowSecHdrElf(void)
+static __filesize_t __FASTCALL__ ShowSecHdrElf(void)
 {
-  unsigned long fpos;
+  __filesize_t fpos;
   int ret;
   fpos = BMGetCurrFilePos();
   ret = fmtShowList(Elf386SecHdrNumItems,__elfReadSecHdr,
@@ -884,11 +885,11 @@ static unsigned long __FASTCALL__ ShowSecHdrElf(void)
   return fpos;
 }
 
-static unsigned long __calcSymEntry(BGLOBAL handle,unsigned long num,tBool display_msg)
+static __filesize_t __calcSymEntry(BGLOBAL handle,__filesize_t num,tBool display_msg)
 {
    ElfXX_External_Sym it;
    ElfXX_External_Shdr sec;
-   unsigned long ffpos,fpos = 0L;
+   __filesize_t ffpos,fpos = 0L;
    ffpos = bioTell(handle);
    bioSeek(handle,__elfSymPtr+__elfSymEntSize*num,SEEKF_START);
    bioReadBuffer(handle,&it,sizeof(it));
@@ -918,9 +919,9 @@ static unsigned long __calcSymEntry(BGLOBAL handle,unsigned long num,tBool displ
    return fpos;
 }
 
-static unsigned long __NEAR__ __FASTCALL__ displayELFsymtab( void )
+static __filesize_t __NEAR__ __FASTCALL__ displayELFsymtab( void )
 {
-  unsigned long fpos;
+  __filesize_t fpos;
   int ret;
   fpos = BMGetCurrFilePos();
   ret = fmtShowList(__elfGetNumSymTab,__elfReadSymTab,
@@ -928,16 +929,16 @@ static unsigned long __NEAR__ __FASTCALL__ displayELFsymtab( void )
                     LB_SELECTIVE,NULL);
   if(ret != -1)
   {
-    unsigned long ea;
+    __filesize_t ea;
     ea = __calcSymEntry(bmbioHandle(),ret,True);
     fpos = ea ? ea : fpos;
   }
   return fpos;
 }
 
-static unsigned long __NEAR__ __FASTCALL__ displayELFdyntab(unsigned long dynptr,unsigned long nitem,long entsize)
+static __filesize_t __NEAR__ __FASTCALL__ displayELFdyntab(__filesize_t dynptr,unsigned long nitem,long entsize)
 {
-  unsigned long fpos;
+  __filesize_t fpos;
   memArray *obj;
   BGLOBAL handle;
   unsigned ndyn;
@@ -956,7 +957,7 @@ static unsigned long __NEAR__ __FASTCALL__ displayELFdyntab(unsigned long dynptr
        addr = strstr(obj->data[ret],"vma=");
        if(addr)
        {
-         unsigned long addr_probe;
+         __filesize_t addr_probe;
          addr_probe = strtoul(&addr[4],NULL,16);
          if(addr_probe && addr_probe >= elf_min_va)
          {
@@ -977,18 +978,19 @@ static unsigned long __NEAR__ __FASTCALL__ displayELFdyntab(unsigned long dynptr
   return fpos;
 }
 
-static unsigned long __FASTCALL__ ShowELFSymTab( void )
+static __filesize_t __FASTCALL__ ShowELFSymTab( void )
 {
-  unsigned long fpos;
+  __filesize_t fpos;
   fpos = BMGetCurrFilePos();
   if(!__elfSymPtr) { NotifyBox(NOT_ENTRY," ELF symbol table "); return fpos; }
   active_shtbl = __elfSymShTbl;
   return displayELFsymtab();
 }
 
-static unsigned long __FASTCALL__ ShowELFDynSec( void )
+static __filesize_t __FASTCALL__ ShowELFDynSec( void )
 {
-  unsigned long fpos,dynptr, number;
+  __filesize_t fpos,dynptr;
+  unsigned long number;
   unsigned nitems,ent_size = UINT_MAX;
   fpos = BMGetCurrFilePos();
   dynptr = findSHEntry(bmbioHandle(), SHT_DYNSYM, &number, &active_shtbl, &ent_size);
@@ -1021,7 +1023,7 @@ static tCompare __FASTCALL__ compare_elf_reloc(const void __HUGE__ *e1,const voi
   return __CmpLong__(p1->offset,p2->offset);
 }
 
-static unsigned long get_f_offset(unsigned long r_offset,tUInt32 sh_link)
+static __filesize_t get_f_offset(__filesize_t r_offset,tUInt32 sh_link)
 {
   /*
     r_offset member gives the location at which to apply the relocation
@@ -1030,14 +1032,14 @@ static unsigned long get_f_offset(unsigned long r_offset,tUInt32 sh_link)
     relocation. For an executable file or a shared object, the value is
     the virtual address of the storage unit affected by the relocation.
   */
-  unsigned long f_offset;
+  __filesize_t f_offset;
   BGLOBAL handle = elfcache;
   switch(ELF_HALF(ELF_EHDR(elf,e_type)))
   {
      case ET_REL:
                 {
                   ElfXX_External_Shdr shdr;
-                  unsigned long fp;
+                  __filesize_t fp;
                   fp = bioTell(handle);
                   bioSeek(handle,ELF_WORD(ELF_EHDR(elf,e_shoff))+sh_link*ELF_SHDR_SIZE(),SEEKF_START);
                   bioReadBuffer(handle,&shdr,sizeof(shdr));
@@ -1059,7 +1061,7 @@ static void __NEAR__ __FASTCALL__ __elfReadRelSection(tUInt32 offset,
   BGLOBAL handle = elfcache,handle2 = namecache;
   size_t i,nitems;
   ElfXX_External_Rel relent;
-  unsigned long fp, sfp, lfp;
+  __filesize_t fp, sfp, lfp;
   if(!entsize) return;
   fp = bioTell(handle);
   bioSeek(handle,offset,SEEKF_START);
@@ -1107,7 +1109,7 @@ static void __NEAR__ __FASTCALL__ __elfReadRelaSection(tUInt32 offset,
   BGLOBAL handle = elfcache;
   size_t i,nitems;
   ElfXX_External_Rela relent;
-  unsigned long fp, lfp;
+  __filesize_t fp, lfp;
   if(!entsize) return;
   fp = bioTell(handle);
   bioSeek(handle,offset,SEEKF_START);
@@ -1133,7 +1135,7 @@ static void __NEAR__ __FASTCALL__ buildElf386RelChain( void )
   size_t i,_nitems;
   TWindow *w,*usd;
   BGLOBAL handle = elfcache;
-  unsigned long fp;
+  __filesize_t fp;
   usd = twUsedWin();
   if(!(CurrElfChain = la_Build(0,sizeof(Elf_Reloc),MemOutBox))) return;
   w = CrtDlgWndnls(SYSTEM_BUSY,49,1);
@@ -1149,7 +1151,7 @@ static void __NEAR__ __FASTCALL__ buildElf386RelChain( void )
     for(i = 0;i < _nitems;i++)
     {
       ElfXX_External_Shdr shdr;
-      unsigned long fp;
+      __filesize_t fp;
       if(IsKbdTerminate() || bioEOF(handle)) break;
       fp=bioTell(handle);
       bioReadBuffer(handle,&shdr,sizeof(shdr));
@@ -1177,7 +1179,7 @@ static void __NEAR__ __FASTCALL__ buildElf386RelChain( void )
     /* If section headers are lost then information can be taken
        from program headers
     */
-    unsigned long dyn_ptr,dynptr,link,type;
+    __filesize_t dyn_ptr,dynptr,link,type;
     unsigned tsize,nitems;
     dynptr = findPHEntry(PT_DYNAMIC,&nitems);
     link = elfVA2PA(findPHDynEntry(DT_SYMTAB,dynptr,nitems));
@@ -1229,7 +1231,7 @@ static void __NEAR__ __FASTCALL__ buildElf386RelChain( void )
   return;
 }
 
-static Elf_Reloc __HUGE__ * __NEAR__ __FASTCALL__ __found_ElfRel(unsigned long offset)
+static Elf_Reloc __HUGE__ * __NEAR__ __FASTCALL__ __found_ElfRel(__filesize_t offset)
 {
   Elf_Reloc key;
   if(!CurrElfChain) buildElf386RelChain();
@@ -1243,7 +1245,7 @@ static tBool __NEAR__ __FASTCALL__ __readRelocName(Elf_Reloc __HUGE__ *erl, char
   ElfXX_External_Shdr shdr;
   ElfXX_External_Sym sym;
   BGLOBAL handle = elfcache;
-  unsigned long fp;
+  __filesize_t fp;
   tBool ret = True;
   r_sym = ELF32_R_SYM(erl->info);
   fp = bioTell(handle);
@@ -1264,7 +1266,7 @@ static tBool __NEAR__ __FASTCALL__ __readRelocName(Elf_Reloc __HUGE__ *erl, char
     if(IsSectionsPresent) active_shtbl = ELF_HALF(ELF_SHDR(shdr,sh_link));
     else
     {
-      unsigned long dynptr;
+      __filesize_t dynptr;
       unsigned nitems;
       dynptr = findPHEntry(PT_DYNAMIC,&nitems);
       active_shtbl = elfVA2PA(findPHDynEntry(DT_STRTAB,dynptr,nitems));
@@ -1381,10 +1383,10 @@ static unsigned long __NEAR__ __FASTCALL__ BuildReferStrElf(char *str,
 
 #define S_INTERPRETER "Interpreter : "
 
-static void __NEAR__ __FASTCALL__ displayELFdyninfo(unsigned long f_off,unsigned nitems)
+static void __NEAR__ __FASTCALL__ displayELFdyninfo(__filesize_t f_off,unsigned nitems)
 {
   ElfXX_External_Dyn dyntab;
-  unsigned long curroff,stroff;
+  __filesize_t curroff,stroff;
   unsigned i;
   tBool is_add;
   memArray * obj;
@@ -1436,9 +1438,9 @@ static void __NEAR__ __FASTCALL__ displayELFdyninfo(unsigned long f_off,unsigned
   ma_Destroy(obj);
 }
 
-static unsigned long __FASTCALL__ ShowELFDynInfo( void )
+static __filesize_t __FASTCALL__ ShowELFDynInfo( void )
 {
-  unsigned long dynptr,fpos;
+  __filesize_t dynptr,fpos;
   unsigned number;
   fpos = BMGetCurrFilePos();
   dynptr = findPHEntry(PT_DYNAMIC,&number);
@@ -1448,7 +1450,7 @@ static unsigned long __FASTCALL__ ShowELFDynInfo( void )
   return fpos;
 }
 
-static unsigned long __FASTCALL__ AppendELFRef(char *str,unsigned long ulShift,int flags,int codelen,unsigned long r_sh)
+static unsigned long __FASTCALL__ AppendELFRef(char *str,__filesize_t ulShift,int flags,int codelen,__filesize_t r_sh)
 {
   char buff[400];
   unsigned long ret = RAPREF_NONE;
@@ -1456,8 +1458,8 @@ static unsigned long __FASTCALL__ AppendELFRef(char *str,unsigned long ulShift,i
   UNUSED(codelen);
   if(flags & APREF_TRY_PIC)
   {
-       unsigned long off_in_got = bmReadDWordEx(ulShift, SEEKF_START);
-       unsigned long dynptr, dyn_ent, got_off;
+       __filesize_t off_in_got = bmReadDWordEx(ulShift, SEEKF_START);
+       __filesize_t dynptr, dyn_ent, got_off;
        unsigned nitems;
 /** @todo: If "program header" will be lost and will be present "section
     header" only then we should handle such situation propertly too */
@@ -1517,7 +1519,7 @@ static void __FASTCALL__ __elfReadSegments(linearArray **to, tBool is_virt )
  ElfXX_External_Phdr phdr;
  ElfXX_External_Shdr shdr;
  struct tag_elfVAMap vamap;
- unsigned long fp;
+ __filesize_t fp;
  unsigned va_map_count;
  tBool test;
  size_t i;
@@ -1536,7 +1538,7 @@ static void __FASTCALL__ __elfReadSegments(linearArray **to, tBool is_virt )
      bmSeek(ELF_WORD(ELF_EHDR(elf,e_shoff)),SEEKF_START);
      for(i = 0;i < va_map_count;i++)
      {
-       unsigned long flg,x_flags;
+       __filesize_t flg,x_flags;
        fp = bmGetCurrFilePos();
        bmReadBuffer(&shdr,sizeof(shdr));
        bmSeek(fp+ELF_HALF(ELF_EHDR(elf,e_shentsize)),SEEKF_START);
@@ -1602,7 +1604,7 @@ static void __FASTCALL__ __elfReadSegments(linearArray **to, tBool is_virt )
 static void __FASTCALL__ ELFinit( void )
 {
  BGLOBAL main_handle;
- unsigned long fs;
+ __filesize_t fs;
  size_t i;
    PMRegLowMemCallBack(elfLowMemFunc);
    bmReadBufferEx(&elf,sizeof(ElfXX_External_Ehdr),0,SEEKF_START);
@@ -1646,19 +1648,19 @@ static void __FASTCALL__ ELFdestroy( void )
    la_Destroy(va_map_phys);
 }
 
-static int __FASTCALL__ ELFbitness(unsigned long off)
+static int __FASTCALL__ ELFbitness(__filesize_t off)
 {
   UNUSED(off);
   return is_64bit?DAB_USE64:DAB_USE32;
 }
 
-static unsigned long __FASTCALL__ ELFHelp( void )
+static __filesize_t __FASTCALL__ ELFHelp( void )
 {
   hlpDisplay(10003);
   return BMGetCurrFilePos();
 }
 
-static tBool __FASTCALL__ ELFAddrResolv(char *addr,unsigned long cfpos)
+static tBool __FASTCALL__ ELFAddrResolv(char *addr,__filesize_t cfpos)
 {
  /* Since this function is used in references resolving of disassembler
     it must be seriously optimized for speed. */
@@ -1687,7 +1689,7 @@ static tCompare __FASTCALL__ compare_pubnames(const void __HUGE__ *v1,const void
   return __CmpLong__(pnam1->pa,pnam2->pa);
 }
 
-static tBool __NEAR__ __FASTCALL__ FindPubName(char *buff,unsigned cb_buff,unsigned long pa)
+static tBool __NEAR__ __FASTCALL__ FindPubName(char *buff,unsigned cb_buff,__filesize_t pa)
 {
   struct PubName *ret,key;
   key.pa = pa;
@@ -1704,7 +1706,8 @@ static tBool __NEAR__ __FASTCALL__ FindPubName(char *buff,unsigned cb_buff,unsig
 
 static void __FASTCALL__ elf_ReadPubNameList(BGLOBAL handle,void (__FASTCALL__ *mem_out)(const char *))
 {
-  unsigned long fpos,fp,tableptr, number, pubname_shtbl;
+  __filesize_t fpos,fp,tableptr,pubname_shtbl;
+  unsigned long number;
   unsigned ent_size;
   struct PubName epn;
   BGLOBAL b_cache;
@@ -1771,16 +1774,16 @@ static void __FASTCALL__ elf_ReadPubName(BGLOBAL b_cache,const struct PubName *i
    elf386_readnametableex(it->nameoff,buff,cb_buff);
 }
 
-static unsigned long __FASTCALL__ elfGetPubSym(char *str,unsigned cb_str,unsigned *func_class,
-                           unsigned long pa,tBool as_prev)
+static __filesize_t __FASTCALL__ elfGetPubSym(char *str,unsigned cb_str,unsigned *func_class,
+                           __filesize_t pa,tBool as_prev)
 {
    return fmtGetPubSym(elfcache,str,cb_str,func_class,pa,as_prev,
                        elf_ReadPubNameList,
                        elf_ReadPubName);
 }
 
-static unsigned __FASTCALL__ elfGetObjAttr(unsigned long pa,char *name,unsigned cb_name,
-                       unsigned long *start,unsigned long *end,int *_class,int *bitness)
+static unsigned __FASTCALL__ elfGetObjAttr(__filesize_t pa,char *name,unsigned cb_name,
+                       __filesize_t *start,__filesize_t *end,int *_class,int *bitness)
 {
   unsigned i,ret;
   struct tag_elfVAMap *evam;

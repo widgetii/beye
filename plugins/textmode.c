@@ -608,7 +608,7 @@ void __FASTCALL__ txt_cvt_lo80(char * str,unsigned size,const unsigned char *tmp
  }
 }
 
-static unsigned char __NEAR__ __FASTCALL__ nlsReadByte(unsigned long cp)
+static unsigned char __NEAR__ __FASTCALL__ nlsReadByte(__filesize_t cp)
 {
  char nls_buff[256];
  unsigned sym_size;
@@ -619,9 +619,9 @@ static unsigned char __NEAR__ __FASTCALL__ nlsReadByte(unsigned long cp)
  return (unsigned char)nls_buff[0];
 }
 
-static unsigned long __NEAR__ __FASTCALL__ BackScanCR( unsigned long cp )
+static __filesize_t __NEAR__ __FASTCALL__ BackScanCR( __filesize_t cp )
 {
- unsigned long lval;
+ __filesize_t lval;
  unsigned int freq;
  unsigned cp_symb_len;
  char ch;
@@ -648,9 +648,9 @@ static unsigned long __NEAR__ __FASTCALL__ BackScanCR( unsigned long cp )
  return lval;
 }
 
-static unsigned long __NEAR__ __FASTCALL__ ForwardScanCR( unsigned long cp ,unsigned long flen)
+static __filesize_t __NEAR__ __FASTCALL__ ForwardScanCR( __filesize_t cp ,__filesize_t flen)
 {
- unsigned long lval;
+ __filesize_t lval;
  unsigned int freq = 0;
  unsigned cp_symb_len;
  cp_symb_len = activeNLS->get_symbol_size();
@@ -673,7 +673,7 @@ static unsigned long __NEAR__ __FASTCALL__ ForwardScanCR( unsigned long cp ,unsi
  return flen;
 }
 
-static void __NEAR__ __FASTCALL__ FillPrevPage(unsigned long lval)
+static void __NEAR__ __FASTCALL__ FillPrevPage(__filesize_t lval)
 {
  unsigned cp_symb_len;
  int i;
@@ -686,7 +686,7 @@ static void __NEAR__ __FASTCALL__ FillPrevPage(unsigned long lval)
  }
 }
 
-static void __NEAR__ __FASTCALL__ FillCurrPage(unsigned long lval,unsigned long flen)
+static void __NEAR__ __FASTCALL__ FillCurrPage(__filesize_t lval,__filesize_t flen)
 {
  size_t i;
  tAbsCoord height = twGetClientHeight(MainWnd);
@@ -698,13 +698,13 @@ static void __NEAR__ __FASTCALL__ FillCurrPage(unsigned long lval,unsigned long 
  }
 }
 
-unsigned long tmocpos = 0;
+static __filesize_t tmocpos = 0;
 
 static void __NEAR__ __FASTCALL__ PrepareLines(int keycode)
 {
  int size,size1,h,height = twGetClientHeight(MainWnd);
  unsigned cp_symb_len;
- unsigned long lval,flen,cp = BMGetCurrFilePos();
+ __filesize_t lval,flen,cp = BMGetCurrFilePos();
  cp_symb_len = activeNLS->get_symbol_size();
  flen = BMGetFLength();
  /** search begin of first string */
@@ -915,7 +915,7 @@ static char *buff;
 static void __NEAR__ __FASTCALL__ txtPaintSearch(HLInfo * cptr,unsigned int shift,int i,int size,int _bin_mode)
 {
     int sh,she;
-    long save,savee;
+    __fileoff_t save,savee;
     unsigned cp_symb_len,loc_st,loc_end;
     cp_symb_len = activeNLS->get_symbol_size();
     loc_st = FoundTextSt > tlines[i].st ? (unsigned)(FoundTextSt - tlines[i].st) : 0;
@@ -957,7 +957,7 @@ static unsigned __FASTCALL__ drawText( unsigned keycode , unsigned shift )
   int hilightline;
   size_t i;
   unsigned size,rsize,rshift;
-  unsigned long cpos;
+  __filesize_t cpos;
   unsigned cp_symb_len,len,tmp,textmaxlen;
   tAbsCoord height = twGetClientHeight(MainWnd);
   HLInfo hli;
@@ -1166,7 +1166,7 @@ static tBool __FASTCALL__ txtDetect( void )
 {
   size_t maxl,i;
   tBool bin = False;
-  unsigned long flen,fpos;
+  __filesize_t flen,fpos;
   maxl = 1000;
   flen = BMGetFLength();
   fpos=BMGetCurrFilePos();

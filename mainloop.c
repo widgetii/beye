@@ -29,12 +29,12 @@
 #include "biewlib/kbd_code.h"
 #include "biewlib/biewlib.h"
 
-extern unsigned long LastOffset;
+extern __filesize_t LastOffset;
 extern unsigned strmaxlen;
 extern REGISTRY_BIN mzTable;
 
-unsigned long lastbyte;
-static unsigned long OldCurrFilePos; /** means previous File position */
+__filesize_t lastbyte;
+static __filesize_t OldCurrFilePos; /** means previous File position */
 unsigned long CurrStrLen = 0;
 unsigned long PrevStrLen = 2;
 unsigned long CurrPageSize = 0;
@@ -42,7 +42,7 @@ unsigned long PrevPageSize = 0;
 
 int textshift = 0;
 
-int __FASTCALL__ isHOnLine(unsigned long cp,int width)
+int __FASTCALL__ isHOnLine(__filesize_t cp,int width)
 {
   if(FoundTextSt == FoundTextEnd) return 0;
   return (FoundTextSt >= cp && FoundTextSt < cp + width)
@@ -50,7 +50,7 @@ int __FASTCALL__ isHOnLine(unsigned long cp,int width)
           || (FoundTextSt <= cp && FoundTextEnd >= cp + width);
 }
 
-void __FASTCALL__ HiLightSearch(TWindow *out,unsigned long cfp,tRelCoord minx,tRelCoord maxx,tRelCoord y,HLInfo *buff,unsigned flags)
+void __FASTCALL__ HiLightSearch(TWindow *out,__filesize_t cfp,tRelCoord minx,tRelCoord maxx,tRelCoord y,HLInfo *buff,unsigned flags)
 {
  tvioBuff it;
  unsigned __len,width;
@@ -97,7 +97,7 @@ void __FASTCALL__ HiLightSearch(TWindow *out,unsigned long cfp,tRelCoord minx,tR
 static void __NEAR__ __FASTCALL__ drawTitle( void )
 {
   unsigned percent;
-  unsigned long flen;
+  __filesize_t flen;
   flen = BMGetFLength();
   percent = flen ? (unsigned)(( lastbyte*100 )/flen) : 100;
   if(percent > 100) percent = 100;
@@ -112,7 +112,7 @@ char legalchars[] = "+-0123456789ABCDEFabcdef";
 void MainLoop( void )
 {
  int ch;
- unsigned long savep = 0,cfp,nfp,flen;
+ __filesize_t savep = 0,cfp,nfp,flen;
  unsigned long lwidth;
  BMSeek(LastOffset,BM_SEEK_SET);
  drawPrompt();
@@ -200,7 +200,7 @@ void MainLoop( void )
     case KE_F(4):
                   if(activeMode->misc_action)
                   {
-                     unsigned long sfp;
+                     __filesize_t sfp;
                      sfp = BMGetCurrFilePos();
                      activeMode->misc_action();
                      ch = KE_SUPERKEY;
@@ -211,7 +211,8 @@ void MainLoop( void )
                   break;
     case KE_F(5):
            {
-             static unsigned long shift = 0,flags = GJDLG_ABSOLUTE;
+             static __filesize_t shift = 0;
+	     static unsigned long flags = GJDLG_ABSOLUTE;
              if(GetJumpDlg(&shift,&flags))
              {
                switch(flags)
@@ -224,7 +225,7 @@ void MainLoop( void )
                  case GJDLG_VIRTUAL:
                                       if(detectedFormat->va2pa)
                                       {
-                                        unsigned long temp_fp;
+                                        __filesize_t temp_fp;
                                         temp_fp = detectedFormat->va2pa(shift);
                                         if(!temp_fp) ErrMessageBox(NOT_ENTRY,NULL);
                                         else nfp = temp_fp;
@@ -322,8 +323,8 @@ void MainLoop( void )
                            activeMode->get_symbol_size() :
                            ( activeMode->flags & __MF_DISASM ) == __MF_DISASM ?
                            1 : lwidth;
-    unsigned long p = flen - twidth;
-    if((long)nfp < 0) nfp = 0;
+    __filesize_t p = flen - twidth;
+    if((__fileoff_t)nfp < 0) nfp = 0;
     if(nfp > 0) if(nfp > p) nfp = p;
     BMSeek(nfp,BM_SEEK_SET);
   }

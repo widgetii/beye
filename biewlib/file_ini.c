@@ -549,7 +549,7 @@ int __FASTCALL__ FiSearch(FiHandler h, const char * str )
 
 unsigned int  __FASTCALL__ FiGetNumberOfSections( FiHandler h)
 {
- long curr;
+ __fileoff_t curr;
  unsigned int eret;
  unsigned int save;
  char * buff;
@@ -571,7 +571,7 @@ unsigned int  __FASTCALL__ FiGetNumberOfSections( FiHandler h)
 
 unsigned int __FASTCALL__ FiGetTotalNumberOfSubSections( FiHandler h )
 {
- long curr;
+ __fileoff_t curr;
  unsigned int eret;
  unsigned int save;
  char * buff;
@@ -593,7 +593,7 @@ unsigned int __FASTCALL__ FiGetTotalNumberOfSubSections( FiHandler h )
 
 unsigned int __FASTCALL__ FiGetLocalNumberOfSubSections( FiHandler h, unsigned unsigned int nSection )
 {
-  long curr;
+  __fileoff_t curr;
   unsigned int eret;
   unsigned int save;
   char * buff;
@@ -615,7 +615,7 @@ unsigned int __FASTCALL__ FiGetLocalNumberOfSubSections( FiHandler h, unsigned u
 
 unsigned int  __FASTCALL__ FiGetTotalNumberOfItems( FiHandler h)
 {
- long curr;
+ __fileoff_t curr;
  unsigned int eret;
  unsigned int save;
  char * buff;
@@ -637,7 +637,7 @@ unsigned int  __FASTCALL__ FiGetTotalNumberOfItems( FiHandler h)
 
 unsigned int  __FASTCALL__ FiGetLocalNumberOfItems( FiHandler h,int nSection, int nSubSection)
 {
-  long curr;
+  __fileoff_t curr;
   unsigned int eret;
   unsigned int save;
   char * buff;

@@ -141,7 +141,7 @@ typedef unsigned long long int	tUIntMax;
 # define UINT8_MAX		(255U)
 # define UINT16_MAX		(65535U)
 # define UINT32_MAX		(4294967295U)
-#ifndef __GNUC__
+#ifdef __GNUC__
 # define UINT64_MAX		(__UINT64_C(18446744073709551615))
 #endif
 

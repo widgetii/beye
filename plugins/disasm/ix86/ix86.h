@@ -43,8 +43,8 @@
 typedef struct tagix86Param
 {
   unsigned long pro_clone; /**< processor family */
-  unsigned long DisasmPrefAddr; /**< address of instruction with prefixes */
-  unsigned long CodeAddress; /**< without prefixes */
+  __filesize_t  DisasmPrefAddr; /**< address of instruction with prefixes */
+  __filesize_t  CodeAddress; /**< without prefixes */
   MBuffer       CodeBuffer; /**< buffer with source code */
   MBuffer       RealCmd; /**< buffer without prefixes */
   unsigned      flags; /**< refer to disasm.h header */

@@ -39,9 +39,9 @@ static tBool __FASTCALL__ IsOldPharLap( void )
    return False;
 }
 
-static unsigned long __FASTCALL__ ShowOPharLapHeader( void )
+static __filesize_t __FASTCALL__ ShowOPharLapHeader( void )
 {
-  unsigned long fpos,entrypoint;
+  __filesize_t fpos,entrypoint;
   TWindow * w;
   unsigned keycode;
   fpos = BMGetCurrFilePos();
@@ -93,7 +93,7 @@ static void __FASTCALL__ OPharLapDestroy( void )
 {
 }
 
-static tBool __FASTCALL__ OldPharLapAddrResolv(char *addr,unsigned long cfpos)
+static tBool __FASTCALL__ OldPharLapAddrResolv(char *addr,__filesize_t cfpos)
 {
  /* Since this function is used in references resolving of disassembler
     it must be seriously optimized for speed. */
@@ -107,7 +107,7 @@ static tBool __FASTCALL__ OldPharLapAddrResolv(char *addr,unsigned long cfpos)
   return bret;
 }
 
-static unsigned long __FASTCALL__ HelpOPharLap( void )
+static __filesize_t __FASTCALL__ HelpOPharLap( void )
 {
   hlpDisplay(10008);
   return BMGetCurrFilePos();

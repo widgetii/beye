@@ -134,9 +134,9 @@ int __FASTCALL__ __OsOpen(const char *fname,int mode)
   return reg.x.ax;
 }
 
-long __FASTCALL__ __OsSeek(int handle,long offset,int origin)
+__fileoff_t __FASTCALL__ __OsSeek(int handle,__fileoff_t offset,int origin)
 {
-  long ret;
+  __fileoff_t ret;
   union REGS reg;
   memset(&reg,0,sizeof(union REGS));
   reg.h.ah = 0x42;
@@ -154,7 +154,7 @@ long __FASTCALL__ __OsSeek(int handle,long offset,int origin)
   return ret;
 }
 
-int __FASTCALL__ __OsTruncFile( int handle, unsigned long newsize)
+int __FASTCALL__ __OsTruncFile( int handle, __filesize_t newsize)
 {
   __OsSeek(handle,newsize,0);
   return __OsWrite(handle,NULL,0);
@@ -202,10 +202,10 @@ int __FASTCALL__  __OsWrite(int handle,const void *buff, unsigned size)
 
 #define BLKSIZE 32767
 
-int __FASTCALL__ __OsChSize(int handle, long size)
+int __FASTCALL__ __OsChSize(int handle, __fileoff_t size)
 
 {
-    long length, fillsize;
+    __fileoff_t length, fillsize;
     char *buf;
     int  bufsize, numtowrite;
 
@@ -235,16 +235,16 @@ int __FASTCALL__ __OsChSize(int handle, long size)
     return 0;
 }
 
-long __FASTCALL__ __FileLength(int handle)
+__fileoff_t __FASTCALL__ __FileLength(int handle)
 {
-  long ret,spos;
+  __fileoff_t ret,spos;
   spos = __OsTell(handle);
   ret = __OsSeek(handle,0L,SEEKF_END);
   __OsSeek(handle,spos,SEEKF_START);
   return ret;
 }
 
-long __FASTCALL__ __OsTell(int handle) { return __OsSeek(handle,0L,SEEKF_CUR); }
+__fileoff_t __FASTCALL__ __OsTell(int handle) { return __OsSeek(handle,0L,SEEKF_CUR); }
 
 tBool __FASTCALL__ __IsFileExists(const char *name)
 {

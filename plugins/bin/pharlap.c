@@ -35,9 +35,9 @@ static newPharLap nph;
 
 static BGLOBAL pl_cache = &bNull;
 
-static unsigned long __FASTCALL__ ShowPharLapHeader( void )
+static __filesize_t __FASTCALL__ ShowPharLapHeader( void )
 {
-  unsigned long fpos;
+  __filesize_t fpos;
   TWindow *w;
   unsigned keycode;
   char sign[3];
@@ -138,11 +138,11 @@ static tBool __FASTCALL__ __PLReadSegInfo(BGLOBAL handle,memArray * obj,unsigned
  return True;
 }
 
-static unsigned long __FASTCALL__ PharLapSegInfo( void )
+static __filesize_t __FASTCALL__ PharLapSegInfo( void )
 {
  BGLOBAL handle;
  unsigned nnames;
- unsigned long fpos;
+ __filesize_t fpos;
  memArray * obj;
  if(nph.plSegInfoOffset && nph.plSegInfoSize) nnames = (unsigned)(nph.plSegInfoSize / sizeof(PLSegInfo));
  else                                           nnames = 0;
@@ -157,7 +157,7 @@ static unsigned long __FASTCALL__ PharLapSegInfo( void )
     i = PageBox(50,4,(const void **)obj->data,obj->nItems,PLSegPaint) + 1;
     if(i > 0)
     {
-      fpos = ((unsigned long)((PLSegInfo *)obj->data[i - 1])->siBaseOff)+nph.plImageOffset;
+      fpos = ((__filesize_t)((PLSegInfo *)obj->data[i - 1])->siBaseOff)+nph.plImageOffset;
     }
  }
  ma_Destroy(obj);
@@ -216,11 +216,11 @@ static tBool __FASTCALL__ __PLReadRunTime(BGLOBAL handle,memArray * obj,unsigned
  return True;
 }
 
-static unsigned long __FASTCALL__ PharLapRunTimeParms( void )
+static __filesize_t __FASTCALL__ PharLapRunTimeParms( void )
 {
  BGLOBAL handle;
  unsigned nnames;
- unsigned long fpos;
+ __filesize_t fpos;
  memArray * obj;
  if(nph.plRunTimeParms && nph.plRunTimeSize) nnames = (unsigned)(nph.plRunTimeSize / sizeof(PLRunTimeParms));
  else                                          nnames = 0;
@@ -265,7 +265,7 @@ static void __FASTCALL__ PharLapDestroy( void )
   if(pl_cache != &bNull && pl_cache != main_handle) bioClose(pl_cache);
 }
 
-static tBool __FASTCALL__ PharLapAddrResolv(char *addr,unsigned long cfpos)
+static tBool __FASTCALL__ PharLapAddrResolv(char *addr,__filesize_t cfpos)
 {
  /* Since this function is used in references resolving of disassembler
     it must be seriously optimized for speed. */
@@ -279,7 +279,7 @@ static tBool __FASTCALL__ PharLapAddrResolv(char *addr,unsigned long cfpos)
   return bret;
 }
 
-static unsigned long __FASTCALL__ PharLapHelp( void )
+static __filesize_t __FASTCALL__ PharLapHelp( void )
 {
   hlpDisplay(10010);
   return BMGetCurrFilePos();

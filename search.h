@@ -28,7 +28,7 @@ extern "C" {
                      * @return             new offset on successful search and
                                            current offset otherwise
                     **/
-extern unsigned long __FASTCALL__ Search( tBool is_continue );
+extern __filesize_t __FASTCALL__ Search( tBool is_continue );
 
 #define SD_SIMPLE       0x0000   /**< indicates simple search dialog to be displayed */
 #define SD_ALLFEATURES  0x0001   /**< indicates fully featured search dialog to be displayed */
@@ -79,8 +79,8 @@ extern unsigned char search_buff[MAX_SEARCH_SIZE];
 extern unsigned char search_len;
 extern unsigned biewSearchFlg;
 
-extern unsigned long FoundTextSt; /**< Indicates start of found text */
-extern unsigned long FoundTextEnd;/**< Indicates end of found text */
+extern __filesize_t FoundTextSt; /**< Indicates start of found text */
+extern __filesize_t FoundTextEnd;/**< Indicates end of found text */
 
 #ifdef __cplusplus
 }

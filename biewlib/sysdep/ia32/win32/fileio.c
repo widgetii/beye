@@ -143,12 +143,13 @@ int  __FASTCALL__ __OsOpen(const char *fname,int mode)
   return (int)handle;
 }
 
-long __FASTCALL__ __OsSeek(int handle,long offset,int origin)
+__fileoff_t __FASTCALL__ __OsSeek(int handle,__fileoff_t offset,int origin)
 {
-  return SetFilePointer((HANDLE)handle,offset,NULL,origin);
+  unsigned long hioff=offset>>32;
+  return SetFilePointer((HANDLE)handle,offset,&hioff,origin);
 }
 
-int __FASTCALL__ __OsTruncFile( int handle, unsigned long newsize)
+int __FASTCALL__ __OsTruncFile( int handle, __filesize_t newsize)
 {
   int ret = 0;
   __OsSeek(handle,newsize,SEEKF_START);
@@ -182,23 +183,24 @@ int __FASTCALL__  __OsWrite(int handle,const void *buff, unsigned size)
   return ret;
 }
 
-int __FASTCALL__ __OsChSize(int handle, long size)
+int __FASTCALL__ __OsChSize(int handle, __fileoff_t size)
 {
   return __OsTruncFile(handle,size);
 }
 
-long __FASTCALL__ __FileLength(int handle)
+__fileoff_t __FASTCALL__ __FileLength(int handle)
 {
-  DWORD ret;
-  if((ret = GetFileSize((HANDLE)handle,NULL)) == 0xFFFFFFFFUL)
+  DWORD ret, hisize, err;
+  ret = GetFileSize((HANDLE)handle,&hisize);
+  if(ret == 0xFFFFFFFFUL && (err = GetLastError()) != NO_ERROR)
   {
-    set_errno(GetLastError());
+    set_errno(err);
     ret = 0;
   }
-  return ret;
+  return ((__fileoff_t)ret&0xFFFFFFFFUL) | (((__fileoff_t)hisize)<<32);
 }
 
-long __FASTCALL__ __OsTell(int handle) { return __OsSeek(handle,0L,SEEKF_CUR); }
+__fileoff_t __FASTCALL__ __OsTell(int handle) { return __OsSeek(handle,0L,SEEKF_CUR); }
 
 tBool __FASTCALL__ __IsFileExists(const char *name)
 {

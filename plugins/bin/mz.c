@@ -34,12 +34,12 @@
 static MZHEADER mz;
 static unsigned long HeadSize;
 
-static unsigned long __FASTCALL__ mzVA2PA(unsigned long va)
+static __filesize_t __FASTCALL__ mzVA2PA(__filesize_t va)
 {
   return va >= HeadSize ? va + HeadSize : 0L;
 }
 
-static unsigned long __FASTCALL__ mzPA2VA(unsigned long pa)
+static __filesize_t __FASTCALL__ mzPA2VA(__filesize_t pa)
 {
   return pa >= HeadSize ? pa - HeadSize : 0L;
 }
@@ -110,7 +110,7 @@ static const char * __NEAR__ __FASTCALL__ QueryAddInfo( void )
    if(memmap)
    {
      const char *ret;
-     unsigned long fpos;
+     __filesize_t fpos;
      fpos = bmGetCurrFilePos();
      bmReadBufferEx(memmap,1000,0x1C,BM_SEEK_SET);
      bmSeek(fpos,BM_SEEK_SET);
@@ -121,11 +121,11 @@ static const char * __NEAR__ __FASTCALL__ QueryAddInfo( void )
    return NULL;
 }
 
-static unsigned long __FASTCALL__ ShowMZHeader( void )
+static __filesize_t __FASTCALL__ ShowMZHeader( void )
 {
  unsigned keycode;
  TWindow * hwnd;
- unsigned long newcpos,fpos;
+ __filesize_t newcpos,fpos;
  unsigned long FPageCnt;
  const char * addinfo;
  fpos = BMGetCurrFilePos();
@@ -207,7 +207,7 @@ static tCompare __FASTCALL__ compare_ptr(const void __HUGE__ *e1,const void __HU
 static void __NEAR__ __FASTCALL__ BuildMZChain( void )
 {
   unsigned i;
-  unsigned long fpos;
+  __filesize_t fpos;
   TWindow * w,*usd;
   usd = twUsedWin();
   w = CrtDlgWndnls(SYSTEM_BUSY,49,1);
@@ -220,7 +220,7 @@ static void __NEAR__ __FASTCALL__ BuildMZChain( void )
   for(i = 0;i < mz.mzRelocationCount;i++)
   {
     unsigned off,seg,j;
-    unsigned long ptr;
+    __filesize_t ptr;
     void __HUGE__ * tptr;
     if(!CurrMZChain) tptr = PHMalloc(sizeof(void *));
     else             tptr = PHRealloc(CurrMZChain,(CurrMZCount + 1)*sizeof(void *));
@@ -251,11 +251,11 @@ static tCompare __FASTCALL__ compare_mz(const void __HUGE__ *e1,const void __HUG
   return ret;
 }
 
-static tBool __NEAR__ __FASTCALL__ isMZReferenced(unsigned long shift,char len)
+static tBool __NEAR__ __FASTCALL__ isMZReferenced(__filesize_t shift,char len)
 {
   if(mz.mzRelocationCount)
   {
-     unsigned long mz_size;
+     __filesize_t mz_size;
      mz_size = (long)(mz.mzPageCount)*512 + mz.mzPartLastPage;
      if(shift <= mz_size && shift >= ((unsigned long)mz.mzHeaderSize) << 4)
      {
@@ -266,7 +266,7 @@ static tBool __NEAR__ __FASTCALL__ isMZReferenced(unsigned long shift,char len)
   }
   return False;
 }
-static unsigned long __FASTCALL__ AppendMZRef(char *str,unsigned long ulShift,int flags,int codelen,unsigned long r_sh)
+static unsigned long __FASTCALL__ AppendMZRef(char *str,__filesize_t ulShift,int flags,int codelen,__filesize_t r_sh)
 {
   unsigned long ret = RAPREF_NONE;
   if(flags & APREF_TRY_PIC) return RAPREF_NONE;
@@ -280,7 +280,7 @@ static unsigned long __FASTCALL__ AppendMZRef(char *str,unsigned long ulShift,in
   }
   if(!DumpMode && !EditMode && (flags & APREF_TRY_LABEL) && codelen == 4)
   {
-    r_sh += (((unsigned long)mz.mzHeaderSize) << 4);
+    r_sh += (((__filesize_t)mz.mzHeaderSize) << 4);
     strcat(str,Get8Digit(r_sh));
     GidAddGoAddress(str,r_sh);
     ret = RAPREF_DONE;
@@ -309,7 +309,7 @@ static void __FASTCALL__ mz_destroy_fmt(void) {}
 
 static int  __FASTCALL__ mz_platform( void) { return DISASM_CPU_IX86; }
 
-static tBool __FASTCALL__ mzAddressResolv(char *addr,unsigned long cfpos)
+static tBool __FASTCALL__ mzAddressResolv(char *addr,__filesize_t cfpos)
 {
   tBool bret = True;
   if(cfpos < sizeof(MZHEADER)+2) sprintf(addr,"MZH :%s",Get4Digit(cfpos));
@@ -328,7 +328,7 @@ static tBool __FASTCALL__ mzAddressResolv(char *addr,unsigned long cfpos)
   return bret;
 }
 
-static unsigned long __FASTCALL__ MZHelp( void )
+static __filesize_t __FASTCALL__ MZHelp( void )
 {
   hlpDisplay(10013);
   return BMGetCurrFilePos();

@@ -529,16 +529,15 @@ void About( void )
  CloseWnd(hwnd);
 }
 
-unsigned long __FASTCALL__ WhereAMI(unsigned long ctrl_pos)
+__filesize_t __FASTCALL__ WhereAMI(__filesize_t ctrl_pos)
 {
   TWindow *hwnd,*wait_wnd;
   char vaddr[64],prev_func[61],next_func[61],oname[25];
   const char *btn;
   int obj_class,obj_bitness;
   unsigned obj_num,func_class;
-  unsigned long obj_start,obj_end;
-  unsigned long cfpos;
-  unsigned long va,prev_func_pa,next_func_pa,ret_addr;
+  __filesize_t obj_start,obj_end;
+  __filesize_t cfpos,ret_addr,va,prev_func_pa,next_func_pa;
   hwnd = CrtDlgWndnls(" Current position information ",78,5);
   twSetFooterAttr(hwnd,"[Enter] - Prev. entry [Ctrl-Enter | F5] - Next entry]",TW_TMODE_RIGHT,dialog_cset.selfooter);
   twGotoXY(1,1);
@@ -549,7 +548,11 @@ unsigned long __FASTCALL__ WhereAMI(unsigned long ctrl_pos)
            detectedFormat->prepare_structs(ctrl_pos,ctrl_pos);
   va = detectedFormat->pa2va ? detectedFormat->pa2va(ctrl_pos) : ctrl_pos;
   vaddr[0] = '\0';
+#if __WORDSIZE >= 32
+  sprintf(&vaddr[strlen(vaddr)],"%016llXH",va);
+#else
   sprintf(&vaddr[strlen(vaddr)],"%08lXH",va);
+#endif
   prev_func_pa = next_func_pa = 0;
   prev_func[0] = next_func[0] = '\0';
   if(detectedFormat->GetPubSym)
@@ -586,11 +589,20 @@ unsigned long __FASTCALL__ WhereAMI(unsigned long ctrl_pos)
     case DAB_USE256:btn = "USE256"; break;
     default: btn = "";
   }
-  twPrintF("File  offset : %08lXH\n"
+  twPrintF(
+#if __WORDSIZE >= 32
+	   "File  offset : %016llXH\n"
+#else
+	   "File  offset : %08lXH\n"
+#endif
            "Virt. address: %s\n"
            "%s entry  : %s\n"
            "Next  entry  : %s\n"
+#if __WORDSIZE >= 32
+           "Curr. object : #%u %s %s %016llXH=%016llXH %s"
+#else
            "Curr. object : #%u %s %s %08lXH=%08lXH %s"
+#endif
            ,ctrl_pos
            ,vaddr
            ,prev_func_pa == ctrl_pos ? "Curr." : "Prev."

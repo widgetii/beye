@@ -34,7 +34,7 @@
 
 static unsigned virtWidthCorr=0;
 
-typedef char *(__NEAR__ __FASTCALL__ *hexFunc)(unsigned long);
+typedef char *(__NEAR__ __FASTCALL__ *hexFunc)(__filesize_t);
 typedef unsigned char (__NEAR__ __FASTCALL__ *sizeFunc) ( void );
 
 typedef struct tag_hexView
@@ -46,15 +46,15 @@ typedef struct tag_hexView
   unsigned char hardlen;
 }hexView;
 
-static char * __NEAR__ __FASTCALL__ GetB(unsigned long val) { return GetBinary(BMReadByteEx(val,BM_SEEK_SET)); }
-static char * __NEAR__ __FASTCALL__ Get2D(unsigned long val) { return Get2Digit(BMReadByteEx(val,BM_SEEK_SET)); }
-static char * __NEAR__ __FASTCALL__ Get4D(unsigned long val) { return Get4Digit(BMReadWordEx(val,BM_SEEK_SET)); }
-static char * __NEAR__ __FASTCALL__ Get8D(unsigned long val) { return Get8Digit(BMReadDWordEx(val,BM_SEEK_SET)); }
+static char * __NEAR__ __FASTCALL__ GetB(__filesize_t val) { return GetBinary(BMReadByteEx(val,BM_SEEK_SET)); }
+static char * __NEAR__ __FASTCALL__ Get2D(__filesize_t val) { return Get2Digit(BMReadByteEx(val,BM_SEEK_SET)); }
+static char * __NEAR__ __FASTCALL__ Get4D(__filesize_t val) { return Get4Digit(BMReadWordEx(val,BM_SEEK_SET)); }
+static char * __NEAR__ __FASTCALL__ Get8D(__filesize_t val) { return Get8Digit(BMReadDWordEx(val,BM_SEEK_SET)); }
 
-static unsigned char __NEAR__ __FASTCALL__ sizeBit( void )  { return (tvioWidth-10)/(8+1+1); }
-static unsigned char __NEAR__ __FASTCALL__ sizeByte( void ) { return ((tvioWidth-10)/(12+1+4)*4); } /* always round on four-column boundary */
-static unsigned char __NEAR__ __FASTCALL__ sizeWord( void ) { return (tvioWidth-10)/(4+1+2); }
-static unsigned char __NEAR__ __FASTCALL__ sizeDWord( void ){ return (tvioWidth-10)/(8+1+4); }
+static unsigned char __NEAR__ __FASTCALL__ sizeBit( void )  { return (tvioWidth-HA_LEN)/(8+1+1); }
+static unsigned char __NEAR__ __FASTCALL__ sizeByte( void ) { return ((tvioWidth-HA_LEN)/(12+1+4)*4); } /* always round on four-column boundary */
+static unsigned char __NEAR__ __FASTCALL__ sizeWord( void ) { return (tvioWidth-HA_LEN)/(4+1+2); }
+static unsigned char __NEAR__ __FASTCALL__ sizeDWord( void ){ return (tvioWidth-HA_LEN)/(8+1+4); }
 
 hexView hexViewer[] =
 {
@@ -75,8 +75,8 @@ static unsigned __FASTCALL__ drawHex( unsigned keycode,unsigned textshift )
  char outstr[__TVIO_MAXSCREENWIDTH+1];
  unsigned char HWidth;
  unsigned scrHWidth;
- unsigned long sindex,cpos,flen,lindex,SIndex;
- static unsigned long hmocpos = 0L;
+ __filesize_t sindex,cpos,flen,lindex,SIndex;
+ static __filesize_t hmocpos = 0L;
  int __inc,dlen;
  cpos = BMGetCurrFilePos();
  if(hmocpos != cpos || keycode == KE_SUPERKEY || keycode == KE_JUSTFIND)
@@ -126,8 +126,8 @@ static unsigned __FASTCALL__ drawHex( unsigned keycode,unsigned textshift )
        int freq,j,rwidth,xmin,len;
        lindex = (flen - sindex)/__inc;
        rwidth = lindex > HWidth ? HWidth : (int)lindex;
-       memcpy(outstr,GidEncodeAddress(sindex,hexAddressResolv),10);
-       len = 10;
+       len = HA_LEN;
+       memcpy(outstr,GidEncodeAddress(sindex,hexAddressResolv),len);
        for(j = 0,freq = 0,lindex = sindex;j < rwidth;j++,lindex += __inc,freq++)
        {
           memcpy(&outstr[len],hexViewer[hmode].func(lindex),dlen);
@@ -304,7 +304,7 @@ static void __FASTCALL__ EditHex( void )
  if(hmode != 1) return;
  if(!BMGetFLength()) { ErrMessageBox(NOTHING_EDIT,NULL); return; }
  bound = width-(hexViewer[hmode].width()-virtWidthCorr);
- ewnd[0] = WindowOpen(11,2,bound,tvioHeight-1,TWS_CURSORABLE);
+ ewnd[0] = WindowOpen(HA_LEN+1,2,bound,tvioHeight-1,TWS_CURSORABLE);
  twSetColorAttr(browser_cset.edit.main); twClearWin();
  ewnd[1] = WindowOpen(bound+1,2,width,tvioHeight-1,TWS_CURSORABLE);
  twSetColorAttr(browser_cset.edit.main); twClearWin();

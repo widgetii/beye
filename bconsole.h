@@ -95,8 +95,13 @@ extern void         __FASTCALL__ MemOutBox(const char *user_msg);
 extern TWindow *    __FASTCALL__ PleaseWaitWnd( void );
 
 extern tBool        __FASTCALL__ Get2DigitDlg(const char *title,const char *text,unsigned char *xx);
+#if __WORDSIZE >= 32
+extern tBool        __FASTCALL__ Get16DigitDlg(const char *title,const char *text,char attr,
+						unsigned long long int *xx);
+#else
 extern tBool        __FASTCALL__ Get8DigitDlg(const char *title,const char *text,char attr,
-                                     unsigned long *xx);
+						unsigned long *xx);
+#endif
 extern tBool        __FASTCALL__ GetStringDlg(char * buff,const char * title,const char *subtitle,
                                      const char *prompt);
 
@@ -104,7 +109,7 @@ extern tBool        __FASTCALL__ GetStringDlg(char * buff,const char * title,con
 #define GJDLG_RELATIVE  0x00000001UL
 #define GJDLG_VIRTUAL   0x00000002UL
 
-extern tBool        __FASTCALL__ GetJumpDlg( unsigned long * addr,unsigned long *flags);
+extern tBool        __FASTCALL__ GetJumpDlg( __filesize_t * addr,unsigned long *flags);
 
 #define FSDLG_BINMODE   0x00000000UL
 #define FSDLG_ASMMODE   0x00000001UL
@@ -119,11 +124,11 @@ extern tBool        __FASTCALL__ GetJumpDlg( unsigned long * addr,unsigned long 
 
 extern tBool        __FASTCALL__ GetFStoreDlg(const char *title,char *fname,
                                      unsigned long *flags,
-                                     unsigned long *start,
-                                     unsigned long *end,
+                                     __filesize_t *start,
+                                     __filesize_t *end,
                                      const char *prompt);
-extern tBool        __FASTCALL__ GetInsDelBlkDlg(const char *title,unsigned long *start,
-                                        long *size);
+extern tBool        __FASTCALL__ GetInsDelBlkDlg(const char *title,__filesize_t *start,
+                                        __fileoff_t *size);
 
 #define LB_SELECTIVE 0x01U
 #define LB_SORTABLE  0x02U

@@ -68,20 +68,23 @@ mmfHandle          __FASTCALL__ __mmfOpen(const char *fname,int mode)
     mret = PMalloc(sizeof(struct mmfRecord));
     if(mret)
     {
-      long length;
+      __fileoff_t length;
       void *addr;
       length = __FileLength(fhandle);
-      addr = mmap(NULL,length,mk_prot(mode),
-                  mk_flags(mode),fhandle,0L);
-      if(addr != (void *)-1)
+      if(length <= PTRDIFF_MAX)
       {
-        mret->fhandle = fhandle;
-        mret->addr    = addr;
-        mret->length  = length;
-        mret->mode    = mode;
-        return mret;
-      }
-      PFree(mret);
+	addr = mmap(NULL,length,mk_prot(mode),
+                  mk_flags(mode),fhandle,0L);
+	if(addr != (void *)-1)
+	{
+	    mret->fhandle = fhandle;
+	    mret->addr    = addr;
+	    mret->length  = length;
+	    mret->mode    = mode;
+	    return mret;
+	}
+     }
+     PFree(mret);
     }
     __OsClose(fhandle);
   }

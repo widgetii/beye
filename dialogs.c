@@ -121,6 +121,60 @@ tBool __FASTCALL__ Get8DigitDlg(const char *title,const char *text,char attr,uns
  return ret;
 }
 
+#if __WORDSIZE >= 32
+tBool        __FASTCALL__ Get16DigitDlg(const char *title,const char *text,char attr,
+					unsigned long long int *xx)
+{
+ tAbsCoord x1,y1,x2,y2;
+ tRelCoord X1,Y1,X2,Y2;
+ int key;
+ TWindow * hwnd,*ewnd,*using;
+ char base = attr & DECIMAL ? 10 : 16;
+ char len  = attr & DECIMAL ? 20 : 16;
+ tBool ret;
+ char decleg[13];
+ char str[20] = "";
+ char * legals;
+ memcpy(decleg,legalchars,12);
+ decleg[12] = '\0';
+ len += attr & SIGN ? 1 : 0;
+ using = twUsedWin();
+ hwnd = CrtDlgWndnls(title,44,1);
+ twUseWin(hwnd);
+ twGetWinPos(hwnd,&x1,&y1,&x2,&y2);
+ twGotoXY(1,1); twPutS(text);
+ X1 = x1;
+ Y1 = y1;
+ X2 = x2;
+ Y2 = y2;
+ Y1 += 1;
+ X2 = X1 + 43;
+ X1 = X2 - (len - 1);
+ Y2 = Y1;
+ ewnd = CreateEditor(X1,Y1,X2,Y2,TWS_VISIBLE | TWS_CURSORABLE | TWS_NLSOEM);
+ twUseWin(ewnd);
+ if(attr & DECIMAL) legals = attr & SIGN ? decleg : &decleg[2];
+ else               legals = attr & SIGN ? legalchars : &legalchars[2];
+ if(*xx)
+ {
+   if(attr & SIGN) lltoa(*xx,str,base);
+   else            ulltoa(*xx,str,base);
+ }
+ while(1)
+ {
+   key = xeditstring(str,legals,len,NULL);
+   if(key == KE_ESCAPE || key == KE_F(10)) { ret = False; break; }
+   else
+     if(key == KE_ENTER) { ret = True; break; }
+ }
+ CloseWnd(ewnd);
+ CloseWnd(hwnd);
+ if(ret) *xx = attr & SIGN ? strtoll(str,NULL,base) : strtoull(str,NULL,base);
+ twUseWin(using);
+ return ret;
+}
+#endif
+
 static void __NEAR__ __FASTCALL__ paintJumpDlg(TWindow *wdlg,unsigned long flags)
 {
   TWindow *usd;
@@ -153,19 +207,19 @@ static void drawJumpPrompt( void )
 }
 
 
-tBool __FASTCALL__ GetJumpDlg( unsigned long * addr,unsigned long *flags)
+tBool __FASTCALL__ GetJumpDlg( __filesize_t * addr,unsigned long *flags)
 {
  tAbsCoord x1,y1,x2,y2;
  tRelCoord X1,Y1,X2,Y2;
  int key;
  TWindow * hwnd,*ewnd,*using;
- unsigned len = 9,stx = 0;
+ unsigned len = HA_LEN-1,stx = 0;
  tBool ret,update;
  char str[12] = "";
  char * legals;
  unsigned attr;
  using = twUsedWin();
- hwnd = CrtDlgWndnls(" Jump within file ",26,4);
+ hwnd = CrtDlgWndnls(" Jump within file ",(BMFileFlags&BMFF_USE64)?34:26,4);
  twUseWin(hwnd);
  twGetWinPos(hwnd,&x1,&y1,&x2,&y2);
  twGotoXY(2,1); twPutS("Enter offset :");
@@ -216,7 +270,15 @@ tBool __FASTCALL__ GetJumpDlg( unsigned long * addr,unsigned long *flags)
  }
  CloseWnd(ewnd);
  CloseWnd(hwnd);
- if(ret) *addr = (*flags) == GJDLG_RELATIVE ? strtol(str,NULL,16) : strtoul(str,NULL,16);
+ if(ret)
+ {
+#if __WORDSIZE >= 32
+ if(BMFileFlags&BMFF_USE64)
+    *addr = (*flags) == GJDLG_RELATIVE ? strtoll(str,NULL,16) : strtoull(str,NULL,16);
+ else
+#endif
+    *addr = (*flags) == GJDLG_RELATIVE ? strtol(str,NULL,16) : strtoul(str,NULL,16);
+ }
  twUseWin(using);
  return ret;
 }
@@ -270,37 +332,49 @@ static void __NEAR__ __FASTCALL__ FFStaticPaint(TWindow * wdlg,char * fname,char
       twGotoXY(3,7); twPutS(fname); for(i = len;i < 71;i++) twPutChar(TWC_MED_SHADE);
     }
     len = strlen(st);
-    twGotoXY(10,4); twPutS(st); for(i = len;i < 10;i++) twPutChar(TWC_MED_SHADE);
+    twGotoXY(8,4); twPutS(st);
+#if __WORDSIZE >= 32
+    for(i = len;i < 18;i++)
+#else
+    for(i = len;i < 10;i++)
+#endif
+	twPutChar(TWC_MED_SHADE);
     len = strlen(end);
-    twGotoXY(36,4); twPutS(end); for(i = len;i < 10;i++) twPutChar(TWC_MED_SHADE);
+    twGotoXY(35,4); twPutS(end);
+#if __WORDSIZE >= 32
+    for(i = len;i < 18;i++)
+#else
+    for(i = len;i < 10;i++)
+#endif
+	twPutChar(TWC_MED_SHADE);
     if(flg & FSDLG_USEMODES)
     {
       twSetColorAttr(dialog_cset.group.active);
-      twGotoXY(49,1); twPutS(msgTypeComments[0]);
-      twGotoXY(56,1); twPutS(flg & FSDLG_ASMMODE ? " Asm              " : " Bin              ");
+      twGotoXY(54,1); twPutS(msgTypeComments[0]);
+      twGotoXY(61,1); twPutS(flg & FSDLG_ASMMODE ? " Asm              " : " Bin              ");
       if(!(flg & FSDLG_ASMMODE)) twSetColorAttr(dialog_cset.group.disabled);
-      for(i = 1;i < 5;i++) { twGotoXY(49,i + 1); twPutS(msgTypeComments[i]); }
-      twGotoXY(51,2); twPutChar(flg & FSDLG_STRUCTS ? TWC_CHECK_CHAR : TWC_DEF_FILLER);
-      twGotoXY(51,4); twPutChar(flg & FSDLG_COMMENT ? TWC_DEF_FILLER : TWC_RADIO_CHAR);
-      twGotoXY(51,5); twPutChar(flg & FSDLG_COMMENT ? TWC_RADIO_CHAR : TWC_DEF_FILLER);
+      for(i = 1;i < 5;i++) { twGotoXY(54,i + 1); twPutS(msgTypeComments[i]); }
+      twGotoXY(56,2); twPutChar(flg & FSDLG_STRUCTS ? TWC_CHECK_CHAR : TWC_DEF_FILLER);
+      twGotoXY(56,4); twPutChar(flg & FSDLG_COMMENT ? TWC_DEF_FILLER : TWC_RADIO_CHAR);
+      twGotoXY(56,5); twPutChar(flg & FSDLG_COMMENT ? TWC_RADIO_CHAR : TWC_DEF_FILLER);
       twSetColorAttr(dialog_cset.main);
     }
     else
     if(flg & FSDLG_USEBITNS)
     {
       twSetColorAttr(dialog_cset.group.active);
-      for(i = 0;i < 4;i++) { twGotoXY(49,i + 1); twPutS(msgTypeBitness[i]); }
+      for(i = 0;i < 4;i++) { twGotoXY(54,i + 1); twPutS(msgTypeBitness[i]); }
 #ifndef INT64_C
       twSetColorAttr(dialog_cset.group.disabled);
 #endif
-      twGotoXY(49,5); twPutS(msgTypeBitness[i]);
+      twGotoXY(54,5); twPutS(msgTypeBitness[i]);
 #ifndef INT64_C
       twSetColorAttr(dialog_cset.group.active);
 #endif
-      twGotoXY(51,2); twPutChar((flg & FSDLG_BTNSMASK) == 0 ? TWC_RADIO_CHAR : TWC_DEF_FILLER);
-      twGotoXY(51,3); twPutChar((flg & FSDLG_BTNSMASK) == 1 ? TWC_RADIO_CHAR : TWC_DEF_FILLER);
-      twGotoXY(51,4); twPutChar((flg & FSDLG_BTNSMASK) == 2 ? TWC_RADIO_CHAR : TWC_DEF_FILLER);
-      twGotoXY(51,5); twPutChar((flg & FSDLG_BTNSMASK) == 3 ? TWC_RADIO_CHAR : TWC_DEF_FILLER);
+      twGotoXY(56,2); twPutChar((flg & FSDLG_BTNSMASK) == 0 ? TWC_RADIO_CHAR : TWC_DEF_FILLER);
+      twGotoXY(56,3); twPutChar((flg & FSDLG_BTNSMASK) == 1 ? TWC_RADIO_CHAR : TWC_DEF_FILLER);
+      twGotoXY(56,4); twPutChar((flg & FSDLG_BTNSMASK) == 2 ? TWC_RADIO_CHAR : TWC_DEF_FILLER);
+      twGotoXY(56,5); twPutChar((flg & FSDLG_BTNSMASK) == 3 ? TWC_RADIO_CHAR : TWC_DEF_FILLER);
       twSetColorAttr(dialog_cset.main);
     }
     twUseWin(using);
@@ -356,19 +430,24 @@ static void drawFSPrompt( void )
 }
 
 tBool __FASTCALL__ GetFStoreDlg(const char *title,char * fname,unsigned long * flags,
-                   unsigned long * start,unsigned long * end,
+                   __filesize_t * start,__filesize_t * end,
                    const char *prompt)
 {
  tAbsCoord x1,y1,x2,y2;
  tRelCoord X1,Y1,XX1,YY1,XX2,YY2;
- TWindow *wdlg = CrtDlgWndnls(title,74,8);
+ TWindow *wdlg = CrtDlgWndnls(title,78,8);
  TWindow *ewnd[3];
  int i,active,oactive,_lastbyte, neditors;
  tBool redraw;
  unsigned attr,stx = 0;
+#if __WORDSIZE >= 32
+ char startdig[19],enddig[19];
+ unsigned mlen[3] = { 19, 19, 71 };
+#else
  char startdig[11],enddig[11];
- char * legal[3] = { &legalchars[2], &legalchars[2], NULL };
  unsigned mlen[3] = { 10, 10, 71 };
+#endif
+ char * legal[3] = { &legalchars[2], &legalchars[2], NULL };
  char *wbuff[3];
 
  if((*flags) & FSDLG_USEMODES) fs_txt = fs1_txt;
@@ -395,18 +474,26 @@ tBool __FASTCALL__ GetFStoreDlg(const char *title,char * fname,unsigned long * f
    ewnd[2] = CreateEditor(XX1,YY1,XX2,YY2,TWS_CURSORABLE | TWS_NLSOEM);
    neditors++;
  }
- XX1 += 7;
+ XX1 += 5;
+#if __WORDSIZE >= 32
+ XX2  = XX1 + 17;
+#else
  XX2  = XX1 + 9;
+#endif
  YY1 -= 3;
  YY2  = YY1;
  ewnd[0] = CreateEditor(XX1,YY1,XX2,YY2,TWS_CURSORABLE | TWS_NLSOEM);
- XX1 += 26;
+ XX1 += 27;
+#if __WORDSIZE >= 32
+ XX2 = XX1 + 17;
+#else
  XX2 = XX1 + 9;
+#endif
  ewnd[1] = CreateEditor(XX1,YY1,XX2,YY2,TWS_CURSORABLE | TWS_NLSOEM);
  twUseWin(wdlg);
- twGotoXY(3,2);  twPutS(TYPE_HEX_FORM);
+ twGotoXY(1,2);  twPutS(TYPE_HEX_FORM);
  if(prompt)    { twGotoXY(3,6);  twPutS(prompt); }
- twGotoXY(3,4);  twPutS(START_PRMT);
+ twGotoXY(1,4);  twPutS(START_PRMT);
  twGotoXY(27,4); twPutS(LENGTH_PRMT);
  ultoa(*start,startdig,16);
  ultoa(*end,enddig,16);
@@ -477,25 +564,40 @@ static void __NEAR__ __FASTCALL__ FFStaticPaintInsDel(TWindow * wdlg,char * st,c
   TWindow * using = twUsedWin();
     twUseWin(wdlg);
     len = strlen(st);
-    twGotoXY(10,4); twPutS(st); for(i = len;i < 10;i++) twPutChar(TWC_MED_SHADE);
+    twGotoXY(8,4); twPutS(st);
+#if __WORDSIZE >= 32
+    for(i = len;i < 18;i++)
+#else
+    for(i = len;i < 10;i++)
+#endif
+	twPutChar(TWC_MED_SHADE);
     len = strlen(end);
-    twGotoXY(36,4); twPutS(end); for(i = len;i < 10;i++) twPutChar(TWC_MED_SHADE);
+    twGotoXY(35,4); twPutS(end);
+#if __WORDSIZE >= 32
+    for(i = len;i < 18;i++)
+#else
+    for(i = len;i < 10;i++)
+#endif
+	twPutChar(TWC_MED_SHADE);
     twUseWin(using);
 }
 
-
-tBool __FASTCALL__ GetInsDelBlkDlg(const char *title,unsigned long * start,long * size)
+tBool __FASTCALL__ GetInsDelBlkDlg(const char *title,__filesize_t * start,__fileoff_t * size)
 {
  tAbsCoord x1,y1,x2,y2;
  tRelCoord X1,Y1,XX1,YY1,XX2,YY2;
- TWindow * wdlg = CrtDlgWndnls(title,74,5);
+ TWindow * wdlg = CrtDlgWndnls(title,78,5);
  TWindow * ewnd[2];
  int i,active,oactive,_lastbyte;
  unsigned stx = 0,attr;
  tBool redraw;
  char startdig[11],enddig[11];
  char * legal[2] = { &legalchars[2], legalchars };
+#if __WORDSIZE >= 32
+ unsigned mlen[2] = { 19, 19 };
+#else
  unsigned mlen[2] = { 10, 10 };
+#endif
  char *wbuff[2];
 
  twGetWinPos(wdlg,&x1,&y1,&x2,&y2);
@@ -504,21 +606,29 @@ tBool __FASTCALL__ GetInsDelBlkDlg(const char *title,unsigned long * start,long 
 
  wbuff[0] = startdig;
  wbuff[1] = enddig;
- XX1 = X1 + 10;
+ XX1 = X1 + 8;
  YY2 = YY1 = Y1 + 4;
+#if __WORDSIZE >= 32
+ XX2 = XX1 + 17;
+#else
  XX2 = XX1 + 9;
+#endif
  ewnd[0] = CreateEditor(XX1,YY1,XX2,YY2,TWS_CURSORABLE | TWS_NLSOEM);
- XX1 += 26;
+ XX1 += 27;
+#if __WORDSIZE >= 32
+ XX2 = XX1 + 17;
+#else
  XX2 = XX1 + 9;
+#endif
  ewnd[1] = CreateEditor(XX1,YY1,XX2,YY2,TWS_CURSORABLE | TWS_NLSOEM);
  twUseWin(wdlg);
- twGotoXY(3,2); twPutS(TYPE_HEX_FORM);
- twGotoXY(3,4);  twPutS(START_PRMT);
+ twGotoXY(1,2); twPutS(TYPE_HEX_FORM);
+ twGotoXY(1,4);  twPutS(START_PRMT);
  twGotoXY(27,4); twPutS(LENGTH_PRMT);
- twinDrawFrameAttr(48,1,74,5,TW_UP3D_FRAME,dialog_cset.main);
- twGotoXY(50,2); twPutS("Remarks:             ");
- twGotoXY(50,3); twPutS("+(pos) - insert block");
- twGotoXY(50,4); twPutS("-(neg) - delete block");
+ twinDrawFrameAttr(53,1,78,5,TW_UP3D_FRAME,dialog_cset.main);
+ twGotoXY(55,2); twPutS("Remarks:             ");
+ twGotoXY(55,3); twPutS("+(pos) - insert block");
+ twGotoXY(55,4); twPutS("-(neg) - delete block");
  ultoa(*start,startdig,16);
  if(*size < 0)
  {

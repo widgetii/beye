@@ -62,7 +62,7 @@ typedef void * BGLOBAL;       /**< This is the data type used to represent buffe
 typedef struct tagvfb
 {
  int             handle;    /**< file handle */
- unsigned long   FBufStart; /**< logical position of mirror the buffer onto file */
+ __filesize_t    FBufStart; /**< logical position of mirror the buffer onto file */
  char *          MBuffer;   /**< NULL - not buffered i/o */
  unsigned        MBufLen;   /**< length data, actually contains in buffer */
  unsigned        MBufSize;  /**< real size of buffer */
@@ -78,8 +78,8 @@ typedef struct tagmmb
 
 typedef struct tagBFILE
 {
- unsigned long   FilePos;   /**< current logical position in file */
- unsigned long   FLength;   /**< real length of the file */
+ __filesize_t    FilePos;   /**< current logical position in file */
+ __filesize_t    FLength;   /**< real length of the file */
  char *          FileName;  /**< Real file name of opened file */
  unsigned        openmode;  /**< mode,that OsOpen this file */
  int             optimize;  /**< seek optimization */
@@ -121,7 +121,7 @@ BGLOBAL               __FASTCALL__ bioOpen(const char * fname,unsigned openmode,
                      *                        the new end of file to the original
                      *                        end of the file are lost.
                     **/
-tBool                 __FASTCALL__ bioChSize(BGLOBAL bioFile,unsigned long newsize);
+tBool                 __FASTCALL__ bioChSize(BGLOBAL bioFile,__filesize_t newsize);
 
                    /** Closes opened stream.
                      * @return                True if operation was succesfully performed
@@ -140,7 +140,7 @@ tBool                 __FASTCALL__ bioEOF(BGLOBAL bioHandle);
                      * @return                file length
                      * @param bioFile         handle of opened stream
                     **/
-unsigned long         __FASTCALL__ bioFLength(BGLOBAL bioFile);
+__filesize_t         __FASTCALL__ bioFLength(BGLOBAL bioFile);
 
                    /** Flushes buffer onto disk.
                      * @return                True if operation was succesfully performed
@@ -206,7 +206,7 @@ tBool                 __FASTCALL__ bioReRead(BGLOBAL bioFile);
                      * @param origin          specifies reference location from which offset will be computed
                      * @see                   bioTell BIO_SEEK_SET BIO_SEEK_CUR BIO_SEEK_END
                     **/
-tBool                 __FASTCALL__ bioSeek(BGLOBAL bioFile,long offset,int origin);
+tBool                 __FASTCALL__ bioSeek(BGLOBAL bioFile,__fileoff_t offset,int origin);
 
                    /** Returns current optimization of buffering.
                      * @return                optimization (BIO_OPT_*)
@@ -227,7 +227,7 @@ unsigned              __FASTCALL__ bioSetOptimization(BGLOBAL bioFile,unsigned f
                      * @param bioFile         handle of opened stream
                      * @see                   bioSeek
                     **/
-unsigned long         __FASTCALL__ bioTell(BGLOBAL bioFile);
+__filesize_t         __FASTCALL__ bioTell(BGLOBAL bioFile);
 
                    /** Writes one byte to stream.
                      * @return                True if operation was succesfully performed

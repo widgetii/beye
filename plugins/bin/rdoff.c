@@ -37,17 +37,18 @@ struct rdoff_ImpName
 {
   unsigned short lsegno;
   unsigned short reserv;
-  unsigned long nameoff;
+  __filesize_t nameoff;
 };
 
-static unsigned long rdoff_hdrlen,cs_start,ds_start,ds_len;
+static unsigned long rdoff_hdrlen,ds_len;
+static __filesize_t cs_start,ds_start;
 
 static linearArray *rdoffReloc = NULL;
 static linearArray *rdoffImpNames = NULL;
 
 static void __NEAR__ __FASTCALL__ ReadImpNameList(BGLOBAL handle,void (__FASTCALL__ *mem_out)(const char *));
 static void __FASTCALL__ rdoff_ReadPubNameList(BGLOBAL handle,void (__FASTCALL__ *mem_out)(const char *));
-static tBool __NEAR__ __FASTCALL__ FindPubName(char *buff,unsigned cb_buff,unsigned long pa);
+static tBool __NEAR__ __FASTCALL__ FindPubName(char *buff,unsigned cb_buff,__filesize_t pa);
 
 static tCompare __FASTCALL__ compare_impnames(const void __HUGE__ *v1,const void __HUGE__ *v2);
 
@@ -79,7 +80,7 @@ static tBool __FASTCALL__ rdoffLowMemFunc( unsigned long need_mem )
   return ret;
 }
 
-static unsigned long __FASTCALL__ rdoff_Help( void )
+static __filesize_t __FASTCALL__ rdoff_Help( void )
 {
   hlpDisplay(10011);
   return BMGetCurrFilePos();
@@ -131,15 +132,15 @@ static tBool __NEAR__ __FASTCALL__ rdoff_skiprec(unsigned char type)
   return ret;
 }
 
-static unsigned long __FASTCALL__ rdoff_ShowExport( void )
+static __filesize_t __FASTCALL__ rdoff_ShowExport( void )
 {
-  unsigned long fpos;
+  __filesize_t fpos;
   unsigned char rec;
   unsigned i;
   char str[33],sout[256];
   unsigned char segno;
-  unsigned long segoff;
-  unsigned long abs_off;
+  __filesize_t segoff;
+  __filesize_t abs_off;
   memArray * rdoff_et;
   fpos = BMGetCurrFilePos();
   if(!(rdoff_et = ma_Build(0,True))) return fpos;
@@ -162,8 +163,8 @@ static unsigned long __FASTCALL__ rdoff_ShowExport( void )
         if(!ch || is_eof) break;
       }
       str[i] = 0;
-      abs_off = segno == 0 ? cs_start : segno == 1 ? ds_start : ULONG_MAX;
-      if(abs_off < ULONG_MAX) abs_off += segoff;
+      abs_off = segno == 0 ? cs_start : segno == 1 ? ds_start : FILESIZE_MAX;
+      if(abs_off < FILESIZE_MAX) abs_off += segoff;
       sprintf(sout,"%-50s offset=%08lXH",str,abs_off);
       if(!ma_AddString(rdoff_et,sout,True) || is_eof) break;
     }
@@ -191,15 +192,15 @@ static unsigned long __FASTCALL__ rdoff_ShowExport( void )
   return fpos;
 }
 
-static unsigned long __FASTCALL__ rdoff_FindExport(const char *name )
+static __filesize_t __FASTCALL__ rdoff_FindExport(const char *name )
 {
-  unsigned long ret;
+  __filesize_t ret;
   unsigned char rec;
   unsigned i;
   char str[33];
   unsigned char segno;
-  unsigned long segoff;
-  unsigned long abs_off;
+  __filesize_t segoff;
+  __filesize_t abs_off;
   bmSeek(10,BM_SEEK_SET);
   ret = 0L;
   while(bmGetCurrFilePos() < rdoff_hdrlen + 5)
@@ -238,9 +239,9 @@ static unsigned long __FASTCALL__ rdoff_FindExport(const char *name )
   return ret;
 }
 
-static unsigned long __FASTCALL__ rdoff_ShowModRef( void )
+static __filesize_t __FASTCALL__ rdoff_ShowModRef( void )
 {
-  unsigned long fpos;
+  __filesize_t fpos;
   unsigned char rec;
   unsigned i;
   char str[129];
@@ -279,9 +280,9 @@ static unsigned long __FASTCALL__ rdoff_ShowModRef( void )
   return fpos;
 }
 
-static unsigned long __FASTCALL__ rdoff_ShowImport( void )
+static __filesize_t __FASTCALL__ rdoff_ShowImport( void )
 {
-  unsigned long fpos;
+  __filesize_t fpos;
   unsigned char rec;
   unsigned i;
   char str[33];
@@ -321,10 +322,10 @@ static unsigned long __FASTCALL__ rdoff_ShowImport( void )
   return fpos;
 }
 
-static unsigned long __FASTCALL__ rdoff_ShowHeader( void )
+static __filesize_t __FASTCALL__ rdoff_ShowHeader( void )
 {
   int endian;
-  unsigned long fpos,entry;
+  __filesize_t fpos,entry;
   unsigned long hs_len,cs_len;
   TWindow *w;
   fpos = BMGetCurrFilePos();
@@ -391,7 +392,7 @@ static void __NEAR__ __FASTCALL__ BuildRelocRDOFF( void )
     if(rec == 1)
     {
       unsigned char segno;
-      unsigned long off;
+      __filesize_t off;
       segno = bmReadByte();
       rdf_r.is_rel = 0;
       if(segno >= 64)
@@ -399,10 +400,10 @@ static void __NEAR__ __FASTCALL__ BuildRelocRDOFF( void )
         rdf_r.is_rel = 1;
         segno -= 64;
       }
-      rdf_r.offset = segno == 0 ? cs_start : segno == 1 ? ds_start : ULONG_MAX;
+      rdf_r.offset = segno == 0 ? cs_start : segno == 1 ? ds_start : FILESIZE_MAX;
       off = bmReadDWord();
       if(bmEOF()) break;
-      if(rdf_r.offset < ULONG_MAX) rdf_r.offset += off;
+      if(rdf_r.offset < FILESIZE_MAX) rdf_r.offset += off;
       rdf_r.reflen = bmReadByte();
       rdf_r.segto = bmReadWord();
       if(!la_AddData(rdoffReloc,&rdf_r,MemOutBox)) break;
@@ -419,11 +420,11 @@ static void __NEAR__ __FASTCALL__ BuildRelocRDOFF( void )
 
 static unsigned char __codelen;
 
-static unsigned long __FASTCALL__ rdoffBuildReferStr(char *str,RDOFF_RELOC *reloc,unsigned long ulShift,int flags)
+static __filesize_t __FASTCALL__ rdoffBuildReferStr(char *str,RDOFF_RELOC *reloc,__filesize_t ulShift,int flags)
 {
    char name[400],ch,buff[400];
    const char *ptr_type;
-   unsigned long field_val,foff,base_seg_off, retrf;
+   __filesize_t field_val,foff,base_seg_off, retrf;
    unsigned i;
    if(flags & APREF_USE_TYPE)
    {
@@ -436,7 +437,7 @@ static unsigned long __FASTCALL__ rdoffBuildReferStr(char *str,RDOFF_RELOC *relo
      }
      strcat(str,ptr_type);
    }
-   base_seg_off = ULONG_MAX;
+   base_seg_off = FILESIZE_MAX;
    switch(reloc->segto)
    {
      case 0:  ptr_type = "cs:";
@@ -489,7 +490,7 @@ static unsigned long __FASTCALL__ rdoffBuildReferStr(char *str,RDOFF_RELOC *relo
      bmSeek(foff,BM_SEEK_SET);
      if(reloc->segto < 3)
      {
-       if(base_seg_off < ULONG_MAX)
+       if(base_seg_off < FILESIZE_MAX)
        {
          base_seg_off += field_val;
          if(FindPubName(buff,sizeof(buff),base_seg_off))
@@ -510,9 +511,9 @@ static unsigned long __FASTCALL__ rdoffBuildReferStr(char *str,RDOFF_RELOC *relo
      }
      if(reloc->is_rel)
      {
-       unsigned long seg_off;
-       long fv;
-       seg_off = ulShift < ds_start ? cs_start : ulShift < ds_start+ds_len ? ds_start : ULONG_MAX;
+       __filesize_t seg_off;
+       __fileoff_t fv;
+       seg_off = ulShift < ds_start ? cs_start : ulShift < ds_start+ds_len ? ds_start : FILESIZE_MAX;
        fv = field_val;
        if(!(ulShift + fv + reloc->reflen == seg_off && (flags & APREF_TRY_LABEL)))
        {
@@ -523,7 +524,7 @@ static unsigned long __FASTCALL__ rdoffBuildReferStr(char *str,RDOFF_RELOC *relo
    return retrf;
 }
 
-static unsigned long __FASTCALL__ rdoff_AppendRef(char *str,unsigned long ulShift,int flags,int codelen,unsigned long r_sh)
+static unsigned long __FASTCALL__ rdoff_AppendRef(char *str,__filesize_t ulShift,int flags,int codelen,__filesize_t r_sh)
 {
   RDOFF_RELOC *rrdoff,key;
   unsigned long ret;
@@ -591,7 +592,7 @@ static void __FASTCALL__ rdoff_ReadPubName(BGLOBAL b_cache,const struct PubName 
     }
 }
 
-static tBool __NEAR__ __FASTCALL__ FindPubName(char *buff,unsigned cb_buff,unsigned long pa)
+static tBool __NEAR__ __FASTCALL__ FindPubName(char *buff,unsigned cb_buff,__filesize_t pa)
 {
   BGLOBAL b_cache;
   b_cache = bmbioHandle();
@@ -603,7 +604,7 @@ static tBool __NEAR__ __FASTCALL__ FindPubName(char *buff,unsigned cb_buff,unsig
 static void __FASTCALL__ rdoff_ReadPubNameList(BGLOBAL handle,void (__FASTCALL__ *mem_out)(const char *))
 {
  unsigned char segno,rec;
- unsigned long segoff,abs_off;
+ __filesize_t segoff,abs_off;
  unsigned i;
  struct PubName rdf_pn;
  UNUSED(handle);
@@ -627,8 +628,8 @@ static void __FASTCALL__ rdoff_ReadPubNameList(BGLOBAL handle,void (__FASTCALL__
         is_eof = bmEOF();
         if(!ch || is_eof) break;
       }
-      abs_off = segno == 0 ? cs_start : segno == 1 ? ds_start : ULONG_MAX;
-      if(abs_off < ULONG_MAX) abs_off += segoff;
+      abs_off = segno == 0 ? cs_start : segno == 1 ? ds_start : FILESIZE_MAX;
+      if(abs_off < FILESIZE_MAX) abs_off += segoff;
       rdf_pn.pa = abs_off;
       rdf_pn.attr = SC_GLOBAL;
       if(!la_AddData(PubNames,&rdf_pn,MemOutBox) || is_eof) break;
@@ -687,14 +688,14 @@ static void __NEAR__ __FASTCALL__ ReadImpNameList(BGLOBAL handle,void (__FASTCAL
 }
 
 /** bitness not declared, but we assign 32-bit as default */
-static int __FASTCALL__ rdoff_bitness(unsigned long pa)
+static int __FASTCALL__ rdoff_bitness(__filesize_t pa)
 {
   UNUSED(pa);
   return DAB_USE32;
 }
 
-static unsigned long __FASTCALL__ rdoffGetPubSym(char *str,unsigned cb_str,unsigned *func_class,
-                           unsigned long pa,tBool as_prev)
+static __filesize_t __FASTCALL__ rdoffGetPubSym(char *str,unsigned cb_str,unsigned *func_class,
+                           __filesize_t pa,tBool as_prev)
 {
   BGLOBAL b_cache;
   b_cache = bmbioHandle();
@@ -703,8 +704,8 @@ static unsigned long __FASTCALL__ rdoffGetPubSym(char *str,unsigned cb_str,unsig
                       rdoff_ReadPubName);
 }
 
-static unsigned __FASTCALL__ rdoffGetObjAttr(unsigned long pa,char *name,unsigned cb_name,
-                         unsigned long *start,unsigned long *end,int *_class,int *bitness)
+static unsigned __FASTCALL__ rdoffGetObjAttr(__filesize_t pa,char *name,unsigned cb_name,
+                         __filesize_t *start,__filesize_t *end,int *_class,int *bitness)
 {
   unsigned ret;
   UNUSED(cb_name);
@@ -755,17 +756,17 @@ static unsigned __FASTCALL__ rdoffGetObjAttr(unsigned long pa,char *name,unsigne
   return ret;
 }
 
-static unsigned long __FASTCALL__ rdoffVA2PA(unsigned long va)
+static __filesize_t __FASTCALL__ rdoffVA2PA(__filesize_t va)
 {
   return va + cs_start;
 }
 
-static unsigned long __FASTCALL__ rdoffPA2VA(unsigned long pa)
+static __filesize_t __FASTCALL__ rdoffPA2VA(__filesize_t pa)
 {
   return pa > cs_start ? pa - cs_start : 0L;
 }
 
-static tBool __FASTCALL__ rdoff_AddressResolv(char *addr,unsigned long cfpos)
+static tBool __FASTCALL__ rdoff_AddressResolv(char *addr,__filesize_t cfpos)
 {
  /* Since this function is used in references resolving of disassembler
     it must be seriously optimized for speed. */

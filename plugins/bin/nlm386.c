@@ -37,9 +37,9 @@
 
 static Nlm_Internal_Fixed_Header nlm;
 
-static tBool __NEAR__ __FASTCALL__ FindPubName(char *buff,unsigned cb_buff,unsigned long pa);
+static tBool __NEAR__ __FASTCALL__ FindPubName(char *buff,unsigned cb_buff,__filesize_t pa);
 static void __FASTCALL__ nlm_ReadPubNameList(BGLOBAL handle,void (__FASTCALL__ *mem_out)(const char *));
-static unsigned long __FASTCALL__ NLMPA2VA(unsigned long pa);
+static __filesize_t __FASTCALL__ NLMPA2VA(__filesize_t pa);
 
 static BGLOBAL nlm_cache = &bNull;
 
@@ -58,9 +58,9 @@ static tBool __FASTCALL__ nlmLowMemFunc( unsigned long need_mem )
   return False;
 }
 
-static unsigned long __FASTCALL__ ShowNLMHeader( void )
+static __filesize_t __FASTCALL__ ShowNLMHeader( void )
 {
-  unsigned long fpos;
+  __filesize_t fpos;
   char modName[NLM_MODULE_NAME_SIZE];
   TWindow * w;
   unsigned keycode;
@@ -139,9 +139,9 @@ static unsigned long __FASTCALL__ ShowNLMHeader( void )
   return fpos;
 }
 
-static unsigned long __FASTCALL__ ShowNewNLM( void )
+static __filesize_t __FASTCALL__ ShowNewNLM( void )
 {
-  unsigned long fpos,ssize,m,d,sharedEntry,sharedExit;
+  __filesize_t fpos,ssize,m,d,sharedEntry,sharedExit;
   char modName[256];
   unsigned char len;
   TWindow *w;
@@ -305,11 +305,11 @@ static tBool __FASTCALL__ __ReadExtRefNamesNLM(BGLOBAL handle,memArray * obj,uns
  return True;
 }
 
-static unsigned long __NEAR__ __FASTCALL__ CalcEntryNLM(unsigned ord,tBool dispmsg)
+static __filesize_t __NEAR__ __FASTCALL__ CalcEntryNLM(unsigned ord,tBool dispmsg)
 {
  unsigned char length;
  unsigned i;
- unsigned long ret,fpos,cpos;
+ __filesize_t ret,fpos,cpos;
  fpos = BMGetCurrFilePos();
  cpos = nlm.nlm_publicsOffset;
  for(i = 0;i < ord;i++)
@@ -358,7 +358,7 @@ static tBool __FASTCALL__ NLMNamesReadItems(BGLOBAL handle,memArray * obj,unsign
  return True;
 }
 
-static unsigned long __FASTCALL__ ShowExtRefNLM( void )
+static __filesize_t __FASTCALL__ ShowExtRefNLM( void )
 {
   fmtShowList(NLMExtRefNumItems,
               __ReadExtRefNamesNLM,
@@ -397,7 +397,7 @@ static tBool __FASTCALL__ __ReadModRefNamesNLM(BGLOBAL handle,memArray * obj,uns
 }
 
 
-static unsigned long __FASTCALL__ ShowModRefNLM( void )
+static __filesize_t __FASTCALL__ ShowModRefNLM( void )
 {
   fmtShowList(NLMModRefNumItems,
               __ReadModRefNamesNLM,
@@ -407,9 +407,9 @@ static unsigned long __FASTCALL__ ShowModRefNLM( void )
    return BMGetCurrFilePos();
 }
 
-static unsigned long __FASTCALL__ ShowPubNamNLM( void )
+static __filesize_t __FASTCALL__ ShowPubNamNLM( void )
 {
-  unsigned long fpos = BMGetCurrFilePos();
+  __filesize_t fpos = BMGetCurrFilePos();
   int ret;
   ret = fmtShowList(NLMNamesNumItems,NLMNamesReadItems,
                     EXP_TABLE,
@@ -453,7 +453,8 @@ static tCompare __FASTCALL__ nlm_compare_f(const void __HUGE__ *e1,const void __
 static void __NEAR__ __FASTCALL__ BuildRelocNlm( void )
 {
   unsigned i,j;
-  unsigned long cpos,val,niter,noff;
+  unsigned long val,niter,noff;
+  __filesize_t cpos;
   unsigned char len;
   TWindow * w,*usd;
   RELOC_NLM rel;
@@ -499,10 +500,10 @@ static void __NEAR__ __FASTCALL__ BuildRelocNlm( void )
   CloseWnd(w);
 }
 
-static unsigned long __NEAR__ __FASTCALL__ BuildReferStrNLM(char *str,RELOC_NLM*rne,int flags)
+static __filesize_t __NEAR__ __FASTCALL__ BuildReferStrNLM(char *str,RELOC_NLM*rne,int flags)
 {
-  unsigned long val;
-  unsigned long retrf;
+  __filesize_t val;
+  __filesize_t retrf;
   char name[256];
   BGLOBAL b_cache;
   unsigned char len;
@@ -535,7 +536,7 @@ static unsigned long __NEAR__ __FASTCALL__ BuildReferStrNLM(char *str,RELOC_NLM*
   return retrf;
 }
 
-static unsigned long __FASTCALL__ AppendNLMRef(char *str,unsigned long ulShift,int flags,int codelen,unsigned long r_sh)
+static unsigned long __FASTCALL__ AppendNLMRef(char *str,__filesize_t ulShift,int flags,int codelen,__filesize_t r_sh)
 {
   RELOC_NLM *rnlm,key;
   unsigned long retrf;
@@ -587,13 +588,13 @@ static void __FASTCALL__ NLMdestroy( void )
   PMUnregLowMemCallBack(nlmLowMemFunc);
 }
 
-static int __FASTCALL__ NLMbitness(unsigned long off)
+static int __FASTCALL__ NLMbitness(__filesize_t off)
 {
   UNUSED(off);
   return DAB_USE32;
 }
 
-static tBool __FASTCALL__ NLMAddrResolv(char *addr,unsigned long cfpos)
+static tBool __FASTCALL__ NLMAddrResolv(char *addr,__filesize_t cfpos)
 {
  /* Since this function is used in references resolving of disassembler
     it must be seriously optimized for speed. */
@@ -614,7 +615,7 @@ static tBool __FASTCALL__ NLMAddrResolv(char *addr,unsigned long cfpos)
   return bret;
 }
 
-static unsigned long __FASTCALL__ HelpNLM( void )
+static __filesize_t __FASTCALL__ HelpNLM( void )
 {
   hlpDisplay(10007);
   return BMGetCurrFilePos();
@@ -631,7 +632,7 @@ static void __FASTCALL__ nlm_ReadPubName(BGLOBAL b_cache,const struct PubName *i
     buff[length] = 0;
 }
 
-static tBool __NEAR__ __FASTCALL__ FindPubName(char *buff,unsigned cb_buff,unsigned long pa)
+static tBool __NEAR__ __FASTCALL__ FindPubName(char *buff,unsigned cb_buff,__filesize_t pa)
 {
   return fmtFindPubName(nlm_cache,buff,cb_buff,pa,
                         nlm_ReadPubNameList,
@@ -660,16 +661,16 @@ static void __FASTCALL__ nlm_ReadPubNameList(BGLOBAL handle,void (__FASTCALL__ *
  if(PubNames->nItems) la_Sort(PubNames,fmtComparePubNames);
 }
 
-static unsigned long __FASTCALL__ NLMGetPubSym(char *str,unsigned cb_str,unsigned *func_class,
-                           unsigned long pa,tBool as_prev)
+static __filesize_t __FASTCALL__ NLMGetPubSym(char *str,unsigned cb_str,unsigned *func_class,
+                           __filesize_t pa,tBool as_prev)
 {
   return fmtGetPubSym(nlm_cache,str,cb_str,func_class,pa,as_prev,
                       nlm_ReadPubNameList,
                       nlm_ReadPubName);
 }
 
-static unsigned __FASTCALL__ NLMGetObjAttr(unsigned long pa,char *name,unsigned cb_name,
-                      unsigned long *start,unsigned long *end,int *_class,int *bitness)
+static unsigned __FASTCALL__ NLMGetObjAttr(__filesize_t pa,char *name,unsigned cb_name,
+                      __filesize_t *start,__filesize_t *end,int *_class,int *bitness)
 {
   unsigned ret;
   UNUSED(cb_name);
@@ -708,14 +709,14 @@ static unsigned __FASTCALL__ NLMGetObjAttr(unsigned long pa,char *name,unsigned 
   return ret;
 }
 
-static unsigned long __FASTCALL__ NLMVA2PA(unsigned long va)
+static __filesize_t __FASTCALL__ NLMVA2PA(__filesize_t va)
 {
   return va + min(nlm.nlm_codeImageOffset,nlm.nlm_dataImageOffset);
 }
 
-static unsigned long __FASTCALL__ NLMPA2VA(unsigned long pa)
+static __filesize_t __FASTCALL__ NLMPA2VA(__filesize_t pa)
 {
-  unsigned long base = min(nlm.nlm_codeImageOffset,nlm.nlm_dataImageOffset);
+  __filesize_t base = min(nlm.nlm_codeImageOffset,nlm.nlm_dataImageOffset);
   return pa > base ? pa - base : 0L;
 }
 

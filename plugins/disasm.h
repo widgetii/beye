@@ -94,7 +94,7 @@ extern unsigned dis_severity; /**< severity of disassembler commentaries */
 #define __INSNT_JMPVVT  0x00000003L /**< Jump via virtual table */
 #define __INSNT_JMPPIC  0x00000004L /**< Jump via PIC. Like: .i386: jmp name@GOT(ebx) */
 
-typedef DisasmRet __FASTCALL__ (*DisasmFunc)(unsigned long shift,
+typedef DisasmRet __FASTCALL__ (*DisasmFunc)(__filesize_t shift,
                                              MBuffer insn_buff,
                                              unsigned flags);
 typedef AsmRet    __FASTCALL__ (*AsmFunc)(const char *str);
@@ -131,7 +131,7 @@ extern unsigned disPanelMode; /**< contains select mode of panel */
 #define NEEDREF_NONE    0    /**< do not resolve references */
 extern unsigned disNeedRef;  /**< contains selected references resolution */
 
-extern DisasmRet Disassembler(unsigned long ulShift,MBuffer buffer,unsigned flags);
+extern DisasmRet Disassembler(__filesize_t ulShift,MBuffer buffer,unsigned flags);
 
 /** Common disassembler utility */
 
@@ -176,7 +176,7 @@ extern void   __FASTCALL__ disSetModifier(char *str,const char *modf);
     disAppendDigits(outstr, 0x5680, 1, 2, 0x1234, DISARG_WORD);
     strcat(outstr,"]");
 **/
-extern int __FASTCALL__  disAppendDigits(char *str,unsigned long ulShift,int flags,
+extern int __FASTCALL__  disAppendDigits(char *str,__filesize_t ulShift,int flags,
                               char codelen,void *defval,unsigned type);
 
 #define DISADR_SHORT   0x00
@@ -211,8 +211,8 @@ extern int __FASTCALL__  disAppendDigits(char *str,unsigned long ulShift,int fla
     strcpy(outstr,"calln32 ");
     disAppendFAddr(outstr, 0x1004, 0x12345678, 0x1002, DISADR_NEAR32, 0, 4);
 **/
-extern int __FASTCALL__  disAppendFAddr(char * str,long ulShift,long distin,
-                             unsigned long r_sh,char type,
+extern int __FASTCALL__  disAppendFAddr(char * str,__fileoff_t ulShift,__fileoff_t distin,
+                             __filesize_t r_sh,char type,
                              unsigned seg,char codelen);
 
 #endif

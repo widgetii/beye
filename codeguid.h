@@ -28,10 +28,10 @@ extern "C" {
 extern char codeguid_image[];
 
 extern void              __FASTCALL__ GidResetGoAddress( int keycode );
-extern void              __FASTCALL__ GidAddGoAddress(char *str,unsigned long addr);
+extern void              __FASTCALL__ GidAddGoAddress(char *str,__filesize_t addr);
 extern void              __FASTCALL__ GidAddBackAddress( void );
-extern unsigned long     __FASTCALL__ GidGetGoAddress(unsigned keycode);
-extern char *            __FASTCALL__ GidEncodeAddress(unsigned long cfpos,tBool aresolv);
+extern __filesize_t      __FASTCALL__ GidGetGoAddress(unsigned keycode);
+extern char *            __FASTCALL__ GidEncodeAddress(__filesize_t cfpos,tBool aresolv);
 
 extern tBool             __FASTCALL__ initCodeGuider( void );
 extern void              __FASTCALL__ termCodeGuider( void );

@@ -314,14 +314,15 @@ java_codes_t java_codes[256]=
 
 static char *outstr;
 static unsigned vartail=0;
-static unsigned long vartail_base=0, vartail_start=0, vartail_flags, vartail_idx;
-static DisasmRet __FASTCALL__ javaDisassembler(unsigned long ulShift,
+static __filesize_t vartail_base=0, vartail_start=0, vartail_flags, vartail_idx;
+static DisasmRet __FASTCALL__ javaDisassembler(__filesize_t ulShift,
                                                MBuffer buffer,
                                                unsigned flags)
 {
   DisasmRet ret;
   unsigned mult,idx,tail,npadds;
-  unsigned long jflags,prev_pa,next_pa;
+  __filesize_t prev_pa,next_pa;
+  unsigned long jflags;
   memset(&ret,0,sizeof(ret));
   ret.str = outstr;
   idx=0;
@@ -361,7 +362,8 @@ static DisasmRet __FASTCALL__ javaDisassembler(unsigned long ulShift,
 	ret.codelen=vartail_flags & JVM_TABLESWITCH ? 4 : 8;
 	if(!((flags & __DISF_SIZEONLY) == __DISF_SIZEONLY))
 	{
-		unsigned long cval,lval,newpos;
+		__filesize_t newpos;
+		unsigned long cval,lval;
 		if(vartail_flags & JVM_TABLESWITCH)
 		{
 			strcpy(outstr,"case ");
@@ -451,7 +453,8 @@ static DisasmRet __FASTCALL__ javaDisassembler(unsigned long ulShift,
 	{
 	    if(jflags & JVM_LOOKUPSWITCH)
 	    {
-		unsigned long defval,npairs,newpos;
+		__filesize_t newpos;
+		unsigned long defval,npairs;
 		defval=FMT_DWORD(&buffer[idx+npadds],1);
 		npairs=FMT_DWORD(&buffer[idx+npadds+4],1);
 		if(!vartail) strcat(outstr,"???invalid???");
@@ -460,7 +463,7 @@ static DisasmRet __FASTCALL__ javaDisassembler(unsigned long ulShift,
 			strcat(outstr,"L");
 			strcat(outstr,Get8Digit(npairs));
 			strcat(outstr,",default:");
-			newpos=ulShift+(signed long)defval;
+			newpos=ulShift+(__fileoff_t)defval;
 			if(defval)
 		    		disAppendFAddr(outstr,ulShift+idx+1+npadds,defval,
 						newpos,DISADR_NEAR32,0,4);
@@ -471,13 +474,14 @@ static DisasmRet __FASTCALL__ javaDisassembler(unsigned long ulShift,
 	    else
 	    if(jflags & JVM_TABLESWITCH)
 	    {
-		unsigned long defval,newpos;
+		__filesize_t newpos;
+		unsigned long defval;
 		defval=FMT_DWORD(&buffer[idx+npadds],1);
 		if(!vartail) strcat(outstr,"???invalid???");
 		else
 		{
 			strcat(outstr," default:");
-			newpos=ulShift+(signed long)defval;
+			newpos=ulShift+(__fileoff_t)defval;
 			if(defval)
 				disAppendFAddr(outstr,ulShift+idx+1+npadds,defval,
 						newpos,DISADR_NEAR32,0,4);
@@ -514,8 +518,8 @@ static DisasmRet __FASTCALL__ javaDisassembler(unsigned long ulShift,
 		}
 		case 2: 
 		{
+		    __filesize_t newpos;
 		    unsigned short sval;
-		    unsigned long newpos;
 		    sval=FMT_WORD(&buffer[idx],1);
 		    if((jflags & JVM_CODEREF)==JVM_CODEREF && sval)
 		    {
@@ -541,12 +545,12 @@ static DisasmRet __FASTCALL__ javaDisassembler(unsigned long ulShift,
 		default:
 		case 4: 
 		{
+		    __filesize_t newpos;
 		    unsigned long lval;
-		    unsigned long newpos;
 		    lval=FMT_DWORD(&buffer[idx],1);
 		    if((jflags & JVM_CODEREF)==JVM_CODEREF && lval)
 		    {
-			newpos = ulShift + (signed long)lval;
+			newpos = ulShift + (__fileoff_t)lval;
 			disAppendFAddr(outstr,ulShift + 1,lval,
 					newpos,DISADR_NEAR32,0,4);
 		    }

@@ -2165,7 +2165,7 @@ static void ix86_gettype(DisasmRet *dret,ix86Param *_DisP)
      }
 }
 
-static DisasmRet __FASTCALL__ ix86Disassembler(unsigned long ulShift,
+static DisasmRet __FASTCALL__ ix86Disassembler(__filesize_t ulShift,
                                                MBuffer buffer,
                                                unsigned flags)
 {

@@ -38,7 +38,7 @@ extern struct tag_emem EditorMem;
 
 extern int edit_x,edit_y;
 extern unsigned char edit_XX;
-extern long edit_cp;
+extern __fileoff_t edit_cp;
 
 
 extern void   __FASTCALL__ PaintETitle( int shift,tBool use_shift );

@@ -64,7 +64,7 @@ int  __FASTCALL__ __OsDupHandle(int handle)
   return ret;
 }
 
-int __FASTCALL__ __OsChSize(int handle, long size)
+int __FASTCALL__ __OsChSize(int handle, __fileoff_t size)
 {
   errno = DosNewSize(handle,size);
   return errno ? -1 : 0;
@@ -96,7 +96,7 @@ int  __FASTCALL__ __OsOpen(const char *fname,int mode)
    return fhandle;
 }
 
-long __FASTCALL__ __OsSeek( int handle, long offset, int origin)
+__fileoff_t __FASTCALL__ __OsSeek( int handle, __fileoff_t offset, int origin)
 {
   unsigned long ret;
   errno = DosChgFilePtr(handle,offset,origin,&ret);
@@ -104,7 +104,7 @@ long __FASTCALL__ __OsSeek( int handle, long offset, int origin)
   return ret;
 }
 
-int __FASTCALL__ __OsTruncFile( int handle, unsigned long size)
+int __FASTCALL__ __OsTruncFile( int handle, __filesize_t size)
 {
   return DosNewSize(handle,size);
 }
@@ -123,7 +123,7 @@ int __FASTCALL__ __OsWrite(int handle,const void *buff,unsigned size)
   return ret;
 }
 
-long __FASTCALL__ __FileLength(int handle)
+__fileoff_t __FASTCALL__ __FileLength(int handle)
 {
   long ret,spos;
   spos = __OsTell(handle);
@@ -132,7 +132,7 @@ long __FASTCALL__ __FileLength(int handle)
   return ret;
 }
 
-long __FASTCALL__ __OsTell(int handle) { return __OsSeek(handle,0L,SEEKF_CUR); }
+__fileoff_t __FASTCALL__ __OsTell(int handle) { return __OsSeek(handle,0L,SEEKF_CUR); }
 
 tBool __FASTCALL__ __IsFileExists(const char *name)
 {
