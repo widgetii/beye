@@ -558,7 +558,11 @@ tBool __FASTCALL__ SearchDialog(int _flags, char * searchbuff,
     if(update>1) SearchUpdate(hwnd,_flags,*sf_flags);
     SearchPaint(hwnd,_flags,*sf_flags);
   }
-  if(*sf_flags & SF_ASHEX) *sf_flags &= ~(SF_CASESENS|SF_WILDCARDS);
+  if(*sf_flags & SF_ASHEX)
+  {
+         *sf_flags &= ~(SF_WILDCARDS);
+         *sf_flags |= SF_CASESENS;
+  }
   CloseWnd(ewnd);
   CloseWnd(hwnd);
   return ret;
