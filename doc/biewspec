@@ -34,7 +34,7 @@ Linux, Unix, QNX, BeOS, DOS, Win32, OS/2 versions are available.
 %setup -q
 
 %build
-make
+make TARGET_CPU=i386 TARGET_OS=linux USE_MOUSE=n PREFIX=${prefix}
 
 %install
 rm -rf $RPM_BUILD_ROOT
@@ -45,7 +45,6 @@ strip -R .note -R .comment $RPM_BUILD_ROOT%{bindir}/%{name}
 
 cp -a bin_rc/{xlt,skn,*.hlp} $RPM_BUILD_ROOT%{datadir}/%{name}
 install doc/biew.1 $RPM_BUILD_ROOT%{mandir}/man1
-
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -59,5 +58,7 @@ rm -rf $RPM_BUILD_ROOT
 %{mandir}/man?/%{name}.1*
 
 %changelog
+* Fri Jan 4 2002 konst <konst@linuxassembly.org> 5.3.2-1
+- explicitly define TARGET_CPU, TARGET_OS, USE_MOUSE
 * Wed Aug 15 2001 konst <konst@linuxassembly.org> 5.3.0-1
 - moved skins to skn folder

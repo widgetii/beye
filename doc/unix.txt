@@ -34,7 +34,7 @@ are gladly accepted, as well as suggestions, feedback, bugreports and fixes.
 UNIX specific features of BIEW
 ------------------------------
 
-1)  Key modifiers are mapped as:
+1)  Key modifiers are re-mapped as:
 
 	CTRL+A - ALT
 	CTRL+C - CTRL
@@ -167,11 +167,12 @@ but do not change compiler parameters at the end of makefile.inc, or all
 sorts of weirdness can happen.
 
 
-ChangeLog (Linux/UNIX)
-----------------------
+ChangeLog (UNIX)
+----------------
 
 5.3.2
 
+- use /struct termdesc/ instead of /int/ for terminal type
 - compiler warnings cleanup
 
 5.3.1
