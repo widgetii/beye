@@ -14,6 +14,12 @@
  * @since       1999
  * @note        Development, fixes and improvements
 **/
+
+/* Reduce include size */
+#define WIN32_LEAN_AND_MEAN
+/* More strict type checking */
+#define STRICT
+
 #include <windows.h>
 #include <stdlib.h>
 #include <string.h>
@@ -26,17 +32,47 @@ static unsigned long vio_flags;
 extern tBool  win32_use_ansi;
 static tBool is_winnt;
 extern OSVERSIONINFO win32_verinfo;
+/* Added by Olivier Mengu\u00e9 */
+/* Backup of console state, to restore it at exit */
+static CONSOLE_SCREEN_BUFFER_INFO win32_init_csbinfo;
+static CONSOLE_CURSOR_INFO win32_init_cci;
+/* End of addition */
 
 void __FASTCALL__ __init_vio( unsigned long flg )
 {
   hOut = GetStdHandle(STD_OUTPUT_HANDLE);
   is_winnt = win32_verinfo.dwPlatformId == VER_PLATFORM_WIN32_NT;
   vio_flags = flg;
+  /* Added by Olivier Mengu\u00e9 */
+  GetConsoleScreenBufferInfo(hOut, &win32_init_csbinfo);
+  GetConsoleCursorInfo(hOut, &win32_init_cci);
+  /* End of addition */
   __vioRereadState();
 }
 
 void __FASTCALL__ __term_vio( void )
 {
+  /* Added by Olivier Mengu\u00e9 */
+  /* Restore console state */
+
+  /* Restore the cursor shape */
+  SetConsoleCursorInfo(hOut, &win32_init_cci);
+
+  /* __term_vio must restore cursor position of before __init_io.
+     Restoring the screen is not enough.
+  */
+  /* To check it is needed, start biew with the cursor at the
+     bottom of the window, then go in a dialog where the cursor appears
+	 (ex: Setup), then Exit
+   */
+  SetConsoleCursorPosition(hOut, win32_init_csbinfo.dwCursorPosition);
+
+  if((vio_flags & __TVIO_FLG_DIRECT_CONSOLE_ACCESS) == __TVIO_FLG_DIRECT_CONSOLE_ACCESS)
+  {
+    /* Restore the original visible window */
+    SetConsoleWindowInfo(hOut, TRUE, &win32_init_csbinfo.srWindow);
+  }
+  /* End of addition */
 }
 
 void __FASTCALL__ __vioRereadState( void )
@@ -94,6 +130,13 @@ void __FASTCALL__ __vioGetCursorPos(tAbsCoord *x,tAbsCoord *y)
 {
   CONSOLE_SCREEN_BUFFER_INFO csbinfo;
   GetConsoleScreenBufferInfo(hOut,&csbinfo);
+  /* Added by Olivier Mengu\u00e9 */
+  /* Calculate cursor position relative to the Win32 Console window */
+  if ((vio_flags & __TVIO_FLG_DIRECT_CONSOLE_ACCESS) != __TVIO_FLG_DIRECT_CONSOLE_ACCESS) {
+    csbinfo.dwCursorPosition.X -= win32_init_csbinfo.srWindow.Left;
+    csbinfo.dwCursorPosition.Y -= win32_init_csbinfo.srWindow.Top;
+  }
+  /* End of addition */
   *x = csbinfo.dwCursorPosition.X;
   *y = csbinfo.dwCursorPosition.Y;
 }
@@ -103,6 +146,13 @@ void __FASTCALL__ __vioSetCursorPos(tAbsCoord x,tAbsCoord y)
   COORD cc;
   cc.X = x;
   cc.Y = y;
+  /* Added by Olivier Mengu\u00e9 */
+  /* Calculate cursor position relative to the Win32 Console window */
+  if ((vio_flags & __TVIO_FLG_DIRECT_CONSOLE_ACCESS) != __TVIO_FLG_DIRECT_CONSOLE_ACCESS) {
+    cc.X += win32_init_csbinfo.srWindow.Left;
+    cc.Y += win32_init_csbinfo.srWindow.Top;
+  }
+  /* End of addition */
   SetConsoleCursorPosition(hOut,cc);
 }
 
@@ -161,8 +211,17 @@ void __FASTCALL__ __vioWriteBuff(tAbsCoord x,tAbsCoord y,const tvioBuff *buff,un
     size.Y = (len/tvioWidth)+(len%tvioWidth?1:0);
     sr.Left = x;
     sr.Top = y;
-    sr.Bottom = y+size.Y;
-    sr.Right = x + size.X;
+    /* Added by Olivier Mengu\u00e9 */
+    /* Calculate cursor position relative to the Win32 Console window */
+    if ((vio_flags & __TVIO_FLG_DIRECT_CONSOLE_ACCESS) != __TVIO_FLG_DIRECT_CONSOLE_ACCESS) {
+      sr.Left += win32_init_csbinfo.srWindow.Left;
+      sr.Top += win32_init_csbinfo.srWindow.Top;
+    }
+    /* End of addition */
+    /* Modified by Olivier Mengu\u00e9 */
+    sr.Right = sr.Left+size.X;
+    sr.Bottom = sr.Top + size.Y;
+    /* End of modification */
     WriteConsoleOutput(hOut,obuff,size,pos,&sr);
     if(obuff != small_buffer) free(obuff);
   }
@@ -182,6 +241,13 @@ void __FASTCALL__ __vioWriteBuff(tAbsCoord x,tAbsCoord y,const tvioBuff *buff,un
     else attr = small_buffer;
     cc.X = x;
     cc.Y = y;
+    /* Added by Olivier Mengu\u00e9 */
+    /* Calculate cursor position relative to the Win32 Console window */
+    if ((vio_flags & __TVIO_FLG_DIRECT_CONSOLE_ACCESS) != __TVIO_FLG_DIRECT_CONSOLE_ACCESS) {
+      cc.X += win32_init_csbinfo.srWindow.Left;
+      cc.Y += win32_init_csbinfo.srWindow.Top;
+    }
+    /* End of addition */
     WriteConsoleOutputCharacter(hOut,buff->chars,len,cc,(LPDWORD)&w);
     __CHARS_TO_SHORTS(len, attr, buff->attrs);
     /* added by Kostya Nosov: */
@@ -211,7 +277,7 @@ void __FASTCALL__ __vioReadBuff(tAbsCoord x,tAbsCoord y,tvioBuff *buff,unsigned 
       {
 	printm("Memory allocation failed: %s\nExiting..", strerror(errno));
 	exit(EXIT_FAILURE);
-      } 
+      }
     }
     else obuff = small_buffer;
     pos.X = pos.Y = 0;
@@ -219,8 +285,17 @@ void __FASTCALL__ __vioReadBuff(tAbsCoord x,tAbsCoord y,tvioBuff *buff,unsigned 
     size.Y = (len/tvioWidth)+(len%tvioWidth?1:0);
     sr.Left = x;
     sr.Top = y;
-    sr.Bottom = y+size.Y;
-    sr.Right = x + size.X;
+    /* Added by Olivier Mengu\u00e9 */
+    /* Calculate cursor position relative to the Win32 Console window */
+    if ((vio_flags & __TVIO_FLG_DIRECT_CONSOLE_ACCESS) != __TVIO_FLG_DIRECT_CONSOLE_ACCESS) {
+      sr.Left += win32_init_csbinfo.srWindow.Left;
+      sr.Top += win32_init_csbinfo.srWindow.Top;
+    }
+    /* End of addition */
+    /* Modified by Olivier Mengu\u00e9 */
+    sr.Right = sr.Left+size.X;
+    sr.Bottom = sr.Top + size.Y;
+    /* End of modification */
     ReadConsoleOutput(hOut,obuff,size,pos,&sr);
     for(i = 0;i < len;i++)
     {
@@ -229,7 +304,7 @@ void __FASTCALL__ __vioReadBuff(tAbsCoord x,tAbsCoord y,tvioBuff *buff,unsigned 
       unsigned newattr;
 */
       buff->chars[i] = obuff[i].Char.AsciiChar;
-      buff->attrs[i] = obuff[i].Attributes;
+      buff->attrs[i] = LOBYTE(obuff[i].Attributes);
 /*
       This code is useful for generic platform
       ========================================
@@ -264,6 +339,13 @@ void __FASTCALL__ __vioReadBuff(tAbsCoord x,tAbsCoord y,tvioBuff *buff,unsigned 
     else attr = small_buffer;
     cc.X = x;
     cc.Y = y;
+    /* Added by Olivier Mengu\u00e9 */
+    /* Calculate cursor position relative to the Win32 Console window */
+    if ((vio_flags & __TVIO_FLG_DIRECT_CONSOLE_ACCESS) != __TVIO_FLG_DIRECT_CONSOLE_ACCESS) {
+      cc.X += win32_init_csbinfo.srWindow.Left;
+      cc.Y += win32_init_csbinfo.srWindow.Top;
+    }
+    /* End of addition */
     ReadConsoleOutputCharacter(hOut,buff->chars,len,cc,(LPDWORD)&r);
     /* added by Kostya Nosov: */
     attr2 = attr;
