@@ -20,7 +20,7 @@
 
 const char msgAboutText[] =
 "   File viewer with built-in Athlon64/\n"
-"   Pentium-4/K7-Athlon/Cyrix-M2 disassembler\n"
+"   Prescott/K7-Athlon/Cyrix-M2 disassembler\n"
 "   Supports multiple executable structures\n"
 "  Written by Nick Kurshev. Kazan. Tatarstan.\n"
 "                    Russia.";
