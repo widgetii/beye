@@ -387,7 +387,10 @@ static void MyAtExit( void )
 tBool isValidIniArgs( void )
 {
   return iniSettingsAnywhere ? True :
-         ArgVector[1] ? strcmp(ArgVector[1],LastOpenFileName) == 0 : False;
+         ArgVector[1] ?
+	 strcmp(ArgVector[1],LastOpenFileName) == 0 ?
+	 biew_mode != UINT_MAX && biew_mode != LastMode ?
+	 False : True : False : False;
 }
 
 static hIniProfile * __NEAR__ __FASTCALL__ load_ini_info( void )
