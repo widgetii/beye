@@ -17,6 +17,8 @@
  *              License along with the GNU C Library; see the file COPYING.LIB.  If not,
  *              write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
  *              Boston, MA 02111-1307, USA.
+ * @remark	portions taken from FreeBSD (sys/elf*.h), and updates from
+ *              current draft (http://www.caldera.com/developers/gabi/)
  * @note        Requires POSIX compatible development system
  *
  * @author      GNU FSF
@@ -60,8 +62,34 @@
 
 #define EI_VERSION	6		/**< File version */
 
-#define EI_PAD		7		/**< Start of padding bytes */
+#define EI_OSABI	7		/**< Operating system / ABI identification */
+#define ELFOSABI_SYSV		0	/**< UNIX System V ABI */
+#define ELFOSABI_NONE		ELFOSABI_SYSV	/**< symbol used in old spec */
+#define ELFOSABI_HPUX		1	/**< HP-UX operating system */
+#define ELFOSABI_NETBSD		2	/**< NetBSD */
+#define ELFOSABI_LINUX		3	/**< GNU/Linux */
+#define ELFOSABI_HURD		4	/**< GNU/Hurd */
+#define ELFOSABI_86OPEN		5	/**< 86Open common IA32 ABI */
+#define ELFOSABI_SOLARIS	6	/**< Solaris */
+#define ELFOSABI_MONTEREY	7	/**< Monterey */
+#define ELFOSABI_IRIX		8	/**< IRIX */
+#define ELFOSABI_FREEBSD	9	/**< FreeBSD */
+#define ELFOSABI_TRU64		10	/**< TRU64 UNIX */
+#define ELFOSABI_MODESTO	11	/**< Novell Modesto */
+#define ELFOSABI_OPENBSD	12	/**< OpenBSD */
+#define ELFOSABI_ARM		97	/**< ARM */
+#define ELFOSABI_STANDALONE	255	/**< Standalone (embedded) application */
 
+#define EI_ABIVERSION	8	/**< ABI version */
+#define OLD_EI_BRAND	8	/**< Start of architecture identification. */
+#define EI_PAD		9	/**< Start of padding (per SVR4 ABI). */
+#define EI_NIDENT	16	/**< Size of e_ident array. */
+
+/* e_ident */
+#define IS_ELF(e_ident)	(e_ident[EI_MAG0] == ELFMAG0 && \
+			 e_ident[EI_MAG1] == ELFMAG1 && \
+			 e_ident[EI_MAG2] == ELFMAG2 && \
+			 e_ident[EI_MAG3] == ELFMAG3)
 
 /** Values for e_type, which identifies the object file type */
 
@@ -70,7 +98,8 @@
 #define ET_EXEC		2		/**< Executable file */
 #define ET_DYN		3		/**< Shared object file */
 #define ET_CORE		4		/**< Core file */
-#define	ET_NUM		5		/**< Number of defined types.  */
+#define ET_LOOS		0xFE00U		/**< OS-specific */
+#define ET_HIOS		0xFEFFU		/**< OS-specific */
 #define ET_LOPROC	0xFF00U		/**< Processor-specific */
 #define ET_HIPROC	0xFFFFU		/**< Processor-specific */
 
@@ -78,24 +107,83 @@
 
 #define EM_NONE		0	/**< No machine */
 #define EM_M32		1	/**< AT&T WE 32100 */
-#define EM_SPARC	2	/**< SUN SPARC */
+#define EM_SPARC	2	/**< Sun SPARC */
 #define EM_386		3	/**< Intel 80386 */
-#define EM_68K		4	/**< Motorola m68k family */
-#define EM_88K		5	/**< Motorola m88k family */
+#define EM_68K		4	/**< Motorola m68k */
+#define EM_88K		5	/**< Motorola m88k */
+				/* 6 reserved, was EM_486 */
 #define EM_860		7	/**< Intel 80860 */
-#define EM_MIPS		8	/**< MIPS R3000 (officially, big-endian only) */
-
-#define EM_MIPS_RS4_BE 10	/**< MIPS R4000 big-endian */
-
-#define EM_SPARC64     11	/**< SPARC v9 (not official) 64-bit */
-
-#define EM_PARISC      15	/**< HPPA */
-
-#define EM_SPARC32PLUS 18	/**< Sun's "v8plus" */
-
-#define EM_PPC	       20	/**< PowerPC */
-
-#define EM_SH	       42	/**< Hitachi SH */
+#define EM_MIPS		8	/**< MIPS I */
+#define EM_S370		9	/**< IBM System/370 */
+#define EM_MIPS_RS3_LE	10	/**< MIPS R3000 little-endian */
+				/**< 11-14 reserved */
+#define EM_PARISC	15	/**< HP PA-RISC */
+				/**< 16 reserved */
+#define	EM_VPP500	17	/**< Fujitsu VPP500 */
+#define EM_SPARC32PLUS	18	/**< Sun SPARC v8plus */
+#define EM_960		19	/**< Intel 80960 */
+#define EM_PPC		20	/**< PowerPC */
+#define EM_PPC64	21	/**< PowerPC 64-bit */
+#define	EM_S390		22	/**< IBM System/390 */
+				/**< 23-35 reserved */
+#define	EM_V800		36	/**< NEC V800 */
+#define	EM_FR20		37	/**< Fujitsu FR20 */
+#define	EM_RH32		38	/**< TRW RH-32 */
+#define	EM_RCE		39	/**< Motorola RCE */
+#define	EM_ARM		40	/**< Advanced RISC Machines ARM */
+#define	EM_ALPHA	41	/**< Digital Alpha */
+#define	EM_SH		42	/**< Hitachi SH */
+#define	EM_SPARCV9	43	/**< SPARC Version 9 64-bit */
+#define	EM_TRICORE	44	/**< Siemens TriCore embedded processor */
+#define	EM_ARC		45	/**< Argonaut RISC Core, Argonaut Technologies Inc. */
+#define	EM_H8_300	46	/**< Hitachi H8/300 */
+#define	EM_H8_300H	47	/**< Hitachi H8/300H */
+#define	EM_H8S		48	/**< Hitachi H8S */
+#define	EM_H8_500	49	/**< Hitachi H8/500 */
+#define	EM_IA_64	50	/**< Intel IA-64 processor architecture */
+#define	EM_MIPS_X	51	/**< Stanford MIPS-X */
+#define	EM_COLDFIRE	52	/**< Motorola ColdFire */
+#define	EM_68HC12	53	/**< Motorola M68HC12 */
+#define	EM_MMA		54	/**< Fujitsu MMA Multimedia Accelerator */
+#define	EM_PCP		55	/**< Siemens PCP */
+#define	EM_NCPU		56	/**< Sony nCPU embedded RISC processor */
+#define	EM_NDR1		57	/**< Denso NDR1 microprocessor */
+#define	EM_STARCORE	58	/**< Motorola Star*Core processor */
+#define	EM_ME16		59	/**< Toyota ME16 processor */
+#define	EM_ST100	60	/**< STMicroelectronics ST100 processor */
+#define	EM_TINYJ	61	/**< Advanced Logic Corp. TinyJ embedded processor family */
+#define	EM_X86_64	62	/**< AMD x86-64 architecture */
+#define	EM_PDSP		63	/**< Sony DSP Processor */
+				/**< 64-65 reserved */
+#define	EM_FX66		66	/**< Siemens FX66 microcontroller */
+#define	EM_ST9PLUS	67	/**< STMicroelectronics ST9+ 8/16 bit microcontroller */
+#define	EM_ST7		68	/**< STMicroelectronics ST7 8-bit microcontroller */
+#define	EM_68HC16	69	/**< Motorola MC68HC16 Microcontroller */
+#define	EM_68HC11	70	/**< Motorola MC68HC11 Microcontroller */
+#define	EM_68HC08	71	/**< Motorola MC68HC08 Microcontroller */
+#define	EM_68HC05	72	/**< Motorola MC68HC05 Microcontroller */
+#define	EM_SVX		73	/**< Silicon Graphics SVx */
+#define	EM_ST19		74	/**< STMicroelectronics ST19 8-bit microcontroller */
+#define	EM_VAX		75	/**< Digital VAX */
+#define	EM_CRIS		76	/**< Axis Communications 32-bit embedded processor */
+#define	EM_JAVELIN	77	/**< Infineon Technologies 32-bit embedded processor */
+#define	EM_FIREPATH	78	/**< Element 14 64-bit DSP Processor */
+#define	EM_ZSP		79	/**< LSI Logic 16-bit DSP Processor */
+#define	EM_MMIX		80	/**< Donald Knuth's educational 64-bit processor */
+#define	EM_HUANY	81	/**< Harvard University machine-independent object files */
+#define	EM_PRISM	82	/**< SiTera Prism */
+#define	EM_AVR		83	/**< Atmel AVR 8-bit microcontroller */
+#define	EM_FR30		84	/**< Fujitsu FR30 */
+#define	EM_D10V		85	/**< Mitsubishi D10V */
+#define	EM_D30V		86	/**< Mitsubishi D30V */
+#define	EM_V850		87	/**< NEC v850 */
+#define	EM_M32R		88	/**< Mitsubishi M32R */
+#define	EM_MN10300	89	/**< Matsushita MN10300 */
+#define	EM_MN10200	90	/**< Matsushita MN10200 */
+#define	EM_PJ		91	/**< picoJava */
+#define	EM_OPENRISC	92	/**< OpenRISC 32-bit embedded processor */
+#define	EM_ARC_A5	93	/**< ARC Cores Tangent-A5 */
+#define	EM_XTENSA	94	/**< Tensilica Xtensa Architecture */
 
 /** If it is necessary to assign new unofficial EM_* values, please pick large
    random numbers (0x8523, 0xa7f2, etc.) to minimize the chances of collision
@@ -108,20 +196,11 @@
 /** Cygnus PowerPC ELF backend.  Written in the absence of an ABI.  */
 #define EM_CYGNUS_POWERPC 0x9025U
 
-/** Old version of PowerPC, this should be removed shortly. */
-#define EM_PPC_OLD	17
-
-
 /** Cygnus M32R ELF backend.  Written in the absence of an ABI.  */
 #define EM_CYGNUS_M32R 0x9041U
 
-/** Alpha backend magic number.  Written in the absence of an ABI.  */
-#define EM_ALPHA	0x9026U
-
 /** D10V backend magic number.  Written in the absence of an ABI.  */
 #define EM_CYGNUS_D10V	0x7650U
-
-
 
 /** mn10200 and mn10300 backend magic numbers.
    Written in the absense of an ABI.  */

@@ -32,7 +32,9 @@
     linked to target executable or shared object.
     See also:
 
-    http://www.linuxassembly.org   as your primary point.
+    http://www.caldera.com/developers/gabi/
+    http://segfault.net/~scut/cpu/generic/
+    http://www.linuxassembly.org   
     
     ELFkickers This distribution is a collection of programs that are generally
                unrelated, except in that they all deal with the ELF file format.
@@ -40,7 +42,7 @@
     teensy     tools that are provided as exhibitions of just how compressed a
                Linux ELF executable can be and still function.
 
-    That can be found at:
+    These can be found at:
     http://www.muppetlabs.com/~breadbox/software/
 */
 
@@ -64,9 +66,10 @@
 #include "biewlib/pmalloc.h"
 #include "biewlib/kbd_code.h"
 
+/* #define	ELF64 */
+
 static char is_big;
-#define ELF_WORD(cval)  FMT_WORD(cval,is_big)
-#define ELF_DWORD(cval) FMT_DWORD(cval,is_big)
+
 static Elf386_External_Ehdr elf;
 static unsigned long active_shtbl = 0;
 static unsigned long elf_min_va = ULONG_MAX;
@@ -84,6 +87,49 @@ struct tag_elfVAMap
   unsigned long flags;
 };
 
+#ifdef	ELF64
+
+/*
+    (VERY) preliminary experimental ELF-64 support.
+    Perhaps it will work on 64-bit platforms someday.
+    Perhaps (though unlikely) it works to some extent on 32-bit platforms.
+    Note that you need to set elf_struct_base to correspondent address
+    each time (if needed) BEFORE calling ELF_HALF and ELF_WORD macros.
+*/
+
+static char is_64bit;
+
+static unsigned long elf_struct_base = (unsigned long)&elf + EI_NIDENT;
+
+static inline unsigned long elf64_value(unsigned long offset)
+{
+    unsigned long *p = (unsigned long *)
+		    (elf_struct_base + ((offset - elf_struct_base) << 1));
+    return *p;
+}
+
+static inline unsigned short __elf_half(unsigned long cval, unsigned long addr)
+{
+    return !is_64bit ?	FMT_WORD(cval,is_big) :
+			FMT_DWORD(elf64_value(addr), is_big);
+}
+
+static inline unsigned long __elf_word(unsigned long cval, unsigned long addr)
+{
+    return !is_64bit ?	FMT_DWORD(cval,is_big) :
+			FMT_QWORD(elf64_value(addr), is_big);
+}
+
+#define ELF_HALF(cval) __elf_half((unsigned long)cval,(unsigned long)&cval)
+#define ELF_WORD(cval) __elf_word((unsigned long)cval,(unsigned long)&cval)
+
+#else
+
+#define ELF_HALF(cval) FMT_WORD(cval,is_big)
+#define ELF_WORD(cval) FMT_DWORD(cval,is_big)
+
+#endif
+
 static tBool __NEAR__ __FASTCALL__ FindPubName(char *buff,unsigned cb_buff,unsigned long pa);
 static void __FASTCALL__ elf_ReadPubNameList(BGLOBAL handle,void (__FASTCALL__ *mem_out)(const char *));
 static unsigned long __FASTCALL__ elfVA2PA(unsigned long va);
@@ -98,15 +144,15 @@ static unsigned long __NEAR__ __FASTCALL__ findPHEntry(unsigned long type,unsign
   fpos = bmGetCurrFilePos();
   dynptr = 0;
   *nitems = 0;
-  limit = ELF_WORD(elf.e_phnum);
+  limit = ELF_HALF(elf.e_phnum);
   for(i = 0;i < limit;i++)
   {
-   bmReadBufferEx(&phdr,sizeof(Elf386_External_Phdr),ELF_DWORD(elf.e_phoff) + i*ELF_WORD(elf.e_phentsize),SEEKF_START);
+   bmReadBufferEx(&phdr,sizeof(Elf386_External_Phdr),ELF_WORD(elf.e_phoff) + i*ELF_HALF(elf.e_phentsize),SEEKF_START);
    if(bmEOF()) break;
-   if(ELF_DWORD(phdr.p_type) == type)
+   if(ELF_WORD(phdr.p_type) == type)
    {
-     dynptr = ELF_DWORD(phdr.p_offset);
-     *nitems = ELF_DWORD(phdr.p_filesz)/sizeof(Elf386_External_Dyn);
+     dynptr = ELF_WORD(phdr.p_offset);
+     *nitems = ELF_WORD(phdr.p_filesz)/sizeof(Elf386_External_Dyn);
      break;
    }
   }
@@ -127,10 +173,10 @@ static unsigned long __NEAR__ __FASTCALL__ findPHDynEntry(unsigned long type,uns
     bmReadBufferEx(&dyntab,sizeof(dyntab),dynptr,SEEKF_START);
     if(bmEOF()) break;
     dynptr += sizeof(dyntab);
-    if(ELF_DWORD(dyntab.d_tag) == type) { is_found = True; break; }
+    if(ELF_WORD(dyntab.d_tag) == type) { is_found = True; break; }
   }    
   bmSeek(fpos,SEEKF_START);
-  return is_found ? ELF_DWORD(dyntab.d_un.d_ptr) : 0L;
+  return is_found ? ELF_WORD(dyntab.d_un.d_ptr) : 0L;
 }
 
 static unsigned long __NEAR__ __FASTCALL__ findPHPubSyms(unsigned *number, unsigned *ent_size, unsigned long *act_shtbl)
@@ -165,7 +211,7 @@ static unsigned long __NEAR__ __FASTCALL__ findPHPubSyms(unsigned *number, unsig
             bmReadBufferEx(&dyntab,sizeof(dyntab),dptr,SEEKF_START);
             if(bmEOF()) break;
             dptr += sizeof(dyntab);
-	    cur_ptr = elfVA2PA(ELF_DWORD(dyntab.d_un.d_ptr));
+	    cur_ptr = elfVA2PA(ELF_WORD(dyntab.d_un.d_ptr));
             if(cur_ptr > dynptr && cur_ptr < max_val) max_val = cur_ptr;
           }    
           bmSeek(_fpos,SEEKF_START);
@@ -187,18 +233,18 @@ static unsigned long __NEAR__ __FASTCALL__
   size_t i, limit;
   fpos = bioTell(b_cache);
   tableptr = 0L;
-  limit = ELF_WORD(elf.e_shnum);
+  limit = ELF_HALF(elf.e_shnum);
   for(i = 0;i < limit;i++)
   {
-   bioSeek(b_cache,ELF_DWORD(elf.e_shoff) + i*ELF_WORD(elf.e_shentsize),SEEKF_START);
+   bioSeek(b_cache,ELF_WORD(elf.e_shoff) + i*ELF_HALF(elf.e_shentsize),SEEKF_START);
    bioReadBuffer(b_cache,&shdr,sizeof(Elf386_External_Shdr));
    if(bioEOF(b_cache)) break;
-   if(ELF_DWORD(shdr.sh_type) == type)
+   if(ELF_WORD(shdr.sh_type) == type)
    {
-     tableptr = ELF_DWORD(shdr.sh_offset);
-     *nitems = ELF_DWORD(shdr.sh_size)/ELF_DWORD(shdr.sh_entsize);
-     *link = ELF_WORD(shdr.sh_link);
-     *ent_size = ELF_DWORD(shdr.sh_entsize);
+     tableptr = ELF_WORD(shdr.sh_offset);
+     *nitems = ELF_WORD(shdr.sh_size)/ELF_WORD(shdr.sh_entsize);
+     *link = ELF_HALF(shdr.sh_link);
+     *ent_size = ELF_WORD(shdr.sh_entsize);
      break;
    }
   }
@@ -281,10 +327,10 @@ static void __NEAR__ __FASTCALL__ elf386_readnametable(unsigned long off,char *b
   BGLOBAL b_cache,b_cache2;
   b_cache = namecache;
   b_cache2 = namecache2;
-  foff = ELF_DWORD(elf.e_shoff)+(ELF_WORD(elf.e_shstrndx)*sizeof(Elf386_External_Shdr));
+  foff = ELF_WORD(elf.e_shoff)+(ELF_HALF(elf.e_shstrndx)*sizeof(Elf386_External_Shdr));
   bioSeek(b_cache2,foff,SEEKF_START);
   bioReadBuffer(b_cache2,&sh,sizeof(Elf386_External_Shdr));
-  foff = ELF_DWORD(sh.sh_offset) + off;
+  foff = ELF_WORD(sh.sh_offset) + off;
   freq = 0;
   while(1)
   {
@@ -304,12 +350,12 @@ static void __NEAR__ __FASTCALL__ elf386_readnametableex(unsigned long off,char 
   BGLOBAL b_cache,b_cache2;
   b_cache = namecache;
   b_cache2 = namecache2;
-  if(ELF_DWORD(elf.e_shoff))
+  if(ELF_WORD(elf.e_shoff))
   {
-    foff = ELF_DWORD(elf.e_shoff)+active_shtbl*sizeof(Elf386_External_Shdr);
+    foff = ELF_WORD(elf.e_shoff)+active_shtbl*sizeof(Elf386_External_Shdr);
     bioSeek(b_cache2,foff,SEEKF_START);
     bioReadBuffer(b_cache2,&sh,sizeof(Elf386_External_Shdr));
-    foff = ELF_DWORD(sh.sh_offset) + off;
+    foff = ELF_WORD(sh.sh_offset) + off;
   }
   /* if section headers are lost then active_shtbl should directly point to
      required string table */
@@ -324,24 +370,25 @@ static void __NEAR__ __FASTCALL__ elf386_readnametableex(unsigned long off,char 
   }
 }
 
-static const char * __NEAR__ __FASTCALL__ elf_class(char id)
+static const char * __NEAR__ __FASTCALL__ elf_class(unsigned char id)
 {
   switch(id)
   {
-    default: return "Unk.obj/";
-    case ELFCLASSNONE: return "Err.obj/";
-    case ELFCLASS32: return "32bit/";
+    case ELFCLASSNONE:	return "Invalid";
+    case ELFCLASS32:	return "32-bit";
+    case ELFCLASS64:	return "64-bit";
+    default:		return "Unknown";
   }
 }
 
-static const char * __NEAR__ __FASTCALL__ elf_data(char id)
+static const char * __NEAR__ __FASTCALL__ elf_data(unsigned char id)
 {
   switch(id)
   {
-    default: return "Unk.data/";
-    case ELFDATANONE: return "Err.data/";
-    case ELFDATA2LSB: return "little endian/";
-    case ELFDATA2MSB: return "big endian/";
+    case ELFDATANONE:	return "Invalid";
+    case ELFDATA2LSB:	return "LSB - little endian";
+    case ELFDATA2MSB:	return "MSB - big endian";
+    default:		return "Unknown";
   }
 }
 
@@ -349,49 +396,88 @@ static const char *__NEAR__ __FASTCALL__ elf_otype(unsigned id)
 {
   switch(id)
   {
-    case ET_NONE: return "none";
-    case ET_REL: return "relocatable";
-    case ET_EXEC: return "executable";
-    case ET_DYN: return "shared object";
-    case ET_CORE: return "core";
-    case ET_NUM: return "number of defined types";
-    case ET_LOPROC: return "low processor-specific";
-    case ET_HIPROC: return "high processor-specific";
-    default: return "Unknown";
+    case ET_NONE:	return "none";
+    case ET_REL:	return "relocatable";
+    case ET_EXEC:	return "executable";
+    case ET_DYN:	return "shared object";
+    case ET_CORE:	return "core";
+    case ET_LOOS:	return "OS-specific low";
+    case ET_HIOS:	return "OS-specific high";
+    case ET_LOPROC:	return "processor-specific low";
+    case ET_HIPROC:	return "processor-specific high";
+    default:		return "Unknown";
   }
 }
+
+/*
+    only common machine types are used, add remaining if needed
+*/
 
 static const char *__NEAR__ __FASTCALL__ elf_machine(unsigned id)
 {
   switch(id)
   {
-    case EM_NONE: return "none";
-    case EM_M32: return "AT&T WE32100";
-    case EM_SPARC: return "Sun Sparc";
-    case EM_386: return "Intel 386";
-    case EM_68K: return "Motorola m68k family";
-    case EM_88K: return "Motorola m88k family";
-    case EM_860: return "Intel 80860";
-    case EM_MIPS: return "MIPS R3000";
-    case EM_MIPS_RS4_BE: return "MIPS R4000";
-    case EM_SPARC64: return "Sparc v9 64-bit";
-    case EM_PARISC: return "HPPA";
-    case EM_SPARC32PLUS: return "Sun's \"v8plus\"";
-    case EM_PPC: return "Power PC";
-    case EM_SH: return "Hitachi SH";
-    default: return "Unknown";
+    case EM_NONE:	return "None";
+    case EM_M32:	return "AT&T WE32100";
+    case EM_SPARC:	return "Sun SPARC";
+    case EM_386:	return "Intel 386";
+    case EM_68K:	return "Motorola m68k";
+    case EM_88K:	return "Motorola m88k";
+    case EM_860:	return "Intel 80860";
+    case EM_MIPS:	return "MIPS I";
+    case EM_S370:	return "IBM System/370";
+    case EM_MIPS_RS3_LE:return "MIPS R3000";
+    case EM_PARISC:	return "HP PA-RISC";
+    case EM_SPARC32PLUS:return "SPARC v8plus";
+    case EM_960:	return "Intel 80960";
+    case EM_PPC:	return "Power PC 32-bit";
+    case EM_PPC64:	return "Power PC 64-bit";
+    case EM_S390:	return "IBM System/390";
+
+    case EM_ARM:	return "ARM";
+    case EM_ALPHA:	return "DEC Alpha";
+    case EM_SPARCV9:	return "SPARC v9 64-bit";
+
+    case EM_IA_64:	return "Intel IA-64";
+    case EM_X86_64:	return "AMD x86-64";
+    case EM_VAX:	return "DEC VAX";
+    default:		return "Unknown";
   }
 }
 
-static const char *__NEAR__ __FASTCALL__ elf_ver(long id)
+static const char *__NEAR__ __FASTCALL__ elf_version(unsigned long id)
 {
   switch(id)
   {
-    case EV_NONE:    return "Invalid ELF version";
-    case EV_CURRENT: return "Current version";
+    case EV_NONE:    return "Invalid";
+    case EV_CURRENT: return "Current";
     default:         return "Unknown";
   }
 }
+
+static const char *__NEAR__ __FASTCALL__ elf_osabi(unsigned char id)
+{
+  switch(id)
+  {
+    case ELFOSABI_SYSV:		return "UNIX System V";
+    case ELFOSABI_HPUX:		return "HP-UX";
+    case ELFOSABI_NETBSD:	return "NetBSD";
+    case ELFOSABI_LINUX:	return "GNU/Linux";
+    case ELFOSABI_HURD:		return "GNU/Hurd";
+    case ELFOSABI_86OPEN:	return "86Open";
+    case ELFOSABI_SOLARIS:	return "Solaris";
+    case ELFOSABI_MONTEREY:	return "Monterey";
+    case ELFOSABI_IRIX:		return "IRIX";
+    case ELFOSABI_FREEBSD:	return "FreeBSD";
+    case ELFOSABI_TRU64:	return "TRU64 UNIX";
+    case ELFOSABI_MODESTO:	return "Novell Modesto";
+    case ELFOSABI_OPENBSD:	return "OpenBSD";
+    case ELFOSABI_ARM:		return "ARM";
+    case ELFOSABI_STANDALONE:	return "Standalone (embedded) application";
+    default:			return "Unknown";
+  }
+}
+
 
 static unsigned long __FASTCALL__ ShowELFHeader( void )
 {
@@ -401,22 +487,35 @@ static unsigned long __FASTCALL__ ShowELFHeader( void )
   unsigned keycode;
   unsigned long entrya;
   fpos = BMGetCurrFilePos();
-  entrya = elfVA2PA(ELF_DWORD(elf.e_entry));
-  sprintf(hdr," Executable and Linkable File (ELF) %s%sver.%c "
-             ,elf_class(elf.e_ident[4])
-             ,elf_data(elf.e_ident[5])
-             ,elf.e_ident[6]+'0');
-  w = CrtDlgWndnls(hdr,74,13);
+  entrya = elfVA2PA(ELF_WORD(elf.e_entry));
+  sprintf(hdr," ELF (Executable and Linking Format) ");
+  w = CrtDlgWndnls(hdr,74,19);
   twGotoXY(1,1);
-  twPrintF("Object file type                  = %s\n"
-           "Machine architecture              = %s\n"
-           "Object file version               = %s\n"
-           ,elf_otype(ELF_WORD(elf.e_type))
-           ,elf_machine(ELF_WORD(elf.e_machine))
-           ,elf_ver(ELF_DWORD(elf.e_version)));
+  twPrintF("Signature                         = %02X %02X %02X %02XH (%c%c%c%c)\n"
+           "File class                        = %02XH (%s)\n"
+           "Data encoding                     = %02XH (%s)\n"
+           "ELF header version                = %02XH (%s)\n"
+           "Operating system / ABI            = %02XH (%s)\n"
+           "ABI version                       = %02XH (%d)\n"
+           "Object file type                  = %04XH (%s)\n"
+           "Machine architecture              = %04XH (%s)\n"
+           "Object file version               = %08XH (%s)\n"
+	    ,elf.e_ident[EI_MAG0],	elf.e_ident[EI_MAG1]
+	    ,elf.e_ident[EI_MAG2],	elf.e_ident[EI_MAG3]
+	    ,elf.e_ident[EI_MAG0],	elf.e_ident[EI_MAG1]
+	    ,elf.e_ident[EI_MAG2],	elf.e_ident[EI_MAG3]
+	    ,elf.e_ident[EI_CLASS], 	elf_class(elf.e_ident[EI_CLASS])
+	    ,elf.e_ident[EI_DATA],	elf_data(elf.e_ident[EI_DATA])
+	    ,elf.e_ident[EI_VERSION],	elf_version(elf.e_ident[EI_VERSION])
+	    ,elf.e_ident[EI_OSABI],	elf_osabi(elf.e_ident[EI_OSABI])
+	    ,elf.e_ident[EI_ABIVERSION],elf.e_ident[EI_ABIVERSION]
+	    ,ELF_HALF(elf.e_type),	elf_otype(ELF_HALF(elf.e_type))
+	    ,ELF_HALF(elf.e_machine),	elf_machine(ELF_HALF(elf.e_machine))
+	    ,ELF_WORD(elf.e_version),	elf_version(ELF_WORD(elf.e_version))
+  );
   twSetColorAttr(dialog_cset.entry);
-  twPrintF("Entry point VA                    = %08lXH (Offset: %08lXH)"
-           ,ELF_DWORD(elf.e_entry),entrya);
+  twPrintF("Entry point VA                    = %08lXH (offset: %08lXH)"
+           ,ELF_WORD(elf.e_entry),entrya);
   twClrEOL(); twPrintF("\n");
   twSetColorAttr(dialog_cset.main);
   twPrintF("Program header table offset       = %08lXH\n"
@@ -428,15 +527,15 @@ static unsigned long __FASTCALL__ ShowELFHeader( void )
            "Section header table entry size   = %04XH\n"
            "Section header table entry count  = %04XH\n"
            "Section header string table index = %04XH"
-           ,ELF_DWORD(elf.e_phoff)
-           ,ELF_DWORD(elf.e_shoff)
-           ,ELF_DWORD(elf.e_flags)
-           ,ELF_WORD(elf.e_ehsize)
-           ,ELF_WORD(elf.e_phentsize)
-           ,ELF_WORD(elf.e_phnum)
-           ,ELF_WORD(elf.e_shentsize)
-           ,ELF_WORD(elf.e_shnum)
-           ,ELF_WORD(elf.e_shstrndx));
+           ,ELF_WORD(elf.e_phoff)
+           ,ELF_WORD(elf.e_shoff)
+           ,ELF_WORD(elf.e_flags)
+           ,ELF_HALF(elf.e_ehsize)
+           ,ELF_HALF(elf.e_phentsize)
+           ,ELF_HALF(elf.e_phnum)
+           ,ELF_HALF(elf.e_shentsize)
+           ,ELF_HALF(elf.e_shnum)
+           ,ELF_HALF(elf.e_shstrndx));
   while(1)
   {
     keycode = GetEvent(drawEmptyPrompt,w);
@@ -469,7 +568,7 @@ static const char * __NEAR__ __FASTCALL__ elf_encode_p_type(long p_type)
 static tBool __FASTCALL__ __elfReadPrgHdr(BGLOBAL handle,memArray *obj,unsigned nnames)
 {
  size_t i;
-  bioSeek(handle,ELF_DWORD(elf.e_phoff),SEEKF_START);
+  bioSeek(handle,ELF_WORD(elf.e_phoff),SEEKF_START);
   for(i = 0;i < nnames;i++)
   {
    unsigned long fp;
@@ -478,27 +577,27 @@ static tBool __FASTCALL__ __elfReadPrgHdr(BGLOBAL handle,memArray *obj,unsigned 
    if(IsKbdTerminate() || bioEOF(handle)) break;
    fp = bioTell(handle);
    bioReadBuffer(handle,&phdr,sizeof(Elf386_External_Phdr));
-   bioSeek(handle,fp+ELF_WORD(elf.e_phentsize),SEEKF_START);
+   bioSeek(handle,fp+ELF_HALF(elf.e_phentsize),SEEKF_START);
    sprintf(stmp,"%-15s %08lX %08lX %08lX %08lX %08lX %c%c%c %08lX",
-                elf_encode_p_type(ELF_DWORD(phdr.p_type)),
-                (unsigned long)ELF_DWORD(phdr.p_offset),
-                (unsigned long)ELF_DWORD(phdr.p_vaddr),
-                (unsigned long)ELF_DWORD(phdr.p_paddr),
-                (unsigned long)ELF_DWORD(phdr.p_filesz),
-                (unsigned long)ELF_DWORD(phdr.p_memsz),
-                (ELF_DWORD(phdr.p_flags) & PF_X) == PF_X ? 'X' : ' ',
-                (ELF_DWORD(phdr.p_flags) & PF_W) == PF_W ? 'W' : ' ',
-                (ELF_DWORD(phdr.p_flags) & PF_R) == PF_R ? 'R' : ' ',
-                (unsigned long)ELF_DWORD(phdr.p_align)
+                elf_encode_p_type(ELF_WORD(phdr.p_type)),
+                (unsigned long)ELF_WORD(phdr.p_offset),
+                (unsigned long)ELF_WORD(phdr.p_vaddr),
+                (unsigned long)ELF_WORD(phdr.p_paddr),
+                (unsigned long)ELF_WORD(phdr.p_filesz),
+                (unsigned long)ELF_WORD(phdr.p_memsz),
+                (ELF_WORD(phdr.p_flags) & PF_X) == PF_X ? 'X' : ' ',
+                (ELF_WORD(phdr.p_flags) & PF_W) == PF_W ? 'W' : ' ',
+                (ELF_WORD(phdr.p_flags) & PF_R) == PF_R ? 'R' : ' ',
+                (unsigned long)ELF_WORD(phdr.p_align)
           );
    if(!ma_AddString(obj,stmp,True)) break;
   }
   return True;
 }
 
-static const char * __NEAR__ __FASTCALL__ elf_encode_sh_type(long p_type)
+static const char * __NEAR__ __FASTCALL__ elf_encode_sh_type(long sh_type)
 {
-   switch(p_type)
+   switch(sh_type)
    {
       case SHT_NULL: return "NULL";
       case SHT_PROGBITS: return "PRGBTS";
@@ -527,7 +626,7 @@ static const char * __NEAR__ __FASTCALL__ elf_encode_sh_type(long p_type)
 static tBool __FASTCALL__ __elfReadSecHdr(BGLOBAL handle,memArray *obj,unsigned nnames)
 {
  size_t i;
-  bioSeek(handle,ELF_DWORD(elf.e_shoff),SEEKF_START);
+  bioSeek(handle,ELF_WORD(elf.e_shoff),SEEKF_START);
   for(i = 0;i < nnames;i++)
   {
    Elf386_External_Shdr shdr;
@@ -537,22 +636,22 @@ static tBool __FASTCALL__ __elfReadSecHdr(BGLOBAL handle,memArray *obj,unsigned 
    if(IsKbdTerminate() || bioEOF(handle)) break;
    fp = bioTell(handle);
    bioReadBuffer(handle,&shdr,sizeof(Elf386_External_Shdr));
-   elf386_readnametable(ELF_DWORD(shdr.sh_name),tmp,sizeof(tmp));
-   bioSeek(handle,fp+ELF_WORD(elf.e_shentsize),SEEKF_START);
+   elf386_readnametable(ELF_WORD(shdr.sh_name),tmp,sizeof(tmp));
+   bioSeek(handle,fp+ELF_HALF(elf.e_shentsize),SEEKF_START);
    tmp[16] = 0;
    sprintf(stmp,"%-16s %-6s %c%c%c %08lX %08lX %08lX %04hX %04hX %04hX %04hX",
                 tmp,
-                elf_encode_sh_type(ELF_DWORD(shdr.sh_type)),
-                (ELF_DWORD(shdr.sh_flags) & SHF_WRITE) == SHF_WRITE ? 'W' : ' ',
-                (ELF_DWORD(shdr.sh_flags) & SHF_ALLOC) == SHF_ALLOC ? 'A' : ' ',
-                (ELF_DWORD(shdr.sh_flags) & SHF_EXECINSTR) == SHF_EXECINSTR ? 'X' : ' ',
-                (unsigned long)ELF_DWORD(shdr.sh_addr),
-                (unsigned long)ELF_DWORD(shdr.sh_offset),
-                (unsigned long)ELF_DWORD(shdr.sh_size),
-                (tUInt16)ELF_DWORD(shdr.sh_link),
-                (tUInt16)ELF_DWORD(shdr.sh_info),
-                (tUInt16)ELF_DWORD(shdr.sh_addralign),
-                (tUInt16)ELF_DWORD(shdr.sh_entsize)
+                elf_encode_sh_type(ELF_WORD(shdr.sh_type)),
+                (ELF_WORD(shdr.sh_flags) & SHF_WRITE) == SHF_WRITE ? 'W' : ' ',
+                (ELF_WORD(shdr.sh_flags) & SHF_ALLOC) == SHF_ALLOC ? 'A' : ' ',
+                (ELF_WORD(shdr.sh_flags) & SHF_EXECINSTR) == SHF_EXECINSTR ? 'X' : ' ',
+                (unsigned long)ELF_WORD(shdr.sh_addr),
+                (unsigned long)ELF_WORD(shdr.sh_offset),
+                (unsigned long)ELF_WORD(shdr.sh_size),
+                (tUInt16)ELF_WORD(shdr.sh_link),
+                (tUInt16)ELF_WORD(shdr.sh_info),
+                (tUInt16)ELF_WORD(shdr.sh_addralign),
+                (tUInt16)ELF_WORD(shdr.sh_entsize)
           );
     if(!ma_AddString(obj,stmp,True)) break;
   }
@@ -631,16 +730,16 @@ static tBool __FASTCALL__ __elfReadSymTab(BGLOBAL handle,memArray *obj,unsigned 
    fp = bioTell(handle);
    bioReadBuffer(handle,&sym,sizeof(Elf386_External_Sym));
    bioSeek(handle,fp+__elfSymEntSize,SEEKF_START);
-   elf386_readnametableex(ELF_DWORD(sym.st_name),text,sizeof(text));
+   elf386_readnametableex(ELF_WORD(sym.st_name),text,sizeof(text));
    text[sizeof(text)-1] = 0;
    sprintf(stmp,"%-31s %08lX %08lX %04hX %s %s %s"
                ,text
-               ,(unsigned long)ELF_DWORD(sym.st_value)
-               ,(unsigned long)ELF_DWORD(sym.st_size)
-               ,ELF_WORD(sym.st_other)
+               ,(unsigned long)ELF_WORD(sym.st_value)
+               ,(unsigned long)ELF_WORD(sym.st_size)
+               ,ELF_HALF(sym.st_other)
                ,elf_SymTabType(sym.st_info[0])
                ,elf_SymTabBind(sym.st_info[0])
-               ,elf_SymTabShNdx(ELF_WORD(sym.st_shndx))
+               ,elf_SymTabShNdx(ELF_HALF(sym.st_shndx))
                );
    if(!ma_AddString(obj,stmp,True)) break;
   }
@@ -661,7 +760,7 @@ static tBool __NEAR__ __FASTCALL__ __elfReadDynTab(BGLOBAL handle,memArray *obj,
    bioReadBuffer(handle,&pdyn,sizeof(Elf386_External_Dyn));
    bioSeek(handle,fp+entsize,SEEKF_START);
    fp = bioTell(handle);
-   elf386_readnametableex(ELF_DWORD(pdyn.d_tag),sout,sizeof(sout));
+   elf386_readnametableex(ELF_WORD(pdyn.d_tag),sout,sizeof(sout));
    len = strlen(sout);
    if(len > 56) len = 53;
    if(IsKbdTerminate() || bioEOF(handle)) break;
@@ -670,7 +769,7 @@ static tBool __NEAR__ __FASTCALL__ __elfReadDynTab(BGLOBAL handle,memArray *obj,
    if(len > 56) strcat(stmp,"...");
    rlen = strlen(stmp);
    if(rlen < 60) { memset(&stmp[rlen],' ',60-rlen); stmp[60] = 0; }
-   sprintf(&stmp[strlen(stmp)]," vma=%08lXH",(unsigned long)ELF_DWORD(pdyn.d_un.d_val));
+   sprintf(&stmp[strlen(stmp)]," vma=%08lXH",(unsigned long)ELF_WORD(pdyn.d_un.d_val));
    if(!ma_AddString(obj,stmp,True)) break;
    bioSeek(handle,fp,SEEKF_START);
   }
@@ -680,7 +779,7 @@ static tBool __NEAR__ __FASTCALL__ __elfReadDynTab(BGLOBAL handle,memArray *obj,
 static unsigned __FASTCALL__ Elf386PrgHdrNumItems(BGLOBAL handle)
 {
    UNUSED(handle);
-   return ELF_WORD(elf.e_phnum);
+   return ELF_HALF(elf.e_phnum);
 }
 
 static unsigned long __FASTCALL__ ShowPrgHdrElf(void)
@@ -694,9 +793,9 @@ static unsigned long __FASTCALL__ ShowPrgHdrElf(void)
   if(ret != -1)
   {
     Elf386_External_Phdr it;
-    bmSeek(ELF_DWORD(elf.e_phoff)+sizeof(Elf386_External_Phdr)*ret,SEEKF_START);
+    bmSeek(ELF_WORD(elf.e_phoff)+sizeof(Elf386_External_Phdr)*ret,SEEKF_START);
     bmReadBuffer(&it,sizeof(Elf386_External_Phdr));
-    fpos = ELF_DWORD(it.p_offset);
+    fpos = ELF_WORD(it.p_offset);
   }
   return fpos;
 }
@@ -704,7 +803,7 @@ static unsigned long __FASTCALL__ ShowPrgHdrElf(void)
 static unsigned __FASTCALL__ Elf386SecHdrNumItems(BGLOBAL handle)
 {
   UNUSED(handle);
-  return IsSectionsPresent ? ELF_WORD(elf.e_shnum) : 0;
+  return IsSectionsPresent ? ELF_HALF(elf.e_shnum) : 0;
 }
 
 static unsigned long __FASTCALL__ ShowSecHdrElf(void)
@@ -718,9 +817,9 @@ static unsigned long __FASTCALL__ ShowSecHdrElf(void)
   if(ret != -1)
   {
     Elf386_External_Shdr it;
-    bmSeek(ELF_DWORD(elf.e_shoff)+sizeof(Elf386_External_Shdr)*ret,SEEKF_START);
+    bmSeek(ELF_WORD(elf.e_shoff)+sizeof(Elf386_External_Shdr)*ret,SEEKF_START);
     bmReadBuffer(&it,sizeof(Elf386_External_Shdr));
-    fpos = ELF_DWORD(it.sh_offset);
+    fpos = ELF_WORD(it.sh_offset);
   }
   return fpos;
 }
@@ -733,10 +832,10 @@ static unsigned long __calcSymEntry(BGLOBAL handle,unsigned long num,tBool displ
    ffpos = bioTell(handle);
    bioSeek(handle,__elfSymPtr+__elfSymEntSize*num,SEEKF_START);
    bioReadBuffer(handle,&it,sizeof(Elf386_External_Sym));
-   bioSeek(handle,ELF_DWORD(elf.e_shoff)+sizeof(Elf386_External_Shdr)*ELF_WORD(it.st_shndx),SEEKF_START);
+   bioSeek(handle,ELF_WORD(elf.e_shoff)+sizeof(Elf386_External_Shdr)*ELF_HALF(it.st_shndx),SEEKF_START);
    bioReadBuffer(handle,&sec,sizeof(Elf386_External_Shdr));
    bioSeek(handle,ffpos,SEEKF_START);
-   if(ELF_IS_SECTION_PHYSICAL(ELF_WORD(it.st_shndx)))
+   if(ELF_IS_SECTION_PHYSICAL(ELF_HALF(it.st_shndx)))
 /*
    In relocatable files, st_value holds alignment constraints for a
    symbol whose section index is SHN_COMMON.
@@ -751,9 +850,9 @@ static unsigned long __calcSymEntry(BGLOBAL handle,unsigned long num,tBool displ
    virtual address (memory interpretation) for which the section number
    is irrelevant.
 */
-     fpos = ELF_WORD(elf.e_type) == ET_REL ? 
-            ELF_DWORD(sec.sh_offset) + ELF_DWORD(it.st_value):
-            elfVA2PA(ELF_DWORD(it.st_value));
+     fpos = ELF_HALF(elf.e_type) == ET_REL ? 
+            ELF_WORD(sec.sh_offset) + ELF_WORD(it.st_value):
+            elfVA2PA(ELF_WORD(it.st_value));
    else
      if(display_msg) ErrMessageBox(NO_ENTRY,BAD_ENTRY);
    return fpos;
@@ -873,18 +972,18 @@ static unsigned long get_f_offset(unsigned long r_offset,tUInt32 sh_link)
   */
   unsigned long f_offset;
   BGLOBAL handle = elfcache;
-  switch(ELF_WORD(elf.e_type))
+  switch(ELF_HALF(elf.e_type))
   {
      case ET_REL:
                 {
                   Elf386_External_Shdr shdr;
                   unsigned long fp;
                   fp = bioTell(handle);
-                  bioSeek(handle,ELF_DWORD(elf.e_shoff),SEEKF_START);
+                  bioSeek(handle,ELF_WORD(elf.e_shoff),SEEKF_START);
 		  bioSeek(handle,sh_link*sizeof(Elf386_External_Shdr),SEEKF_CUR);
                   bioReadBuffer(handle,&shdr,sizeof(Elf386_External_Shdr));
 		  bioSeek(handle,fp,SEEKF_START);
-		  f_offset = ELF_DWORD(shdr.sh_offset) + r_offset;
+		  f_offset = ELF_WORD(shdr.sh_offset) + r_offset;
                 }
      default: f_offset = elfVA2PA(r_offset);
               break;
@@ -911,8 +1010,8 @@ static void __NEAR__ __FASTCALL__ __elfReadRelSection(tUInt32 offset,
     Elf_Reloc erc;
     bioReadBuffer(handle,&relent,sizeof(Elf386_External_Rel));
     if(entsize > sizeof(Elf386_External_Rel)) bioSeek(handle,entsize-sizeof(Elf386_External_Rel),SEEKF_CUR);
-    erc.offset = get_f_offset(ELF_DWORD(relent.r_offset),info);
-    erc.info = ELF_DWORD(relent.r_info);
+    erc.offset = get_f_offset(ELF_WORD(relent.r_offset),info);
+    erc.info = ELF_WORD(relent.r_info);
     /* Entries of type Elf32_Rel store an implicit addend in the
        location to be modified */
     bioSeek(handle2, erc.offset, SEEKF_START);
@@ -955,9 +1054,9 @@ static void __NEAR__ __FASTCALL__ __elfReadRelaSection(tUInt32 offset,
     Elf_Reloc erc;
     bioReadBuffer(handle,&relent,sizeof(Elf386_External_Rela));
     if(entsize > sizeof(Elf386_External_Rela)) bioSeek(handle,entsize-sizeof(Elf386_External_Rela),SEEKF_CUR);
-    erc.offset = get_f_offset(ELF_DWORD(relent.r_offset),info);
-    erc.info = ELF_DWORD(relent.r_info);
-    erc.addend = ELF_DWORD(relent.r_addend);
+    erc.offset = get_f_offset(ELF_WORD(relent.r_offset),info);
+    erc.info = ELF_WORD(relent.r_info);
+    erc.addend = ELF_WORD(relent.r_addend);
     erc.sh_idx = sh_link;
     if(!la_AddData(CurrElfChain,&erc,NULL)) break;
   }
@@ -980,32 +1079,32 @@ static void __NEAR__ __FASTCALL__ buildElf386RelChain( void )
   fp = bioTell(handle);
   if(IsSectionsPresent) /* Section headers are present */
   {     
-    bioSeek(handle,ELF_DWORD(elf.e_shoff),SEEKF_START);
-    _nitems = ELF_WORD(elf.e_shnum);
+    bioSeek(handle,ELF_WORD(elf.e_shoff),SEEKF_START);
+    _nitems = ELF_HALF(elf.e_shnum);
     for(i = 0;i < _nitems;i++)
     {
       Elf386_External_Shdr shdr;
       if(IsKbdTerminate() || bioEOF(handle)) break;
       bioReadBuffer(handle,&shdr,sizeof(Elf386_External_Shdr));
-      switch(ELF_DWORD(shdr.sh_type))
+      switch(ELF_WORD(shdr.sh_type))
       {
-        case SHT_REL: __elfReadRelSection(ELF_DWORD(shdr.sh_offset),
-               			          ELF_DWORD(shdr.sh_size),
-            			          ELF_DWORD(shdr.sh_link),
-            			          ELF_DWORD(shdr.sh_info),
-            			          ELF_DWORD(shdr.sh_entsize));
+        case SHT_REL: __elfReadRelSection(ELF_WORD(shdr.sh_offset),
+               			          ELF_WORD(shdr.sh_size),
+            			          ELF_WORD(shdr.sh_link),
+            			          ELF_WORD(shdr.sh_info),
+            			          ELF_WORD(shdr.sh_entsize));
                       break;
-        case SHT_RELA: __elfReadRelaSection(ELF_DWORD(shdr.sh_offset),
-            				    ELF_DWORD(shdr.sh_size),
-            				    ELF_DWORD(shdr.sh_link),
-            			            ELF_DWORD(shdr.sh_info),
-            			            ELF_DWORD(shdr.sh_entsize));
+        case SHT_RELA: __elfReadRelaSection(ELF_WORD(shdr.sh_offset),
+            				    ELF_WORD(shdr.sh_size),
+            				    ELF_WORD(shdr.sh_link),
+            			            ELF_WORD(shdr.sh_info),
+            			            ELF_WORD(shdr.sh_entsize));
                       break;
         default: break;
      }
     } 
   }
-  else if(ELF_WORD(elf.e_type) != ET_REL)
+  else if(ELF_HALF(elf.e_type) != ET_REL)
   {
     /* If section headers are lost then information can be taken
        from program headers
@@ -1082,11 +1181,11 @@ static tBool __NEAR__ __FASTCALL__ __readRelocName(Elf_Reloc __HUGE__ *erl, char
   fp = bioTell(handle);
   if(IsSectionsPresent) /* Section headers are present */
   {
-     bioSeek(handle,ELF_DWORD(elf.e_shoff)+erl->sh_idx*sizeof(Elf386_External_Shdr),SEEKF_START);
+     bioSeek(handle,ELF_WORD(elf.e_shoff)+erl->sh_idx*sizeof(Elf386_External_Shdr),SEEKF_START);
      bioReadBuffer(handle,&shdr,sizeof(Elf386_External_Shdr));
-     bioSeek(handle,ELF_DWORD(shdr.sh_offset),SEEKF_START);
+     bioSeek(handle,ELF_WORD(shdr.sh_offset),SEEKF_START);
      /* Minor integrity test */
-     ret = ELF_DWORD(shdr.sh_type) == SHT_SYMTAB || ELF_DWORD(shdr.sh_type) == SHT_DYNSYM;
+     ret = ELF_WORD(shdr.sh_type) == SHT_SYMTAB || ELF_WORD(shdr.sh_type) == SHT_DYNSYM;
   }     
   else bioSeek(handle,erl->sh_idx,SEEKF_START);
   if(ret)
@@ -1094,7 +1193,7 @@ static tBool __NEAR__ __FASTCALL__ __readRelocName(Elf_Reloc __HUGE__ *erl, char
     /* We assume that dynsym and symtab are equal */
     unsigned old_active;
     old_active = active_shtbl;
-    if(IsSectionsPresent) active_shtbl = ELF_WORD(shdr.sh_link);
+    if(IsSectionsPresent) active_shtbl = ELF_HALF(shdr.sh_link);
     else
     {
       unsigned long dynptr;
@@ -1104,7 +1203,7 @@ static tBool __NEAR__ __FASTCALL__ __readRelocName(Elf_Reloc __HUGE__ *erl, char
     }  
     bioSeek(handle,r_sym*sizeof(Elf386_External_Sym),SEEKF_CUR);
     bioReadBuffer(handle,&sym,sizeof(Elf386_External_Sym));
-    elf386_readnametableex(ELF_DWORD(sym.st_name),buff,cbBuff);
+    elf386_readnametableex(ELF_WORD(sym.st_name),buff,cbBuff);
     buff[cbBuff-1] = '\0';
     active_shtbl = old_active;
     if(!buff[0])
@@ -1113,13 +1212,13 @@ static tBool __NEAR__ __FASTCALL__ __readRelocName(Elf_Reloc __HUGE__ *erl, char
       if(IsSectionsPresent)
       {
        if(ELF_ST_TYPE(sym.st_info[0]) == STT_SECTION && 
-          ELF_WORD(sym.st_shndx) &&
-          ELF_IS_SECTION_PHYSICAL(ELF_WORD(sym.st_shndx)))
+          ELF_HALF(sym.st_shndx) &&
+          ELF_IS_SECTION_PHYSICAL(ELF_HALF(sym.st_shndx)))
        {
-         bioSeek(handle,ELF_DWORD(elf.e_shoff)+ELF_WORD(sym.st_shndx)*sizeof(Elf386_External_Shdr),SEEKF_START);
+         bioSeek(handle,ELF_WORD(elf.e_shoff)+ELF_HALF(sym.st_shndx)*sizeof(Elf386_External_Shdr),SEEKF_START);
          bioReadBuffer(handle,&shdr,sizeof(Elf386_External_Shdr));
-         if(!FindPubName(buff, cbBuff, ELF_DWORD(shdr.sh_offset)+erl->addend))
-                      elf386_readnametable(ELF_DWORD(shdr.sh_name),buff,cbBuff);         
+         if(!FindPubName(buff, cbBuff, ELF_WORD(shdr.sh_offset)+erl->addend))
+                      elf386_readnametable(ELF_WORD(shdr.sh_name),buff,cbBuff);         
        }
       }
       if(!buff[0]) strcpy(buff,"?noname");
@@ -1239,25 +1338,25 @@ static void __NEAR__ __FASTCALL__ displayELFdyninfo(unsigned long f_off,unsigned
     if(bmEOF()) break;
     f_off += sizeof(dyntab);
     is_add = True;
-    switch(ELF_DWORD(dyntab.d_tag))
+    switch(ELF_WORD(dyntab.d_tag))
     {
       case DT_NULL: goto dyn_end;
       case DT_NEEDED:
                     {
                       strcpy(stmp,"Needed : ");
-                      bmReadBufferEx(&stmp[strlen(stmp)],70,ELF_DWORD(dyntab.d_un.d_ptr) + stroff,SEEKF_START);
+                      bmReadBufferEx(&stmp[strlen(stmp)],70,ELF_WORD(dyntab.d_un.d_ptr) + stroff,SEEKF_START);
                     }
                     break;
       case DT_SONAME:
                     {
                       strcpy(stmp,"SO name: ");
-                      bmReadBufferEx(&stmp[strlen(stmp)],70,ELF_DWORD(dyntab.d_un.d_ptr) + stroff,SEEKF_START);
+                      bmReadBufferEx(&stmp[strlen(stmp)],70,ELF_WORD(dyntab.d_un.d_ptr) + stroff,SEEKF_START);
                     }
                     break;
       case DT_RPATH:
                     {
                       strcpy(stmp,"LibPath: ");
-                      bmReadBufferEx(&stmp[strlen(stmp)],70,ELF_DWORD(dyntab.d_un.d_ptr) + stroff,SEEKF_START);
+                      bmReadBufferEx(&stmp[strlen(stmp)],70,ELF_WORD(dyntab.d_un.d_ptr) + stroff,SEEKF_START);
                     }
                     break;
        default:     is_add = False; break;
@@ -1341,7 +1440,8 @@ static tBool __FASTCALL__ IsELF32( void )
 {
   char id[4];
   bmReadBufferEx(id,sizeof(id),0,SEEKF_START);
-  return id[0] == 0x7F && id[1] == 'E' && id[2] == 'L' && id[3] == 'F';
+  return IS_ELF(id);
+//  [0] == EI_MAG0 && id[1] == EI_MAG1 && id[2] == 'L' && id[3] == 'F';
 }
 
 static void __FASTCALL__ __elfReadSegments(linearArray **to, tBool is_virt )
@@ -1360,23 +1460,23 @@ static void __FASTCALL__ __elfReadSegments(linearArray **to, tBool is_virt )
       and often is unordered by file offsets. */
    if(IsSectionsPresent) /* Section headers are present */
    {
-     va_map_count = ELF_WORD(elf.e_shnum);
+     va_map_count = ELF_HALF(elf.e_shnum);
      if(!(*to = la_Build(0,sizeof(struct tag_elfVAMap),MemOutBox)))
      {
        exit(EXIT_FAILURE);
      }
-     bmSeek(ELF_DWORD(elf.e_shoff),SEEKF_START);
+     bmSeek(ELF_WORD(elf.e_shoff),SEEKF_START);
      for(i = 0;i < va_map_count;i++)
      {
        unsigned long flg,x_flags;
        fp = bmGetCurrFilePos();
        bmReadBuffer(&shdr,sizeof(Elf386_External_Shdr));
-       bmSeek(fp+ELF_WORD(elf.e_shentsize),SEEKF_START);
-       vamap.va = ELF_DWORD(shdr.sh_addr);
-       vamap.size = ELF_DWORD(shdr.sh_size);
-       vamap.foff = ELF_DWORD(shdr.sh_offset);
-       vamap.nameoff = ELF_DWORD(shdr.sh_name);
-       flg = ELF_DWORD(shdr.sh_flags);
+       bmSeek(fp+ELF_HALF(elf.e_shentsize),SEEKF_START);
+       vamap.va = ELF_WORD(shdr.sh_addr);
+       vamap.size = ELF_WORD(shdr.sh_size);
+       vamap.foff = ELF_WORD(shdr.sh_offset);
+       vamap.nameoff = ELF_WORD(shdr.sh_name);
+       flg = ELF_WORD(shdr.sh_flags);
        x_flags = 0;
        /* I think - it would be better to use for computation of virtual and
           physical addresses maps only that sections which occupy memory
@@ -1399,23 +1499,23 @@ static void __FASTCALL__ __elfReadSegments(linearArray **to, tBool is_virt )
      }
    }
    else /* Try to build program headers map */
-    if((va_map_count = ELF_WORD(elf.e_phnum)) != 0) /* Program headers are present */
+    if((va_map_count = ELF_HALF(elf.e_phnum)) != 0) /* Program headers are present */
     {
       if(!(*to = la_Build(va_map_count,sizeof(struct tag_elfVAMap),MemOutBox)))
       {
         exit(EXIT_FAILURE);
       }
-      bmSeek(ELF_DWORD(elf.e_phoff),SEEKF_START);
+      bmSeek(ELF_WORD(elf.e_phoff),SEEKF_START);
       for(i = 0;i < va_map_count;i++)
       {
         fp = bmGetCurrFilePos();
         bmReadBuffer(&phdr,sizeof(Elf386_External_Phdr));
-        bmSeek(fp+ELF_WORD(elf.e_phentsize),SEEKF_START);
-        vamap.va = ELF_DWORD(phdr.p_vaddr);
-        vamap.size = max(ELF_DWORD(phdr.p_filesz), ELF_DWORD(phdr.p_memsz));
-        vamap.foff = ELF_DWORD(phdr.p_offset);
-        vamap.nameoff = ELF_DWORD(phdr.p_type) & 0x000000FFUL ? ~ELF_DWORD(phdr.p_type) : 0xFFFFFFFFUL;
-        vamap.flags = ELF_DWORD(phdr.p_flags);
+        bmSeek(fp+ELF_HALF(elf.e_phentsize),SEEKF_START);
+        vamap.va = ELF_WORD(phdr.p_vaddr);
+        vamap.size = max(ELF_WORD(phdr.p_filesz), ELF_WORD(phdr.p_memsz));
+        vamap.foff = ELF_WORD(phdr.p_offset);
+        vamap.nameoff = ELF_WORD(phdr.p_type) & 0x000000FFUL ? ~ELF_WORD(phdr.p_type) : 0xFFFFFFFFUL;
+        vamap.flags = ELF_WORD(phdr.p_flags);
         test = is_virt ? elfVA2PA(vamap.va) != 0 : elfPA2VA(vamap.foff) != 0;
         if(!test)
         {
@@ -1438,13 +1538,16 @@ static void __FASTCALL__ ELFinit( void )
  size_t i;
    PMRegLowMemCallBack(elfLowMemFunc);
    bmReadBufferEx(&elf,sizeof(Elf386_External_Ehdr),0,SEEKF_START);
-   is_big = elf.e_ident[5] == ELFDATA2MSB;
+   is_big = elf.e_ident[EI_DATA] == ELFDATA2MSB;
+#ifdef	ELF64
+   is_64bit = elf.e_ident[EI_CLASS] == ELFCLASS64;
+#endif
    fs = bmGetFLength();
-   IsSectionsPresent = ELF_WORD(elf.e_shnum) != 0 &&
-                       ELF_DWORD(elf.e_shoff) &&
-                       ELF_DWORD(elf.e_shoff) < fs && 
-                       ELF_DWORD(elf.e_shoff) +
-                       ELF_WORD(elf.e_shnum)*ELF_WORD(elf.e_shentsize) <= fs;
+   IsSectionsPresent = ELF_HALF(elf.e_shnum) != 0 &&
+                       ELF_WORD(elf.e_shoff) &&
+                       ELF_WORD(elf.e_shoff) < fs && 
+                       ELF_WORD(elf.e_shoff) +
+                       ELF_HALF(elf.e_shnum)*ELF_HALF(elf.e_shentsize) <= fs;
    __elfReadSegments(&va_map_virt,True);
    __elfReadSegments(&va_map_phys,False);
    /** Find min value of virtual address */
@@ -1559,8 +1662,8 @@ static void __FASTCALL__ elf_ReadPubNameList(BGLOBAL handle,void (__FASTCALL__ *
      bioReadBuffer(b_cache,&pdyn,sizeof(Elf386_External_Dyn));
      if(bioEOF(b_cache)) break;
      bioSeek(b_cache,fp+ent_size,SEEKF_START);
-     epn.nameoff = ELF_DWORD(pdyn.d_tag);
-     epn.pa = elfVA2PA(ELF_DWORD(pdyn.d_un.d_val));
+     epn.nameoff = ELF_WORD(pdyn.d_tag);
+     epn.pa = elfVA2PA(ELF_WORD(pdyn.d_un.d_val));
      epn.addinfo = pubname_shtbl;
      epn.attr = ELF_ST_INFO(STB_GLOBAL,STT_NOTYPE);
      if(!la_AddData(PubNames,&epn,mem_out)) break;
@@ -1578,11 +1681,11 @@ static void __FASTCALL__ elf_ReadPubNameList(BGLOBAL handle,void (__FASTCALL__ *
       bioReadBuffer(handle,&sym,sizeof(Elf386_External_Sym));
       if(bioEOF(handle) || IsKbdTerminate()) break;
       bioSeek(handle,fp+__elfSymEntSize,SEEKF_START);
-      if(ELF_IS_SECTION_PHYSICAL(ELF_WORD(sym.st_shndx)) &&
+      if(ELF_IS_SECTION_PHYSICAL(ELF_HALF(sym.st_shndx)) &&
          ELF_ST_TYPE(sym.st_info[0]) != STT_SECTION)
       {
         epn.pa = __calcSymEntry(handle,i,False);
-        epn.nameoff = ELF_DWORD(sym.st_name);
+        epn.nameoff = ELF_WORD(sym.st_name);
         epn.addinfo = __elfSymShTbl;
         epn.attr = sym.st_info[0];
         if(!la_AddData(PubNames,&epn,MemOutBox)) break;
@@ -1655,7 +1758,7 @@ static int __FASTCALL__ ELFplatform( void ) { return DISASM_CPU_IX86; }
 
 REGISTRY_BIN elf386Table =
 {
-  "ELF-i386 (Executable and Linkable Format)",
+  "ELF (Executable and Linking Format)",
   { "ELFhlp", "DynInf", "DynSec", NULL, NULL, NULL, "SymTab", NULL, "SecHdr", "PrgDef" },
   { ELFHelp, ShowELFDynInfo, ShowELFDynSec, NULL, NULL, NULL, ShowELFSymTab, NULL, ShowSecHdrElf, ShowPrgHdrElf },
   IsELF32, ELFinit, ELFdestroy,
