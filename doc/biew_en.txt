@@ -10,8 +10,8 @@
 €≤±∞                 ‹‹  ‹‹  ‹‹   ‹‹  ‹   ‹ ‹ ‹ ‹                     ∞±≤€
 €≤±∞                ‹‹‹‹‹‹  ‹‹‹‹ ‹‹‹‹‹‹    ‹   ‹                      ∞±≤€
 €≤±∞                                                                  ∞±≤€
-€≤±∞                           Ver 5.6.0                              ∞±≤€
-€≤±∞                          29 mar 2004.                            ∞±≤€
+€≤±∞                           Ver 5.6.1                              ∞±≤€
+€≤±∞                          01 apr 2004.                            ∞±≤€
 €≤±∞                                                                  ∞±≤€
 €≤±∞    Made in Kazan.Tatarstan.Russia. Written By Nick Kurshev.      ∞±≤€
 €≤±∞                                                                  ∞±≤€
@@ -1126,6 +1126,8 @@ v5.0.2        ! Changes:
                   by Oblomov Sergey <Sergey.Oblomov@intel.com>
                 * Fixed correct elf32 reading after applying 64-bit support
                 * Other minor/major fixes.
+5.6.1         ! Changes:
+01 apr 2004     * Fixed focus positioning in dialog
 []======================================================================[]
 []  Thank you for your interest.                                        []
 []  Nick Kurshev.                                                       []

@@ -65,7 +65,7 @@ static int __NEAR__ __FASTCALL__ getkey(int hard, void (*func)(void))
  return KB_freq ? KB_Buff[--KB_freq] :
                   GetEvent( func ? func : hard ? hard > 1 ? 
 			    drawAsmEdPrompt : drawEditPrompt : drawEmptyPrompt,
-			    func ? func : hard ? hard > 1 ? 
+			    func ? NULL : hard ? hard > 1 ? 
 			    EditAsmActionFromMenu: NULL: NULL,
 			    NULL);
 }
