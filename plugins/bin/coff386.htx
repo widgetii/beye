@@ -1,0 +1,17 @@
+ Coff-i386 introduction 
+    %BCommon Object File Format.%b
+    This format appeared with UNIX SVR3, formerly common for UNIX,
+and still used by some  embedded  systems. The Microsoft PE format
+for Windows is based on COFF.
+
+                %BFunction keys%b
+
+%IAltF1%i   -  Display this screen
+%IAltF7%i   -  Display symbol table
+%IAltF10%i  -  Display sections table
+
+                %BAddress Resolving%b
+
+%Icoffih:xx%i - Current file position is coff-i386 header
+            %Uxx%u - local offset within coff-i386 header
+%I.xxxxxxxx%i - Virtual address

@@ -1,0 +1,36 @@
+ New Executable introduction 
+  OS/2 programs, dynamic libraries, and device drivers reside  on  the
+disk in load modules called segmented executable files, or %B "new  EXE"%b
+files. The new EXE file  format,  which  is  also  used  by  Microsoft
+Windows, is a superset of the "old EXE" format used by MS-DOS.
+
+                %BFunction keys%b
+
+%IAltF1%i   -  Display this screen
+%IAltF2%i   -  Display references to external modules
+           By pressing ENTER you can see external names
+           and ordinal numbers of functions from selected
+           module that are required for external link resolving
+%IAltF3%i   -  Display list of exported resident names
+%IAltF4%i   -  Display list of exported non-resident names
+%IAltF6%i   -  Dislpay list of entries
+%IAltF7%i   -  Dislpay list of resources
+%IAltF8%i   -  Display NE-header
+%IAltF10%i  -  Display list of segment definitions
+
+                %BAddress Resolving%b
+
+%INEH :xxxx%i - Current file position is NE header
+            %Uxxxx%u - local offset within NE header
+%INESD:xxxx%i - Current file position is segment definition table
+            %Uxxxx%u - local offset within SegDef table
+%INEET:xxxx%i - Current file position is entries table
+            %Uxxxx%u - local offset within entries table
+%I.xxxxxxxx%i - Virtual address
+
+                  Virtual Jump
+                  ============
+
+For jump to virtual address you must input value as SegOff without
+whitespace characters (For example: for moving to Seg#1 Off=035Fh
+type: 0001035F).

@@ -1,0 +1,11 @@
+ Arch introduction 
+   Sorry! arch format in betta-stage
+
+                %BFunction keys%b
+
+%IAltF1%i   -  Display this screen
+
+                %BAddress Resolving%b
+
+%Iarch.h:xx%i - Current file position is arch header
+            %Uxx%u - local offset within arch header

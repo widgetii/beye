@@ -1,0 +1,24 @@
+ Setup 
+   If You see this dialog box, then path to help file is adjusted
+properly! If you do not see this dialog box every time at program
+start, then your copy of BIEW is configured correctly!
+This dialog box allows you to configure BIEW and BIEW console.
+
+Console settings are:
+%BDirect console access%b - use direct console access functions
+                        (video and keyboard), if possible
+%BMouse sensitivity%b     - receive mouse events as frequently as
+                        possible. Otherwise each press on mouse
+                        button will send only one event.
+%BForce mono%b            - force monochrome output to console
+                        (colors will be disabled).
+%BForce 7-bit output%b    - force 7-bit output stream (clean high bit).
+                        %UOnly for UNIX systems.%u
+General settings are:
+%BApply plugins%b         - Do not reset plugins settings when name of
+%Bsettings to all files%b   viewing file is changed. This option is useful
+                        for viewing different files in the same mode.
+%BUse MMF%b               - Allows using %UMMF%u (memory-mapped files)
+                        instead of traditional input/output technology.
+%BPreserve timestamp%b    - Allows preserving 'modification timestamp' of
+                        opened file even if modifications were performed.

@@ -1,0 +1,193 @@
+/**
+ * @namespace   biewlib
+ * @file        biewlib/sysdep/ia32/qnx/cpu_info.c
+ * @brief       This file contains function for retrieving CPU information for
+ *              32-bit Intel x86 compatible platform
+ * @version     -
+ * @remark      this source file is part of Binary vIEW project (BIEW).
+ *              The Binary vIEW (BIEW) is copyright (C) 1995 Nick Kurshev.
+ *              All rights reserved. This software is redistributable under the
+ *              licence given in the file "Licence.en" ("Licence.ru" in russian
+ *              translation) distributed in the BIEW archive.
+ * @note        Requires POSIX compatible development system
+ * @remark      I used such form of this file because of build-in assembler
+ *              allow write calling convention independed code. In addition,
+ *              GNU C compiler is ported under multiple OS's. If somebody will
+ *              port it under ABC-xyz platform, then more easy find compiler
+ *              with build-in assembler, instead rewriting of makefile with .s
+ *              (or .asm) extensions for choosen development system.
+ *
+ * @author      Andrew Golovnia
+ * @date        09.04.2001
+ * @note        Development, fixes and improvements for QNX4 & Watcom C
+**/
+
+unsigned __cpu_type(void);
+#pragma aux __cpu_type =\
+	"mov	eax,3"\
+	"push	esp"\
+	"pushfd"\
+	"mov	edx,esp"\
+	"and	esp,-4"\
+	"pushfd"\
+	"pop	eax"\
+	"mov	ecx,eax"\
+	"xor	eax,40000h"\
+	"push	eax"\
+	"popfd"\
+	"pushfd"\
+	"pop	eax"\
+	"xor	eax,ecx"\
+	"shr	eax,12h"\
+	"and	eax,1"\
+	"push	ecx"\
+	"popfd"\
+	"mov	esp,edx"\
+	"cmp	eax,0"\
+	"jnz	L4"\
+	"mov	eax,3"\
+	"jmp	L1"\
+"L4:"\
+	"pushfd"\
+	"pop	eax"\
+	"mov	ecx,eax"\
+	"xor	eax,200000h"\
+	"push	eax"\
+	"popfd"\
+	"pushfd"\
+	"pop	eax"\
+	"xor	eax,ecx"\
+	"jnz	L5"\
+	"mov	eax,4"\
+	"jmp	L1"\
+"L5:"\
+	"mov	eax,1"\
+	"dw		0A20Fh"\
+	"mov	al,ah"\
+	"and	eax,0Fh"\
+	"or		eax,4000h"\
+	"test	edx,800000h"\
+	"jz		L0"\
+	"or		eax,2000h"\
+"L0:"\
+	"test	edx,200000h"\
+	"jz		L1"\
+	"or		eax,1000h"\
+"L1:"\
+	"popfd"\
+	"pop	esp"\
+	value [eax]\
+	modify [ecx edx ebx]
+
+void __cpu_name(char*);
+#pragma aux __cpu_name=\
+	"xor	eax,eax"\
+	"dw		0A20Fh"\
+	"mov	eax,ebx"\
+	"stosd"\
+	"mov	eax,edx"\
+	"stosd"\
+	"mov	eax,ecx"\
+	"stosd"\
+	"xor	al,al"\
+	"stosb"\
+	parm [edi]\
+	modify [eax ebx ecx edx edi]
+
+void __extended_name(char*);
+#pragma aux __extended_name=\
+	"mov	eax,80000002h"\
+	"dw		0A20Fh"\
+	"stosd"\
+	"mov	eax,ebx"\
+	"stosd"\
+	"mov	eax,ecx"\
+	"stosd"\
+	"mov	eax,edx"\
+	"stosd"\
+	"mov	eax,80000003h"\
+	"dw		0A20Fh"\
+	"stosd"\
+	"mov	eax,ebx"\
+	"stosd"\
+	"mov	eax,ecx"\
+	"stosd"\
+	"mov	eax,edx"\
+	"stosd"\
+	"mov	eax,80000004h"\
+	"dw		0A20Fh"\
+	"stosd"\
+	"mov	eax,ebx"\
+	"stosd"\
+	"mov	eax,ecx"\
+	"stosd"\
+	"mov	eax,edx"\
+	"stosd"\
+	"xor	al,al"\
+	"stosb"\
+	parm [edi]\
+	modify [eax ebx ecx edx edi]
+
+unsigned long __cpuid_edx(unsigned long*);
+#pragma aux __cpuid_edx=\
+	"mov	esi,edi"\
+	"lodsd"\
+	"dw		0A20Fh"\
+	"stosd"\
+	value [edx]\
+	parm [edi]\
+	modify [eax ebx ecx edx edi esi]
+
+unsigned long __cpuid_ebxecx(unsigned long*);
+#pragma aux __cpuid_ebxecx=\
+	"mov	esi,edi"\
+	"lodsd"\
+	"dw		0A20Fh"\
+	"mov	eax,ecx"\
+	"stosd"\
+	value [ebx]\
+	parm [edi]\
+	modify [eax ebx ecx edx edi esi]
+
+unsigned __fpu_type(void);
+#pragma aux __fpu_type=\
+	"push	ebp"\
+	"mov	ebp,esp"\
+	"sub	esp,4"\
+	"finit"\
+	"mov	ecx,20h"\
+"L1:"\
+	"loop	L1"\
+	"fstcw	[ebp-4]"\
+	"mov	ecx,10h"\
+"L2:"\
+	"loop	L2"\
+	"mov	eax,[ebp-4]"\
+	"and	ah,0Fh"\
+	"cmp	ah,3"\
+	"jnz	L3"\
+	"mov	edx,3"\
+	"jmp	L4"\
+"L3:"\
+	"xor	edx,edx"\
+"L4:"\
+	"mov	esp,ebp"\
+	"pop	ebp"\
+	value [edx]\
+	modify [eax ebx ecx edx ebp]
+
+#pragma aux __OPS_nop parm [eax] value [eax]
+extern unsigned long __OPS_std(volatile unsigned*,char*);
+#pragma aux __OPS_std parm [eax edx] value [eax]
+extern unsigned long __FOPS_nowait(volatile unsigned*,char*);
+#pragma aux __FOPS_nowait parm [eax edx] modify [8087] value [eax]
+extern unsigned long __MOPS_std(volatile unsigned*,char*);
+#pragma aux __MOPS_std parm [eax edx] modify [8087] value [eax]
+extern unsigned long __SSEOPS_std(volatile unsigned*,char*);
+#pragma aux __SSEOPS_std parm [eax edx] value [eax]
+
+static unsigned long __FASTCALL__ __FOPS_w_wait(volatile unsigned *counter,char *arr14bytes)
+{
+  return __FOPS_nowait(counter,arr14bytes);
+}
+

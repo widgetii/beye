@@ -1,0 +1,722 @@
+/**
+ * @namespace   biewlib
+ * @file        biewlib/sysdep/ia32/cpu_info.wc
+ * @brief       This file contains function for retrieving CPU information for
+ *              32-bit Intel x86 compatible platform
+ * @version     -
+ * @remark      this source file is part of Binary vIEW project (BIEW).
+ *              The Binary vIEW (BIEW) is copyright (C) 1995 Nick Kurshev.
+ *              All rights reserved. This software is redistributable under the
+ *              licence given in the file "Licence.en" ("Licence.ru" in russian
+ *              translation) distributed in the BIEW archive.
+ * @note        Requires Watcom C/C++ v11.
+ *
+ * @author      Andrew Golovnia
+ * @since       2001
+ * @note        Development, fixes and improvements
+**/
+
+extern unsigned aux__cpu_type(void);
+#pragma aux aux__cpu_type =\
+	"mov	eax,3"\
+	"push	esp"\
+	"pushfd"\
+	"mov	edx,esp"\
+	"and	esp,-4"\
+	"pushfd"\
+	"pop	eax"\
+	"mov	ecx,eax"\
+	"xor	eax,40000h"\
+	"push	eax"\
+	"popfd"\
+	"pushfd"\
+	"pop	eax"\
+	"xor	eax,ecx"\
+	"shr	eax,12h"\
+	"and	eax,1"\
+	"push	ecx"\
+	"popfd"\
+	"mov	esp,edx"\
+	"cmp	eax,0"\
+	"jnz	L4"\
+	"mov	eax,3"\
+	"jmp	L1"\
+"L4:"\
+	"pushfd"\
+	"pop	eax"\
+	"mov	ecx,eax"\
+	"xor	eax,200000h"\
+	"push	eax"\
+	"popfd"\
+	"pushfd"\
+	"pop	eax"\
+	"xor	eax,ecx"\
+	"jnz	L5"\
+	"mov	eax,4"\
+	"jmp	L1"\
+"L5:"\
+	"mov	eax,1"\
+	"dw	0A20Fh"\
+	"mov	al,ah"\
+	"and	eax,0Fh"\
+	"or	eax,4000h"\
+	"test	edx,800000h"\
+	"jz	L0"\
+	"or	eax,2000h"\
+"L0:"\
+	"test	edx,200000h"\
+	"jz	L1"\
+	"or	eax,1000h"\
+"L1:"\
+	"popfd"\
+	"pop	esp"\
+	value [eax]\
+	modify [ecx edx ebx];
+
+static unsigned __cpu_type(void)
+{
+  return aux__cpu_type();
+}
+
+extern void aux__cpu_name(char*);
+#pragma aux aux__cpu_name=\
+	"xor	eax,eax"\
+	"dw	0A20Fh"\
+	"mov	eax,ebx"\
+	"stosd"\
+	"mov	eax,edx"\
+	"stosd"\
+	"mov	eax,ecx"\
+	"stosd"\
+	"xor	al,al"\
+	"stosb"\
+	parm [edi]\
+	modify [eax ebx ecx edx];
+
+static void __cpu_name(char*name)
+{
+  aux__cpu_name(name);
+}
+
+extern void aux__extended_name(char*);
+#pragma aux aux__extended_name=\
+	"mov	eax,80000002h"\
+	"dw	0A20Fh"\
+	"stosd"\
+	"mov	eax,ebx"\
+	"stosd"\
+	"mov	eax,ecx"\
+	"stosd"\
+	"mov	eax,edx"\
+	"stosd"\
+	"mov	eax,80000003h"\
+	"dw	0A20Fh"\
+	"stosd"\
+	"mov	eax,ebx"\
+	"stosd"\
+	"mov	eax,ecx"\
+	"stosd"\
+	"mov	eax,edx"\
+	"stosd"\
+	"mov	eax,80000004h"\
+	"dw	0A20Fh"\
+	"stosd"\
+	"mov	eax,ebx"\
+	"stosd"\
+	"mov	eax,ecx"\
+	"stosd"\
+	"mov	eax,edx"\
+	"stosd"\
+	"xor	al,al"\
+	"stosb"\
+	parm [edi]\
+	modify [eax ebx ecx edx];
+
+static void __extended_name(char*name)
+{
+  aux__extended_name(name);
+}
+
+extern unsigned long aux__cpuid_edx(unsigned long*);
+#pragma aux aux__cpuid_edx=\
+	"mov	esi, edi"\
+	"lodsd"\
+	"dw	0A20Fh"\
+	"stosd"\
+	value [edx]\
+	parm [edi]\
+	modify [eax ebx ecx esi];
+
+static unsigned long __cpuid_edx(unsigned long*r_eax)
+{
+  return aux__cpuid_edx(r_eax);
+}
+
+extern unsigned long aux__cpuid_ebxecx(unsigned long*);
+#pragma aux aux__cpuid_ebxecx=\
+	"mov	esi,edi"\
+	"lodsd"\
+	"dw	0A20Fh"\
+	"mov	eax,ecx"\
+	"stosd"\
+	value [ebx]\
+	parm [edi]\
+	modify [eax ecx edx esi];
+
+static unsigned long __cpuid_ebxecx(unsigned long*r_eax)
+{
+  return aux__cpuid_ebxecx(r_eax);
+}
+
+extern unsigned aux__fpu_type(void);
+#pragma aux aux__fpu_type=\
+	"sub	esp,4"\
+	"finit"\
+	"mov	ecx,20h"\
+"L1:"\
+	"loop	L1"\
+	"fstcw	[esp]"\
+	"mov	ecx,10h"\
+"L2:"\
+	"loop	L2"\
+	"mov	eax,[esp]"\
+	"and	ah,0Fh"\
+	"cmp	ah,3"\
+	"jnz	L3"\
+	"mov	edx,3"\
+	"jmp	L4"\
+"L3:"\
+	"xor	edx,edx"\
+"L4:"\
+	"add	esp, 4"\
+	value [edx]\
+	modify [eax ebx ecx];
+
+static unsigned __fpu_type(void)
+{
+  return aux__fpu_type();
+}
+
+extern unsigned long aux__OPS_nop(volatile unsigned*counter);
+#pragma aux aux__OPS_nop=\
+	"xor	eax,eax"\
+"L1:"\
+	"cmp	dword ptr [edx],0"\
+	"jz	L1"\
+"L2:"\
+	"cmp	[edx],0"\
+	"jz	near	L3"\
+	"db	90h,90h,90h,90h,90h,90h,90h,90h,90h,90h"\
+	"db	90h,90h,90h,90h,90h,90h,90h,90h,90h,90h"\
+	"db	90h,90h,90h,90h,90h,90h,90h,90h,90h,90h"\
+	"db	90h,90h,90h,90h,90h,90h,90h,90h,90h,90h"\
+	"db	90h,90h,90h,90h,90h,90h,90h,90h,90h,90h"\
+	"db	90h,90h,90h,90h,90h,90h,90h,90h,90h,90h"\
+	"db	90h,90h,90h,90h,90h,90h,90h,90h,90h,90h"\
+	"db	90h,90h,90h,90h,90h,90h,90h,90h,90h,90h"\
+	"db	90h,90h,90h,90h,90h,90h,90h,90h,90h,90h"\
+	"db	90h,90h,90h,90h,90h,90h,90h,90h,90h,90h"\
+	"db	90h,90h,90h,90h,90h,90h,90h,90h,90h,90h"\
+	"db	90h,90h,90h,90h,90h,90h,90h,90h,90h,90h"\
+	"db	90h,90h,90h,90h,90h,90h,90h,90h,90h,90h"\
+	"db	90h,90h,90h,90h,90h,90h,90h,90h,90h,90h"\
+	"db	90h,90h,90h,90h,90h,90h,90h,90h,90h,90h"\
+	"db	90h,90h,90h,90h,90h,90h,90h,90h,90h,90h"\
+	"db	90h,90h,90h,90h,90h,90h,90h,90h,90h,90h"\
+	"db	90h,90h,90h,90h,90h,90h,90h,90h,90h,90h"\
+	"db	90h,90h,90h,90h,90h,90h,90h,90h,90h,90h"\
+	"db	90h,90h,90h,90h,90h,90h,90h,90h,90h,90h"\
+	"db	90h,90h,90h,90h,90h,90h,90h,90h,90h,90h"\
+	"db	90h,90h,90h,90h,90h,90h,90h,90h,90h,90h"\
+	"db	90h,90h,90h,90h,90h,90h,90h,90h,90h,90h"\
+	"db	90h,90h,90h,90h,90h,90h,90h,90h,90h,90h"\
+	"db	90h,90h,90h,90h,90h,90h,90h,90h,90h,90h"\
+	"db	90h,90h,90h,90h,90h,90h,90h,90h,90h,90h"\
+	"db	90h,90h,90h,90h,90h,90h,90h,90h,90h,90h"\
+	"db	90h,90h,90h,90h,90h,90h,90h,90h,90h,90h"\
+	"db	90h,90h,90h,90h,90h,90h,90h,90h,90h,90h"\
+	"db	90h,90h,90h,90h,90h,90h,90h,90h,90h,90h"\
+	"db	90h,90h,90h,90h,90h,90h,90h,90h,90h,90h"\
+	"db	90h,90h,90h,90h,90h,90h,90h,90h,90h,90h"\
+	"db	90h,90h,90h,90h,90h,90h,90h,90h,90h,90h"\
+	"db	90h,90h,90h,90h,90h,90h,90h,90h,90h,90h"\
+	"db	90h,90h,90h,90h,90h,90h,90h,90h,90h,90h"\
+	"db	90h,90h,90h,90h,90h,90h,90h,90h,90h,90h"\
+	"db	90h,90h,90h,90h,90h,90h,90h,90h,90h,90h"\
+	"db	90h,90h,90h,90h,90h,90h,90h,90h,90h,90h"\
+	"db	90h,90h,90h,90h,90h,90h,90h,90h,90h,90h"\
+	"db	90h,90h,90h,90h,90h,90h,90h,90h,90h,90h"\
+	"db	90h,90h,90h,90h,90h,90h,90h,90h,90h,90h"\
+	"db	90h,90h,90h,90h,90h,90h,90h,90h,90h,90h"\
+	"db	90h,90h,90h,90h,90h,90h,90h,90h,90h,90h"\
+	"db	90h,90h,90h,90h,90h,90h,90h,90h,90h,90h"\
+	"db	90h,90h,90h,90h,90h,90h,90h,90h,90h,90h"\
+	"db	90h,90h,90h,90h,90h,90h,90h,90h,90h,90h"\
+	"db	90h,90h,90h,90h,90h,90h,90h,90h,90h,90h"\
+	"db	90h,90h,90h,90h,90h,90h,90h,90h,90h,90h"\
+	"db	90h,90h,90h,90h,90h,90h,90h,90h,90h,90h"\
+	"db	90h,90h,90h,90h,90h,90h,90h,90h,90h,90h"\
+	"db	90h,90h,90h,90h,90h,90h,90h,90h,90h,90h"\
+	"db	90h,90h,90h,90h,90h,90h,90h,90h,90h,90h"\
+	"db	90h,90h,90h,90h,90h,90h,90h,90h,90h,90h"\
+	"db	90h,90h,90h,90h,90h,90h,90h,90h,90h,90h"\
+	"db	90h,90h,90h,90h,90h,90h,90h,90h,90h,90h"\
+	"db	90h,90h,90h,90h,90h,90h,90h,90h,90h,90h"\
+	"db	90h,90h,90h,90h,90h,90h,90h,90h,90h,90h"\
+	"db	90h,90h,90h,90h,90h,90h,90h,90h,90h,90h"\
+	"db	90h,90h,90h,90h,90h,90h,90h,90h,90h,90h"\
+	"db	90h,90h,90h,90h,90h,90h,90h,90h,90h,90h"\
+	"db	90h,90h,90h,90h,90h,90h,90h,90h,90h,90h"\
+	"db	90h,90h,90h,90h,90h,90h,90h,90h,90h,90h"\
+	"db	90h,90h,90h,90h,90h,90h,90h,90h,90h,90h"\
+	"db	90h,90h,90h,90h,90h,90h,90h,90h,90h,90h"\
+	"db	90h,90h,90h,90h,90h,90h,90h,90h,90h,90h"\
+	"db	90h,90h,90h,90h,90h,90h,90h,90h,90h,90h"\
+	"db	90h,90h,90h,90h,90h,90h,90h,90h,90h,90h"\
+	"db	90h,90h,90h,90h,90h,90h,90h,90h,90h,90h"\
+	"db	90h,90h,90h,90h,90h,90h,90h,90h,90h,90h"\
+	"db	90h,90h,90h,90h,90h,90h,90h,90h,90h,90h"\
+	"db	90h,90h,90h,90h,90h,90h,90h,90h,90h,90h"\
+	"db	90h,90h,90h,90h,90h,90h,90h,90h,90h,90h"\
+	"db	90h,90h,90h,90h,90h,90h,90h,90h,90h,90h"\
+	"db	90h,90h,90h,90h,90h,90h,90h,90h,90h,90h"\
+	"db	90h,90h,90h,90h,90h,90h,90h,90h,90h,90h"\
+	"db	90h,90h,90h,90h,90h,90h,90h,90h,90h,90h"\
+	"db	90h,90h,90h,90h,90h,90h,90h,90h,90h,90h"\
+	"db	90h,90h,90h,90h,90h,90h,90h,90h,90h,90h"\
+	"db	90h,90h,90h,90h,90h,90h,90h,90h,90h,90h"\
+	"db	90h,90h,90h,90h,90h,90h,90h,90h,90h,90h"\
+	"db	90h,90h,90h,90h,90h,90h,90h,90h,90h,90h"\
+	"db	90h,90h,90h,90h,90h,90h,90h,90h,90h,90h"\
+	"db	90h,90h,90h,90h,90h,90h,90h,90h,90h,90h"\
+	"db	90h,90h,90h,90h,90h,90h,90h,90h,90h,90h"\
+	"db	90h,90h,90h,90h,90h,90h,90h,90h,90h,90h"\
+	"db	90h,90h,90h,90h,90h,90h,90h,90h,90h,90h"\
+	"db	90h,90h,90h,90h,90h,90h,90h,90h,90h,90h"\
+	"db	90h,90h,90h,90h,90h,90h,90h,90h,90h,90h"\
+	"db	90h,90h,90h,90h,90h,90h,90h,90h,90h,90h"\
+	"db	90h,90h,90h,90h,90h,90h,90h,90h,90h,90h"\
+	"db	90h,90h,90h,90h,90h,90h,90h,90h,90h,90h"\
+	"db	90h,90h,90h,90h,90h,90h,90h,90h,90h,90h"\
+	"db	90h,90h,90h,90h,90h,90h,90h,90h,90h,90h"\
+	"db	90h,90h,90h,90h,90h,90h,90h,90h,90h,90h"\
+	"db	90h,90h,90h,90h,90h,90h,90h,90h,90h,90h"\
+	"db	90h,90h,90h,90h,90h,90h,90h,90h,90h,90h"\
+	"db	90h,90h,90h,90h,90h,90h,90h,90h,90h,90h"\
+	"db	90h,90h,90h,90h,90h,90h,90h,90h,90h,90h"\
+	"db	90h,90h,90h,90h,90h,90h,90h,90h,90h,90h"\
+	"db	90h,90h,90h,90h,90h,90h,90h,90h,90h,90h"\
+	"inc	eax"\
+	"jmp	L2"\
+"L3:"\
+	value [eax]\
+	parm [edx];
+
+static unsigned long __OPS_nop(volatile unsigned*counter)
+{
+  return aux__OPS_nop(counter);
+}
+
+extern unsigned long aux__OPS_std(volatile unsigned*,char*);
+#pragma aux aux__OPS_std=\
+	"xor	eax,eax"\
+"L1:"\
+	"cmp	[esi],0"\
+	"jz	L1"\
+"L2:"\
+	"cmp	[esi],0"\
+	"jnz	L3"\
+	"jmp	near L4"\
+"L3:"\
+	"push	eax"\
+	"mov	eax,14h"\
+	"mov	ecx,7"\
+	"mul	ecx"\
+	"imul	ecx"\
+	"div	ecx"\
+	"idiv	ecx"\
+	"add	eax,ecx"\
+	"adc	eax,1"\
+	"sub	eax,ecx"\
+	"sbb	eax,1"\
+	"push	esi"\
+	"push	edi"\
+	"mov	esi,edi"\
+	"movsd"\
+	"call	L5"\
+	"cmpsd"\
+	"pop	edi"\
+	"pop	esi"\
+	"push	eax"\
+	"push	edx"\
+	"pop	edx"\
+	"pop	eax"\
+	"mov	eax,14h"\
+	"mov	ecx,7"\
+	"mul	ecx"\
+	"imul	ecx"\
+	"div	ecx"\
+	"idiv	ecx"\
+	"add	eax,ecx"\
+	"adc	eax,1"\
+	"sub	eax,ecx"\
+	"sbb	eax,1"\
+	"push	esi"\
+	"push	edi"\
+	"mov	esi,edi"\
+	"movsd"\
+	"call	L5"\
+	"cmpsd"\
+	"pop	edi"\
+	"pop	esi"\
+	"push	eax"\
+	"push	edx"\
+	"pop	edx"\
+	"pop	eax"\
+	"mov	eax,14h"\
+	"mov	ecx,7"\
+	"mul	ecx"\
+	"imul	ecx"\
+	"div	ecx"\
+	"idiv	ecx"\
+	"add	eax,ecx"\
+	"adc	eax,1"\
+	"sub	eax,ecx"\
+	"sbb	eax,1"\
+	"push	esi"\
+	"push	edi"\
+	"mov	esi,edi"\
+	"movsd"\
+	"call	L5"\
+	"cmpsd"\
+	"pop	edi"\
+	"pop	esi"\
+	"push	eax"\
+	"push	edx"\
+	"pop	edx"\
+	"pop	eax"\
+	"mov	eax,14h"\
+	"mov	ecx,7"\
+	"mul	ecx"\
+	"imul	ecx"\
+	"div	ecx"\
+	"idiv	ecx"\
+	"adc	eax,1"\
+	"sub	eax,ecx"\
+	"sbb	eax,1"\
+	"push	edx"\
+	"pop	edx"\
+	"pop	eax"\
+	"inc	eax"\
+	"jmp	L2"\
+"L5:"\
+	"ret"\
+"L4:"\
+	value [eax]\
+	parm [esi] [edi]\
+	modify [edx ecx];
+
+static unsigned long __OPS_std(volatile unsigned*counter,char*arr)
+{
+  return aux__OPS_std(counter, arr);
+}
+
+extern unsigned long aux__FOPS_nowait(volatile unsigned*counter,char*arr);
+#pragma aux aux__FOPS_nowait=\
+	"xor	eax,eax"\
+"L1:"\
+	"cmp	dword ptr [esi],0"\
+	"jz	L1"\
+"L2:"\
+	"cmp	dword ptr [esi],0"\
+	"jz	near	L3"\
+	"finit"\
+	"fld	tbyte ptr [edi+8]"\
+	"fstp	tbyte ptr [edi+8]"\
+	"fstp	st(1)"\
+	"fldz"\
+	"fld1"\
+	"fcompp"\
+	"fstsw	[edi+4]"\
+	"fstcw	[edi]"\
+	"fldcw	[edi]"\
+	"fldpi"\
+	"fstp	st(1)"\
+	"fst	st(2)"\
+	"fst	st(3)"\
+	"f2xm1"\
+	"fabs"\
+	"fchs"\
+	"fprem"\
+	"fptan"\
+	"fsqrt"\
+	"frndint"\
+	"faddp	st(1),st"\
+	"fstp	st(1)"\
+	"fmulp	st(1),st"\
+	"fstp	st(1)"\
+	"fld1"\
+	"fstp	st(1)"\
+	"fpatan"\
+	"fstp	st(1)"\
+	"fscale"\
+	"fstp	st(1)"\
+	"fdivp	st(1),st"\
+	"fstp	st(1)"\
+	"fsubrp	st(1),st"\
+	"fstp	st(1)"\
+	"fyl2x"\
+	"fstp	st(1)"\
+	"fyl2xp1"\
+	"fstp	st(1)"\
+	"fbld	tbyte ptr [edi+8]"\
+	"fbstp	tbyte ptr [edi+8]"\
+	"fild	word ptr [edi]"\
+	"fistp	word ptr [edi]"\
+	"fld	tbyte ptr [edi+4]"\
+	"fstp	tbyte ptr [edi+4]"\
+	"fstp	st(1)"\
+	"fldz"\
+	"fld1"\
+	"fcompp"\
+	"fstsw	[edi+4]"\
+	"fstcw	[edi]"\
+	"fldcw	[edi]"\
+	"fldpi"\
+	"fstp	st(1)"\
+	"fst	st(2)"\
+	"fst	st(3)"\
+	"f2xm1"\
+	"fabs"\
+	"fchs"\
+	"fprem"\
+	"fptan"\
+	"fsqrt"\
+	"frndint"\
+	"faddp	st(1),st"\
+	"fstp	st(1)"\
+	"fmulp	st(1),st"\
+	"fstp	st(1)"\
+	"fld1"\
+	"fstp	st(1)"\
+	"fpatan"\
+	"fstp	st(1)"\
+	"fscale"\
+	"fstp	st(1)"\
+	"fdivp	st(1),st"\
+	"fstp	st(1)"\
+	"fsubrp	st(1),st"\
+	"fstp	st(1)"\
+	"fyl2x"\
+	"fstp	st(1)"\
+	"fyl2xp1"\
+	"fstp	st(1)"\
+	"fild	word ptr [edi]"\
+	"fistp	word ptr [edi]"\
+	"inc	eax"\
+	"jmp	L2"\
+"L3:"\
+	value [eax]\
+	parm [esi] [edi]\
+	modify [8087];
+
+static unsigned long __FOPS_nowait(volatile unsigned*counter,char*arr)
+{
+  return aux__FOPS_nowait(counter, arr);
+}
+
+static unsigned long __FASTCALL__ __FOPS_w_wait(volatile unsigned *counter,char *arr14bytes)
+{
+  return __FOPS_nowait(counter,arr14bytes);
+}
+
+extern unsigned long aux__MOPS_std(volatile unsigned*,char*);
+#pragma aux aux__MOPS_std=\
+	"xor	eax,eax"\
+"L1:"\
+	"cmp	dword ptr [esi],0"\
+	"jz	L1"\
+"L2:"\
+	"cmp	dword ptr [esi],0"\
+	"jz	near	L3"\
+	"db	00Fh,077h"\
+	"db	00Fh,06Eh,0C0h"\
+	"db	00Fh,06Bh,0C5h"\
+	"db	00Fh,063h,0C4h"\
+	"db	00Fh,067h,0C7h"\
+	"db	00Fh,0FCh,0DAh"\
+	"db	00Fh,0FEh,0E9h"\
+	"db	00Fh,0E8h,0E6h"\
+	"db	00Fh,0D8h,0DCh"\
+	"db	00Fh,0DBh,0CBh"\
+	"db	00Fh,076h,0C0h"\
+	"db	00Fh,064h,0D2h"\
+	"db	00Fh,0F5h,0FFh"\
+	"db	00Fh,0D5h,0F6h"\
+	"db	00Fh,0EBh,0D4h"\
+	"db	00Fh,0F3h,0C6h"\
+	"db	00Fh,0E2h,0CBh"\
+	"db	00Fh,0F8h,0C9h"\
+	"db	00Fh,0E9h,0D7h"\
+	"db	00Fh,0D9h,0D9h"\
+	"db	00Fh,06Ah,0C4h"\
+	"db	00Fh,061h,0D0h"\
+	"db	00Fh,0EFh,0E2h"\
+	"db	00Fh,06Bh,0C5h"\
+	"db	00Fh,063h,0C4h"\
+	"db	00Fh,067h,0C7h"\
+	"db	00Fh,0FCh,0DAh"\
+	"db	00Fh,0FEh,0E9h"\
+	"db	00Fh,0E8h,0E6h"\
+	"db	00Fh,0D8h,0DCh"\
+	"db	00Fh,0DBh,0CBh"\
+	"db	00Fh,076h,0C0h"\
+	"db	00Fh,064h,0D2h"\
+	"db	00Fh,0F5h,0FFh"\
+	"db	00Fh,0D5h,0F6h"\
+	"db	00Fh,0EBh,0D4h"\
+	"db	00Fh,0F3h,0C6h"\
+	"db	00Fh,0E2h,0CBh"\
+	"db	00Fh,0F8h,0C9h"\
+	"db	00Fh,0E9h,0D7h"\
+	"db	00Fh,0D9h,0D9h"\
+	"db	00Fh,06Ah,0C4h"\
+	"db	00Fh,061h,0D0h"\
+	"db	00Fh,0EFh,0E2h"\
+	"db	00Fh,077h"\
+	"db	00Fh,06Eh,0C0h"\
+	"db	00Fh,06Bh,0C5h"\
+	"db	00Fh,063h,0C4h"\
+	"db	00Fh,067h,0C7h"\
+	"db	00Fh,0FCh,0DAh"\
+	"db	00Fh,0FEh,0E9h"\
+	"db	00Fh,0E8h,0E6h"\
+	"db	00Fh,0D8h,0DCh"\
+	"db	00Fh,0DBh,0CBh"\
+	"db	00Fh,076h,0C0h"\
+	"db	00Fh,064h,0D2h"\
+	"db	00Fh,0F5h,0FFh"\
+	"db	00Fh,0D5h,0F6h"\
+	"db	00Fh,0EBh,0D4h"\
+	"db	00Fh,0F3h,0C6h"\
+	"db	00Fh,0E2h,0CBh"\
+	"db	00Fh,0F8h,0C9h"\
+	"db	00Fh,0E9h,0D7h"\
+	"db	00Fh,0D9h,0D9h"\
+	"db	00Fh,06Ah,0C4h"\
+	"db	00Fh,061h,0D0h"\
+	"db	00Fh,0EFh,0E2h"\
+	"db	00Fh,06Bh,0C5h"\
+	"db	00Fh,063h,0C4h"\
+	"db	00Fh,067h,0C7h"\
+	"db	00Fh,0FCh,0DAh"\
+	"db	00Fh,0FEh,0E9h"\
+	"db	00Fh,0E8h,0E6h"\
+	"db	00Fh,0D8h,0DCh"\
+	"db	00Fh,0DBh,0CBh"\
+	"db	00Fh,076h,0C0h"\
+	"db	00Fh,064h,0D2h"\
+	"db	00Fh,0F5h,0FFh"\
+	"db	00Fh,0D5h,0F6h"\
+	"db	00Fh,0EBh,0D4h"\
+	"db	00Fh,0F3h,0C6h"\
+	"db	00Fh,0E2h,0CBh"\
+	"db	00Fh,0F8h,0C9h"\
+	"db	00Fh,0E9h,0D7h"\
+	"db	00Fh,0D9h,0D9h"\
+	"db	00Fh,06Ah,0C4h"\
+	"db	00Fh,061h,0D0h"\
+	"db	00Fh,0EFh,0E2h"\
+	"inc	eax"\
+	"jmp	L2"\
+"L3:"\
+	value [eax]\
+	parm [esi] [eax]\
+	modify [8087];
+
+static unsigned long __MOPS_std(volatile unsigned*counter,char*arr)
+{
+  return aux__MOPS_std(counter, arr);
+}
+
+extern unsigned long aux__SSEOPS_std(volatile unsigned*,char*);
+#pragma aux aux__SSEOPS_std=\
+	"xor	eax,eax"\
+"L1:"\
+	"cmp	dword ptr [esi],0"\
+	"jz	L1"\
+"L2:"\
+	"cmp	dword ptr [esi],0"\
+	"jz	near	L3"\
+	"db	00Fh,077h"\
+	"db	00Fh,028h,007h"\
+	"db	00Fh,016h,00Fh"\
+	"db	00Fh,012h,017h"\
+	"db	00Fh,010h,01Fh"\
+	"db	00Fh,058h,0C1h"\
+	"db	0F3h,00Fh,058h,0C1h"\
+	"db	00Fh,02Dh,0C1h"\
+	"db	00Fh,02Ch,0CAh"\
+	"db	00Fh,05Fh,0C1h"\
+	"db	0F3h,00Fh,05Fh,0C1h"\
+	"db	00Fh,05Dh,0C1h"\
+	"db	0F3h,00Fh,05Dh,0C1h"\
+	"db	00Fh,059h,0C1h"\
+	"db	0F3h,00Fh,059h,0C1h"\
+	"db	00Fh,054h,0C1h"\
+	"db	00Fh,056h,0C1h"\
+	"db	00Fh,057h,0C9h"\
+	"db	00Fh,05Eh,0C1h"\
+	"db	0F3h,00Fh,05Eh,0C1h"\
+	"db	00Fh,053h,0C1h"\
+	"db	0F3h,00Fh,053h,0C1h"\
+	"db	00Fh,052h,0C1h"\
+	"db	0F3h,00Fh,052h,0C1h"\
+	"db	00Fh,051h,0C1h"\
+	"db	0F3h,00Fh,051h,0C1h"\
+	"db	00Fh,05Ch,0C1h"\
+	"db	0F3h,00Fh,05Ch,0C1h"\
+	"db	00Fh,02Eh,0C1h"\
+	"db	00Fh,015h,0C1h"\
+	"db	00Fh,014h,0C1h"\
+	"db	00Fh,077h"\
+	"db	00Fh,028h,007h"\
+	"db	00Fh,016h,00Fh"\
+	"db	00Fh,012h,017h"\
+	"db	00Fh,010h,01Fh"\
+	"db	00Fh,058h,0C1h"\
+	"db	0F3h,00Fh,058h,0C1h"\
+	"db	00Fh,02Dh,0C1h"\
+	"db	00Fh,02Ch,0CAh"\
+	"db	00Fh,05Fh,0C1h"\
+	"db	0F3h,00Fh,05Fh,0C1h"\
+	"db	00Fh,05Dh,0C1h"\
+	"db	0F3h,00Fh,05Dh,0C1h"\
+	"db	00Fh,059h,0C1h"\
+	"db	0F3h,00Fh,059h,0C1h"\
+	"db	00Fh,054h,0C1h"\
+	"db	00Fh,056h,0C1h"\
+	"db	00Fh,057h,0C9h"\
+	"db	00Fh,05Eh,0C1h"\
+	"db	0F3h,00Fh,05Eh,0C1h"\
+	"db	00Fh,053h,0C1h"\
+	"db	0F3h,00Fh,053h,0C1h"\
+	"db	00Fh,052h,0C1h"\
+	"db	0F3h,00Fh,052h,0C1h"\
+	"db	00Fh,051h,0C1h"\
+	"db	0F3h,00Fh,051h,0C1h"\
+	"db	00Fh,05Ch,0C1h"\
+	"db	0F3h,00Fh,05Ch,0C1h"\
+	"db	00Fh,02Eh,0C1h"\
+	"db	00Fh,015h,0C1h"\
+	"db	00Fh,014h,0C1h"\
+	"inc	eax"\
+	"jmp	L2"\
+"L3:"\
+	value [eax]\
+	parm [esi] [edi];
+
+static unsigned long __SSEOPS_std(volatile unsigned*counter,char*arr)
+{
+  return aux__SSEOPS_std(counter, arr);
+}

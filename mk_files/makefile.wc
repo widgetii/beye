@@ -1,0 +1,262 @@
+##############################################################################
+#   MAKEFILE - this file is part of Binary vIEW project (BIEW)               #
+##############################################################################
+#   Copyrights:           2000 Nick Kurshev                                  #
+#   License:              See below                                          #
+#   Author and developer: Nick Kurshev                                       #
+#   Requirement:          Watcom make (wmake)                                #
+####################### [ D e s c r i p t i o n ] ############################
+#  This file is script for make utility of Watcom development system.        #
+########################### [ L i c e n c e ] ################################
+# The Binary vIEW (BIEW) is copyright (C) 1995 Nick Kurshev.                 #
+# All rights reserved.                                                       #
+# This software is redistributable under the licence given in the file       #
+# "Licence" distributed in the BIEW archive.                                 #
+##############################################################################
+# How to run this file:
+# Copy it into base BIEW folder (../)
+# and type: wmake /ms /f makefile.wc
+#-----------------------------------------------------------------------------
+# TARGET is one of: dos4gw os2 win32
+TARGET=dos4gw
+# BUILD is one of: debug release
+BUILD=release
+#
+# Make has conditional preprocessing directives that are similar to the
+# C preprocessor directives.  Make supports these preprocessor directives:
+#
+# !ifeq
+# !ifneq
+# !ifdef
+# !ifndef
+#
+# along with
+#
+# !else
+# !endif
+#
+
+!ifeq TARGET win32
+HOST=win32
+WSYS=nt
+CFLAGS = -i=$(%WATCOM)\h;$(%WATCOM)\h\nt -bt=$(SYST)
+CFLAGS += -D__WIN32__ -D__OS_NAME__="Win32" -D__OS__="win32" -U__OS__
+!else
+!ifeq TARGET os2
+HOST=os2
+WSYS=os2v2
+CFLAGS = -i=$(%WATCOM)\h;$(%WATCOM)\h\os2 -bt=$(SYST)
+CFLAGS += -D__OS2__ -D__OS_NAME__="OS/2" -D__OS__="os2" -U__OS__
+!else
+HOST=dos4gw
+WSYS=dos4g
+CFLAGS = -i=$(%WATCOM)\h -bt=$(SYST)
+CFLAGS += -D__MSDOS__ -D__OS_NAME__="DOS/4GW" -D__OS__="dos4gw" -U__OS__
+!endif
+!endif
+!ifeq BUILD debug
+CFLAGS += -d3 -zpw -en -et
+LDFLAGS=DEBUG Dwarf
+!else
+CFLAGS += -d0 -s -othermanlib -em -zm -mf -r -3r -DNDEBUG=1
+LDFLAGS=
+!endif
+MACHINE=ia32
+CFLAGS += -I. -w4
+CFLAGS += -D__MACHINE__=$(MACHINE) -D__OS__=$(HOST)
+CFLAGS += -D__CPU_NAME__="i386" -D__DEFAULT_DISASM=0
+CFLAGS += -D__HAVE_PRAGMA_PACK__=1
+CFLAGS += -D__DISABLE_LOWLEVEL_MMF=1
+#
+# -od          - no optimization (most reliable key ;-)
+# -os          - space optimization
+# -ox          - average space and time
+# -ot          - time optimization
+# -othermanlib - fastest possible code
+# -o - optimization:
+#  a	      -> relax aliasing constraints
+#  b	      -> branch prediction
+#  e[=<num>]  -> expand user functions inline (<num> controls max size)
+#  h	      -> enable expensive optimizations
+#  i	      -> expand intrinsic functions inline
+#  l	      -> enable loop optimizations
+#  m	      -> generate inline code for math functions
+#  n	      -> allow numerically unstable optimizations
+#  r	      -> reorder instructions for best pipeline usage
+#  s	      -> favor code size over execution time in optimizations
+#  t	      -> favor execution time over code size in optimizations
+#  x	      -> equivalent to -obmiler -s
+# -em	      force enum base type to use minimum integral type
+# -en	      emit routine names in the code segment
+# -et	      P5 profiling
+# -zm	      place each function in separate segment
+# -zpw	      output warning when padding is added in a struct
+# -mf	      flat memory model (small code/small data assuming CS=DS=SS=ES)
+# -r	      save/restore segment registers across calls
+# -s	      remove stack overflow checks
+# -d0	      no debugging information
+# -d3	      full symbolic debugging with unreferenced type names
+# -w=<num>    set warning level number
+# -3r	      386 register calling conventions
+# -bt=<id>    build target for operating system <id>
+#
+
+LDFLAGS += SYSTEM $(WSYS) OPTION el, caseexact, stack=1000000, map
+CC=wcc386.exe
+LD=wlink.exe
+#
+# List of objects that needed for project
+#
+BIEWOBJS = &
+addendum.obj &
+bconsole.obj &
+biew.obj &
+biewhelp.obj &
+biewutil.obj &
+bin_util.obj &
+bmfile.obj &
+codeguid.obj &
+colorset.obj &
+dialogs.obj &
+editors.obj &
+events.obj &
+fileutil.obj &
+info_win.obj &
+mainloop.obj &
+refs.obj &
+search.obj &
+setup.obj &
+sysinfo.obj &
+tstrings.obj &
+ascii.obj &
+consinfo.obj &
+cpu_perf.obj &
+dig_conv.obj &
+eval.obj &
+aout.obj &
+arch.obj &
+bin.obj &
+coff386.obj &
+dos_sys.obj &
+elf386.obj &
+le.obj &
+lx.obj &
+mz.obj &
+ne.obj &
+nlm386.obj &
+opharlap.obj &
+pe.obj &
+pharlap.obj &
+rdoff.obj &
+rdoff2.obj &
+binmode.obj &
+disasm.obj &
+hexmode.obj &
+textmode.obj &
+russian.obj &
+null_da.obj &
+ix86.obj &
+ix86_fpu.obj &
+ix86_fun.obj &
+bbio.obj &
+biewlib.obj &
+file_ini.obj &
+pmalloc.obj &
+twin.obj &
+tw_class.obj &
+cpu_info.obj &
+fileio.obj &
+keyboard.obj &
+mmfio.obj &
+mouse.obj &
+nls.obj &
+os_dep.obj &
+timer.obj &
+vio.obj
+#
+# The .EXTENSIONS directive declares which extensions are allowed to be used
+# in implicit rules and how these extensions are ordered.
+#
+.EXTENSIONS: .exe .lnk .obj .c
+
+#
+# Make will retain (for each suffix) what sub-directory yielded the last
+# successful search for a file. The search for a file is resumed at this
+# directory in the hope that wasted disk activity will be minimized. If the
+# file cannot be found in the sub-directory then Make will search the next
+# sub-directory in the path specification (cycling to the first sub-directory
+# in the path specification after an unsuccessful search in the last
+# sub-directory).
+#
+.OPTIMIZE
+
+#
+# The UNIX compatible special macros supported are:
+#
+# $@     full name of the target
+# $*     target with the extension removed
+# $<     list of all dependents
+# $?     list of dependents that are younger than the target
+#
+# An implicit rule provides a command list for a dependency between files
+# with certain extensions.  The form of an implicit rule is as follows:
+#     .<dependent_extension>.<target_extension>:
+#             <command_list>
+#
+biew.exe: biew.lnk
+	$(LD) $(LDFLAGS) NAME $@ @$^*
+
+biew.lnk: $(BIEWOBJS)
+	%create $^@
+	for %i in ($(BIEWOBJS)) do @%append $^@ FILE %i
+
+
+#
+# The use of the .SYMBOLIC directive indicates to Make that the target should
+# always be updated internally after the command list associated with the rule
+# has been executed.
+# In short: target is not a file.
+#
+clean: .SYMBOLIC
+	del $(BIEWOBJS)
+	del biew.exe
+        del biew.lnk
+	del *.map
+        del *.err
+#
+# If the application requires many source files in different directories
+# Make will search for the files using their associated path specifications.
+#
+.c:&
+addons;&
+addons\sys;&
+addons\tools;&
+plugins;&
+plugins\bin;&
+plugins\nls;&
+plugins\disasm;&
+plugins\disasm\ix86;&
+biewlib;&
+biewlib\sysdep;&
+biewlib\sysdep\$(MACHINE);&
+biewlib\sysdep\$(MACHINE)\$(HOST)
+#
+# Implicit rules are used if a file has not been declared as a target in any
+# explicit rule or the file has been declared as a target in an explicit rule
+# with no command list.  For a given target file, a search is conducted to see
+# if there are any implicit rules defined for the target file's extension in
+# which case Make will then check if the file with the dependent extension in
+# the implicit rule exists.  If the file with the dependent extension exists
+# then the command list associated with the implicit rule is executed and
+# processing of the makefile continues.
+#
+# .AUTODEPEND:
+# The Watcom C/C++ compiler will insert dependency information into the object
+# file as is processes source files so that a complete snapshot of the files
+# necessary to build the object file are recorded.  Since all files do not have
+# dependency information contained within them in a standard form, it is
+# necessary to indicate to Make when dependencies are present.
+#
+.c.obj: .AUTODEPEND
+	@$(CC) $(CFLAGS) $[*
+

@@ -1,0 +1,30 @@
+ Linear Executable introduction 
+  %BLE%b format is used in Windows virtual  device  driver  (VxD),  DOS4GW
+executables and some OS/2 applications, that use 32-bit  segments  for
+80386+, but basic format for 0S/2 v2.0+ is LX (powered version of LE).
+   Format  contains  combination  of  code,  data  and  collection  of
+resources. In VxD drivers the first entry  point  in  the  Entry_Table
+points to the Virtual Driver Descriptor.
+
+Sorry! LE format in gamma-stage
+
+                %BFunction keys%b
+
+%IAltF1%i   -  Display this screen
+%IAltF2%i   -  Display references to external modules
+%IAltF3%i   -  Display list of exported resident names
+%IAltF4%i   -  Display list of exported non-resident names
+%IAltF5%i   -  Display list of imported external names
+%IAltF6%i   -  Dislpay list of entries
+%IAltF8%i   -  Display LE-header
+%IAltF9%i   -  Display list of map tables
+%IAltF10%i  -  Display list of object definitions
+
+                %BAddress Resolving%b
+
+%ILEH :xxxx%i - Current file position is LE header
+            %Uxxxx%u - local offset within LE header
+%ILEOD:xxxx%i - Current file position is object definition table
+            %Uxxxx%u - local offset within ObjDef table
+%ILEPD:xxxx%i - Current file position is page map table
+            %Uxxxx%u - local offset within page map table

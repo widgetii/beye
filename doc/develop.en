@@ -1,0 +1,1050 @@
+WARNING!!!  This  manual  (English  version  only)  may  contain  some
+lexical and grammar errors and mistakes.  Author  do  not  pretend  on
+ideal knowledge of English on highest technical and lingual level.  If
+you met some  misunderstanding of this document  please  contact  with
+author.  On  his  part, author  has  exerted  all  efforts  that  this
+document became comprehensible and tried to use the most  widely  used
+forms   of   comprehension   and   expressions   for   mono-semantical
+understanding of this manual by readers.
+(In this connexion, suggestions, feedback and  bugreports  are  gladly
+accepted.)
+
+                         BIEW Internals
+                =============================
+
+     This  manual  documents  internal  architecture   of   BIEW   and
+development notes. Main goal of this document is to tell  you  how  to
+expand project functionality,  and help  you  to  understand  it. This
+manual is written with the assumption that you are familiar  with  the
+C programming language and basic programming concepts.
+
+
+Table of Contents
+=================
+0. Preamble
+1. Hierarchical structure
+1.1. How it works
+1.2. Understanding of plugins and addons
+1.3. Why biewlib
+2. How to expand or port the project
+2.1. Creation a pluggins and addons
+2.2. Project porting
+3. Source code notes
+3.1. Placing of sources
+3.2. Source layout
+3.3. GNU Makefile
+4. Optimization notes
+4.1. A few words about calling conventions
+4.2. Source code optimization notes
+4.3. Tests of performance
+5. Final chapter
+
+0. Preamble
+===========
+   BIEW is a modular project, based on plugins-addons technology.  Any
+new plugin and addon can be easily added to the project,  as  well  as
+removed  from  the  project.  As  interaction  facility  with  OS  and
+computer, BIEW uses own library named biewlib. There are  two  reasons
+of birth and existence of biewlib:
+- Project was born in 16-bit DOS environment with poor development kit
+- Portability to non-POSIX systems
+
+1. Hierarchical structure
+=========================
+                                    Plugins of auto level:
+                                    +--------------------+
+                               +----| All files in       |
+           +-----------+       |    | plugins/bin        |
+           | Various   |       |    +--------------------+
+           | addons    |       |             ^
+           +-----------+       |             :             Plugins of II level:
+                 |             |             v              +---------------+
+                 |             |     Plugins of I level:    |plugins/nls    |
+   biew lib:     | Base level: |     +-------------+      +-|??? in feature |
+ +-------------+ +-*============*    |  binmode.c  |      | +---------------+
+ | OS and CPU  |===# biew.c     #----|  hexmode.c  |      | +----------------+
+ | depended    |===# mainloop.c #    |  textmode.c |------+ | various        |
+ | library     |   *============*    |  disasm.c   |--------| disassemblers  |
+ +-------------+         |           +-------------+        | plugins/disasm |
+                         |                                  +----------------+
+                         |
+             +----------------------+
+             |   biew utilities:    |
+             | biewutil, bin_util   |
+             | bconsole, biewhelp,  |
+             | events, ...          |
+             +----------------------+
+
+1.1. How it works
+-----------------
+   If you want acquaint with details of  sourcecodes  interaction  you
+should install DOXYGEN to which are oriented commentaries  of  project
+sources. Interaction in short:
+
+- At program start control is riched of main function that is  defined
+  in biew.c. Here program initializes itself, analyses  command  line,
+  reads .ini file, creates general windows,  initializes  plugins  and
+  addons and puts control to mainloop.c file.
+- In module mainloop.c is defined basic message loop  of  program.  It
+  works similar "GetMessage - DispatchMessage" loop  from  Win3.1  SDK
+  with realized callback function.
+- After receiving EXIT message loop returns control to main  function.
+  After getting control main function  of  program  deinitializes  the
+  program, saves variables  in  .ini  file,  disconnects  plugins  and
+  addons, destroys all global objects and terminates an execution.
+
+All other modules is auxiliary for this loop.
+
+1.2. Understanding of plugins and addons
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Now in project exist tree classes an plugins:
+- autolevel
+- I level
+- II level
+
+   Plugins of autolevel, basically, are designed for the  file  format
+support. Plugins of this class are automatic plugins. This means:
+- You can not see and find them in the menu, prompts and e.t.c.
+- You can not activate such plugins at your opinion.
+During initialization BIEW performs survey of autolevel  plugin  about
+viewing file format and assign first plugin that is  known  with  this
+format as server of opened file.  This  plugin  is  turned  to  active
+state. All other plugins of this class are turned in unplugged  state.
+Only way to see what plugin of  autolevel  is  active  it  call  "File
+information" utility and read information  about  detected  format  of
+file.
+
+  Plugins of I level are work horses of project.  They  present  main
+view modes of file. Plugins of this class either as II level  are  not
+automatic plugins. This means:
+- You can see and find them in menu, prompts and e.t.c.
+- You can activate such plugins at your opinion.
+
+During initialization BIEW performs survey of  plugin  I  level  about
+who first will be able to handle with the viewing file. Main  goal  of
+such survey is realization of attempt  to  separate  text  and  binary
+files. Anyway, plugins of  I  level  can  be  selected  and  activated
+through the menu. When plugin of I level is activated by  the  program
+or user it performs surveys and initialization  an  plugins  of  level
+II, which are connected with level I plugins only.
+
+In principle, in the future can be added plugins of level  III,  which
+will connected with plugins of II level only and e.t.c. ad infinitum.
+
+Example  for  understanding  of   differences   between   plugins   of
+autolevel, I level and II level:
+1. We have opened a file of Windows PE format.
+2.  Plugin  for  PE  format  will  accepted  as  server  for  binaries
+structure of this file. (In principle, we must have a possibility  for
+viewing this file as NE or any other format,  but  if  user  is  aware
+about it then one must to edit  signature  of  file  and  restart  the
+program  or  reread  a  file.  I.e.  basically,   such   features   is
+meaningless).
+3. How to look this file. Program detects  this  file  as  binary  and
+automatically  assigns  binary  mode  viewer.   But   we   must   have
+possibility of change a viewing mode and user can to do  this  through
+the menu.
+4. User selects disassembler mode. In general, PE format  is  designed
+for Intel-32 architecture and disassembler plugin of I  level,  making
+request to active plugin of autolevel (PE format)  will know  of  this
+and assigned ix86 disassembler by default for this file. But  we  must
+have possibility of changing disassembler on any other, and  user  can
+to do it by using menu. But  in  this  case  all  such  work  performs
+plugin of I level (disassembler plugin).
+5. User wants to resolve all internal references in the  viewing  file
+and get full disassembling dump of file. Plugin of I level performs of
+this work. It communicates with plugin of  autolevel which knows  this
+format. Plugin of I level in this  case  is  facility  of  interaction
+between plugin of level II  and  plugin  of  autolevel.  By  the  way,
+plugin of level II also is aware about  references  resolving  but  it
+builds all requests for plugin of I level.
+6. User wants to save result into the file. File utility  also  builds
+all requests to plugin of level  I and this plugin performs  all  work
+for creating connection between plugins of other levels,  but  outputs
+result into the file stream instead of the  screen.
+   Resume: Role of plugins level I is realization of common  interface
+between the program and plugins of other levels  and  containing  some
+common function for  plugins  of  next  level,  which  abstracts  such
+plugins from some media specific features.
+   In terms of C++ plugin of level I provides  an  interface  of  base
+class for plugins of next level.
+
+  In contrast with plugins, addons are modules, which  do  not  change
+properties of program and only add some useful features into it.  They
+always  are  selected  through  the  menu  at  user  opinion.  Program
+interface of addons is too simple  and  can  be  understood  from  the
+source code of program.
+
+1.3. Why biewlib
+~~~~~~~~~~~~~~~~~~
+   As  this  is  described  above  exist  two  reasons  of  birth  and
+existence of biewlib:
+- Project was born in 16-bit DOS environment with poor development kit
+- Portability to non-POSIX systems
+  Biewlib does not pretend on the  place  of  substitute  C  and  many
+other existence libraries. Unfortunately, many topics in biewlib  were
+born as facility of fighting with errors  of  standard  libraries  and
+discrepancy of  properties  their  functions  to  documentation.  Some
+parts of biewlib were born as facility of  rehabilitation of  dead  or
+abandoned libraries. For this existed history  reasons.  When  project
+was born there were a lot of  unknown  today  companies  with  popular
+products. Part from them now in the WindZone,  part  are  acquired  by
+the others. If separate biewlib on parts that will be got following:
+- bbio     - a facility of  caching  the  binary  streams  (Family  of
+             functions, working with FILE * streams in  many  IDE  (at
+             least in early  versions)  contain  errors  when  working
+             with binary files.
+- biewlib  - contains   functions,   which   are   implemented    with
+             difference  in  posix  and  ms-compatible  libraries  and
+             small kit, eager to  increase,  useful  utilities,  being
+             absent in all C-libraries.
+- file_ini - an unique library for work with .ini files.
+- pmalloc -  implements some useful mechanisms of work with the memory
+             in the preemptive mode. (May be I not right - but  I  did
+             not find of facilities in the standard kit an  libraries,
+             signalizing to program on  the  lack  of  memory  in  the
+             system).
+- twin -     a window library  that  is  compatible  by  functionality
+             with the window library of TopSpeed C JPI  (window.h)  to
+             which project was oriented from begin. (It  seems  to  me
+             that mostly easier to create  a  full  analogue  of  this
+             library instead porting the project under other  windows.
+             In additional I had own library of  windows  -  I  vastly
+             increased it and make it portable).
+sysdep/ -    all that is  located  in  this  subdirectory  needed  for
+             implementation of lowlevel  interface  to  the  operating
+             system. I hope - here all so understandable. May be  only
+             one question - why fileio.c?  Strangely,  but  even  port
+             gcc under os/2 - emx-0.9c(d) is kept an error  when works
+             with   files   through   open,   read,   write,    close.
+             Consequently  fileio  (either  as  all   others)   -   is
+             guarantee of stable work  of project  independently  from
+             IDE.
+   Certainly, biew uses standard functions from C libraries, but  this
+in general ANSI compatible  functions  (ISO  -  too  narrow  for  such
+project, as biew, POSIX - in many versions of C-libraries  implemented
+or with bugs or with errors). Anyway, using  subset  of  functions  in
+biew does not cause problems at  recompiling  it  under  MSC,  Watcom,
+TopSpeed and many ports of gcc. Though  -  certainly,  if  working  of
+some functions  causes  suspicions,  the  more  correct  to  take  its
+implementation from stable working  project  with  the  open  sources,
+than reject a  development  system  (Example:  qsort  -  lfind,  which
+happen to take from the project  djgpp.)  or  search  and  correct  an
+error by hand.
+
+
+2. How to expand or port the project
+====================================
+
+    In general project is expandable on tree ways:
+- Adding and register new plugin.
+- Adding and register new addon.
+- Porting a project under new computing architecture and/or OS.
+    All other cases are  rewriting  an  ideology  of  project  and/or
+patching mistakes and errors.
+
+2.1. Creation a pluggins and addons
+-----------------------------------
+
+   For creating of new plugin or addon  is  necessary  to  create  the
+object, whose interface must be implemented through  the  corresponded
+structure. Though such variant is  not  the  most  ideal   for  future
+extension of  possibilities  of  such  objects,  but  this  scheme  is
+chosen as facility of  program  parts  interaction,   additionally  it
+does not exclude  a  possibility  of  implementation  of  objects,  as
+external modules in the manner of  dynamically  linked  libraries  and
+e.t.c.
+  For creating plugins of any level always  possible  using  of  empty
+template, which is submitted for each level:
+- autolevel: plugins/bin/bin.c
+- level I: plugins/binmode.c
+- level II:
+  - disassembler:              plugins/disasm/null_da.c
+  - national language support: plugins/nls/russian.c
+  Practically, all (except russian.c) files contain  a  minimum  level
+of functionality, which is allowed for objects of such class.
+  The file reg_form.h contains declaration of  interfaces,  and  their
+full description, for plugins (except  of  level  II  and  above)  and
+addons.
+  Description of interface for  plugins  of  II  level  is  located in
+corresponding header files for plugins level I.
+  As accepted in rules, all files, which implement interfaces must  be
+located in corresponding thematic directories  and  contain  not  more
+than one interface per file. In the future  this  will  enable  detach
+their into the separate modules.
+  After writing of source code there is the last thing that needed  to
+do: to correct corresponding  makefiles  with  the  aid  of  which  is
+planned to build the project.
+
+2.2. Project porting
+--------------------
+
+   Problem of porting a project one of  the  most  light.  All  system
+depended  parts  of  the  project  is   located   in   the   directory
+'biewlib/sysdep'. Structure of  subdirectories  is  built  as  CPU/OS.
+Exception from this rule is 'generic' subdirectory,  where  inheres  a
+code, which can be used on any platforms. Within of this  subdirectory
+also are located subdirectories 'posix' and 'unix'. Directory  'posix'
+contains a implementation of  functions,  which  are  common  for  all
+fully posix-compatible operating systems. POSIX can not be  completely
+implemented  in  terms  of  itself,  so  a  compilation   using   just
+TARGET_OS=posix can not  be  complete.  Directory  'unix'  contains  a
+implementation of all functions for  fully  unix-compatible  operating
+systems.  Most  Unix   systems   are   fundamentally   very   similar.
+Unfortunately, unified standard, like  POSIX,  for  implementation  of
+console (however either  as  graphics)  applications  does  not  exist
+today, and if it will  appear,  stays  a  lot  of  existing  operating
+system (or at least development systems), which  will  not  compatible
+with it. In this connexion, it was  necessary  to  implement  invented
+standard separately  for  each  operating  system.  (If  OS  is  fully
+unix-compatible, then hardly needed to  port  project,  though  hardly
+somebody will happy to wait of program reactions in this model).
+   All system depended  functions  well  documented  in  corresponding
+header files, that is located in biewlib and its subdirectories.
+   If during project porting some  file  can  be  taken  from  existed
+implementation, it can be easy made  by including this  file  in  anew
+created.
+Example:
+The file /biewlib/sysdep/ia32/linux/fileio.c contains a single line:
+#include "biewlib/sysdep/generic/linux/fileio.c"
+   Thereby,  these  are  implemented  portable  on  any  file  systems
+"symbolic links". After writing of  source  code  there  is  the  last
+thing that needed to do: to correct corresponding makefiles  with  the
+aid of which is planned to build the project.
+
+3. Source code notes
+====================
+
+   History of project is beginning in  DOS  environment.  Project  was
+born and for a long time  existed  in  DOS.  In  this  connexion,  are
+accepted following rules of source code development:
+- All source of  project  has  written  in  ibm-866  code  page  (equ:
+  ibm-437 + russian letters).
+- All names of files must be in 8.3 model, no symlinks e.t.c  (Project
+  builds in DOS environment).
+
+3.1. Placing of sources
+-----------------------
+
+  Directory where sources will be placed  do  not  matter.  All  paths
+which used in project are relative.
+
+3.2. Source layout
+------------------
+
+  Hierarchy of source tree is very simple. Top level is  started  from
+directory where source code is located. Following picture  illustrated
+source tree layout:
+
+/          - top level contains entry point routine and common utilities
+addons     - contains various addons
+ sys       - contains system related addons
+ tools     - contains general addons
+biewlib    - contains library named biewlib
+ sysdep    - contains all system and OS depended files and structured as CPU/OS
+bin_rc     - contains various ready to use binary and text files
+doc        - contains documentation
+hlp        - contains project help and some help sources
+mk_files   - contains various makefiles for non GNU make utilities
+plugins    - contains various plugins
+ bin       - contains plugins of autolevel
+ disasm    - contains various disassemblers
+ nls       - contains national language support
+testlab    - contains various test routines and files
+tools      - contains auxiliary utilities
+
+3.3. GNU Makefile
+-----------------
+
+  The process of building the project is  driven  by  makefile,  which
+uses features of GNU make utility. The makefile is not  very  complex,
+and you probably want to try to understand it. All rules  are  defined
+in makefile.inc file. Makefile included this file to itself  and  does
+not contain any OS and CPU specific information. All what you must  to
+do during porting project it add OS and  CPU  specific  sections  into
+makefile.inc using previously declared sections as template. After  it
+you  can  change  values  of  TARGET_OS  and  TAGET_PLATFORM  to   the
+preferred values.
+
+4. Optimization notes
+=====================
+
+   Task  of  optimization  of  any   program   requires   a   separate
+interpretation. Each program has their own fine places  which  require
+special optimization for the qualitative speedup of project.
+   Of course biew -  interactive  program,  therefore  interchange  by
+information with console will thin place for it.  In  any  case,  best
+facility  for  searching  such  places  in  each  separate  event   is
+profiler, but today some function is already known as  possible  brake
+for project and after their  optimization  seriously  accelerating  of
+project is possible:
+- __MsGetPos
+- __vioGet(Set)CursorPos (it is cached if to  use  twGet(Set)CursorPos
+  instead)
+  Thereby, best  implementation  of  these  and  other  functions  for
+working with the console will  using  of  internal  flags,  that  must
+signalizing about  changing  of  state  observed  (by  this  function)
+objects, which asynchronously change of own state.
+   Optimization of non interactive  part  of  program  needed  special
+measurements by profiler.
+   See also 4.3
+
+4.1. A few words about calling conventions
+------------------------------------------
+
+   Why has happened so that mainstream of programmers  considers  that
+destiny  of  language  C  is  cdecl  calling  convention.   Absolutely
+understandable that K&R  áreated  language  C  on  earliest  stage  of
+computer industry evolution. The base concept of  accepted  agreements
+about  calling  convention  is implementation of variable  number   of
+arguments (...). But, in first - percent proportion of such  functions
+per the program is too little and secondly - this was a first  edition
+of standard that hereinafter was correctly extended by ANSI  committee
+up to modifiers of call. I do not want to consider these questions  in
+terms  of  non  Intel  architectures,  may  be  there  are  their  own
+particularities, though I am convinced that  on  these  platforms  are
+possible to use fast calling convention.  But  as  far  as  during  of
+writing of this document by the working platforms for the program  are
+ia16 and ia32 architectures, such kind of optimization is  meaningful.
+Certainly it will possible to object to me  that  with  appearance  in
+newest processors of branch prediction, pipelinest and  etc  -  effect
+from similar changes is lost, but in first, this  yet  does  not  mean
+that program will not  work  on  earlier  processor  models.  Secondly
+decreasing of code size (by such  optimization)  always  produces  the
+most effective using of processor caches and in third it  is  not  the
+fact  that  pipelines  and  predictions  reduce  optimization  effects
+towards the zero, they minimize effect of cdecl but in any case  there
+are differences.
+   Be that as it may, in the  code  is  defined  macros  __FASTCALL__,
+with aid of which big part of the project is  modified.  In  principle
+it can be redefined with any value,  but  during  development  of  new
+functions it would be better to use it.
+
+What said Watcom manual about calling conventions:
+
+__cdecl:
+Defines the calling convention used by Microsoft compilers.
+
+Notes:
+1.      All symbols are preceded by an underscore character.
+2.      Arguments are pushed on the stack from  right  to  left.  That
+        is, the last argument is pushed  first.  The  calling  routine
+        will remove the arguments from the stack.
+3.      Floating-point  values  are  returned  in  the  same  way   as
+        structures. When a structure is returned, the  called  routine
+        returns a pointer in  register  AX/EAX  to  the  return  value
+        which is stored in the data segment (DGROUP).
+        (NK: In 32-bit version floating-point values are  returned  in
+             80x87 register ST(0)).
+4.      For the 16-bit compiler, registers AX,  BX,  CX  and  DX,  and
+        segment register ES are not saved and restored when a call  is
+        made.
+5.      For the 32-bit compiler, registers EAX, ECX and  EDX  are  not
+        saved and restored when a call is made.
+
+__stdcall:
+(32-bit  only)  The  __stdcall  keyword  may  be  used  with  function
+definitions, and indicates that the 32-bit  Win32  calling  convention
+is to be used.
+
+Notes:
+
+1.      All symbols are preceded by an underscore character.
+2.      All C symbols (extern "C" symbols  in  C++)  are  suffixed  by
+        "@nnn" where "nnn" is the sum  of  the  argument  sizes  (each
+        size is rounded up to a multiple of 4 bytes so that  char  and
+        short are size 4). When the argument list contains "...",  the
+        "@nnn" suffix is omitted.
+3.      Arguments are pushed on the stack from  right  to  left.  That
+        is, the last argument is  pushed  first.  The  called  routine
+        will remove the arguments from the stack.
+4.      When a structure is returned, the caller  allocates  space  on
+        the stack. The address of the allocated space will  be  pushed
+        on the stack immediately before  the  call  instruction.  Upon
+        returning from the call, register EAX will contain address  of
+        the space  allocated  for  the  return  value.  Floating-point
+        values are returned in 80x87 register ST(0).
+5.      Registers EAX, ECX and EDX are not saved and restored  when  a
+        call is made.
+
+__syscall:
+(32-bit  only)  The  __syscall  keyword  may  be  used  with  function
+definitions,  and  indicates  that  the  calling  convention  used  is
+compatible with functions provided by 32-bit OS/2.
+
+Notes:
+1.      Symbols names are not modified, that is, they are not  adorned
+        with leading or trailing underscores.
+2.      Arguments are pushed on the stack from  right  to  left.  That
+        is, the last argument is pushed  first.  The  calling  routine
+        will remove the arguments from the stack.
+3.      When a structure is returned, the caller  allocates  space  on
+        the stack. The address of the allocated space will  be  pushed
+        on the stack immediately before  the  call  instruction.  Upon
+        returning from the call, register EAX will contain address  of
+        the space  allocated  for  the  return  value.  Floating-point
+        values are returned in 80x87 register ST(0).
+4.      Registers EAX, ECX and EDX are not saved and restored  when  a
+        call is made.
+
+__pascal:
+(16-bit only) Defines the calling convention  used  by  OS/2  1.x  and
+Windows 3.x API functions.
+
+Notes:
+1.      All symbols are mapped to upper case.
+2.      Arguments are pushed on the stack in reverse order.  That  is,
+        the first argument is pushed first,  the  second  argument  is
+        pushed next, and so on. The routine being called  will  remove
+        the arguments from the stack.
+3.      Floating-point  values  are  returned  in  the  same  way   as
+        structures.  When  a  structure  is   returned,   the   caller
+        allocates space on the stack. The  address  of  the  allocated
+        space will be pushed on the stack immediately before the  call
+        instruction. Upon returning from the call,  register  AX  will
+        contain address of the space allocated for the return value.
+4.      Registers AX, BX, CX and DX, and segment register ES  are  not
+        saved and restored when a call is made.
+
+Author notes:
+
+__fastcall:
+Different compilers has different implementation of it.
+
+Notes:
+1.      Name of functions or are not  modified  or  are  adorned  with
+        trailing underscore.
+2.      Arguments are passed through  registers  (E)AX,  (E)BX,  (E)CX
+        and (E)DX. If number of arguments is  greater than  number  of
+        registers then remainder of arguments are pushed on  the stack
+        from right to left. That  is,  the  last  argument  is  pushed
+        first. The called routine will remove the arguments  from  the
+        stack.  In  some  implementations  floating-point  values  are
+        passed   through   registers   (ST(0)-ST(2(5)))   of     80x87
+        coprocessor.
+3.      In some implementations small structures  are  return  through
+        registers of processor. Floating-point values are returned  in
+        80x87 register ST(0). When a big structure  is  returned,  the
+        caller allocates space  on  the  stack.  The  address  of  the
+        allocated space  will  be  pushed  on  the  stack  immediately
+        before the call instruction. Upon  returning  from  the  call,
+        register AX will contain address of the  space  allocated  for
+        the return value.
+4.      All registers, except registers which contain  return  values,
+        are saved and do not require restoring after call is made.
+
+4.2. Source code optimization notes
+-----------------------------------
+
+   There are  may  exist  various  interpretations  of  brought  below
+material - as manual about how never need to program or accept  it  as
+guidelines. (While I was reading it seems  to  me  very  strange,  why
+this work must do programmer but not processor).  But  anyway  - these
+are official recommendations from leaders of processors  industry  for
+personal computers and they must be well known.
+
+Intel P-III manual says:               Athlon-K7 manual says:
+
+(System Programming Guide, Order       (Publication # 22007 Rev: D
+Number 243192 (pages 443 and           Issue Date: August 1999 (pages 21 and
+below)):                               below)):
+
+ [14.1.1. General Code Optimization    C Source Level Optimizations:
+ Guidelines]
+
+Write code that can be optimized by    This chapter details C programming
+the compiler. For example:             practices for optimizing code for the
+                                       AMD Athlon  processor:
+*******************************************************************************
+- Minimize the use of global           Avoid frequently de-referencing pointer
+  variables, pointers, and complex     arguments inside a function. Since the
+  control flow statements.             compiler has no knowledge of whether
+                                       aliasing exists between the pointers,
+                                       such de-referencing can not be optimized
+                                       away by the compiler. This prevents data
+                                       from being kept in registers and
+                                       significantly increases memory traffic.
+
+- Do not use the "register" modifier.  --------------[ N/A ]----------------
+
+- Use the "const" modifier.            Use the "const" type qualifier as much as
+                                       possible. This optimization makes code
+                                       more robust and may enable higher
+                                       performance code to be generated due to
+                                       the additional information available to
+                                       the compiler. For example, the C standard
+                                       allows compilers to not allocate storage
+                                       for objects that are declared const, if
+                                       their address is never taken.
+
+- Do not defeat the typing system.     --------------[ N/A ]----------------
+
+- Do not make indirect calls.          --------------[ N/A ]----------------
+
+- Sign Extension is usually quite      If possible, use unsigned integer types
+  expensive.                           over signed integer types. The unsigned
+                                       types convey to the compiler that data
+                                       cannot be negative, which allows some
+                                       optimizations not possible with signed
+                                       and potentially negative data.
+
+--------------[ N/A ]----------------  Optimize Switch Statements:
+                                       recommended to sort the cases of a switch
+                                       statement according to the probability of
+                                       occurrences, with the most probable first.
+                                        int days_in_month, short_months,
+                                            normal_months, long_months;
+                                         switch (days_in_month) {
+                                            case 31: long_months++; break;
+                                            case 30: normal_months++; break;
+                                            case 28:
+                                            case 29: short_months++; break;
+                                            default: printf ("month has fewer"
+                                            "than 28 or more than 31 days\n");
+                                         }
+
+--------------[ N/A ]----------------  Declare Local Functions as Static:
+                                       Functions that are not used outside the
+                                       file in which they are defined should
+                                       always be declared static, which forces
+                                       internal linkage. Otherwise, such
+                                       functions default to external linkage,
+                                       which might inhibit certain optimizations
+                                       with some compilers for example,
+                                       aggressive inlining.
+
+--------------[ N/A ]----------------  Use Prototypes for All Functions:
+                                       Prototypes can convey additional
+                                       information to the compiler that might
+                                       enable more aggressive optimizations.
+
+- For best performance, make sure      C Language Structure Component Considerations
+  that data structures and arrays      - Sort structure members according to
+  greater than 32 bytes, are 32-byte     their base type size, declaring members
+  aligned, and that access patterns      with a larger base type size ahead of
+  to data structures and arrays do       members with a smaller base type size.
+  not break the alignment rules.       - Pad the structure to a multiple of the
+                                         largest base type size of any member:
+                                         struct {
+                                           double x;
+                                           long k;
+                                           char a[5];
+                                           char pad[7]; } baz;
+
+- ALIGNMENT OF DATA ON THE STACK       Sort Local Variables According to Base
+  Use static variables instead of      Type Size:
+  dynamic (stack) variables.           When a compiler allocates local variables
+  On the Pentium processor, accessing  in the same order in which they are
+  64-bit variables that are not 8-byte declared in the source code, it can be
+  aligned will cost an extra 3 clocks. helpful to declare local variables in
+  On the P6 family processors,         such a manner that variables with a
+  accessing a 64-bit variable will     larger base type size are declared ahead
+  cause a data cache split.            of the variables with smaller base type
+                                       size:
+                                        double z[3];
+                                        double x, y;
+                                        long foo, bar;
+                                        float baz;
+                                        short ga, gu, gi;
+
+- Use minimum sizes for integer and    Use 32-bit data types for integer code.
+  floating-point data types, to        Compiler implementations vary, but
+  enable SIMD parallelism.             typically the following data types are
+                                       included int, signed, signed int,
+                                       unsigned, unsigned int, long, signed long,
+                                       long int, signed long int, unsigned long,
+                                       and unsigned long int.
+
+--------------[ N/A ]----------------  Avoid Unnecessary Integer Division:
+                                       Integer division is the slowest of all
+                                       integer arithmetic operations and should
+                                       be avoided wherever possible.
+
+- Unroll all very short loops. Loops   Complete unrolling reduces register
+  that execute for less than 2 clocks  pressure by removing the loop counter.
+  waste loop overhead.                 To completely unroll a loop, remove the
+                                       loop control and replicate the loop body
+                                       N times. In addition, completely
+                                       unrolling a loop increases scheduling
+                                       opportunities. Only unrolling very large
+                                       code loops can result in the inefficient
+                                       use of the L1 instruction cache.
+
+--------------[ N/A ]----------------  Always Inline Functions with Fewer Than
+                                       25 Machine Instructions
+
+- Pay attention to the branch          Place branch targets at or near the
+  prediction algorithm for the target  beginning of 16-byte aligned code windows.
+  processor. This optimization is      This technique helps to maximize the number
+  particularly important for P6 family of instructions that are filled into the
+  processors. Code that optimizes      instruction-byte queue.
+  branch predict-ability will spend
+  fewer clocks fetching instructions.
+
+- Take advantage of the SIMD           Use 3DNow! Instructions:
+  capabilities of MMXT technology and  Unless accuracy requirements dictate
+  Streaming SIMD Extensions.           otherwise, perform floating-point
+                                       computations using the 3DNow! instructions
+                                       instead of x87 instructions. The SIMD
+                                       nature of 3DNow! instructions achieves
+                                       twice the number of FLOPs that are
+                                       achieved through x87 instructions. 3DNow!
+                                       instructions also provide for a flat
+                                       register file instead of the stack-based
+                                       approach of x87 instructions.
+
+- Avoid partial register stalls:       Avoid Partial Register Reads and Writes:
+  On P6 family processors, when a      In order to handle partial register
+  large (32-bit) general-purpose       writes, the AMD Athlon processor
+  register is read immediately after   execution core implements a data-merging
+  a small register (8- or 16-bit)      scheme. In the execution unit, an
+  that is contained in the large       instruction writing a partial register
+  register has been written, the read  merges the modified portion with the
+  is stalled until the write retires   current state of the remainder of the
+  (a minimum of 7 clocks). Consider    register. Therefore, the dependency
+  the example below:                   hardware can potentially force a false
+    MOV AX, 8                          dependency on the most recent instruction
+    ADD ECX, EAX ;Partial stall        that writes to any part of the register.
+                 ;occurs on access of  Example 1 (Avoid):
+                 ;the EAX register       MOV AL, 10 ;inst 1
+  Here, the first instruction moves      MOV AH, 12 ;inst 2.
+  the value 8 into the small register  Inst 2 has a false dependency on inst 1.
+  AX. The next instruction accesses    Inst 2 merges new AH with current the
+  sequence results in a partial        large register EAX. This code EAX
+  register stall.                      register value forwarded by inst 1. In
+                                       addition, an instruction that has a read
+  Pentium R and Intel486T processors   dependency on any part of a given
+  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^   architectural register has a read
+  do not generate this stall.          dependency on the most recent instruction
+  ^^^^^^^^^^^^^^^^^^^^^^^^^^^          that modifies any part of the same
+                                       architectural register.
+                                       Example 2 (Avoid):
+                                         MOV BX, 12h ;inst 1
+                                         MOV BL, DL  ;inst 2
+                                         MOV BH, CL  ;inst 3
+                                         MOV AL, BL  ;inst 4
+                                       Inst 2 false dependency on completion of
+                                       inst 1. Inst 3, false dependency on
+                                       completion of inst 2. Inst 4, depends on
+                                       completion of inst 2.
+
+- Align all data.                      Avoid Memory Size Mismatches:
+ - Align 8-bit data on any boundary    - Align 8-bit data on any boundary
+ - Align 16-bit data to be contained   - WORD accesses are aligned if they
+   within an aligned 4-byte word.        access an address divisible by 2.
+ - Align 32-bit data on any boundary   - DWORD accesses are aligned if they
+   that is a multiple of 4.              access an address divisible by 4.
+ - Align 64-bit data on any boundary   - QWORD accesses are aligned if they
+   that is a multiple of 8.              access an address divisible by 8.
+ - Align 80-bit and 128-bit data on    - TBYTE accesses are aligned if they
+   a 128-bit boundary (that is, any      access an address divisible by 16.
+   boundary that is a multiple of 16
+   bytes).
+
+ - A loop entry label should be        --------------[ N/A ]----------------
+   16-byte aligned when it is less
+   than 8 bytes  away from that
+   boundary.
+
+ - A label that follows a conditional  --------------[ N/A ]----------------
+   branch should not be aligned.
+
+ - A label that follows an             --------------[ N/A ]----------------
+   unconditional branch or function
+   call should be 16-byte aligned when
+   it is less than 8 bytes away from
+   that boundary.
+
+ Aligment penalties:                   Avoid misaligned data references. A
+ - On a Pentium R processor, a         misaligned store or load operation
+   misaligned access costs 3 clocks.   suffers a minimum 1-cycle penalty in
+ - On a P6 family processor, a         the AMD Athlon processor load/store
+   misaligned access that crosses a    pipeline.
+   cache line boundary costs 6 to 9
+   clocks.
+ - On a P6 family processor,
+   unaligned accesses that cause a
+   data cache split stall the
+   processor. A data cache split is
+   a memory access that crosses a
+   32-byte cache line boundary.
+
+- Dynamic Allocation Using MALLOC      Dynamic Memory Allocation Consideration:
+  When using dynamic allocation, check Dynamic memory allocation ( malloc in C
+  that the compiler aligns doubleword  language) should always return a pointer
+  or quadword values on 8-byte         that is suitably aligned for the largest
+  boundaries. If the compiler does not base type (quadword alignment). Where
+  implement this alignment, then use   this aligned pointer cannot be guaranteed,
+  the following technique to align     use the technique shown in the following
+  doublewords and quadwords for        code to make the pointer quadword aligned,
+  optimum code execution:              if needed. This code assumes the pointer
+  1. Allocate memory equal to the size can be cast to a long. Example:
+     of the array or structure plus 4
+     bytes.
+  2. Use "bitwise" and to make sure
+     that the array is aligned, for
+     example:
+       double a[5];                     double* p;
+       double *p, *newp;                double* np;
+       p = (double*)malloc              p = (double *)malloc
+         ((sizeof(double)*5)+4)           (sizeof(double)*number_of_doubles+7L);
+       newp = (p+4) & (-7)              np = (double *)((((long)(p))+7L)&(8L));
+
+- Organize code to minimize            !!!!!!!! [SAME ] !!!!!!!!!!!!!!!!!!!!!
+  instruction cache misses and
+  optimize instruction prefetches.
+
+- Avoid prefixed opcodes other than    --------------[ N/A ]----------------
+  0FH.
+
+- Use software pipelining.             !!!!!!!! [SAME ] !!!!!!!!!!!!!!!!!!!!!
+
+- Always pair CALL and RET (return)    --------------[ N/A ]----------------
+  instructions.
+
+- Avoid self-modifying code.           !!!!!!!! [SAME ] !!!!!!!!!!!!!!!!!!!!!
+
+- Do not place data in the code        !!!!!!!! [SAME ] !!!!!!!!!!!!!!!!!!!!!
+  segment.
+
+- Avoid instructions that contain 4 or Use Short Instruction Lengths:
+  more micro-ops or instructions that  Assemblers and compilers should generate
+  are more than 7 bytes long. If       the tightest code possible to optimize
+      ^^^^^^^^^^^^^^^^^^^^^^^          use of the I-Cache and increase average
+  possible, use instructions that      decode rate. Wherever possible, use
+  require 1 micro-op.                  instructions with shorter lengths.
+  Pentium R processors without MMXT    Using shorter instructions increases the
+  technology do not execute a set of   number of instructions that can fit into
+  paired instructions if either        the instruction-byte queue.
+  instruction is longer than 7 bytes;
+  Pentium R processors with MMXT       avoid:
+  technology do not execute a set of   81 C3 FB FF FF FF:  add ebx, -5
+  paired instructions if the first     preffered:
+  instruction is longer than 11 bytes  83 C3 FB:           add ebx, -5
+  or the second instruction is longer
+  than 7 bytes. Prefixes are not
+       ^^^^^^^^
+  counted.
+  The P6 family processors have 3
+  decoders that translate Intel
+  Architecture macro instructions into
+  micro operations (micro-ops, also
+  called "uops"). The decoder
+  limitations are as follows:
+  The first decoder (decoder 0) can
+  decode instructions up to 7 bytes in
+                      ^^^^^^^^^^^^^
+  length and with up to 4 micro-ops in
+  one clock cycle. The second two
+  decoders (decoders 1 and 2) can
+  decode instructions that are 1 micro-
+  op instructions, and these
+  instructions will also be decoded in
+  one clock cycle.
+
+  So, for best performance on all
+  Intel processors, use simple
+  instructions that are less than 8
+  bytes in length.
+
+ [14.1.2. Guidelines for Optimizing
+ MMXT Code]
+
+- Do not intermix MMXT instructions    There is no penalty for switching
+  and floating-point instructions.     between x87 FPU and 3DNow!/MMX
+                                       instructions in the AMD Athlon processor.
+
+- Use the opcode reg, mem instruction  Avoid Address Generation Interlocks:
+  format whenever possible. This       It is advantageous to schedule loads and
+  format helps to free registers and   stores that can calculate their addresses
+  reduce clocks without generating     quickly, ahead of loads and stores that
+  unnecessary loads.                   require the resolution of a long
+                                       dependency chain in order to generate
+                                       their addresses.
+
+- Put an EMMS instruction at the end   FEMMS instruction should be used to
+  of all MMXT code sections that you   ensure the same code also runs optimally
+  know will transition to floating-    on the AMD-K6 processor. The FEMMS
+  point code.                          instruction is supported for backward
+                                       compatibility with the AMD-K6 processor,
+                                       and is aliased to the EMMS instruction.
+
+ [14.1.3. Guidelines for Optimizing
+ Floating-Point Code]
+
+- Understand how the compiler handles  - Use Multiplies Rather Than Divides
+  floating-point code. Look at the     - Use FFREEP to Pop One Register from the
+  assembly dump and see what             FPU Stack
+  transforms are already performed on  - For branches that are dependent on
+  the program. Study the loop nests in   floating-point comparisons, use the
+  the application that dominate the      FCOMI/FCOMIP/FUCOMI/FUCOMIP instructions.
+  execution time. Determine why the      These instructions are much faster than
+  compiler is not creating the fastest   the classical approach using FSTSW,
+  code. For example, look for            because FSTSW is essentially a
+  dependences that can be resolved by    serializing instruction on the AMD
+  rearranging code                       Athlon processor. When FSTSW cannot
+                                         be avoided (for example, backward
+                                         compatibility of code with older
+                                         processors), no FPU instruction should
+                                         occur between an FCOM[P], FICOM[P],
+                                         FUCOM[P], or FTST and a dependent
+                                         FSTSW. This optimization allows the use
+                                         of a fast forwarding mechanism for the
+                                         FPU condition codes internal to the AMD
+                                         Athlon processor FPU and increases
+                                         performance.
+
+- Look for and correct situations      Ensure All FPU Data is Aligned:
+  known to cause slow execution of
+  floating-point code, such as:
+  - Large memory bandwidth             Misaligned memory accesses reduce the
+    requirements.                      available memory bandwidth.
+  - Poor cache locality.
+  - Long-latency floating-point
+    arithmetic operations.
+
+- Do not use more precision than is    Avoid Using Extended-Precision Data:
+  necessary. Single precision          Store data as either single-precision or
+  (32-bits) is faster on some          double-precision quantities. Loading and
+  operations and consumes only half    storing extended-precision data is
+  the memory space as double precision comparatively slower.
+  (64-bits) or double extended
+  (80-bits).
+
+- Use a library that provides fast     Minimize Floating-Point-to-Integer
+  floating-point to integer routines.  Conversions
+  Many library routines do more work
+  than is necessary.
+
+- Insure whenever possible that        --------------[ N/A ]----------------
+  computations stay in range. Out of
+  range numbers cause very high
+  overhead.
+
+- Schedule code in assembly language   Use the FXCH instruction rather than
+  using the FXCH instruction. When     FST/FLD pairs:
+  possible, unroll loops and pipeline  Using FXCH is preferred over the use of
+  code.                                FST/FLD pairs, even if the FST/FLD pair
+                                       works on a register. An FST/FLD pair adds
+                                       two cycles of latency and consists of two
+                                       OPs.
+
+- Perform transformations to improve   --------------[ N/A ]----------------
+  memory access patterns. Use loop
+  fusion or compression to keep as
+  much of the computation in the cache
+  as possible.
+
+- Break dependency chains.             --------------[ N/A ]----------------
+
+ [14.6.3. Write Allocation Effects]
+P6 family processors have a "write     --------------[ N/A ]----------------
+allocate by read-for-ownership" cache,
+whereas the Pentium R processor has a
+"no-write-allocate; write through on
+write miss" cache.
+
+ boolean array[max];
+  /* 1-In "boolean" in this example
+     there is a "char" array. Here, it
+     may well be better to make the
+     "boolean" array into an array of
+     bits, thereby reducing the size
+     of the array, which in turn
+     reduces the number of cache line
+     fetches. */
+ for(i=2;i<max;i++) {
+   array = 1;
+ }
+  for(i=2;i<max;i++) {
+   if( array[i] ) {
+    for(j=2;j<max;j+=i) {
+     if( array[j] != 0 ) {
+       array[j] = 0;
+/* check to see if value is already 0.
+if the value is already zero before
+writing (as shown in the following
+example), thereby reducing the number
+of writes to memory (dirty cache
+lines) */
+     }
+    }
+   }
+  }
+
+4.3. Perfomance tests
+=====================
+
+   When development of 5.3 branch has  begun,  my  main  goal  was  to
+accelerate the project. I performed a lot of different tests  to  find
+"thin" parts in  the  program,  and,  as  the  result,  the  following
+comparative table has appeared.
+
+
+TEST:
+   All tests were performed on the same computer (AMDK6-200/128Mb).  I
+was interested in relative but  not  absolute  numbers  (it  would  be
+better to run such tests on i386-40 machine, but I was unable to  find
+such a rarity).
+   For the test I took kernel32.dll and used the  following  modes  of
+disassembling:   Reference   prediction   (Ctrl-F8),   Local   offsets
+(Ctrl-F6),  Save  as...(Shift-F10)  mode  of   assembler   (F2),   put
+structures (F4)
+
++-----------------------------------------------------------------+
+| Operating system      | 5.2.0 mode  |     MMF    | MMF + ^Break |
++-----------------------+-------------+------------+--------------+
+| Linux-2.2.17-pre.14   | 0 m 58 sec  | 0 m 14 sec | 0 m 07 sec   |
+| WinNT4.0+SP4          | 1 m 07 sec  | 0 m 28 sec | 0 m 07 sec   |
+| OS/2(WSeB+fp1+UNI_060)| 4 m 57 sec  | 3 m 42 sec | 0 m 08(19)sec|
+| DOS32 on WinNT        | 2 m 30 sec  | N/A        | N/A          |
+| DOS32 on OS/2         | 3 m 13 sec  | N/A        | N/A          |
++-----------------------------------------------------------------+
+
+Abbrevations:
+5.2.0 mode  - mode present in 5.2.0 version
+MMF  -        Memory Mapped Files is a technique used to access files
+              like ordinary RAM (also known as mmap).
+^Break -      In 5.3 version,  new  scheme  of  keyboard  polling  was
+              implemented. In 5.2.0 to  interrupt  current  operation,
+              for example, a dump sequence, user should press  Escape;
+              in 5.3 version  Escape  was  replaced  with  Ctrl+Break,
+              because in several operating systems it  is  implemented
+              as asynchronous signal, which  is  not  sent  via  usual
+              keyboard functions.
+
+
+Numbers in few words:
+   Up to 5.3.0-pre.2 OS/2 port of program was the  slowest,  but  with
+implementation of new technologies, it  occupied  a  worthy  place  in
+comparative performance. Numbers in parenthesis indicate work time  at
+the first start, which means: it does not matter how long  the  OS  is
+working before this program is started, but important is that  program
+is launched for the first time. Problem is that at  the  second  start
+output file is already cached. These 8 seconds  are  interesting  from
+the point of performance probing, but in practice any user will use  a
+program for completion of operation only once.
+  Conclusion: in spite of the above words about OS/2  (though  now  it
+is not a serious product), this example  indicates  that  optimization
+of one program block  does  not  always  increase  performance  enough
+(even if that block obviously requires  optimization).  In  this  case
+effect was reached after optimization of two program blocks, but  each
+of them individually did not give such strong effect (37 times  faster
+for extreme values).
+   So, when porting the project under other operating systems,  it  is
+necessary to remember that all functions that are  located  in  system
+depended  subfolders  require  a  lot   of   your   attention   during
+implementation (it would be wrong to emulate  logic  of  async  signal
+Ctrl+Break through keyboard functions, etc) - they may  cause  serious
+performance degradation.
+                        
+   SOME REMARKS ON GCC: I use the same test with fastcall  technology,
+but still two dumps of file are  different  with  fastcall  and  cdecl
+optimizations. Btw cdecl optimized project produces correct  dumps  of
+file (same as after building it with  other  compilers).  I  prone  to
+think of this as of gcc bug, as far as I have no other ideas.
+
+5. Final chapter
+================
+
+  That all!!!

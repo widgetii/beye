@@ -1,0 +1,209 @@
+;
+; "Insight theme" (not AFD) BIEW skin by Nick Kurshev
+;
+[ Skin info ]
+ Name = Insight theme
+[ Color map ]
+  Black        = 0
+  Blue         = 1
+  Green        = 2
+  Cyan         = 3
+  Red          = 4
+  Magenta      = 5
+  Brown        = 6
+  LightGray    = 7
+  Gray         = 8
+  LightBlue    = 9
+  LightGreen   = 10
+  LightCyan    = 11
+  LightRed     = 12
+  LightMagenta = 13
+  Yellow       = 14
+  White        = 15
+[ Terminal ]
+  Trans1       = Blue
+  Trans2       =
+  Trans3       =
+  Trans4       =
+  Trans5       =
+  Trans6       =
+  Trans7       =
+  Trans8       =
+[ Browser ]
+  Main         = Black:Cyan
+  Bound        = Black:Yellow
+  HighLight    = Red:Black
+  HighLightLine= Black:White
+  Title        = LightGray:Blue
+  Footer       = Green:Blue
+  Scroller     = Black:Yellow
+  < Edit >
+    Main         = Black:White     ; multiline editor
+    Change       = Black:LightRed  ; when undo buffer is not same with editor
+    Selected     = LightGray:Black ; for future: when buffer is selected
+[ Prompt ] ; Lower string of BIEW
+  Button       = LightGray:Black        ; Color of buttons
+  Digit        = LightGray:Red	        ; Color of digits
+  Control      = LightGray:Blue        ; Lower left corner of screen
+[ Title ]  ; Upper string of BIEW
+  Main         = LightGray:Black
+  Change       = LightGray:Red
+[ Text ]   ; HighLight text support (still for textmode)
+  Normal       = Black:Cyan
+  Bold         = Black:White
+  Italic       = Black:LightGreen
+  Underline    = Black:Yellow
+  StrikeThrough= Black:LightBlue
+[ Disasm ] ; HighLight disassembler support
+  FamilyId     = Black:LightCyan
+  Opcodes      = Black:Green
+  Comments     = Black:Cyan
+ < Processor0 > ; Main processor (or Central Processor Unit)
+    Clone1       = Black:LightCyan
+    Clone2       = Black:LightGray
+    Clone3       = Black:Yellow
+    Clone4       = Black:LightGreen
+    Clone5       = Black:Red
+    Clone6       = Black:LightRed
+    Clone7       = Black:LightMagenta
+    Clone8       = Black:LightBlue
+    Clone9       = Black:Blue
+    Clone10      = Black:Gray
+    Clone11      = Black:Black
+    Clone12      = Black:Black
+    Clone13      = Black:Black
+    Clone14      = Black:Black
+    Clone15      = Black:Black
+    Clone16      = Black:Black
+ < Processor1 > ; Second Processor (for x86 - it FPU)
+    Clone1       = Black:Cyan
+    Clone2       = Black:Black
+    Clone3       = Black:Brown
+    Clone4       = Black:Green
+    Clone5       = Black:Magenta
+    Clone6       = Black:Black
+    Clone7       = Black:LightMagenta
+    Clone8       = Black:LightBlue
+    Clone9       = Black:Blue
+    Clone10      = Black:Gray
+    Clone11      = Black:Black
+    Clone12      = Black:Black
+    Clone13      = Black:Black
+    Clone14      = Black:Black
+    Clone15      = Black:Black
+    Clone16      = Black:Black
+ < Processor2 > ; Third Processor (for x86 it MMX)
+    Clone1       = Black:Black
+    Clone2       = Black:Black
+    Clone3       = Black:Black
+    Clone4       = Black:Black
+    Clone5       = Black:Black
+    Clone6       = Black:White
+    Clone7       = Black:LightMagenta
+    Clone8       = Black:LightBlue
+    Clone9       = Black:Blue
+    Clone10      = Black:Gray
+    Clone11      = Black:Black
+    Clone12      = Black:Black
+    Clone13      = Black:Black
+    Clone14      = Black:Black
+    Clone15      = Black:Black
+    Clone16      = Black:Black
+ < Processor3 > ; for x86 it not used
+    Clone1       = Black:Black
+    Clone2       = Black:Black
+    Clone3       = Black:Black
+    Clone4       = Black:Black
+    Clone5       = Black:Black
+    Clone6       = Black:Black
+    Clone7       = Black:Black
+    Clone8       = Black:Black
+    Clone9       = Black:Black
+    Clone10      = Black:Black
+    Clone11      = Black:Black
+    Clone12      = Black:Black
+    Clone13      = Black:Black
+    Clone14      = Black:Black
+    Clone15      = Black:Black
+    Clone16      = Black:Black
+[ Programming ] ; Programming language support (for future)
+  Regular      = Black:Yellow
+  Keyword      = Black:White
+  Const        = Black:LightCyan
+  Preprocessor = Black:LightGreen
+  BadExpr      = Red:Black
+  Punctuation  = Black:LightBlue
+  Comments     = Black:LightGray
+[ Error ] ; Error message box
+  Main         = Red:Yellow
+  Border       = Red:LightRed
+  < Button > ; for future
+    Active     = Green:Yellow
+    Focused    = Cyan:White
+    Disabled   = LightGray:Gray
+[ Warning ] ; Warning box
+  Main         = Magenta:White
+  Border       = Magenta:LightMagenta
+  < Button > ; for future
+    Active     = Green:Yellow
+    Focused    = Cyan:White
+    Disabled   = LightGray:Gray
+[ Notify ] ; Notify box
+  Main         = Green:White
+  Border       = Green:Yellow
+  < Button > ; for future
+    Active     = Green:Yellow
+    Focused    = Cyan:White
+    Disabled   = LightGray:Gray
+[ Dialog ] ; Dialog box support
+  Main         = LightGray:Black
+  Border       = LightGray:White
+  Title        = LightGray:White
+  Footer       = LightGray:Black
+  SelFooter    = Black:White        ; Footer text if [ENTER] changes file position
+  Entry        = Black:White        ; highlighted entry point
+  AltEntry     = Blue:Yellow        ; highlighted alterantive entry point
+  AddInfo      = LightGray:Yellow   ; addition information
+  AltInfo      = LightGray:LightCyan; information about alternative entry
+  ExtraInfo    = LightGray:Red      ; extra information (sample: when old MZ file is compressed by pklite)
+  < Group > ; group + check & radio buttons inside the group
+    Active       = Cyan:Black
+    Focused      = Cyan:White ; for group elements only
+    Disabled     = Cyan:Gray
+  < Button > ; for future
+    Active       = Blue:Yellow
+    Focused      = Green:White
+    Disabled     = LightGray:Gray
+  < Any > ; for any unknown today control
+    Active       = LightGray:Black
+    Focused      = LightGray:Black
+    Disabled     = LightGray:Gray
+  < Editor >
+    Active       = Blue:White
+    Focused      = Blue:White
+    Disabled     = Blue:Gray
+    Select       = Green:White ; for future
+[ Menu ] ; Combine for lists and menu (in future)
+  Main           = LightGray:Black
+  Border         = LightGray:Black
+  Title          = LightGray:Blue
+  HighLight      = Cyan:Blue
+  < HotKey >
+    Active       = LightGray:Red
+    Focused      = Green:Red
+    Disabled     = LightGray:Gray
+  < Item >
+    Active       = LightGray:Black
+    Focused      = Green:Black
+    Disabled     = LightGray:Gray
+[ Help ] ; Help system
+  Main         = Cyan:Black
+  Border       = Cyan:Blue
+  Title        = Cyan:LightGreen
+  Bold         = Cyan:Yellow
+  Italic       = Cyan:Blue
+  Reverse      = Cyan:Magenta
+  Underline    = Cyan:Red
+  StrikeThrough= Cyan:Gray
+  Link         = Cyan:Yellow
+  SelLink      = Black:White

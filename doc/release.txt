@@ -1,0 +1,90 @@
+Release notes for BIEW version 5.3.0
+====================================
+
+  This document contains up-to-date information for end-users and developers.
+
+Limitations of use of this release:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Min. screen width:                   80  characters
+Max. screen width:                   255 characters
+Min. screen height:                  3   rows
+Max. screen height:                  unlimited
+Min. colors:                         2
+Max. colors:                         16
+Dynamic resizing of size of screen:  no
+Max. size of viewing file:           2Gb
+
+Known problems in this release:
+===============================
+
+Known problems at developing-time:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+- When I try used *scanf* function family, then in many development systems
+  I found bugs for those functions. I mostly recommend use strto* function
+  family instead.
+- Project contains "danger" code for some platforms.
+  (See: biewlib/sysdep/ia32/dos/timer.c, ...)
+  I mostly recommend use -O2 switch for gcc with any other keys.
+- Wrong displayed contents of LX format, when file consist from
+  "Iterated data page type II" pages.
+- About problem with different results of fastcall and cdecl versions
+  under Win32: It may be a deep-hidden bug of biew or bug of gcc,
+  because in some snapshots of biew it appeared also under other gcc related
+  development systems. (Notes: compiled with GCC CDECL version works correctly,
+  as compiled with Watcom and TopSpeed, where fastcall is used by default!!!)
+  See also topic 4.3 in develop.en(ru)
+  PROBLEM IS SOLVED: BUG IN GCC. This problem never occurs if gcc-2.95.3 is
+  installed.
+
+Known problem at run-time (this problem of OS's):
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+- When biew-OS/2 is running under OS/2 v4.5 UNI_040 in fullscreen
+  mode sometime it generated TRAP in POINTER$ device. (Better run it
+  in windowed mode or use last patched UNI_039 kernel (at 03.11.1999)
+  or last patched UNI_040 kernel (at 28.03.2000)).
+  (Author has no problems with UNI_054 (unofficial)).
+- Biew-Win32 does not work properly under WinNT-4.0 SP3 and older.
+- Sometime, when biew-Win32 is running under WinNT-4.0 (SP4-5) and
+  system perform swapping after quitting of biew You may receive GPF.
+- If you have selected 'Use MMF' option in biew-Win32 and are viewing
+  file biew.ini, that after leaving biew you get GPF.
+- 'CPU performance' of biew-DOS32 (aka djgpp) doesn't work under Win98
+  and may crash such systems.
+What's todo:
+============
+(This block contain a lot of ideas. Not all will released, but most of them)
+
++ Try to implement MMF for DOS32 with using DPMI32 service  (AS FAR AS POSSIBLE)
+  if it possible.
++ For procedure 'Save as (disassembler mode)' usage virtual            (QUICKLY)
+  addresses instead of physical ones.
++ User defined names for labels.                                       (QUICKLY)
++ Support of ordinal entries by name.                                  (QUICKLY)
++ Expand references prediction code.                  (WHEN NEW IDEAS WILL COME)
++ Accelerating video i/o                                                (ALWAYS)
++ Fully-featured support for LE, LX, a.out, arch,           (AS FAR AS POSSIBLE)
+  *nix formats (if possible with using binutils or scripts)
++ Dissasemblers for other platform.               (IF THEIR USERS WILL CODED IT)
++ OS/2 mouse-related bug fix.                               (AS FAR AS POSSIBLE)
++ Any base for hex-mode (probably it will digit mode viewer)      (NOT URGENTLY)
++ C (.c .cpp .h .hpp) syntax hilighting                           (NOT URGENTLY)
++ Bookmarks (screen-shot functionality)                           (NOT URGENTLY)
++ Search and replace (non-interactive)                            (NOT URGENTLY)
++ capable showing the stack of calls.                       (IN THE NEAR FUTURE)
+  As effect: search of code which references given place
+  (NOTE: Partially done as disassembler search engine since 5.3.0-pre.5)
++ Window classes -> most effective mouse usage                    (NOT URGENTLY)
+  (this will start 6.x series)
++ Add support for dynamically linked plugins and addons.          (NOT URGENTLY)
+  (this will in 6.x series)
++ Fully featured Java support                               (AS FAR AS POSSIBLE)
+
+Sweet dreams:                                                   (DISTANT FUTURE)
+~~~~~~~~~~~~~
++ Format-related writting. (Insert new sections, change size
+  of existsing sections and rebind them e.t.c.).
+++ First effect: attempt to try particular restore of corrupted file.
+++ Next effect: optimization of binary files on assembler level
+   (Note: not all formates allowed it).
+
+See also @todo records in sources.

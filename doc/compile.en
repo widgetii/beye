@@ -1,0 +1,75 @@
+                          How to compile
+                          ==============
+
+Compiling the project is a very simple thing. All you need  to  do  is
+to modify makefile with preferred values of several variables.
+
+GNU makefile
+------------
+
+If you have any GNU  compatible  development  system  (DJGPP,  Cygwin,
+EMX) or genuine port of GNU system, follow the instruction below.
+
+Edit top makefile in the root folder. In general, you must change  two
+variables:
+
+TARGET_PLATFORM=
+TARGET_OS=
+
+Valid values are described above each variable. You  may  also  modify
+(if you know what you're doing):
+
+HOST_CFLAGS=
+HOST_LDFLAGS=
+
+On UNIX systems you may also modify:
+
+TARGET_SCREEN_LIB=
+USE_MOUSE=
+USE_SELECT=
+
+On other systems these variables are meaningless.
+
+If you have  gcc-2.95.2  or  higher  it  would  be  better  to  change
+compilation level:
+
+compilation=advance
+
+Please use:
+
+compilation=normal
+
+in any other cases.
+
+That's all!
+
+Other makefiles
+---------------
+
+  Makefiles for non GNU development system are located  in  'mk_files'
+subfolder. In general, they  are  always  workable.  As  a  rule  they
+contain instructions for execution of correspondent make utility.
+
+Example:
+
+File makefile.wc is designed for Watcom C/C++.  Copy  this  file  into
+base folder  of  the  project.  After  that  modify  one  variable  of
+makefile:
+
+TARGET=
+
+to preferred value, which is listed above. Last thing that  is  needed
+- type command (as described in makefile.wc):
+
+wmake /ms /f makefile.wc
+
+If your Watcom compiler is correctly installed,  you  will  get  right
+result.
+
+
+Other binaries of the distribution
+----------------------------------
+
+All additional binaries and text files required for  the  project  are
+located in the 'bin_rc' subfloder. They work on any  platform  without
+modification or recompilation.

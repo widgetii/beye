@@ -1,0 +1,141 @@
+ Short keyboard guide 
+
+%BConcept%b
+
+%IF1-F10%i   - Basic functions of BIEW, basically for switching modes.
+
+%IShiftF1-%i - Help functions of BIEW, for calling service utilities.
+%IShiftF10%i
+
+%IAltF1-%i   - Defined by executable module fragment of BIEW.
+%IAltF10%i     (PE, NE, ELF, etc.)
+
+%ICtrlF1-%i  - Defined by current view mode
+%ICtrlF10%i    (bin, text, hex, disasm).
+
+%UBasic keys:%u
+
+  %IF1%i - Displayed window "Intro" (About)
+  %IF2%i - Mode switch:
+                %RBinary%r - Binary mode. All characters displayed as is.
+                         ( Very quick )
+                %RText%r - Text mode. In this mode characters %I0AH%i and  %I0DH%i
+                       are  %Rstring  terminators%r.   The   program   has
+                       several modes of text  view  available  through
+                       %ICtrl-F2%i.
+                %RHex%r - Hexadecimal mode. In this  mode  information  is
+                      displayed in form of hexadecimal digits:
+                           %RByte%r - as 8-bit byte,
+                           %RWord%r - as 16-bit word,
+                           %RDoubleWord%r - as 32-bit double word,
+                           %RBinary%r - as bits.
+                %RDisasm%r - Disassembler mode. Information  is  displayed
+                         as   assembly   instructions   of    %ICPU/FPU%i.
+                         Disassembler contains full instruction set for
+                         %IPentiumIII/K7 Athlon/Cyrix-M2%i microchips.
+                         Instructions   for   different   chips    are
+                         displayed  with   different   colors.   Press
+                         %I[ShiftF1]%i for color set legend, %I[CtrlF1]%i  for
+                         known instruction sets.
+  %IF3%i - Select %Iother file%i to view from file list in command line
+  %IF4%i - Modification mode. ( Not  available  in  text  mode  ).  Allows
+       modifying information in binary, hexadecimal  and  disassembler
+       modes. Also it is possible to put the  mask  %I[F3]%i  and  execute
+       logical operation ( %IOR, XOR, AND, PUT%i ) for  input  information
+       stream  and  mask.  Current  value   of   mask   displayed   in
+       upper-right corner of screen %I[F2]%i - save changes to disk.  %I[F9]%i
+       and %I[CtrlBkSpace]%i - restore original values of  modified  byte.
+       In text mode this key %I[F4]%i switches Wrap/Unwrap modes.
+  %IF5%i - Goto. Moves current file pointer on given offset:
+        - from start of file (%RABSOLUTE%r mode).
+        - from current position (%RRELATIVE%r mode).
+        - to virtual address (%RVIRTUAL%r mode).
+  %IF6%i - Reread file.
+  %IF7%i - Search. Offers to  input  sequence  %Iup  to  20  characters%i  and
+       searches  for  it.  If  given  sequence  exists  then   program
+       highlights it  during  all  lifetime,  or  until  other  search
+       sequence, or file rereading.
+  %IF8%i - If viewing file is  DOS-driver,  DOS-exe  or  NEW-exe  displays
+       "old" "MZ" DOS header. %I[Enter]%i - jump on entry point.
+  %IF9%i - Setup.
+  %IF10%i - Quit function or program. %I[Escape]%i - alternative way.
+
+%USHIFT - common utilities and setup:%u
+
+  %IShiftF1%i - Help for current mode.
+  %IShiftF5%i - Where - Display information about current file position.
+  %IShiftF6%i - System information:
+            - %RASCII%r table of character generator.
+            - ...
+  %IShiftF7%i - Continues search without query for new sequence.
+  %IShiftF8%i - Auxiliary utilities:
+            - %RDigital converter%r. Convert numbers from one base to other:
+              16, +-10, 8, 2
+            - %RCalculator%r
+            - ...
+  %IShiftF10%i- File utilities. Utilities that allow  to  change  contents
+            and size of current file.
+              - %RChSize%r. Change file size.
+              - %RFStore%r. Write  dump  of  current  file  to  the  given
+                filename  of  choice.  It   is   possible   to   write
+                disassembler block of information in selected  bitness
+                (USE16 or USE32). Not allowed out of range of file.
+              - %RFRestore%r.  Restores  already  stored  before  dump  of
+                information starting from given  position  and  length
+                in  file.  Not  allowed   out   of   range   of   file
+                (Autotruncation).
+              - %RInsert/delete%r  -  Inserts  empty  block  or    deletes
+                existing block of information with resizing.
+              - %RCrypt block%r - crypt/decrypt block with user password.
+                This feature used non standard algorithm of encryption.
+
+%UALT - key binding to NEW-exe:%u
+
+Usage of these keys is not hard limited, and  generally  follows  this
+conception:
+
+(function is applied only if given feature exists in current format)
+
+  %IAltF1%i - Help for current format.
+  %IAltF2%i -  Displays  list  of  external  modules  (dynamic  or  shared
+          libraries) referenced by the current module (dynamic  link).
+          In  many  modes  by  pressing  %I[Enter]%i  list  of  referenced
+          external (imported) names (functions) from  required  module
+          needed for external link resolving will be displayed.
+  %IAltF3%i - Displays list of exported names.
+  %IAltF8%i - Displays native (non MZ) header of module.
+  %IAltF9%i - Displays list of pages contained in the objects of module.
+  %IAltF10%i - Displays object (segment) list of module.
+
+All other keys have function defined by internal structure of module.
+
+%UCTRL - key binding to view mode:%u
+
+  %ICtrlF1%i - Additional mode help.
+  %ICtrlF2%i - Select "submode" of view
+  %ICtrlF6%i -  Address  Resolution  (Resolving)  -  in  hex/disasm  modes
+           controls details of address in left  column.  Will  display
+           absolute  file  offset  from  beginning  of  the  file   or
+           relative offset from  beginning  of  the  block/segment  of
+           current binary format with the name of  block/segment.  All
+           other keys are defined by selected mode.
+
+  %UNote:%u you can jump on points  in  tables  or  lists  highlighted  by
+        black background by pressing %I[ENTER]%i.
+
+%BFunctional keys, that are not displayed in prompt string:%b
+
+%ICtrl-O%i - Review the last screen. This allows  you  to  see  again  the
+         output produced by the last program executed.
+
+%UUNIX specific features of BIEW:%u
+
+Key modifiers are mapped as:
+
+        %ICTRL+A%i - ALT
+        %ICTRL+C%i - CTRL
+        %ICTRL+S%i - SHIFT
+
+    i.e. pressing %ICTRL+A%i in acts as holding down %UALT%u, and so on.
+    %ICTRL+Z%i resets modifiers to defaults. Modifiers are also reseted
+    after any function key is pressed.

@@ -1,0 +1,31 @@
+ ELF introduction 
+   Appeared with UNIX SVR4 and used on many systems, including Solaris
+SunOS, Irix, and Linux. Many embedded systems also use ELF.
+   The ELF Specification  is  one  chapter  of  the  Portable  Formats
+Specification Version 1.1.
+   %BThe Executable and Linking  Format%b  was  originally  developed  and
+published  by  UNIX  System  Laboratories  (USL)  as   part   of   the
+Application Binary  Interface  (ABI).  The  Tool  Interface  Standards
+committee (TIS) has selected the evolving ELF standard as  a  portable
+object  file  format  that  works   on   32-bit   Intel   Architecture
+environments for a variety of operating systems.
+   The ELF standard is intended to streamline software development  by
+providing developers with a set of binary interface  definitions  that
+extend across multiple operating environments. This should reduce  the
+number of different interface implementations,  thereby  reducing  the
+need for recoding and recompiling code.
+
+                %BFunction keys%b
+
+%IAltF1%i   -  Display this screen
+%IAltF2%i   -  Display dynamic information section
+%IAltF3%i   -  Display dynamic symbols section
+%IAltF7%i   -  Dislpay symbol table section
+%IAltF9%i   -  Display section headers
+%IAltF10%i  -  Display program headers
+
+                %BAddress Resolving%b
+
+%IELFhdr:xx%i - Current file position is ELF header
+            %Uxxxx%u - local offset within ELF header
+%I.xxxxxxxx%i - Virtual address

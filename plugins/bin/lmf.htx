@@ -1,0 +1,48 @@
+ Load Module Format introduction (QNX4 executable file)
+  %BLMF%b format is used in QNX4 32-bit and 16-bit program modules and
+device drivers.
+   Format contains combination of code, data, collection of resources
+and usage information.
+
+File consist of some sections. It can be:
+%IDefinition%i record   - module type and segments information, entry point,
+                      segment lengthes.
+%IComment%i record      - ???
+%IData%i (and Code) record - loadable data and code.
+%IFixup Seg%i record    - fixup in code and data.
+%IFixup 80x87%i record  - x87 instructions information (???).
+%IEOF%i record          - zeros.
+%IResource%i record     - it can be usage information.
+%IEnd Data%i record     - some license checksum.
+%ILinear Fixup%i record - ???
+%IPh Resource%i record  - ???
+Each section have a header record (6 bytes)...
+
+Sorry! LMF format in batta-stage. I have no information about it!
+It's work very buggy!!!!
+
+                %BFunction keys%b
+
+%IAltF1%i   -  Display this screen
+%IAltF9%i   -  Display list of sections
+
+                %BAddress Resolving%b
+
+%IHnn:xxxx%i - Current file position is section header
+            %Unn%u   - number of section header
+            %Uxxxx%u - local offset within section header
+%IDat:xxxx%i or %IFix:xxxx%i - Current file position is data/fixup
+                               record prefix
+            %Uxxxx%u - local offset within data/fixup record prefix
+%IDef:xxxx%i - Current file position is definition record
+            %Uxxxx%u - local offset within definition record
+%ICom:xxxx%i - Current file position is comment record
+            %Uxxxx%u - local offset within comment record
+%IF87:xxxx%i - Current file position is fixup x87 record
+            %Uxxxx%u - local offset within fixup x87 record
+%IEof:xxxx%i - Current file position is eof record
+            %Uxxxx%u - local offset within eof record
+%IRes:xxxx%i - Current file position is resource record
+            %Uxxxx%u - local offset within resource record
+%IEnD:xxxx%i - Current file position is end data record
+            %Uxxxx%u - local offset within end data record

@@ -1,0 +1,1046 @@
+ÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛ
+Û²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²Û
+Û²±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±²Û
+Û²±°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°±²Û
+Û²±°                ÜÜÜÜÜÜ  ÜÜÜÜ ÜÜÜÜÜÜ ÜÜÜÜ   ÜÜÜÜ                   °±²Û
+Û²±°                 ÜÜ  ÜÜ  ÜÜ   ÜÜ  Ü  ÜÜ     ÜÜ                    °±²Û
+Û²±°                 ÜÜ  ÜÜ  ÜÜ   ÜÜ     ÜÜ     ÜÜ                    °±²Û
+Û²±°                 ÜÜÜÜÜ   ÜÜ   ÜÜÜ    ÜÜ     ÜÜ                    °±²Û
+Û²±°                 ÜÜ  ÜÜ  ÜÜ   ÜÜ     ÜÜ  Ü  ÜÜ                    °±²Û
+Û²±°                 ÜÜ  ÜÜ  ÜÜ   ÜÜ  Ü   Ü Ü Ü Ü                     °±²Û
+Û²±°                ÜÜÜÜÜÜ  ÜÜÜÜ ÜÜÜÜÜÜ    Ü   Ü                      °±²Û
+Û²±°                                                                  °±²Û
+Û²±°                           Ver 5.3.0                              °±²Û
+Û²±°                          07 nov 2001.                            °±²Û
+Û²±°                                                                  °±²Û
+Û²±°    Made in Kazan.Tatarstan.Russia. Written By Nick Kurshev.      °±²Û
+Û²±°                                                                  °±²Û
+Û²±° WWW:   http://biew.sourceforge.net                               °±²Û
+Û²±° FTP:   ftp://biew.sourceforge.net/pub/biew/                      °±²Û
+Û²±° FIDO:  BIEW.SUPPORT                                              °±²Û
+Û²±° E-mail:biew-general@lists.sourceforge.net                        °±²Û
+Û²±°        To (un)subscribe:                                         °±²Û
+Û²±°        http://lists.sourceforge.net/mailman/listinfo/biew-general°±²Û
+Û²±° CVS:   http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/biew/      °±²Û
+Û²±°                                                                  °±²Û
+Û²±°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°±²Û
+Û²±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±²Û
+Û²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²Û
+ÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛ
+
+                                     Dedicated to documentation readers!!!
+
+    This manual documents how to install, setup and use BIEW. Also  it
+contains history of the program with the list of fixed  bugs  in  each
+release.
+
+Table of Contents
+=================
+
+0.-      Preamble
+1.-      BIEW history
+2.-      Installation and setup
+2.1.-      Under DOS, OS2, Win32 following files are needed
+2.2.-      For *NIX systems
+2.3.-      For all systems
+3.-      Program startup
+4.-      Short keyboard guide
+4.1.-      Basic keys
+4.2.-      SHIFT - common utilities and setup
+4.3.-      ALT - key binding to NEW-exe
+4.4.-      CTRL - key binding to view mode
+4.5.-      Functional keys, that are not displayed in prompt string
+5.-      CodeGuider
+6.-      Invisible features ( dark secrets )
+7.-      Undocumented features
+8.-      Program versions.
+9.-      History
+9.1.-      Old history
+9.2.-      New history
+
+0.- Preamble
+============
+
+    BIEW (Binary vIEW) is a free, portable, advanced file viewer with
+built-in editor for binary, hexadecimal and disassembler modes.
+
+It contains a highlight PentiumIV/K7-Athlon/Cyrix-M2 disassembler,
+full preview of MZ, NE, PE, LE, LX, DOS.SYS, NLM, ELF, a.out, arch,
+coff32, PharLap, rdoff executable formats, a code guider, and lot of
+other features, making it invaluable for examining binary code.
+
+DOS, Win32, OS/2, Linux, BeOS, QNX, Unix versions are available.
+
+1.- BIEW history
+================
+
+   Why did I write BIEW? As for me, I  was  always  looking  for  some
+powerful viewer of binary files. All viewers that I had in  1995  year
+did not satisfy me. Neither famous HIEW, neither  QVIEW  or  something
+else did not contain more than 50% of needed features.
+   And so, tired to wait when their  authors  would  write  a  viewer,
+which can display  any  information  without  any  problem  about  any
+executable file, I wrote BIEW. Though  it  looks  like  those  viewers
+that I've already had (of course: I borrowed some ideas), but I  think
+that it's easier and more modeless,  besides  I  tried  to  make  easy
+access  to  different  information  stored  in  file.  Nowdays,   BIEW
+conjoins PIII disassembler, TDUMP (  without  possibility  of  viewing
+.obj as OMF ), EXEHDR, DUMPEXE, NewExe Disasm,  and  also  quite  good
+text viewer with Russian codepage converter, and so on.
+   However I do not want to  compete  with  any  other  authors.  More
+over, I'm thankful to them, their programs pushed me  on  this  heroic
+step - to carry out my own ideas. Basically, I wrote BIEW  for  myself
+and my friends, and if somebody else appreciates it - good luck.
+
+2.- Installation and setup
+==========================
+
+   Today BIEW is ported under  several  operating  systems.  For  each
+operating system there are own nuances of adjusting  the  program.  If
+your operating system does not support security or if you always  work
+as a Administrator, then the placing of files on the disk is a  matter
+of your taste. Otherwise  you  can  place  program  in  your  personal
+subfolder (where You have write access). As a rule, you can place  all
+files of distribution in the same subfolder.
+
+2.1.- Under DOS, OS2, Win32 following files are needed:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   biew.exe - executable module ;-)
+   biew.ini - file of initializing and keeping variables between sessions.
+              (is created automatically at first launch).
+   biew.hlp - a file containing help system. BIEW will search these files
+              in startup folder.
+standard.skn- a file containing color skin. BIEW will search these files
+              in startup folder.
+2.2.- For *NIX systems:
+~~~~~~~~~~~~~~~~~~~~~~~
+   biew     - executable module ;-)
+   .biewrc  - file of initializing and keeping variables between sessions.
+              (is created automatically at first launch).
+              BIEW will search for (or try to create) it in the home
+              directory; if attempt will fail, then in  /tmp,  if you don't
+              have access rights to /tmp, then BIEW will work without it.
+   biew.hlp - file containing help system. BIEW will try to open it
+              as /usr/lib/biew/biew.hlp and in case of failure will
+              work without it.
+standard.skn- file containing color skin. BIEW will try to open it in
+              same subfolder as biew.hlp and in case of failure will
+              work without it.
+
+For more information see unix.txt
+
+2.3.- For all systems:
+~~~~~~~~~~~~~~~~~~~~~~
+Anyway, if you do not agree with default  placing  of  files  you  can
+create BIEW_INI environment  variable  that  will  indicate  where  to
+search a file of initializing a project, through  which  you  will  be
+able to define all other adjustment of program.
+
+3.- Program startup.
+====================
+
+Why this subject appeared in documentation?
+Many people ask me: "How to start a program ?-("
+And I considered necessary to  add  this  material,  though  for  many
+users it may seem primitive (they can skip this subject).
+
+I skip start the program from the  command  line  of  console  as  not
+requiring additional comments.
+
+Main goal of program interface is  working  under  some  shells  (like
+Norton Commander, Far, Midnight and etc), to be launched  as  external
+viewer by F3 key. In this case adjusting  of  program  is  reduced  to
+adjustment of respective file manager. For major  number  of  managers
+an adjustment is reduced to instruction - what  external  viewer  will
+launched for F3 key. Name of viewed  file  will  be  sent  to  program
+through generally accepted in this case '!' symbols.
+
+Example of adjusting calling BIEW for Norton Commander:
+`C:\biew\biew.exe !.!'
+
+Example of adjusting calling BIEW for Far Commander:
+`"C:\Program Files\biew\biew.exe" !.!'
+
+If You use Volkov Commander, then best edit vcview.ext file:
+
+com: biew.exe !.!
+exe: biew.exe !.!
+dll: biew.exe !.!
+*:   your default viewer
+
+If you are not admirer of different  commanders  and  prefer  to  work
+only with GUI shells (like explorer, PM/2 or KDE),  but  herewith  you
+even so have decided to use BIEW, the best decision is to create  BIEW
+icons  on  your  "desktop",  adjust  its  properties  (such  as   size
+consoles, font size etc) and use  drag-and-drop  technology  to  start
+the program. (I.e. catch by "mouse" icon of any file and drop it  over
+BIEW icon, herewith OS will automatically start BIEW with the name  of
+dropped file as an argument). I think, today major number of  desktops
+supporting drag-and-drop technology have such  feature  (at  least  it
+checked  in  WinNT,  OS/2.  Not  checked,  but  hopefully   works   on
+Unix-Gnome, KDE).
+
+4.- Short keyboard guide
+========================
+
+   Starting from version 5.00 there is following concept of keyboard
+usage:
+
+F1-F10   - Basic functions of BIEW, basically for switching modes.
+
+ShiftF1- - Help functions of BIEW, for calling service utilities.
+ShiftF10
+
+AltF1-   - Defined by executable module fragment of BIEW.
+AltF10     (PE, NE, ELF, etc.)
+
+CtrlF1-  - Defined by current view mode
+CtrlF10    (bin, text, hex, disasm).
+
+4.1.- Basic keys:
+-----------------
+
+  F1 - Displayed window "Intro" (About)
+  F2 - Mode switch:
+                Binary - Binary mode. All characters displayed as is.
+                         ( Very quick )
+                Text - Text mode. In this mode characters 0AH and  0DH
+                       are  string  terminators.   The   program   has
+                       several modes of text  view  available  through
+                       Ctrl-F2.
+                Hex - Hexadecimal mode. In this  mode  information  is
+                      displayed in form of hexadecimal digits:
+                           Byte - as 8-bit byte,
+                           Word - as 16-bit word,
+                           DoubleWord - as 32-bit double word,
+                           Binary - as bits.
+                Disasm - Disassembler mode. Information  is  displayed
+                         as   assembly   instructions   of    CPU/FPU.
+                         Disassembler contain full instruction set for
+                         PentiumIII/K7 Athlon/Cyrix-M2 microchips.
+                         Instructions   for   different   chips    are
+                         displayed  with   different   colors.   Press
+                         [ShiftF1] for color set legend, [CtrlF1]  for
+                         known instruction sets.
+  F3 - Select other file to view from file list in command line
+  F4 - Modification mode. ( Not  available  in  text  mode  ).  Allows
+       modifying information in binary, hexadecimal  and  disassembler
+       modes. Also it is possible to put the  mask  [F3]  and  execute
+       logical operation ( OR, XOR, AND, PUT ) for  input  information
+       stream  and  mask.  Current  value   of   mask   displayed   in
+       upper-right corner of screen [F2] - save changes to disk.  [F9]
+       and [CtrlBkSpace] - restore original values of  modified  byte.
+       In text mode this key (F4) switches Wrap/Unwrap modes.
+  F5 - Goto. Moves current file pointer on given offset:
+        - from start of file (ABSOLUTE mode).
+        - from current position (RELATIVE mode).
+        - to virtual address (VIRTUAL mode).
+  F6 - Reread file.
+  F7 - Search. Offers to  input  sequence  up  to  20  characters  and
+       searches  for  it.  If  given  sequence  exists  then   program
+       highlights it  during  all  lifetime,  or  until  other  search
+       sequence, or file rereading.
+  F8 - If viewing file is  DOS-driver,  DOS-exe  or  NEW-exe  displays
+       "old" "MZ" DOS header. [Enter] - jump on entry point.
+  F9 - Setup.
+  F10 - Quit function or program. [Escape] - alternative way.
+
+4.2.- SHIFT - common utilities and setup:
+-----------------------------------------
+
+  ShiftF1 - Help for current mode.
+  ShiftF5 - Where - Display information about current file position.
+  ShiftF6 - System information:
+            - ASCII table of character generator.
+            - ...
+  ShiftF7 - Continues search without query for new sequence.
+  ShiftF8 - Auxiliary utilities:
+            - Digital converter. Convert numbers from one base to other:
+              16, +-10, 8, 2
+            - Calculator
+            - ...
+  ShiftF10- File utilities. Utilities that allow  to  change  contents
+            and size of current file.
+              - ChSize. Change file size.
+              - FStore. Write  dump  of  current  file  to  the  given
+                filename  of  choice.  It   is   possible   to   write
+                disassembler block of information in selected  bitness
+                (USE16 or USE32). Not allowed out of range of file.
+              - FRestore.  Restores  already  stored  before  dump  of
+                information starting from given  position  and  length
+                in  file.  Not  allowed   out   of   range   of   file
+                (Autotruncation).
+              - Insert/delete  -  Inserts  empty  block  or    deletes
+                existing block of information with resizing.
+              - Crypt block - crypt/decrypt block with user password.
+                This feature used non standard algorithm of encryption.
+
+4.3.- ALT - key binding to NEW-exe:
+-----------------------------------
+
+Usage of these keys is not hard limited, and  generally  follows  this
+conception:
+
+(function is applied only if given feature exists in current format)
+
+  AltF1 - Help for current format.
+  AltF2 -  Displays  list  of  external  modules  (dynamic  or  shared
+          libraries) referenced by the current module (dynamic  link).
+          In  many  modes  by  pressing  [Enter]  list  of  referenced
+          external (imported) names (functions) from  required  module
+          needed for external link resolving will be displayed.
+  AltF3 - Displays list of exported names.
+  AltF8 - Displays native (non MZ) header of module.
+  AltF9 - Displays list of pages contained in the objects of module.
+  AltF10 - Displays object (segment) list of module.
+
+All other keys have function defined by internal structure of module.
+
+4.4.- CTRL - key binding to view mode:
+--------------------------------------
+
+  CtrlF1 - Additional mode help.
+  CtrlF2 - Select "submode" of view
+  CtrlF6 -  Address  Resolution  (Resolving)  -  in  hex/disasm  modes
+           controls details of address in left  column.  Will  display
+           absolute  file  offset  from  beginning  of  the  file   or
+           relative offset from  beginning  of  the  block/segment  of
+           current binary format with the name of  block/segment.  All
+           other keys are defined by selected mode.
+
+  Note: you can jump on points  in  tables  or  lists  highlighted  by
+        black background by pressing [ENTER].
+
+4.5.- Functional keys, that are not displayed in prompt string
+--------------------------------------------------------------
+
+Ctrl-O - Review the last screen. This allows  you  to  see  again  the
+         output produced by the last program executed.
+
+5.- CodeGuider
+==============
+ (available only in disassembler mode)
+
+Codeguider is mechanism of moving within code of program.  For  moving
+within code following keys are used:
+
+  [0],[1],[2],...[9],[A]([a]),[B]([b]),...[Z]([z]), [BackSpace]
+
+  If there's a pointer in the right position of  disassembler  string:
+=>[X] then after pressing key [X] you move to  address  referenced  by
+instruction.  To  return  back  press  [BackSpace].  Stack  of  return
+addresses is 256 cells.
+
+6.- Invisible features ( dark secrets )
+=======================================
+
+   In any program there's number of possibilities which obviously  are
+not seen through menu items and prompt, but which influence  upon  the
+behaviour or result of program performance, and on them  is  necessary
+know all.
+   All these functional possibilities with time will be  described  in
+the help system, on the measure that, as it will develop.
+   Below brought on the whole visibility their incomplete list:
+
+- Help System, if it exists, it is available through  [F1]  key,  even
+  though in  the  help  this  obviously  not  specified.  (In  greater
+  degrees this concerns windows of dialogues).
+
+- Transition  on  [F5]  saves   in  the  stack  CodeGuider'    current
+  position, as an address of return.
+
+- Code page convertion:
+  Code page convertion of the document occurs automatically  when
+  calling the functions [ShiftF10] => "Save block as...",  if  program
+  bases  in  the  "Text  mode"  and   chosen   coding   "CodPag",   is
+  distinguished   from   "Current".   Herewith   save   block     will
+  automatically be transformed to  the  code  operating  system  page.
+  This  fair  for  all  modes  having  not  trivial   realization   of
+  convert_cp function (today it is only beside TextMode).
+
+7.- Undocumented features
+=========================
+
+Why undocumented if it is placed into documentation?
+Because these features were not programmed specially and exist not  in
+all ports of project. I do not know all of them, but think  that  this
+material will grow.
+
+   For 32-bit version of project on Win32 & DOS32 there's next feature:
+
+   If program runs with wildcard as argument, then automatic  globbing
+of wildcard to full name of files occures. Example:
+
+   biew *.c
+
+will equivalent to run of biew with  enumeration  of  all  files  that
+have .c extension in the current folder. (I.e. all names  will  exists
+in list 'more' through F3  key).  Unfortunately  this  feature  exists
+only in libraries of DJGPP and Cygwin, but port for OS2 has  emx-glibc
+and proper to rsxnt (for it project does not oriented) does  not  have
+such feature. In contrast, such behaviour of project is,  by  default,
+documented for all *NIX system.
+
+8.- Program versions
+=====================
+
+I'm choose following concepts of appropriation of version  numbers  to
+program:
+
+    V.S.E-R.T-C.O
+
+V - VERSION.   Basic   program  version.  Changes   in   case   global
+    (strategical) changes in philosophy of program or  when  principle
+    new features appear.
+S - SUBVERSION. Changes in case serious changes of code or appear  new
+    tactical possibilities or features.
+E - EXTRAVERSION. Changes at each new immediate stable release and  as
+    rule related with bug fixing or adding a little innovations.
+R - REVISION.   When   version  is  stable   then   R.T   is   omited.
+    Traditionally can to contain approximately following values:
+    pre    - PREVIEW VERSION: recommend for preview purposes only
+    devel  - DEVELOPMENT: version, intended  for  developers  and  beta
+             testers.
+    hotfix - extraordinary bug fixing in already released version.
+    fp     - fix package
+T - TESTLEVEL. revision level of program.
+‘ - CPU. Indicated for which platform build the program.
+O - OS. Indicated for which OS build the program.
+
+
+9.- History
+===========
+
+Amount of found errors is decreasing in each release
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+9.1.- Old history.
+------------------
+v0.01       -              Was so long ago I don't remember.
+v0.90       - 29 dec 1995. ( 80486/387 disassembler )
+v0.99       - 17 jan 1996. ( Search system )
+v1.00 BETA  - 19 jan 1996. Final edition 1.00.
+v1.01 BETA  - 21 feb 1996. DOS Drivers header & system information
+v1.50 BETA  - 27 feb 1996. RAM viewer
+v1.51 BETA  - 01 mar 1996. PE header ( without tables )
+v2.00 BETA  - 04 mar 1996. Text viewer
+v2.01 BETA  - 05 mar 1996. Windows CodePage 1251 & DKOI converter
+v2.02 BETA  - 06 mar 1996. EBCDIC converter
+v3.00       - 12 mar 1996. Binary editor
+v3.10       - 14 mar 1996. Hexadecimal editor
+v3.11       - 15 mar 1996. Digital converter
+v3.20       - 22 mar 1996. Disassembler editor.
+v3.21       - 29 mar 1996. Performance detection CPU/FPU
+v3.21 PRO   - 01 apr 1996. Testing of disassembler.
+v3.22 PRO   - 02 apr 1996. Mouse support.
+v3.23 PRO   - 04 apr 1996. Add work with dumps. ( CtrlF2 / CtrlF3 )
+v3.50 PRO   - 04 may 1996. Add calculation of entry point in NE files.
+v3.52 PRO   - 23 may 1996. LE,LX headers. LX name tables
+v3.53 PRO   - 28 may 1996. PE objects.
+v3.60 PRO   - 11 jun 1996. 80586 disassembler.
+v3.61 PRO   - 31 jul 1996. PE table and entry points.
+v3.65 PRO   - 19 feb 1997. ImpDef utility.
+v3.66 PRO   - 23 may 1997. CMOS viewer.
+v3.70 PRO   - 28 may 1997. For Ctrl-F2 changed dump of disassembler (add
+                           labels), also different types of comments.
+                           ( Special for A. Glinkin )
+v3.79.99 PRO- 29 may 1997. 80686/80687 disassembler.
+v3.80 PRO   -  2 jun  1997. K. Boldyshev made right translation of texts
+                           to English. Better mouse support.
+                           Automatic detection of text files.
+v3.81 PRO   -  4 jun 1997. Correct some bugs.
+v3.85 PRO   - 11 jun 1997. Add displaying relocation references
+                           in MZ ¨ NE structures.
+v3.86 PRO   - 13 jun 1997. Add CodeGuider.
+v3.87 PRO   - 23 jun 1997. In PE format for ImportDirRVA add correction
+                           for MajVer,MinVer <> 0.
+                           Add sort of lists by F2,F3.
+v3.90 PRO   - 17 jul 1997. LX,LE tables and entry points.
+v3.95 PRO   - 28 aug 1997. Speed-up NE file binding, and corrected some
+                           mistakes of ver 3.90. Changed displaying prefixes
+                           in disassembler. Add object code hiding ( CrtlF7 )
+                           Rewrote Help of assembler.
+v3.96 PRO   -  3 sep 1997. Speed-up MZ binding, corrected some errors of
+                           disassembler and shell.
+v3.97 PRO   -  5 sep 1997. Virtual binding PE files. ( Virtual - because
+                           special analyze of address of relative jump,
+                           but not this place, as in NE format).
+                           Corrected call/jmp far for MZ files!
+                           Corrected 66h/67h for Use16/Use32 after change
+                           prefix representation.
+v4.00 PRO   - 26 sep 1997. P5MMX disassembler.
+                           Optimization of disassembler.
+                           Changed strategy moving within disassembler:
+                             1. backward disassembling
+                             2. keys <-,-> changed file position on -+ 1 byte
+                             3. keys , changed file position on -+ 1
+                                instruction
+                           Independent remember Bin/Txt/Hex/Asm for memory
+                           and file.
+                           Rewriting Help for disassembler; expanded service
+                           in disassembler editor. Correct little errors.
+v4.01 PRO   - 20 dec 1998. Work in protected mode.
+
+9.2.- New history.
+------------------
+
+v5.0.0-beta.0 ! Changed interface, internal architecture of code. Now program is
+16 may 1999.    more object-oriented. Rewrote aprox. 80% of code. (For program
+                this started new life. Code now is simple expanded and made
+                first steps in portability way - multiplatform) Somewhat lost
+                (RAM, CMOS view), added alpha support Unix formats - ELF, a.out,
+                coff32, arch
+v5.0.0-pre.1  ! Cut off:
+24 may 1999.    - work with memory
+                - SysInfo (First step for porting on any platforms and OS'es)
+                Added:
+                + hot keys in lists.
+v5.0.0-pre.2  ! Returned disassembler functions
+26 may 1999.    + (HiLight, PanelMode, Reference resolving)
+v5.0.0-pre.3  ! Bug fixes:
+10 jun 1999.    * work with mouse.
+                * conversation long int -> string
+                * little errors of disassembler
+                Added:
+                + Additional info for MZ format (such as: archiver, ...)
+                + alpha support of PharLap format.
+                + quick mode switch by Enter
+                + License (F9)
+v5.0.0-pre.4  ! Bug fixes:
+18 jun 1999.    * hex edition
+                * errors of disassembler
+                Added:
+                + Pentium III instructions sets
+                + K6 3dNow! instructions set
+                + CPU family pointer in 10 position in disassembler mode
+v5.0.0-pre.5  ! Added:
+23 jun 1999.    + Cyrix 686 instructions set
+                * Rewrote help of assembler
+                + Search in lists
+v5.0.0-pre.6  ! Changes:
+30 jun 1999.    * Error of search in selective lists
+                + ShiftF10 - File utilities
+                * ShiftF2/ShiftF3 moved to ShiftF10 menu
+                + Insert/delete block in File Utilities
+v5.0.0-pre.7  ! Changes:
+6 jul 1999.     * Error in Save as/Restore procedures
+                * Linked with new version of XDOS16 loader
+                Works on:
+                - DOS + QDPMI 7 (1.02)
+                - Win9x
+                - WinNT + SP3
+                - OS2Warp.4 + FP5
+                Don't works on :-((( :
+                - DOS + QDPMI 9 (1.10)
+                - Linux + dosemu
+v5.0.0-pre.8  ! Changes:
+29 jul 1999.    ++++++ HURRAY!!! PROJECT IS PORTABLE +++++++++
+                ++++++ JUST IN TIME 32-BITS VERSION
+                ++++++ PORTED UNDER:
+                ++++++ DOS32 (GO32 of DJGPP)
+                ++++++ OS/2 (16 & (32 bit's version for EMX))
+                ++++++ WIN32 for Cygwin and RSX
+                + File Information in ShiftF10
+                * Restored function AddressResolv by CtrlF6
+                * Opened read-only file
+                * Rewrote all console part
+v5.0.0-pre.9  ! Changed:
+20 aug 1999.    * Disassembler errors:
+                  in some instructions with one operand wrong interpreted
+                  field mod of command
+                * Accelerated video output
+                + Added .ini files (There biew saved basic variables for
+                  restoring self state after rerun (In future will expanded)
+                + Translit in Russia codepage converter
+                * Corrected error in search system
+v5.0.0-pre.10 ! Changes:
+5 oct 1999.     * Detected error of disassembler - wrong displaying arguments
+                  many instructions (I hope it last)
+                * Don't warning, if write in file impossible
+                * Correct error of edition for small files
+                * Changed wrong size of some dialog windows
+                * Cosmetic changes of dialog windows
+                * Corrected some little errors
+                + Additional Russian codepages
+                + Common accelerates
+                = Comparison of productivity 32 and 16 bits versions is: 4/1.
+                  (May be 16-bits version must die?)
+                + F3 - More
+                + Initial Linux port
+                + Displayed pressed control key in left lower corner ( special
+                  for *NIX terminal )
+                * Accelerated search by using Boyer-Moore algorithm
+v5.0.0 (Stable) ! Changes:
+20 feb 2000     ++++++ I opened project under GNU GPL (Developers are welcome!)
+                * Project was proofread
+                + Accelerated video output
+                * Corrected minor errors
+                * Disassembler block rewritten as plugin
+                + Best memory usage. Decreased number of static arrays.
+                  Dynamics array is allocated in compete mode.
+                * Fixed memory leak (existed since v5.0.0-pre.9)
+                + User screen (Ctrl-O)
+                + Undocumented opcodes of i387SL, Cyrix487
+                + Help system
+                + Opcodes of AMD-K7 Athlon
+                + Utilities rewritten as addons
+                + Integer calculator
+                + .Ini file has saved more number of modes
+                + Crypt/Decrypt block
+                * Fixed error of buffering of file
+                * Fixed search system error
+                * Correct disassembler error in SIB-block (existed since 0.xx
+                  versions)
+                + Released time slice while waiting for input
+                + Virtual jump
+                + Where. Display information about current position of file.
+                + CPU performance utility (restored from 4.x versions)
+                * Some optimization
+                + 'Put structures' in Save as dialogs for disassembler mode.
+                  (attempt to recreate internal structures of current file).
+                + Added RDOFF support
+                + Restored 0F BA opcodes family.
+                  Reported by ("Patrick Alken" <wnder@underworld.net>)
+v5.0.1        ! Changes:
+03 mar 2000     + Force mono output
+                + Mouse sensitivity
+                + Accelerated .ini file input/output
+                * Fixed minor error in sources (ansi compliance, gcc-2.95
+                  compatible)
+                * Fixed bug in hexadecimal editor
+                * Fixed minor bugs in disassembler
+v5.0.2        ! Changes:
+26 mar 2000     * Fixed bug of viewing 0 length file(s) reported by
+                  ("Alexey Plehanov" <aplehan@hoaxer.opensys.tsogu.ru>)
+                * Fixed bug in disassembler editor (when screen width > 80).
+                  Fixed by CyberMan (cyberman@ag.ru)
+                + Added fully-featured Unicode support (ru/en zones)
+                  and lot of Unicode-related bugs fixed.
+                * Fixed bug when search system did not correctly show the found
+                  string in text mode with expanded tabs characters, when the
+                  found string was outside of screen
+                + Max. width of screen increased upto 255 chars.
+                * Fixed minor bugs
+                * Minor optimization
+                * Now function twDirectWrite is not affected cursor position
+                + Win2000 ready! (thanks to Eugene Roshal roshal@rarsoft.com and
+                  Cyberman cyberman@ag.ru)
+                + MSCV 6.0 port (ported by Cyberman cyberman@ag.ru still
+                  without assembler block).
+                + Hexadecimal viewer adapts to screen size.
+                * Full screen editors rewrite contents lesser.
+                * If value of item written to .ini file has % symbol,
+                  then this string is written to .ini file within #nosmart
+                  #smart records.
+5.0.3         ! Changes:
+31 mar 2000     * Fixed bug of lost title and footer in some windows.
+                  (twRefreshWin now updates only internal part of window,
+                  but entire window is updated with twRefreshFullWin)
+                * Fixed bug of creating temporary files when it was unable
+                  to open viewed file.
+                * Convert OS/2 rc to UNIX errno.
+                * In windows that used own filling technology filler char is
+                  changed from 0x00(zero) to TW_DEF_FILLER.
+                  Thanks to Paul Sokolovsky <Paul.Sokolovsky@technologist.com>
+                * All constants from twin.h file now have prefix TW_*.
+                * Found way to avoid problem of bugs of console input
+                  under Win95. Works while with the little delay.
+                  Tested on Win95 PE, OSR2, Win98
+                  Fixed by Alexander Lokhan'ko <alex@eunet.lt>
+5.0.4         ! Changes:
+14 apr 2000     * Removed slight delay in win9x console bug workaround code.
+                  Fixed by Alexander Lokhan'ko <alex@eunet.lt>
+                * Fixed bug in UNICODE, incorretly displayed symbol 0xFE
+                  from cp437/cp866 (BLACK SQUARE).
+                * Fixed text mode bug (caused GPF/segfault) when
+                  viewing any binary file as UNICODE text.
+                * Removed warning 'fnUnix2Dos discards const attributes'
+                  for DOS, OS/2, Win32 platforms.
+                * Fixed bug of wrong keyboard codes for SHIFT+key under Win9x
+                  (existed since 5.0.3)
+                * Minor optimization.
+                * Fixed minor bugs.
+                * Added BeOS support
+5.1.0         ! Changes:
+02 jun 2000     * Some changes in structures of source tree,
+                  rewritten makefiles, kbd_code.h. (pgcc-2.95.2 compatible)
+                * Since this release all platform independed binary files
+                  will be stored in bin_rc subfolder in source package.
+                * Fixed bug of nonredrawing hex-window when text window is
+                  updates in hexadecimal editor.
+                  Reported by Alexander Lokhan'ko <alex@eunet.lt>
+                * Some revision functionality and fixing some bugs in text
+                  window library. Little accelerating of project.
+                * Revision of .ini library. Accelerated work with .ini files.
+                + Increased documentation.
+                * Fixed bug in disassembler mode - incorrectly displayed
+                  percents. Reported by Barlog <barlog@mail.ru>
+                * Fixed bug of incorrectly displaying new source when new source
+                  selectes through F3(more).
+                * Fixed bug of non aligned on four columns, when file viewed as
+                  byte in hecadecimal mode.
+                  Reported by "Stanislav Shenk" <live-evil@mtu-net.ru>
+                + Fully featured COFF386 support.
+                + Add skin support.
+                + Add color to help system.
+                * Fixed bug of highlighting search result (caused GPF /segfault),
+                  when width of screen > 80 characters.
+                  Reported by Alexey Kuznetsov <flame@baltnet.ru>
+                * Fixed bug in disassembler (lost ib (2-nd argument)
+                  in 'enter' instruction)
+                * Fixed bug in module of PE format - GPF/segfault when viewing
+                  import table with very long names.
+                  Reported by Alexey Kuznetsov <flame@baltnet.ru>
+                * Fixed bug in module of LX format - calculation of entry point
+                  was blocked. Detect LX format even "old" MZ header is lost.
+                + !!! STRESS TEST of program and lot of bug fixed !!!
+                * Fixed bug of NLS file names on Win32.
+                  Reported by Eugene Suslikov <sen@kmr.ru>
+                * Viewing file now opened in read only mode.
+                * Extended support of symbolic tables in ELF and autodetected
+                  endian of ELF.
+                + Tried to prevent a program from infinity loops, when binary
+                  file is broken or corrupt.
+                  Reported by Eugene Suslikov <sen@kmr.ru>
+                * Fixed bug when search system displayed only part of the found
+                  string in the text mode with expanded tabs characters.
+                + Added new experimental calling convention: __FASTCALL__
+                  defined in lib/sysdep/##__MACHINE_/_inlines.h
+                  Capacity to work was tested for gcc-2.7.2.3 - pgcc-2.95.2
+                  (gcc-2.7.2.3 looks the most trustworthy).
+                  Most functions were modified. Executable is reduced on ~17Kb
+                  and gained some speedup.
+                  Remarks: using this technology possible only if C-library
+		  of host system is fully compliant with accepted standards
+		  (saving of registers: esi, edi, ebx and etc.).
+                  So cdecl and fastcall versions under os2-emx, linux and unix
+                  have same results of work, but under winnt-crtdll.dll -
+                  different. Therefore, this technology is possible to use only
+                  when using libraries (external and statically linked),
+                  compiled with gcc and only after frequently testing.
+                  __FASTCALL__ is part of stress test technology.
+5.1.1         ! Changes:
+23 jun 2000     * Minor changes, fixes and optimization.
+                + Initial Watcom C and DOS/4GW port (see mk_files/makefile.wc)
+                + Added new flag for ia32: -fshort-enums
+                  (For details see "Optimization notes" in "release.txt")
+                * Suppressed most compilation extra warnings.
+                * Fixed bug of denied writting in FileUtils and disassembler,
+                  which appeared after opening file in readonly mode.
+                + Added opcode FFREEP, found in documentation on Athlon
+                  Publication # 22007 Rev: D and documented as available for all
+                  32-bit x86 processors.
+                * Fixed bug of uninitializing lx_cache in LE format. (le_cache
+                  more not used).
+5.1.2         ! Changes:
+06 jul 2000     * MSVC compile fixes
+                  Fixed by CyberMan <cyberman@ag.ru>
+                * Fixed bug of incorrect displaying in binary submode of
+                  textmode.
+                * Fixed bug of sorting in listboxes.
+                + Extended coff386 format navigation
+                * Rewritten twin library and vio.c in endian independed manner
+                  Changed interface to twWriteBuffer, twReadBuffer functions!!!
+                  (Probably should work on non-little endian platforms).
+                + Qualitative speedup Win32 input/output by use of
+                  WaitForSingleObject
+                * lib subfolder renamed to biewlib
+                * Removed all redirecting headers.
+                * Bugfixes and changes in colorset.c and standard.skn
+                * Other minor changes and fixes.
+5.2.0-pre.1   ! Changes:
+22 sep 2000     * Improved sources documentation
+                * Doxygen compatible commentaries
+                * __FASTCALL__ macros defined as __stdcall__ by default
+                * In windows that used own filling technology changed using
+                  strncpy to memcpy. strncpy function caused filling output
+                  buffer with 0x00 characters:
+                  As it defined in GNU-glibc manual:
+
+                      If the length of FROM is less than SIZE, then `strncpy'
+                      copies all of FROM, followed by enough null characters to
+                      add up to SIZE characters in all.  This behavior is rarely
+                      useful, but it is specified by the ISO C standard.
+
+                  Reported by Sergey Ratnikov <RatnikovS@mail.ru>
+                * Fixed bug of wrong computing entries in Symbol Table of elf386
+                * Fixed bug of wrong computing segments when they are unordered
+                  in elf386 format
+                * OS depended release of all file related functions.
+                * P4 compatible CPU Performance tool.
+                * Fixed bug of nondestroying of CurrPEChain in destroyPE
+                  Fixed by "Kostya Nosov" <k-nosov@yandex.ru>
+                * Fixed bug of nondisplaying import names when idFlags field
+                  is NULL. Described in book of Matt Pietrek
+                  "Windows 95 System Programming Secrets".
+                  Fixed by "Kostya Nosov" <k-nosov@yandex.ru>
+                + For PE format hidding .dll extension in import names at
+                  references resolving only.
+                  Added by "Kostya Nosov" <k-nosov@yandex.ru>
+                + Added forwarding references for PE format and dereferencing
+                  ret instructions.
+                  Added by "Kostya Nosov" <k-nosov@yandex.ru>
+                  Applied to all formats by author, as new menu item of
+                  disassembler: reference prediction.
+                + Added dysplaying of virtual address in address column
+                  format and as argument of jump insns.
+                  For PE added by "Kostya Nosov" <k-nosov@yandex.ru>
+                  Applied to all formats by author
+                + Modified codenavigation for indirect jmp and call for
+                  Reference resolving = navigation
+                  Modified by "Kostya Nosov" <k-nosov@yandex.ru>
+                + Modified code navigation system: for same target addresses of
+                  location are used same keys.
+                  Modified by "Kostya Nosov" <k-nosov@yandex.ru>
+                + Saving dump of disassembler to file has virtual addresses
+                  if it selected in disassembler.
+                + Added references prediction in disassembler. Will tend
+                  to growing in future versions.
+5.2.0-pre.2   ! Changes:
+29 sep 2000     + Pentium-4 (Willamette) disassembler.
+                  (+144 new instructions of SSE2)
+                * Fixed wrong order of operands on some MMX (not SSE)
+                  instructions. (Right disassembling, but wrong order).
+                * Fixed codeguide problem with BkSpace key. Existed since
+                  5.2.0-pre.1
+5.2.0-pre.3   ! Changes:
+13 oct 2000     * Fixed control of object bounds in PE format.
+                  Fixed by "Kostya Nosov" <k-nosov@yandex.ru>
+                + Finalized developer documentation.
+                + Improved reference prediction, references are displaying even
+                  when internal fixup is detected or when operand is
+                  dislpacement but not immediate.
+                + Colored commentaries of reference prediction.
+                + New prediction: LEAVE. It is applied when jump is not referred
+                  to RET insn directly, but it obviously return from routine.
+                  Example:
+                            jmpC YYYY ; RETURN
+                            jmpC XXXX ; LEAVE
+                            ...
+                      XXXX:
+                            pop  edx
+                            mov  esp, ebp
+                            pop  ebp
+                      YYYY:
+                            ret  NNNN
+5.2.0         ! Changes:
+29 oct 2000     * Fixed minor errors
+                * Minor optimization
+                * Increased reference prediction depth.
+                * Improved prediction of LEAVE.
+                * Fixed interpretation of 2 byte displacement of ModRM and
+                  immediate operands of x86 disassembler as signed if it
+                  meaningfully for instruction.
+                  Reported by "Kostya Nosov" <k-nosov@yandex.ru>
+                * Fixed interpretation of 4 byte displacement of ModRM and
+                  immediate values of x86 disassembler.
+                  If ModRM contains displacement only it is unsigned, otherwise
+                  - signed.
+                  Immediate operand of add, adc, sub, sbb instructions is
+                  interpreting as signed. For any other instructions such
+                  conversions are ambiguous.
+                * Minor changes in dialogs.
+                * Fixed problem with pseudographics under *nix-terminal.
+                * In module twin.c: added checking of bounds of physical
+                  screen buffer.
+                * Fixed minor bugs in textmode plugin.
+                + Since curses library (is used in Unix versions)
+                  has 1 second delay after ESCAPE key pressing, for it was
+                  added alias - F10, in general, anywhere.
+5.3.0-pre.1   ! Changes:
+26 nov 2000     + NEW: MMF (Memory-mapped files) technology for work with files.
+                  Available for all OS exclude DOSxx.
+		  (Optimization for native CPU now is significant. Comparision
+		   of k6 versus i386 optimization for this project ~10%)
+                  OS/2 part is based on code http://www.edm2.com/0610/memorymap.zip
+                  written by Sergey I. Yevtushenko <evsi@naverex.kiev.ua>
+                = Effect of speedup MMF versus traditional I/O = from 2.5 to 5
+		  times (depends from OS and testing algorithm).
+                * Fixed bug when text mode plugin did not correctly show the
+                  found string in plain submode with expanded tabs characters,
+                  when the found sequence is located out of 255
+                  characters from start of string.
+                * Fixed errno filling in win32 part.
+                * Minor improving of LX format support.
+                + Implementation biewlib as standalone library. As effect,
+                  rewritting some makefiles.
+                + Added possibility of preserving timestamp of files that
+                  are being modified by BIEW.
+                * Minor optimization.
+5.3.0-pre.2   ! Changes:
+08 dec 2000     * Qualitative speedup of many processes for all OS. Was born
+                  after a long discussion in forum on www.os2.spb.ru
+                * Minor fixes:
+                   * some pointers during disassembling were not initialized
+                   * losing of last character in commentaries
+                   * changing technology recognition of new-exe files
+                  Fixed by Kostya Nosov <k-nosov@yandex.ru>
+                + Added possibility of preserving of virtual addresses during
+                  reference resolving in 'Local offsets' mode.
+                  (Implemented only for NLM and PE formats)
+                + Added leaving a message boxes by pressing SPACE and ENTER.
+                * Fixed bug of reading of elf386 virtual map when section
+                  headers are lost. (Probably exists since 5.2.0-pre.1)
+                * Fixed bugs in OS/2 MMF part. (Probably same logic should
+                  to use in Win32).
+5.3.0-pre.3   ! Changes:
+24 dec 2000     * Fixed minor bugs in dialogs. (Exist since 5.3.0-pre.2)
+                + Improved and expanded search engine and fixed a lot of minor
+                  search related errors.
+                  I tried to use Boyer-Moore optimization for wildcard engine
+                  as far as it possible
+                + NEW!!! Started work with classes of windows
+                  See usage in bconsole.c for PercentWnd function.
+                  Work inheres on the initial stage but technology already
+                  works!
+                * Minor changes in coff386 format for reference prediction
+5.3.0-pre.4   ! Changes:
+11 feb 2001     * Fixed bug of computing virtual and physical address maps
+                  for elf386 format. For computing that maps now are used
+                  only sections which occupy space during execution.
+                  Example:
+                   name             type   flg virtaddr fileoffs   size
+                   .got             PRGBTS WA  0000567C 0000467C 00000010
+                   .dynamic         DYNLNK WA  0000568C 0000468C 00000058
+                   .bss             NOBITS WA  000056E4 000046E4 00008010
+                   .stab            PRGBTS     00000000 000046E4 00004F38
+                   .stabstr         STRTAB     00000000 0000961C 000027A9
+                   .comment         PRGBTS     00000000 0000BDC5 000000DA
+                   .note            NOTES      00000000 0000BE9F 00000064
+                   .shstrtab        STRTAB     00000000 0000BF03 0000009F
+                   .symtab          SYMTAB     00000000 0000C2EC 00001770
+                   .strtab          STRTAB     00000000 0000DA5C 0000118C
+                  Here: last 7 sections are rubbish for computing of address
+                  space.
+                * Fixed bug in computing symbolic table entry point of elf386
+                  (I hope it final fix)
+                * Fixed minor errors in coff386 formats.
+		* Fixed bug in twPutS (has effect under *nix only)
+                + Added new skins: insight.skn by me
+                  golded.skn by Konstantin Boldyshev <konst@linuxassembly.org>
+                  and slightly changed assembly.skn
+                + Implementation of biew.man and biew.spec
+                  by Konstantin Boldyshev <konst@linuxassembly.org>
+                + Added support for elf386 relocations. This has finished a
+                  gamma-stage of elf386 plugin and has updated it up to
+                  fully-featured one.
+                + Improved LEAVE prediction. Instructions:
+                   sub (e)sp, digits
+                   add (e)sp, digits { add esp, -2 === sub esp, 2 }
+                  also are instructions of LEAVE set.
+                + Minor expanded developer's documentation (topic 4.3 was
+                  added).
+                + Developer's documentaion (English part) was proofreaded
+                  by Konstantin Boldyshev <konst@linuxassembly.org>
+                + A lot of improvements in elf386 plugin. Added support of
+                  non-standard binaries.
+                + Minor assembler's optimization.
+                * A lot of changes and improvements in Linux/Unix depended
+                  parts of project that was implemented
+                  by Konstantin Boldyshev <konst@linuxassembly.org>
+5.3.0-pre.5   ! Changes:
+30 mar 2001     * Fixed bug of addend losing in elf386 format
+                + Added MMX optimization (only for (p)gcc compiler)
+                  (You should modify makefile to enable it).
+                * Fixed minor bugs in elf386, coff386 plugins.
+                * Qualitative speedup video output for main window of browser
+                  (approx. upto 95-100% under WinNT, but under DOS32 - effect
+                  is too minor).
+                * Minor improvements in mz plugin
+                * Fixed MMF related bugs in bbio. It might decrease stability!
+                + Improved ix86 help.
+                * Win32-MMF was rewritten with using OS/2-MMF logic.
+                  (ChSize now works in MMF mode too).
+                  Unfortunately this code can not be used with Watcom 11
+                  because its C-libraries use own exception handlers.
+                + Improved CPU performance test.
+                + Improved references prediction. (Logic of autolevel plugins
+                  (plugins/bin) was slightly changed).
+                + Added first implementation of search within disassembler
+                  output and fixed a lot of minor errors in the search engine.
+                * Fixed a lot of minor errors in auxiliary programs
+                  (NOTE: Internal strcuture of help file was not changed)
+                * Fixed bug of losing of alignment during viewing unicode files
+                  at EOF reaching.
+                * Solved fastcall problem: bug was in gcc. You should to use
+                  gcc-2.95.3 if you want build the project with fast calling
+                  convention.
+                * Fixed bug in "File information".
+                  Fixed by Konstantin Boldyshev <konst@linuxassembly.org>
+5.3.0-pre.6   ! Changes:
+22 may 2001     + Added QNX port.
+                  Ported by Andrew Golovnia <andrew_golovnia@ukr.net>
+                * 3dnow opcodes prefetch and prefetchw now are different.
+                + Added Watcom implementation of cpu_info.c
+                  Added by Andrew Golovnia <andrew_golovnia@ukr.net>
+                  Modified for using with Watcom11 by me. 
+                + Fast memory operations. Support 3dNow/MMX2/SSE optimization.
+                  It speedups memcpy up to 5 times on modern (K7, P3) cpus
+                  and about 20% on K6-2+ ones opposite to standard C-memcpy.
+                  This technique was born in MPLAYER project.
+                  Special thanks to:
+                  Arpád GereOffy (A'rpi/ESP-team) <arpi@thot.banki.hu>
+                  Felix Buenemann <Felix.Buenemann@gmx.de>
+                  Zoltán Ponekker (Pontscho/Fresh!) <pontscho@makacs.poliod.hu>
+                * emmx was renamed to emms ;)
+                + Automatical selection of compiling parameters.
+                * Fixed eof bug of ReadBuffer in mmf.
+5.3.0-pre.7   ! Changes:
+11 aug 2001     * Some improvements in NLS support
+                + Added new pseudo opcodes for P3 and P4:
+                   cmp(eq, lt, le, unord, neq, nlt, nle, ord)(ss, ps, sd, pd)
+                * Minor improvements in some dialogs
+                + Endianify block (reverse byte order)
+                * Fixed bug of non repainting of hexfield in hexmode editor.
+                + Xlat block (converts block with using of external tables)
+                * Fixed minor bugs in block operations
+                + Added initial support of LMF (QNX4)
+                  by Andrew Golovnia <andrew_golovnia@ukr.net>.
+                + Prompts of dialogs were dropped to prompt string
+                * Fixed bug of dissasembler's dump when program created
+                  incorrect dump if several labels referenced to the same
+                  physical address.
+                * Fixed hilight search when width and height of window are
+                  great of 255.
+                  Fixed by Alex Derbeev <2:455/2251.12>
+                * Fixed bug of segfault under Win9x in non-standard video modes
+                  (like 150x50) - found way to avoid bugs of
+                  Write(Read)ConsoleOutputAttribute from KERNEL32.DLL
+                  Fixed by Kostya Nosov <k-nosov@yandex.ru>
+                * Fixed bug of wrong disassembler's redrawing at end of little
+                  files. (Of these 3-h bytes: ÍÍô)
+                * Fixed bug of wrong fixup for instructions which start from 0Fh.
+                + Expanded coff386's Public Name space by ST_LABEL.
+                + Improved elf386 reference's name computing.
+                * Fixed bug of jump to symbol entry in elf386.
+5.3.0         ! Changes:
+07 nov 2001     * Fixed bug of editing 0 length file(s).
+                * Changed default location of 'biew.ini' under BeOS.
+                * Fixed bug of 03 hours in Percent dialogs (localtime->gmtime).
+                  Fixed by Kostya Nosov <k-nosov@yandex.ru>
+                * Fixed bug of finding 0xFF code during performing one-byte
+                  search.
+                * Kostya Nosov <k-nosov@yandex.ru> fixes:
+                  * PE import: Displaying virtual address of function reloc.
+                  * PE export: Displaying function exported by ordinal
+                  * PE export: Displaying virtual address of function start
+                  * NE bug: Fixed relocation computing in case of misordered
+                            segments
+                + Improvements which are related with ordinal's export in
+                  ListBox dialog:
+                  + Size of ListBox is computed dynamically depend on
+                    size of screen and strings.
+                  + Formatting of lines is performed within ListBox. As effect -
+                    they requires less memory.
+                  (Idea of Kostya Nosov. My implementation).
+                * Fixed gcc-3.x compilation.
+                  Thanks to Neil Booth <neil@daikokuya.demon.co.uk>
+                * Fixed viewing of non regular and pseudo files under *nix
+                  systems (like /dev/mem, /proc/cpu and so on). 
+                * Fixed 'highligh search' bug in hexmode viewer.
+                + Expanded CPUID stuff.
+                * Virtual addresses as operands of call and jmp insns in NE
+                  plugin.
+[]======================================================================[]
+[]  Thank you for your interest.                                        []
+[]  Nick Kurshev.                                                       []
+[]======================================================================[]

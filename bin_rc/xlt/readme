@@ -1,0 +1,25 @@
+Notes about biew xlat tables
+============================
+
+There is not special compiler/assembler for xlat tables which are used by biew.
+You can code them yourself with using biew or any other hexadecimal editor.
+
+The internal structure of these files is very simple:
+
+1. File must have size 320(140h) bytes.
+
+2. File must contain:
+
+ Offset |   Length  |   Values
+ -------+-----------+---------------------------
+ 00h:   |   10h     |   Biew Xlat Table. 
+ 10h:   |   30h     |   Description of table
+ 40h:   |  100h     |   Body of table
+ -------+-----------+---------------------------
+
+3. Body of table is considered as single-byte character set (SBCS).
+
+Note: Biew does not support double-byte character set (DBCS)
+and multi-byte character set (MBCS).
+
+That's all.

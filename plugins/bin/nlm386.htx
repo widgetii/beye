@@ -1,0 +1,17 @@
+ Novell Loadable Module introduction 
+   Official documentation for  %BNovell  Loadable Module format%b
+has not found.  But I has been put support for NLM in BIEW by
+using binary files and some useful sources from GNU binutils.
+
+                %BFunction keys%b
+
+%IAltF1%i   -  Display this screen
+%IAltF2%i   -  Display external references
+%IAltF3%i   -  Display public references
+%IAltF8%i   -  Display alternative NLM header
+
+                %BAddress Resolving%b
+
+%Inlm32h:xx%i - Current file position is NLM32 header
+       %Uxx%u - local offset within NLM32 header
+%I.xxxxxxxx%i - Virtual address

@@ -1,0 +1,11 @@
+ Old PharLap introduction 
+   Sorry! old PharLap format in alpha-stage
+
+                %BFunction keys%b
+
+%IAltF1%i   -  Display this screen
+
+                %BAddress Resolving%b
+
+%ioplhdr:xx%i - Current file position is old PharLap header
+            %Uxx%u - local offset within oldPharLap header

@@ -1,0 +1,238 @@
+
+		    Notes for UNIX ports of BIEW
+
+	    Konstantin Boldyshev <konst@linuxassembly.org>
+
+	 $Id$
+
+	=====================================================
+
+This is README for Linux/UNIX BIEW users. 
+Note that it is useless if you haven't read biew_en.txt before.
+
+BIEW can be compiled with (or without) different terminal libraries,
+so there are four versions of UNIX BIEW, they are called further
+BIEW/SLANG, BIEW/CURSES, BIEW/VT100 and BIEW/LINUX.
+Each of them has its (dis)advantages, unique features and bugs
+(this is really a mess, biewlib console interface needs rewrite).
+See BUGS section below.
+
+As BIEW can use slang or curses screen library, it is possible to run it
+(well, at least to try :) on all platforms supported by these libraries.
+
+I have tested this release with following OS'es on IA-32:
+
+    Linux 2.0/2.2/2.4	(BIEW/SLANG, BIEW/CURSES, BIEW/VT100, BIEW/LINUX: ok)
+    FreeBSD 3.2		(BIEW/SLANG, BIEW/CURSES: ok)
+    BeOS 4.5		(BIEW/VT100: weird, but better than nothing)
+
+Any (un)successful reports of trying BIEW on other OS'es and architectures
+are gladly accepted, as well as suggestions, feedback, bugreports and fixes.
+
+
+UNIX specific features of BIEW
+------------------------------
+
+1)  Key modifiers are mapped as:
+
+	CTRL+A - ALT
+	CTRL+C - CTRL
+	CTRL+S - SHIFT
+
+    i.e. pressing CTRL+A in acts as holding down ALT, and so on.
+    CTRL+Z resets modifiers to defaults. Modifiers are also reseted
+    after any function key is pressed.
+
+    Important: several terminals can handle SHIFT+Fx and CTRL+Fx keys,
+    and BIEW/VT100 and BIEW/LINUX supports them when they are available.
+    (e.g. Linux console supports SHIFT+Fx, Eterm supports both SHIFT+Fx
+    and CTRL+Fx). Note that status line is not updated when you'll
+    use such keys directly (except BIEW/LINUX in console mode).
+
+2)  There are some limitations on output, i.e. you can't see all characters
+    as they are: output is filtered to avoid unexpected behavior
+    (except BIEW/LINUX in console mode).
+
+3)  It is possible to use 7bit output.
+
+4)  Configuration file is ~/.biewrc, not biew.ini.
+
+
+Note for X Window users
+-----------------------
+
+While plain xterm is somewhat stable, fancy toys like Eterm behave
+very strange: F1-F5 are somewhy not reported in BIEW/SLANG (and
+crash BIEW/CURSES!), and it seems that Eterm has bugs in handling
+color and/or charset switching escape sequences. So my advice is:
+if stability is your primary goal, do not use BIEW on Eterm (sigh,
+Eterm supports transparent colors and CTRL+Fx keys, and BIEW makes
+use of these cool features :). I hope this issue will be solved soon.
+And, a tip: if something goes wrong on xterm, try to set 7bit output.
+
+
+BIEW/LINUX
+----------
+
+BIEW/LINUX supports two work modes: console and VT100 compatible terminal.
+In console mode BIEW acts EXACTLY as dos/os2/win32 version, this means that
+you can't switch virtual consoles by pressing ALT+Fx, because these keys
+are used by BIEW -- use CTRL+ALT+Fx combination for that purpose.
+
+VT100 mode should work on any VT100 compatible terminal.
+
+Linux console version uses:
+
+- scan codes (not keystrokes)
+- direct video output via /dev/vcsa
+
+Console mode has major disadvantage on 2.0 kernels: if it hangs keyboard,
+you can't do anything, except pressing reset (certainly you can terminate
+BIEW remotely from other machine on network, or from terminal connected to
+serial port); on 2.2+ you can simply use magic SysRq key to terminate it.
+
+Console mode is invoked only:
+
+1) if "Direct console access" flag is enabled (F9)
+2) on pure virtual terminal
+
+In any other case VT100 mode is used.
+
+Note that BIEW/LINUX was designed primarily for local console use,
+it is not recommended to use this version remotely (over serial
+lines or telnet sessions), use BIEW/SLANG or BIEW/CURSES instead.
+
+BeOS
+----
+
+You must run BIEW in terminal window on BeOS. As beterm is not
+documented, I assume it acts as xterm. Unfortunately function
+keys are shifted: F1-F5 are ok, F6 does nothing, F7-F11 act as
+F6-F10. Bear this in mind. I know this is weird, but it's better
+than nothing. Any help on beterm is appreciated. 
+
+NOTE:
+
+BeOS sucks. Really. It has no timers, no mmap, no SIGIO..
+its "beterm" doesn't support VT100 graphics..
+.. as they say - "someone shoot me, I'm in hell".
+We should do a native BeOS port instead of current.
+Yes, I mean GUI :-) Who will be that brave one?
+
+
+BUGS
+----
+
+Not necessarily BIEW bugs, often just "features" of screen libraries:
+
+BIEW/SLANG:	strange Eterm behavior (F1-F5 do not work)
+BIEW/CURSES:	1 second delay after single escape (at least with ncurses),
+		strange Eterm behavior (crash on F1-F5)
+
+I think that BIEW/LINUX is the most optimized version (in the meaning
+of CPU time and system calls), especially in console mode.
+
+
+Compiling the source
+--------------------
+
+You will need GNU make and gcc.
+
+Edit makefile: choose TARGET_PLATFORM and TARGET_OS.
+TARGET_OS="linux" builds BIEW/LINUX only.
+TARGET_OS="unix" allows you to build BIEW/SLANG, BIEW/CURSES
+or BIEW/VT100 - this is set by TARGET_SCREEN_LIB variable.
+
+I strongly recommend to use slang instead of curses when possible.
+If your system lacks any of these screen libraries, you can try BIEW/VT100.
+
+Xterm mouse is (unconditionally) supported in BIEW/LINUX and BIEW/VT100.
+BIEW/CURSES (unconditionally) supports mouse only when ncurses is used.
+BIEW/SLANG (unconditionally) doesn't support mouse (guess why?).
+USE_MOUSE variable turns on gpm daemon support, and so applies
+only to BIEW/LINUX (or BIEW/VT100).
+
+You can play with other parameters in makefile (read comments carefully),
+but do not change compiler parameters at the end of makefile.inc, or all
+sorts of weirdness can happen.
+
+
+ChangeLog (Linux/UNIX)
+----------------------
+
+5.3.0
+
+- BIEW/LINUX: reduce use of system calls, use pwrite if possible,
+        keyboard functions reimplemented using async IO,
+	added proper pseudographics support on xterms
+	(with G1 charset) and console (with null map),
+	autodetection of vcsaN number,
+	"Save as" codepage convertion fixed.
+- BIEW/SLANG: wrap lines in WriteBuff when buffer length exceeds
+	terminal width - thanks to John Davis for helping me out.
+- BIEW/CURSES: added mouse support (ncurses are required for this),
+	added acs_map ncurses hack.
+- BIEW/VT100: added proper pseudographics support (with G1 charset),
+	keyboard functions reimplemented using async IO,
+	added mouse support on Linux systems (gpm).
+- use getpwuid() to determine home directory when HOME is unavailable
+- reduce malloc()/free() calls in vioWriteBuff()
+- moved default datadir from /usr/lib/biew to /usr/share/biew
+
+5.2.0
+
+- slang, curses: added proper pseudographics support,
+  added output filter on xterm; overall minor cleanup
+
+5.1.2
+
+- video output rewritten (__vioReadBuff, vioWriteBuff, etc)
+
+5.1.1
+
+- curses: fixed pseudographics bug
+
+5.1.0
+
+- miscellaneous fixes
+
+5.0.4
+
+- BeOS support (CONFIG_BEOS), minor fixes
+
+5.0.3
+
+- xterm mouse reporting, added window caption in xterm
+- cursor is no longer lost on exit
+- correct handling of COLORTERM
+- other minor bugfixes
+
+5.0.2
+
+- first slang version
+- transparent background on Eterm
+- Linux console: added vt switching through CTRL+ALT+Fx
+- vt100: keyboard management rewritten
+- started pseudographics fixes
+- 7bit output
+- directories are no longer opened as files
+- various improvements & fixes
+
+5.0.1
+
+- Linux console: added CTRL+O, uppercase letters/numbers support
+- separate handles for input and output
+- dynamic memory allocation for output
+- different minor bugfixes and improvements
+
+5.0.0
+
+- first curses version
+- completely rewritten keyboard management (max performance)
+- VT100: screwed video output fixed
+- Linux console: 'w' bug fixed
+
+
+TODO:
+
+- make console functions pluggable

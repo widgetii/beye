@@ -1,0 +1,63 @@
+%define name	biew
+%define version	5.3.0
+%define release	1
+
+%define prefix	/usr
+%define bindir	%{prefix}/bin
+%define datadir	%{prefix}/share
+%define mandir	%{datadir}/man
+
+Name:		%{name}
+Version:	%{version}
+Release:	%{release}
+Prefix:		%{prefix}
+Summary:	console hex viewer/editor and disassembler
+Copyright:	GPL
+Group:		Development/Other
+Packager:	Konstantin Boldyshev <konst@linuxassembly.org>
+URL:		http://biew.sourceforge.net
+
+Source:		%{name}-%{version}.tar.gz
+
+%description
+BIEW (Binary vIEW) is a free, portable, advanced file viewer with
+built-in editor for binary, hexadecimal and disassembler modes.
+
+It contains a highlight PentiumIV/K7-Athlon/Cyrix-M2 disassembler,
+full preview of MZ, NE, PE, LE, LX, DOS.SYS, NLM, ELF, a.out, arch,
+coff32, PharLap, rdoff executable formats, a code guider, and lot of
+other features, making it invaluable for examining binary code.
+
+Linux, Unix, QNX, BeOS, DOS, Win32, OS/2 versions are available.
+
+%prep
+%setup -q
+
+%build
+make
+
+%install
+rm -rf $RPM_BUILD_ROOT
+install -d ${RPM_BUILD_ROOT}{%{bindir},%{datadir}/%{name},%{mandir}/man1}
+
+install -m 755 biew $RPM_BUILD_ROOT%{bindir}/%{name}
+strip -R .note -R .comment $RPM_BUILD_ROOT%{bindir}/%{name}
+
+cp -a bin_rc/{xlt,skn,*.hlp} $RPM_BUILD_ROOT%{datadir}/%{name}
+install doc/biew.1 $RPM_BUILD_ROOT%{mandir}/man1
+
+
+%clean
+rm -rf $RPM_BUILD_ROOT
+
+%files
+%defattr(-,root,root)
+%doc doc/biew_en.txt doc/biew_ru.txt doc/unix.txt doc/release.txt
+
+%{bindir}/%{name}
+%{datadir}/%{name}/*
+%{mandir}/man?/%{name}.1*
+
+%changelog
+* Wed Aug 15 2001 konst <konst@linuxassembly.org> 5.3.0-1
+- moved skins to skn folder

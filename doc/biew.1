@@ -1,0 +1,138 @@
+.\"$Id$
+.\"
+.TH biew 1 "$Date$" "UNIX"
+
+.SH NAME
+.I BIEW
+\- console hex viewer/editor and disassembler.
+
+.SH SYNOPSIS
+biew [OPTIONS] file...
+
+.SH DESCRIPTION
+
+.I BIEW
+(Binary vIEW) is a free, portable, advanced file viewer with
+built-in editor for binary, hexadecimal and disassembler modes.
+
+It contains a highlight PentiumIV/K7-Athlon/Cyrix-M2 disassembler,
+full preview of MZ, NE, PE, LE, LX, DOS.SYS, NLM, ELF, a.out, arch,
+coff32, PharLap, rdoff executable formats, a code guider, and lot of
+other features, making it invaluable for examining binary code.
+
+Refer to biew_en.txt and unix.txt files which should come along with
+the program package for detailed description of what 
+.I BIEW
+can do for you -- this manual page describes only few UNIX-specific features,
+and is useless without above mentioned documents.
+
+.SH COMMAND-LINE OPTIONS
+.TP
+.B \-a
+autodetect mode (default)
+.TP
+.B \-b
+view file in binary mode
+.TP
+.B \-d
+view file in disassembler mode
+.TP
+.B \-h
+view file in hexadecimal mode
+.TP
+.B \-t
+view file in text mode
+.TP
+.B \-s
+change size of file to NNN bytes (create, if file does not exist)
+.TP
+.B \-i
+ignore .ini file (create new)
+.TP
+.B \-?
+display help screen
+
+.SH UNIX-specific features of BIEW
+
+1)  Key modifiers are mapped as:
+
+.B CTRL+A
+=
+.I ALT
+
+.B CTRL+C
+=
+.I CTRL
+
+.B CTRL+S
+=
+.I SHIFT
+
+i.e. pressing
+.B CTRL+A
+acts as holding down
+.I ALT
+, and so on.
+.B CTRL+Z
+resets modifiers to defaults. Modifiers are also reseted
+after any function key is pressed.
+
+2)  There are some limitations on output, i.e. you can't see all characters
+as they are (output is filtered to avoid unexpected behavior).
+
+3)  It is possible to use 7bit output.
+
+4)  Configuration file is ~/.biewrc, not biew.ini.
+
+
+.SH Linux-specific features
+
+Current Linux version of 
+.I BIEW
+supports two work modes:
+console and VT100 compatible terminal. Console version
+can act EXACTLY as dos/os2/win32 version, this means
+that you can't switch virtual consoles by pressing ALT+Fx,
+because these keys are used by
+.I BIEW
+-- use
+.B CTRL+ALT+Fx
+combination for that purpose.
+
+Terminal mode should work on any VT100 compatible terminal.
+
+Linux console version uses:
+.RS
+- scan codes (not keystrokes)
+.br
+- direct video output via /dev/vcsa
+.RE
+
+IMPORTANT! Console mode is invoked only:
+.RS
+1) if "Direct console access" flag is enabled (F9)
+.br
+2) on pure virtual terminal
+.RE
+
+In any other case VT100 mode is used.
+
+.SH BUGS
+There could be few.
+You can fix them on your own, or ask authors to do it.
+
+.SH AUTHOR
+.I BIEW
+is written by
+.br
+.B Nick Kurshev
+<nickols_k@mail.ru>.
+
+UNIX ports are done by
+.br
+.B Konstantin Boldyshev
+<konst@linuxassembly.org>.
+
+.I BIEW
+homepage is at
+.B http://biew.sourceforge.net

@@ -1,0 +1,46 @@
+; This is project file for building biew.hlp
+;
+; Rules:
+;  first string of each help source file (*.htx) - is help title
+;  All other - is body of document
+;  Any help file must contain less than 65533 strings
+;  Width of each string in help file must be not greate than screen width (76)
+;  Total size of help file must be not greate than 65533*76=4 890 508 bytes
+;  but it number is theoretical value (for DOS-16 version max. real size of
+;  largest source help file approx. 100-200 Kb)
+;
+[OPTION]
+; This is output file name
+output = biew.hlp
+id = BIEW_HLP v5.3.0
+[ITEMS]
+; item_id = source_file_name
+1 = ../doc/licence.en
+2 = ./editor.htx
+3 = ./mainhelp.htx
+4 = ./credits.htx
+5 = ./setup.htx
+6 = ./goto.htx
+7 = ./search.htx
+1000 = ../plugins/binmode.htx
+1001 = ../plugins/textmode.htx
+1002 = ../plugins/hexmode.htx
+10000 = ../plugins/bin/aout.htx
+10001 = ../plugins/bin/arch.htx
+10002 = ../plugins/bin/coff386.htx
+10003 = ../plugins/bin/elf386.htx
+10004 = ../plugins/bin/le.htx
+10005 = ../plugins/bin/lx.htx
+10006 = ../plugins/bin/ne.htx
+10007 = ../plugins/bin/nlm386.htx
+10008 = ../plugins/bin/opharlap.htx
+10009 = ../plugins/bin/pe.htx
+10010 = ../plugins/bin/pharlap.htx
+10011 = ../plugins/bin/rdoff.htx
+10012 = ../plugins/bin/rdoff2.htx
+10013 = ../plugins/bin/mz.htx
+10014 = ../plugins/bin/dos_sys.htx
+10015 = ../plugins/bin/lmf.htx
+20000 = ../plugins/disasm/ix86/ix86.htx
+20001 = ../plugins/disasm/ix86/ix86size.htx
+20010 = ../plugins/disasm/null_da.htx

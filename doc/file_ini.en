@@ -1,0 +1,159 @@
+**********************************************************************
+              Documentation on files of initializing a project
+----------------------------------------------------------------------
+Author and developer : Nick Kurshev (1995-2000)
+**********************************************************************
+
+                               Preamble
+                               ~~~~~~~~
+
+  This useful library for C - programs is written  by  me  after  long
+hours  of  work on the library of windows for DOS ( such as:  a  menu,
+lists, check and radio buttons, editor. Since size of code was greater
+than 100 kb and library don't look  as  perfection  I  has  understood
+that for adjusting of most programs interactivity is superfluous,  but
+for many intermediate and  auxiliary  utilities  -  ruinous.  Lack  of
+possibility of direct contact with the user  is  easy  indemnifies  an
+entering the necessary keys in files of initialization,  in  addition,
+as  a  rule,  all  situations  can  be  known  at  stage  of   program
+development.
+  I has taken as a basis  format  -  Windows.ini  files,  have  little
+enlarged depth of sections and has added light preprocessor in it.
+
+                               Introduction
+                               ~~~~~~~~~~~~
+
+   Library for working with files of initializing a  project  presents
+itself a realization of idea of  transmission  of  parameters  to  the
+program and their keeping through the file of initialization. File  of
+initializing a program  presents  itself  ASCII  file,  building  from
+records   of   sections,   subsections   and   records   of     class:
+variable=value. The same name of variable, but  written  in  different
+sections and subsections - are considered as different.  Variable  can
+be declared outside of subsections or  sections.  Full  name  variable
+consists of section, subsection and name of variable. Section opens  a
+block logically bound between itself  of  subsections  and  variables.
+Subsection, accordingly, opens a blockette logically  bound  variable.
+Main idea of making such hierarchy conclude  in  that  that  one  .ini
+file can be used by several programs.
+
+                                Description
+                                ~~~~~~~~~~~
+Structure .ini file:
+
+[ square brackets ] - is described section. Section - a global subject
+                      for  the  group  of  specifiers.  For   example,
+                      describes a program or group of programs.
+                              . . .
+                             [ Boot ]
+                              . . .
+                             [ Root ]
+                              . . .
+< corner brackets > - is   described   subsection.   Subsection     is
+                      tantamount to sections,  but  inheres  on  other
+                      level. For  example,  describes  subsections  of
+                      some program.
+                                  . . .
+                               < Subtopic1 >
+                                  . . .
+                               < Subtopic2 >
+                                   . . .
+name = value - name - logical variable, compared  with  some  variable
+                      or flag of program.
+                      value - a value of this variable.  In  principle
+                      any string constant.
+                      For example:
+                                 . . .
+                            Radius  =  100.098
+                            SmartCompute = yes
+                            Output = display
+                            OutFile = result.res
+                                 . . .
+;                   - A   symbol   a   commentary.  Reading  data  are
+                      considered as commentaried  from  the  place  of
+                      meeting of symbol ';' and until the newline.
+                      For example:
+                            . . .
+                          ; - it commentary
+                          debug = full ; possible - full, off , min
+                            . . .
+# - a symbol of preprocessor and file processor:
+    #include " fff " - expand this line of contents of file fff.
+    #set var = value - declared logical variable  var  and  associates
+                       it with value. For example:
+                            . . .
+                          #set filename = my_file
+                          #set ext      = dat
+                          #set suffix   = 001
+                            . . .
+    #delete var - deletes variable var from the list of variables.
+    #reset - deletes all variables.
+Attention !!!!! Use any undeclared  or  removed  variable  will  bring
+                about  error  (error  will  be   described   in   file
+                file_sys.$$$) Example to variable:
+
+                . . .
+        #set files = hello
+        #set ext   = out
+        #set suffix = 001
+
+        Outfiles = %files%%suffix%.%ext%; ==> Outfiles = hello001.out
+
+        #delete suffix
+
+        Outfiles = %files%%suffix%.%ext%; ==> Error: suffix removed
+             . . .
+
+    #case - switches on case sensitivity of program ( by default)
+    #uppercase - translates  the all reading below information in the
+                 upper case
+    #lowercase - translates  the all reading below information in the
+                 lower case
+    #smart - switches on an extension variable comprised by symbols
+             %... %. This mode is accepted by default.
+    #nosmart - switches off an extension variables. Symbol % becomes
+               as usual symbol
+
+    #if - Opens a conditional section.
+                        After #if must follow a condition of type:
+                        one of earlier declared by #set variable .ini
+                        file, sign of comparison:
+                        ==, != as in C language.
+                        and hereinafter value of variable.
+                        Complex conditions in  given  realization  are
+                        not supported,  use  nested  #if  construction
+                        instead.  Method  a  comparison  of  lines   :
+                        strcmp.
+
+    #else - executes a conditional section, if condition was false
+    #elif - similarly   sections   #else,  but  with  the   additional
+            condition ( refer to #if ).
+    #endif - closes #if section
+
+Example:
+
+          . . .
+      #set a = hello
+      #if  a == hello
+         . . .
+      #else
+       #if a <= hello
+         . . .
+       #endif
+      #endif
+         . . .
+
+    #error "message" - put the "message" in file  of  errors  as  user
+                       message
+
+Full directive list:
+
+#case
+#del
+#case
+#delete
+#elif
+#else
+#endif
+#eset
+#uppercase

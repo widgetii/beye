@@ -1,0 +1,5 @@
+ DOS driver introduction 
+      It is an interface module between the device-independed portion
+of DOS and an actual hardware device which converts device-independed
+requests into the actual sequence of device operations to perform the
+request action.

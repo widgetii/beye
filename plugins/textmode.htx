@@ -1,0 +1,11 @@
+ Help for Text mode 
+  In this mode you can view file as text, i.e. wrapped after
+%ICR%i or/and %ILF%i characters (or after end of screen lines into wrap mode).
+  The maximum length of the string is %U255%u bytes for binary submode and
+more for text modes.
+  In binary submode you can see all characters as written in
+the file. The main difference from Binary mode viewer is wrapping
+strings after %ICR%i or/and %ILF%i characters.
+  In TxtMod you can see file as text with %ITAB%i characters expanded
+to spaces and with hidden control characters ( < 20H ).
+  Press %UCtrl+F2%u to change text codepage.

@@ -1,0 +1,10 @@
+ Jump to 
+   This function allows to move within file on given offset.
+Offset can be:
+
+%BAbsolute%b    - Given offset is treated as absolute offset from start
+              of file.
+%BRelative%b    - Given offset is treated as relative offset from current
+              position.
+%BVirtual%b     - Given offset is treated as virtual address defined by
+              internal structure of module.

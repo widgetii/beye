@@ -1,0 +1,34 @@
+ Relocatable Dynamic Object File Format 
+%BRDOFF is a relocatable object file  format%b  whose  design  goals  were
+mainly to keep it simple, so that an RDOFF object can  be  loaded  and
+executed by a very small piece of code (primarily so that  it  can  be
+used by the  microkernel  of  an  operating  system  to  store  system
+modules, which can then go on to load and execute more complex  object
+files, eg ELF, if so desired), yet still  be  able  to  be  cope  with
+everything required by  the  operating  system;  linkage  of  multiple
+modules together (possibly with automatic  loading  of  new  libraries
+that are referred to by the object) at load time, allowing  static  or
+dynamic linking as required by the application.
+RDOFF was  designed  initially  to  test  the  object-file  production
+interface to NASM. It soon became apparent that it could  be  enhanced
+for use in serious applications due to its simplicity;  code  to  load
+and execute an RDOFF object module is very simple.  It  also  contains
+enhancements to allow it to be linked with a dynamic link  library  at
+either run- or load- time, depending on how complex you wish  to  make
+your loader.
+
+                %BFunction keys%b
+
+%IAltF1%i   -  Display this screen
+%IAltF2%i   -  Display references to external modules
+           By pressing ENTER you can see external names
+           and ordinal numbers of functions from selected
+           module that are required for external link resolving
+%IAltF3%i   -  Display list of exported names
+%IAltF4%i   -  Display list of imported names
+
+                %BAddress Resolving%b
+
+%IRDFH:xxxx%i - Current file position is RDOFF header
+            %Uxxxx%u - local offset within RDOFF header
+%I.xxxxxxxx%i - Virtual address

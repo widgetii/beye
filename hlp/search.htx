@@ -1,0 +1,42 @@
+ Search 
+ %UBASE%u (Biew's advance search engine) allows to search given sequence of
+characters. You can fine your searching by:
+
+%BMatch Case%b            - Locates text that exactly matches the combination
+                        of upper and lowercase letters you type in the
+                        ASCII input box.
+%BMatch Whole Word Only%b - Locates distinct occurrences of words, not groups
+                        of characters inside words.
+%BReverse search%b        - Searching from the current position towards the
+                        ending of the file (if not set) or towards the
+                        beginning of the file (if set).
+%BSearch for hex%b        - Allows to search sequence of bytes instead of
+                        characters
+%BUse wildcard ( *? )%b   - Allows to search sequence with using wildcard
+                        characters ( *? ).
+                        %U?%u - Substitutes for one character of any value
+                        %U*%u - Substitutes for any number of characters of
+                            any value
+%BUse plugin's output%b   - Will use "%IViMode%i" plugin's search engine instead
+                        of flat search if available.
+                        %IExample:%i In disassembler mode you can type %Umemcpy%u
+                        or something other and search engine should find
+                        all instructions which contain the pattern:
+                        %Imov    eax, [memcpy+04]%i or %Icalln    mydll.memcpy%i
+
+                        %IExample #2:%i Also you can type %Umov*eax%u and search
+                        engine should find all instructions like:
+                        %Imov    eax, edi%i or %Imovxz    esi, [eax+04]%i
+                        but if you want to find only %Umov%u instructions then
+                        add one space character after instruction mnemonic:
+                        %Umov *eax%u
+
+                        %IExample #3:%i for pattern %Umov?x*eax*strlen%i
+                        search engine should find all instructions like:
+                        %Imovsx    eax, [strlen+04]%i
+                        or
+                        %Imovzx    [eax], off32 mydll.strlen%i
+
+                        %INOTE:%i search engine can perform search in comments
+                        of disassembler but only if corresponded mode is
+                        selected.

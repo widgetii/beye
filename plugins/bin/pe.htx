@@ -1,0 +1,35 @@
+ Portable Executable introduction 
+  The  recent  addition  of  the  Microsoft(R)  Windows  NT   (trade);
+operating system to the family of Windows (trade);  operating  systems
+brought many changes to the development environment and  more  than  a
+few changes to applications themselves. One of  the  more  significant
+changes is the introduction  of  the %BPortable  Executable  (PE)%b  file
+format. The new PE file format draws primarily from the  %UCOFF  (Common%u
+%UObject File Format)%u specification that is common to UNIX(R)  operating
+systems. Yet, to remain  compatible  with  previous  versions  of  the
+MS-DOS(R) and Windows operating  systems,  the  PE  file  format  also
+retains the old familiar MZ header from MS-DOS.
+  The PE file format  for  Windows  NT  introduces  a  completely  new
+structure  to  developers  familiar  with  the  Windows   and   MS-DOS
+environments. Yet developers familiar with the UNIX  environment  will
+find that the PE file format is similar to, if not based on, the  COFF
+specification.
+
+                %BFunction keys%b
+
+%IAltF1%i   -  Display this screen
+%IAltF2%i   -  Display references to external modules
+           By pressing ENTER you can see external names
+           and ordinal numbers of functions from selected
+           module that are required for external link resolving
+%IAltF3%i   -  Display list of exported names
+%IAltF8%i   -  Display PE-header
+%IAltF10%i  -  Display list of object definitions
+
+                %BAddress Resolving%b
+
+%IPEH :xxxx%i - Current file position is PE header
+            %Uxxxx%u - local offset within PE header
+%IPEOD:xxxx%i - Current file position is object definition table
+            %Uxxxx%u - local offset within ObjDef table
+%I.xxxxxxxx%i - Virtual address

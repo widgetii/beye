@@ -1,0 +1,48 @@
+ LX introduction 
+     IBM OS/2 32 bit %BLinear eXecutable%b Module Format  (LX)  from  Boca
+Programming Center. Boca Raton, Florida.
+     Document is intended to describe the interface that  is  used  by
+language translators and generators as their  intermediate  output  to
+the linker for the 32-bit  OS/2  operating  system.  The  linker  will
+generate the executable module that is used by the  loader  to  invoke
+the .EXE and .DLL programs at execution time.
+    IBM and Microsoft** introduced OS/2 in 1987 as a successor to  the
+PC DOS/MS DOS** operating system [For simplicity, the term "DOS"  will
+be used throughout this document to refer to both the PC  DOS  and  MS
+DOS products.] in the programmable  workstation  environment.  In  the
+years since its inception in the early 1980s, DOS has  grown  in  both
+capabilities and sophistication,  but  by  1987  advanced  workstation
+users were demanding more sophistication from their  applications,  to
+an extent which was beyond the capabilities of DOS to deliver.
+    The choice for operating system  developers  lay  between  further
+enhancing the existing  DOS  architecture  to  support  more  powerful
+processors, larger memory and so on,  or  migrating  to  a  new,  more
+powerful operating system architecture which offered  more  facilities
+to satisfy user  requirements,  a  broader  platform  for  application
+development, and potential for future  expansion.  The  latter  choice
+was taken, and the result was OS/2.
+
+Sorry! LX format in gamma-stage
+
+                %BFunction keys%b
+
+%IAltF1%i   -  Display this screen
+%IAltF2%i   -  Display references to external modules
+%IAltF3%i   -  Display list of exported resident names
+%IAltF4%i   -  Display list of exported non-resident names
+%IAltF5%i   -  Display list of imported external names
+%IAltF6%i   -  Dislpay list of entries
+%IAltF7%i   -  Display list of resources
+%IAltF8%i   -  Display LX-header
+%IAltF9%i   -  Display list of map tables
+%IAltF10%i  -  Display list of object definitions
+
+                %BAddress Resolving%b
+
+%ILXH :xxxx%i - Current file position is LX header
+            %Uxxxx%u - local offset within LX header
+%ILXOD:xxxx%i - Current file position is object definition table
+            %Uxxxx%u - local offset within ObjDef table
+%ILXPD:xxxx%i - Current file position is page map table
+            %Uxxxx%u - local offset within page map table
+%I.xxxxxxxx%i - Virtual address

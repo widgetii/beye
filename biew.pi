@@ -1,0 +1,36 @@
+--------------------------------------------------------------------------------
+--   biew.pi - this file is part of Binary vIEW project (BIEW)                --
+--------------------------------------------------------------------------------
+--   Copyrights:           1998, 2000 Nick Kurshev                            --
+--   License:              See below                                          --
+--   Author and developer: Nick Kurshev                                       --
+--   Requirement:          TopSpeed v3.x or above                             --
+--   Original file name:   biew.pi                                            --
+------------------------ [ D e s c r i p t i o n ] -----------------------------
+--  This project-include file allows you to preset environment settings.      --
+---------------------------- [ L i c e n c e ] ---------------------------------
+-- The Binary vIEW (BIEW) is copyright (C) 1995 Nick Kurshev.                 --
+-- All rights reserved. This software is redistributable under the licence    --
+-- given in the file "Licence.en" ("Licence.ru" in russian translation)       --
+-- distributed in the BIEW archive.                                           --
+--------------------------------------------------------------------------------
+#pragma define(NDEBUG=>on,__DEFAULT_DISASM=>0)
+#if %model = extended #or %system = os2 #then
+  #pragma define(__OS2__=>on)
+  #pragma define(__CPU_NAME__=>'"i286"',__MACHINE=>"i86",__HOST=>"os2")
+#else
+  #pragma define(__MSDOS__=>on)
+  #pragma define(__CPU_NAME__=>'"i86"',__MACHINE=>i86,__HOST=>dos)
+#endif
+
+#if %system = dos #then
+  #if %model = extended #then
+  #pragma define(__OS_NAME__=>'"XDOS"')
+  #else
+  #pragma define(__OS_NAME__=>'"DOS"')
+  #endif
+#elsif %system = os2 #then
+#pragma define (__OS_NAME__=>'"OS/2"')
+#pragma link_option(pm=>on,non_pm=>on)
+#endif
+

@@ -1,0 +1,16 @@
+/*! \mainpage BIEW [Binary vIEW documentation]
+* This manual documents internal architecture of BIEW and development
+* notes. Main goal of this document is to tell you how to expand possibility
+* of project and help you to understand it. This manual is written with the
+* assumption that you are familiar with the C programming language and basic
+* programming concepts.
+* \section Preamble Preamble
+* BIEW is a modular project, based  on  plugins-addons  technology.  Any
+* new plugin and addon can be easily added to the project,  as  well  as
+* removed  from  the  project.  As  interaction  facility  with  OS  and
+* computer, BIEW uses own library named biewlib. There are  two  reasons
+* of birth and existance of biewlib:
+* - Project was born in 16-bit DOS environment with poor development kit
+* - Portability to non-POSIX systems
+*
+*/
