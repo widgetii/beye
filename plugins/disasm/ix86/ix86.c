@@ -51,11 +51,15 @@ const char * ix86_DrxRegs[]  = { "dr0", "dr1", "dr2", "dr3", "dr4", "dr5", "dr6"
 const char * ix86_TrxRegs[]  = { "tr0", "tr1", "tr2", "tr3", "tr4", "tr5", "tr6", "tr7" };
 const char * ix86_XrxRegs[]  = { "?r0", "?r1", "?r2", "?r3", "?r4", "?r5", "?r6", "?r7" };
 #ifdef IX86_64
-const char * k86_ByteRegs[] = { "al", "cl", "dl", "bl", "sil", "dil", "bpl", "spl", "r8b", "r9b", "r10b", "r11b", "r12b", "r13b", "r14b", "r15b" };
-const char * k86_WordRegs[] = { "ax", "cx", "dx", "bx", "sp", "bp", "si", "di", "r8w", "r9w", "r10w", "r11w", "r12w", "r13w", "r14w", "r15w" };
+const char * k86_ByteRegs[] = { "al",  "cl",  "dl",  "bl",  "spl", "bpl", "sil", "dil", "r8b", "r9b", "r10b", "r11b", "r12b", "r13b", "r14b", "r15b" };
+const char * k86_WordRegs[] = { "ax",  "cx",  "dx",  "bx",  "sp",  "bp",  "si",  "di",  "r8w", "r9w", "r10w", "r11w", "r12w", "r13w", "r14w", "r15w" };
 const char * k86_DWordRegs[]= { "eax", "ecx", "edx", "ebx", "esp", "ebp", "esi", "edi", "r8d", "r9d", "r10d", "r11d", "r12d", "r13d", "r14d", "r15d" };
-const char * k86_QWordRegs[]= { "rax", "rcx", "rdx", "rbx", "rsp", "rbp", "rsi", "rdi", "r8", "r9", "r10", "r11", "r12", "r13", "r14", "r15" };
-const char * k86_XMMXRegs[]  = { "xmm0", "xmm1", "xmm2", "xmm3", "xmm4", "xmm5", "xmm6", "xmm7", "xmm8", "xmm9", "xmm10", "xmm11", "xmm12", "xmm13", "xmm14", "xmm15" };
+const char * k86_QWordRegs[]= { "rax", "rcx", "rdx", "rbx", "rsp", "rbp", "rsi", "rdi", "r8",  "r9",  "r10",  "r11",  "r12",  "r13",  "r14",  "r15" };
+const char * k86_XMMXRegs[] = { "xmm0","xmm1","xmm2","xmm3","xmm4","xmm5","xmm6","xmm7","xmm8","xmm9","xmm10","xmm11","xmm12","xmm13","xmm14","xmm15" };
+const char * k86_CrxRegs[]  = { "cr0", "cr1", "cr2", "cr3", "cr4", "cr5", "cr6", "cr7", "cr8", "cr9", "cr10", "cr11", "cr12", "cr13", "cr14", "cr15" };
+const char * k86_DrxRegs[]  = { "dr0", "dr1", "dr2", "dr3", "dr4", "dr5", "dr6", "dr7", "dr8", "dr9", "dr10", "dr11", "dr12", "dr13", "dr14", "dr15" };
+const char * k86_TrxRegs[]  = { "tr0", "tr1", "tr2", "tr3", "tr4", "tr5", "tr6", "tr7", "tr8", "tr9", "tr10", "tr11", "tr12", "tr13", "tr14", "tr15" };
+const char * k86_XrxRegs[]  = { "?r0", "?r1", "?r2", "?r3", "?r4", "?r5", "?r6", "?r7", "?r8", "?r9", "?r10", "?r11", "?r12", "?r13", "?r14", "?r15" };
 /*
   REX is 0x4? opcodes 
   bits  meaning
@@ -152,38 +156,38 @@ ix86_Opcodes ix86_table[256] =
   /*0x3D*/ DECLARE_BASE_INSN("cmp","cmp","cmp",ix86_ArgAXDigit,ix86_ArgAXDigit,IX86_CPU086,K64_ATHLON),
   /*0x3E*/ DECLARE_BASE_INSN("seg","seg","seg",ix86_ArgDS,ix86_ArgDS,IX86_CPU086,K64_ATHLON),
   /*0x3F*/ DECLARE_BASE_INSN("aas","aas","???",NULL,NULL,IX86_CPU086,K64_ATHLON),
-  /*0x40*/ DECLARE_BASE_INSN("inc","inc","inc",ix86_ArgIReg,ix86_ArgIReg,IX86_CPU086,K64_ATHLON),
-  /*0x41*/ DECLARE_BASE_INSN("inc","inc","inc",ix86_ArgIReg,ix86_ArgIReg,IX86_CPU086,K64_ATHLON),
-  /*0x42*/ DECLARE_BASE_INSN("inc","inc","inc",ix86_ArgIReg,ix86_ArgIReg,IX86_CPU086,K64_ATHLON),
-  /*0x43*/ DECLARE_BASE_INSN("inc","inc","inc",ix86_ArgIReg,ix86_ArgIReg,IX86_CPU086,K64_ATHLON),
-  /*0x44*/ DECLARE_BASE_INSN("inc","inc","inc",ix86_ArgIReg,ix86_ArgIReg,IX86_CPU086,K64_ATHLON),
-  /*0x45*/ DECLARE_BASE_INSN("inc","inc","inc",ix86_ArgIReg,ix86_ArgIReg,IX86_CPU086,K64_ATHLON),
-  /*0x46*/ DECLARE_BASE_INSN("inc","inc","inc",ix86_ArgIReg,ix86_ArgIReg,IX86_CPU086,K64_ATHLON),
-  /*0x47*/ DECLARE_BASE_INSN("inc","inc","inc",ix86_ArgIReg,ix86_ArgIReg,IX86_CPU086,K64_ATHLON),
-  /*0x48*/ DECLARE_BASE_INSN("dec","dec","dec",ix86_ArgIReg,ix86_ArgIReg,IX86_CPU086,K64_ATHLON),
-  /*0x49*/ DECLARE_BASE_INSN("dec","dec","dec",ix86_ArgIReg,ix86_ArgIReg,IX86_CPU086,K64_ATHLON),
-  /*0x4A*/ DECLARE_BASE_INSN("dec","dec","dec",ix86_ArgIReg,ix86_ArgIReg,IX86_CPU086,K64_ATHLON),
-  /*0x4B*/ DECLARE_BASE_INSN("dec","dec","dec",ix86_ArgIReg,ix86_ArgIReg,IX86_CPU086,K64_ATHLON),
-  /*0x4C*/ DECLARE_BASE_INSN("dec","dec","dec",ix86_ArgIReg,ix86_ArgIReg,IX86_CPU086,K64_ATHLON),
-  /*0x4D*/ DECLARE_BASE_INSN("dec","dec","dec",ix86_ArgIReg,ix86_ArgIReg,IX86_CPU086,K64_ATHLON),
-  /*0x4E*/ DECLARE_BASE_INSN("dec","dec","dec",ix86_ArgIReg,ix86_ArgIReg,IX86_CPU086,K64_ATHLON),
-  /*0x4F*/ DECLARE_BASE_INSN("dec","dec","dec",ix86_ArgIReg,ix86_ArgIReg,IX86_CPU086,K64_ATHLON),
-  /*0x50*/ DECLARE_BASE_INSN("push","push","push",ix86_ArgIReg,ix86_ArgIReg,IX86_CPU086,K64_ATHLON),
-  /*0x51*/ DECLARE_BASE_INSN("push","push","push",ix86_ArgIReg,ix86_ArgIReg,IX86_CPU086,K64_ATHLON),
-  /*0x52*/ DECLARE_BASE_INSN("push","push","push",ix86_ArgIReg,ix86_ArgIReg,IX86_CPU086,K64_ATHLON),
-  /*0x53*/ DECLARE_BASE_INSN("push","push","push",ix86_ArgIReg,ix86_ArgIReg,IX86_CPU086,K64_ATHLON),
-  /*0x54*/ DECLARE_BASE_INSN("push","push","push",ix86_ArgIReg,ix86_ArgIReg,IX86_CPU086,K64_ATHLON),
-  /*0x55*/ DECLARE_BASE_INSN("push","push","push",ix86_ArgIReg,ix86_ArgIReg,IX86_CPU086,K64_ATHLON),
-  /*0x56*/ DECLARE_BASE_INSN("push","push","push",ix86_ArgIReg,ix86_ArgIReg,IX86_CPU086,K64_ATHLON),
-  /*0x57*/ DECLARE_BASE_INSN("push","push","push",ix86_ArgIReg,ix86_ArgIReg,IX86_CPU086,K64_ATHLON),
-  /*0x58*/ DECLARE_BASE_INSN("pop","pop","pop",ix86_ArgIReg,ix86_ArgIReg,IX86_CPU086,K64_ATHLON),
-  /*0x59*/ DECLARE_BASE_INSN("pop","pop","pop",ix86_ArgIReg,ix86_ArgIReg,IX86_CPU086,K64_ATHLON),
-  /*0x5A*/ DECLARE_BASE_INSN("pop","pop","pop",ix86_ArgIReg,ix86_ArgIReg,IX86_CPU086,K64_ATHLON),
-  /*0x5B*/ DECLARE_BASE_INSN("pop","pop","pop",ix86_ArgIReg,ix86_ArgIReg,IX86_CPU086,K64_ATHLON),
-  /*0x5C*/ DECLARE_BASE_INSN("pop","pop","pop",ix86_ArgIReg,ix86_ArgIReg,IX86_CPU086,K64_ATHLON),
-  /*0x5D*/ DECLARE_BASE_INSN("pop","pop","pop",ix86_ArgIReg,ix86_ArgIReg,IX86_CPU086,K64_ATHLON),
-  /*0x5E*/ DECLARE_BASE_INSN("pop","pop","pop",ix86_ArgIReg,ix86_ArgIReg,IX86_CPU086,K64_ATHLON),
-  /*0x5F*/ DECLARE_BASE_INSN("pop","pop","pop",ix86_ArgIReg,ix86_ArgIReg,IX86_CPU086,K64_ATHLON),
+  /*0x40*/ DECLARE_BASE_INSN("inc","inc","inc",ix86_ArgIReg,ix86_ArgIReg64,IX86_CPU086,K64_ATHLON),
+  /*0x41*/ DECLARE_BASE_INSN("inc","inc","inc",ix86_ArgIReg,ix86_ArgIReg64,IX86_CPU086,K64_ATHLON),
+  /*0x42*/ DECLARE_BASE_INSN("inc","inc","inc",ix86_ArgIReg,ix86_ArgIReg64,IX86_CPU086,K64_ATHLON),
+  /*0x43*/ DECLARE_BASE_INSN("inc","inc","inc",ix86_ArgIReg,ix86_ArgIReg64,IX86_CPU086,K64_ATHLON),
+  /*0x44*/ DECLARE_BASE_INSN("inc","inc","inc",ix86_ArgIReg,ix86_ArgIReg64,IX86_CPU086,K64_ATHLON),
+  /*0x45*/ DECLARE_BASE_INSN("inc","inc","inc",ix86_ArgIReg,ix86_ArgIReg64,IX86_CPU086,K64_ATHLON),
+  /*0x46*/ DECLARE_BASE_INSN("inc","inc","inc",ix86_ArgIReg,ix86_ArgIReg64,IX86_CPU086,K64_ATHLON),
+  /*0x47*/ DECLARE_BASE_INSN("inc","inc","inc",ix86_ArgIReg,ix86_ArgIReg64,IX86_CPU086,K64_ATHLON),
+  /*0x48*/ DECLARE_BASE_INSN("dec","dec","dec",ix86_ArgIReg,ix86_ArgIReg64,IX86_CPU086,K64_ATHLON),
+  /*0x49*/ DECLARE_BASE_INSN("dec","dec","dec",ix86_ArgIReg,ix86_ArgIReg64,IX86_CPU086,K64_ATHLON),
+  /*0x4A*/ DECLARE_BASE_INSN("dec","dec","dec",ix86_ArgIReg,ix86_ArgIReg64,IX86_CPU086,K64_ATHLON),
+  /*0x4B*/ DECLARE_BASE_INSN("dec","dec","dec",ix86_ArgIReg,ix86_ArgIReg64,IX86_CPU086,K64_ATHLON),
+  /*0x4C*/ DECLARE_BASE_INSN("dec","dec","dec",ix86_ArgIReg,ix86_ArgIReg64,IX86_CPU086,K64_ATHLON),
+  /*0x4D*/ DECLARE_BASE_INSN("dec","dec","dec",ix86_ArgIReg,ix86_ArgIReg64,IX86_CPU086,K64_ATHLON),
+  /*0x4E*/ DECLARE_BASE_INSN("dec","dec","dec",ix86_ArgIReg,ix86_ArgIReg64,IX86_CPU086,K64_ATHLON),
+  /*0x4F*/ DECLARE_BASE_INSN("dec","dec","dec",ix86_ArgIReg,ix86_ArgIReg64,IX86_CPU086,K64_ATHLON),
+  /*0x50*/ DECLARE_BASE_INSN("push","push","push",ix86_ArgIReg,ix86_ArgIReg64,IX86_CPU086,K64_ATHLON),
+  /*0x51*/ DECLARE_BASE_INSN("push","push","push",ix86_ArgIReg,ix86_ArgIReg64,IX86_CPU086,K64_ATHLON),
+  /*0x52*/ DECLARE_BASE_INSN("push","push","push",ix86_ArgIReg,ix86_ArgIReg64,IX86_CPU086,K64_ATHLON),
+  /*0x53*/ DECLARE_BASE_INSN("push","push","push",ix86_ArgIReg,ix86_ArgIReg64,IX86_CPU086,K64_ATHLON),
+  /*0x54*/ DECLARE_BASE_INSN("push","push","push",ix86_ArgIReg,ix86_ArgIReg64,IX86_CPU086,K64_ATHLON),
+  /*0x55*/ DECLARE_BASE_INSN("push","push","push",ix86_ArgIReg,ix86_ArgIReg64,IX86_CPU086,K64_ATHLON),
+  /*0x56*/ DECLARE_BASE_INSN("push","push","push",ix86_ArgIReg,ix86_ArgIReg64,IX86_CPU086,K64_ATHLON),
+  /*0x57*/ DECLARE_BASE_INSN("push","push","push",ix86_ArgIReg,ix86_ArgIReg64,IX86_CPU086,K64_ATHLON),
+  /*0x58*/ DECLARE_BASE_INSN("pop","pop","pop",ix86_ArgIReg,ix86_ArgIReg64,IX86_CPU086,K64_ATHLON),
+  /*0x59*/ DECLARE_BASE_INSN("pop","pop","pop",ix86_ArgIReg,ix86_ArgIReg64,IX86_CPU086,K64_ATHLON),
+  /*0x5A*/ DECLARE_BASE_INSN("pop","pop","pop",ix86_ArgIReg,ix86_ArgIReg64,IX86_CPU086,K64_ATHLON),
+  /*0x5B*/ DECLARE_BASE_INSN("pop","pop","pop",ix86_ArgIReg,ix86_ArgIReg64,IX86_CPU086,K64_ATHLON),
+  /*0x5C*/ DECLARE_BASE_INSN("pop","pop","pop",ix86_ArgIReg,ix86_ArgIReg64,IX86_CPU086,K64_ATHLON),
+  /*0x5D*/ DECLARE_BASE_INSN("pop","pop","pop",ix86_ArgIReg,ix86_ArgIReg64,IX86_CPU086,K64_ATHLON),
+  /*0x5E*/ DECLARE_BASE_INSN("pop","pop","pop",ix86_ArgIReg,ix86_ArgIReg64,IX86_CPU086,K64_ATHLON),
+  /*0x5F*/ DECLARE_BASE_INSN("pop","pop","pop",ix86_ArgIReg,ix86_ArgIReg64,IX86_CPU086,K64_ATHLON),
   /*0x60*/ DECLARE_BASE_INSN("pushaw","pushad","???",NULL,NULL,IX86_CPU186,K64_ATHLON),
   /*0x61*/ DECLARE_BASE_INSN("popaw","popad","???",NULL,NULL,IX86_CPU186,K64_ATHLON),
   /*0x62*/ DECLARE_BASE_INSN("bound","bound","???",ix86_ArgModRMDW,ix86_ArgModRMDW,IX86_CPU286,K64_ATHLON),
