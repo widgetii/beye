@@ -262,8 +262,10 @@ static void __NEAR__ __FASTCALL__ getSIBRegs(char * base,char * scale,char * _in
   char ind = (code & 0x38) >> 3;
   tBool use32data = Use32Data;
   tBool useMMX = UseMMXSet;
+  tBool useXMMX = UseXMMXSet;
   Use32Data = True;
   UseMMXSet = False;
+  UseXMMXSet = False;
   if(scl)
   {
     scale[0] = '*';
@@ -277,6 +279,7 @@ static void __NEAR__ __FASTCALL__ getSIBRegs(char * base,char * scale,char * _in
   else         strcpy(base,ix86_getREG(bas,True));
   Use32Data = use32data;
   UseMMXSet = useMMX;
+  UseXMMXSet = useXMMX;
 #if 0
   return ind == 4 || ind == 5 || bas == 4 || bas == 5; /** return is_stack */
 #endif
