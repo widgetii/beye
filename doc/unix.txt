@@ -173,6 +173,11 @@ sorts of weirdness can happen.
 
 ChangeLog (UNIX)
 ----------------
+5.6.0
+- Add russian locales support in linux/unix systems (AG)
+- Fixed bug of block-device opening (Alex)
+- fixed bug of non repainting of bottom part of window under some
+  terminals (NK).	
 5.5.0
 - fixed bug of non repainting of bottom part of window under some
   vt100 terminals (NK).	

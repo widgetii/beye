@@ -20,10 +20,10 @@
 
 const char msgAboutText[] =
 "   File viewer with built-in Athlon64/\n"
-"   Prescott/K7-Athlon/Cyrix-M2 disassembler\n"
-"   Supports multiple executable structures\n"
-"  Written by Nick Kurshev. Kazan. Tatarstan.\n"
-"                    Russia.";
+"   Prescott/K7-Athlon/Cyrix-M2, Java, AVR\n"
+"   disassemblers. Supports multiple executable\n"
+"   structures. Written by Nick Kurshev. Kazan.\n"
+"              Tatarstan. Russia.";
 const char * BiewPicture[] = {
  "‹‹‹‹  ‹‹‹ ‹‹‹‹ ‹‹‹   ‹‹‹",
  " ‹  ‹  ‹  ‹  ‹  ‹     ‹",

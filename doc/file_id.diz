@@ -1,4 +1,4 @@
-ÚÄÄÄÄ[ BIEW Version 5.5.0 ]ÄÄÄÄÄ¿
+ÚÄÄÄÄ[ BIEW Version 5.6.0 ]ÄÄÄÄÄ¿
 ³BIEW is binary file viewer with³
 ³build-in editors for binary,   ³
 ³hexadecimal & disassembler     ³
@@ -7,12 +7,15 @@
 ³ş Highlight Athlon64/Prescott  ³
 ³  K7 Athlon/Cyrix-M2           ³
 ³  disassembler.                ³
-³ş Text viewer with russian     ³
+³ş Build-in Java, AVR           ³
+³  disassemblers                ³
+³ş Text viewer with syntax      ³
+³  highlight / russian          ³
 ³  codepage support.            ³
 ³ş Full preview of formats      ³
 ³  MZ, NE, PE, LE, LX, DOS.SYS, ³
 ³  NLM, arch, ELF, a.out, coff32³
-³  PharLap, rdoff               ³
+³  PharLap, rdoff, java.class   ³
 ³ş Work with dumps.             ³
 ³ş Powerful search system.      ³
 ³ş Mouse support.               ³
@@ -21,4 +24,4 @@
 ³           GNUWare             ³
 ³   Written by Nick Kurshev.    ³
 ³    Kazan.Tatarstan.Russia.    ³
-ÀÄÄÄÄÄ[ Release : 04 jun 2003 ]ÄÙ
+ÀÄÄÄÄÄ[ Release : 29 mar 2004 ]ÄÙ

@@ -1166,9 +1166,10 @@ static tBool __FASTCALL__ txtDetect( void )
 {
   size_t maxl,i;
   tBool bin = False;
-  unsigned long flen;
+  unsigned long flen,fpos;
   maxl = 1000;
   flen = BMGetFLength();
+  fpos=BMGetCurrFilePos();
   if(maxl > flen) maxl = (size_t)flen;
   for(i = 0;i < maxl;i++)
   {
@@ -1177,6 +1178,7 @@ static tBool __FASTCALL__ txtDetect( void )
    if((bin=isBinByte(ch))!=False) break;
   }
   if(bin==False) bin_mode = MOD_PLAIN;
+  BMSeek(fpos,BM_SEEK_SET);
   return bin == False;
 }
 

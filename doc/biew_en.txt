@@ -10,8 +10,8 @@
 Û²±°                 ÜÜ  ÜÜ  ÜÜ   ÜÜ  Ü   Ü Ü Ü Ü                     °±²Û
 Û²±°                ÜÜÜÜÜÜ  ÜÜÜÜ ÜÜÜÜÜÜ    Ü   Ü                      °±²Û
 Û²±°                                                                  °±²Û
-Û²±°                           Ver 5.5.0                              °±²Û
-Û²±°                          04 jun 2003.                            °±²Û
+Û²±°                           Ver 5.6.0                              °±²Û
+Û²±°                          29 mar 2004.                            °±²Û
 Û²±°                                                                  °±²Û
 Û²±°    Made in Kazan.Tatarstan.Russia. Written By Nick Kurshev.      °±²Û
 Û²±°                                                                  °±²Û
@@ -1097,6 +1097,35 @@ v5.0.2        ! Changes:
                   through SysMenu->Edit->Paste facility of window
                   (by Sergey Oblomov <hoopoepg@mail.ru>)
                 * Fixed 'CPU performance' tool under DJGPP
+5.6.0         ! Changes:
+29 mar 2004     + Java disassembler
+                + New feature: "Tabbed" browsing.
+                  (Now you may access F1-F10 actions through TAB key)
+                + Textmode syntax highlighing
+                + New submodes of binmode
+                + AVR disassembler by Stephan Linz
+                + Enable SSE3 for Athlon64
+                  (due Intel Extended Memory 64 Technology)
+                + New feature: input viewer
+                * Fixed Bug#234729(debian.org):
+                  Hexadecimal dump is not hex, but binary
+                  (if hexmode was forced by -h key in command line)
+                * Fixed Bug#235005(debian.org): Missing values in hex listing
+                  (was detected when width of terminal window was 106 chars)
+                * Fixes by Alex <latinsud@users.sourceforge.net>:
+                  * Fixed bug of block-device opening
+                  * Fixed case sensitive search in hexmode
+                * Fixed old and evil bug of not repainting of low part of window
+                  under some terminals.
+                + Add russian locales support in linux/unix systems
+                * Fixing multiple QNX related bugs
+                + Added support for QNX 6 Neutrino
+                * QNX6 related fixes and improvements
+                + Added mouse wheel support for Win2k+
+                * Some MSWin related fixes
+                  by Oblomov Sergey <Sergey.Oblomov@intel.com>
+                * Fixed correct elf32 reading after applying 64-bit support
+                * Other minor/major fixes.
 []======================================================================[]
 []  Thank you for your interest.                                        []
 []  Nick Kurshev.                                                       []
