@@ -151,11 +151,16 @@ name   =       value    - name - логическая переменная, сопоставляемая
 Полный список директив :
 
 #case
-#del
-#case
 #delete
 #elif
 #else
 #endif
-#eset
+#error
+#if
+#include
+#lowercase
+#nosmart
+#reset
+#set
+#smart
 #uppercase
