@@ -119,6 +119,7 @@ typedef void (__FASTCALL__*ix86_method)(char *encode_str,ix86Param *);
 
 #define K64_ATHLON	0x00000000UL
 #define K64_CLONEMASK	0x00FFFFFFUL
+#define K64_NOCOMPAT	0x01000000UL /* means insnshas no 16 or 32 bit forms */
 
 typedef struct tag_ix86opcodes
 {
@@ -138,9 +139,23 @@ typedef struct tag_ix86opcodes
 typedef struct tag_ix86ExOpcodes
 {
   const char *  name;
+#ifdef INT64_C
+  const char *  name64;
+#endif
   ix86_method   method;
+#ifdef INT64_C
+  ix86_method   method64;
+  unsigned long flags64;
+#endif
   unsigned long pro_clone;
 }ix86_ExOpcodes;
+
+typedef struct tag_ix86MMOpcodes
+{
+  const char *  name;
+  ix86_method   method;
+  unsigned long pro_clone;
+}ix86_MMOpcodes;
 
 typedef struct tag_ix3dNowopcodes
 {

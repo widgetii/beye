@@ -231,6 +231,14 @@ void __FASTCALL__ ix86_ArgDWord(char *str,ix86Param *DisP)
   DisP->codelen+=4;
 }
 
+static void __FASTCALL__ ix86_ArgQWord(char *str,ix86Param *DisP)
+{
+  if(!((DisP->flags & __DISF_SIZEONLY) == __DISF_SIZEONLY))
+    disAppendDigits(str,DisP->CodeAddress + DisP->codelen,
+                 APREF_USE_TYPE,8,&DisP->RealCmd[DisP->codelen],DISARG_QWORD | DISARG_IMM);
+  DisP->codelen+=8;
+}
+
 static char * __FASTCALL__ ix86_GetDigitTile(ix86Param* DisP,char wrd,char sgn,unsigned char loc_off)
 {
   int cl,type;
@@ -459,6 +467,9 @@ char * __FASTCALL__ ix86_getModRM(tBool w,unsigned char mod,unsigned char rm,ix8
        case 2:
             {
               disp_long:
+#ifdef INT64_C
+		 if(x86_Bitness == DAB_USE64 && is_disponly) strcat(ix86_modrm_ret,"rip");
+#endif
               if(!Use32Addr)
               {
                 strcat(ix86_modrm_ret,ix86_segpref);
@@ -645,6 +656,11 @@ void __FASTCALL__ ix86_ArgAXDigit(char * str,ix86Param *DisP)
   tBool use64=0;
 #ifdef INT64_C
   if(x86_Bitness == DAB_USE64) use64 = Use64;
+  /* I guess that K9 will support "OP rax, imm64" forms
+     same as "OP rrx, imm64" since they are not longer
+     than 15 bytes in length
+     (example: "adc r13, 123456789ABCDEF0").
+     TODO: if(use64) w = -1; here */
 #endif
   strcat(str,k86_getREG(0,w,0,use64));
   ix86_CStile(str,ix86_GetDigitTile(DisP,w,0,1));
@@ -723,7 +739,12 @@ void __FASTCALL__ ix86_ArgSInt(char *str,ix86Param *DisP)
 
 void __FASTCALL__ ix86_ArgInt(char *str,ix86Param *DisP)
 {
-  Use32Data ? ix86_ArgDWord(str,DisP) : ix86_ArgWord(str,DisP);
+  tBool use64;
+  use64 = 0;
+#ifdef INT64_C
+  if(x86_Bitness == DAB_USE64) use64 = Use64;
+#endif
+  use64 ? ix86_ArgQWord(str,DisP) : Use32Data ? ix86_ArgDWord(str,DisP) : ix86_ArgWord(str,DisP);
 }
 
 void __FASTCALL__ ix86_ArgRegRMDigit(char *str,ix86Param *DisP)
@@ -947,12 +968,34 @@ void  __FASTCALL__ ix86_ExOpCodes(char *str,ix86Param *DisP)
  DisP->CodeAddress++;
  code = DisP->RealCmd[0];
  DisP->codelen++;
+#ifdef INT64_C
+ if(x86_Bitness == DAB_USE64)
+ {
+    strcpy(str,ix86_extable[code].name64);
+ }
+ else
+#endif
  strcpy(str,ix86_extable[code].name);
+#ifdef INT64_C
+ if(x86_Bitness == DAB_USE64)
+ {
+   if(ix86_extable[code].method64)
+   {
+     TabSpace(str,TAB_POS);
+     ix86_extable[code].method64(str,DisP);
+   }
+ }
+ else
+#endif
  if(ix86_extable[code].method)
  {
    TabSpace(str,TAB_POS);
    ix86_extable[code].method(str,DisP);
  }
+#ifdef INT64_C
+ if(x86_Bitness == DAB_USE64) DisP->pro_clone = ix86_extable[code].flags64 & K64_CLONEMASK;
+ else
+#endif
  if(DisP->pro_clone < ix86_extable[code].pro_clone) DisP->pro_clone = ix86_extable[code].pro_clone;
 }
 
