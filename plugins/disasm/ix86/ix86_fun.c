@@ -343,11 +343,24 @@ static void __NEAR__ __FASTCALL__ getSIBRegs(char * base,char * scale,char * _in
     scale[2] = 0;
   }
   else scale[0] = 0;
-  if(ind == 4) _index[0] = 0;
+  if(ind == 4)
+  {
+#ifdef IX86_64
+	if(x86_Bitness == DAB_USE64 && ((k86_REX&2)>>1))
+	    /*	AMD 24594.pdf rev 3.02 aug 2002:
+		REX adds fourth bit (X) which is decoded
+		that allows to use R12 as index.
+	     */
+	     goto do_r12;
+	else
+#endif
+	_index[0] = 0;
+  }
   else 
   {
 
 #ifdef IX86_64
+     do_r12:
      if(x86_Bitness == DAB_USE64)
      {
          use64 = has67_in64?0:1;
@@ -996,7 +1009,8 @@ void __FASTCALL__ ix86_ArgAXMem(char *str,ix86Param *DisP)
   {
     use64 = Use64;
   }
-  if(x86_Bitness == DAB_USE64 && Use64 && k86_REX&1)
+  if(x86_Bitness == DAB_USE64 && !has67_in64)
+  /* Opcodes A0 through A3 are address sized. In 64-bit mode, memory offset default to 64-bit. */
   {
     mem = Get16SquareDig(1,DisP,False,True);
   }
@@ -1016,7 +1030,7 @@ void __FASTCALL__ ix86_ArgAXMem(char *str,ix86Param *DisP)
   if(x86_Bitness == DAB_USE64 && Use64) k86_REX=sav_REX;
 #endif
 #ifdef IX86_64
-  if(x86_Bitness == DAB_USE64 && Use64 && k86_REX&1)
+  if(x86_Bitness == DAB_USE64 && !has67_in64)
     DisP->codelen = 9;
   else
 #endif
@@ -1190,8 +1204,9 @@ void  __FASTCALL__ ix86_ArgMovXRY(char *str,ix86Param *DisP)
 #ifdef IX86_64
     if(x86_Bitness == DAB_USE64)
     {
-	strcat(str,d ? k86_xry[ridx][xreg|(k86_REX&8)] : k86_getREG(reg,True,brex,1));
-	ix86_CStile(str,d ? k86_getREG(reg,True,brex,1) : k86_xry[ridx][xreg|(k86_REX&8)]);
+	/* according on intel 30083401.pdf p# 1.4.3 to access cr8-tr15 is used REX.r */
+	strcat(str,d ? k86_xry[ridx][xreg|(REX_R(k86_REX)<<3)] : k86_getREG(reg,True,brex,1));
+	ix86_CStile(str,d ? k86_getREG(reg,True,brex,1) : k86_xry[ridx][xreg|(REX_R(k86_REX)<<3)]);
     }
     else
 #endif
