@@ -129,6 +129,8 @@
 extern int on_console, terminal, transparent, do_nls;
 extern tBool break_status;
 
+extern void __FASTCALL__ ReadNextEvent(void);
+
 typedef struct {
     int x;
     int y;

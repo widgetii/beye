@@ -51,8 +51,7 @@ static unsigned char *viomem;
 static struct {
     unsigned char last;
     unsigned char color[0x10];
-} tp = { 0 };
-
+} tp = { 0, {0} };
 
 #ifdef	_SLANG_
 #include <slang.h>
@@ -119,7 +118,7 @@ static int _color[8] = {
     otherwise examine how acs_map called in your library.
 */
 
-#ifdef	NCURSES_VERSION
+#if defined(NCURSES_VERSION) && defined(NDEBUG)
 
 static unsigned char frames_vt100[0x30] =
 "aaaxuuukkuxkjjjkmvwtqnttmlvwtqnvvwwmmllnnjl00000";

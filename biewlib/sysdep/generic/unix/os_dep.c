@@ -52,11 +52,10 @@ static char _rc_dir_name[FILENAME_MAX + 1];
 int terminal = TERM_UNKNOWN;
 
 tBool break_status = False;	/**< CTRL+BREAK flag */
-extern void ReadNextEvent(void);
 
-static struct {
-    char *name;
-    char type;
+struct {
+    unsigned char *name;
+    unsigned char type;
 } termtab[] = {
 { "linux",	TERM_LINUX },
 { "console",	TERM_LINUX },

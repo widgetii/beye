@@ -17,9 +17,11 @@
 **/
 #include <stdio.h>
 
+#include "biewlib/biewlib.h"
+
 void __FillCPUInfo(char *buff,unsigned cbBuff,void (*func)(int))
 {
   (*func)(100);
-  sprintf(buff,"\n\n\n\n\n\n\n\nCan not work on generic platform\n");
+  sprintf(buff,"\n\n\n\n\n\n    CPU information is not available in this build\n");
   buff[cbBuff-1] = '\0';
 }

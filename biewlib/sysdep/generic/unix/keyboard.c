@@ -42,7 +42,7 @@ static const char rcs_id[] = "$Id$";
 
 #ifdef	_CURSES_
 #include <curses.h>
-#ifdef	NCURSES_MOUSE_VERSION
+#if defined(NCURSES_MOUSE_VERSION) && !defined(HAVE_MOUSE)
 #define	HAVE_MOUSE
 #endif
 #endif

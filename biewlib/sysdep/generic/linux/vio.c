@@ -85,7 +85,7 @@ static unsigned char frames_dumb[0x30] =
 static struct {
     unsigned char last;
     unsigned char color[0x10];
-} tp = { 0 };
+} tp = { 0, {0} };
 
 static char *__FASTCALL__ _2ansi(unsigned char attr)
 {
