@@ -63,6 +63,17 @@ static tUInt32 __FASTCALL__ ByteSwapL(tUInt32  val) =
 #define ByteSwapL ByteSwapL
 #pragma restore
 
+#ifndef ByteSwapLL
+#define ByteSwapLL(x)\
+{ union { tUInt64 __ll;		     		\
+	  tUInt32 __l[2]; } __w, __r;		\
+	 __w.__ll = (x);			\
+	 __r.__l[0] = ByteSwapL (__w.__l[1]);	\
+	 __r.__l[1] = ByteSwapL (__w.__l[0]);	\
+	 __r.__ll; }
+#endif
+
+
 #ifdef __cplusplus
 }
 #endif
