@@ -148,28 +148,29 @@ void __FASTCALL__ hlpPaintLine(TWindow *win,unsigned i,const char *name,tBool is
 
 static void __NEAR__ __FASTCALL__ Paint(TWindow *win,char * * names,unsigned nlist,unsigned start,unsigned height,unsigned width)
 {
- unsigned i;
+ unsigned i, pos = 0;
  twUseWin(win);
  twFreezeWin(win);
  width -= 3;
+ if (height>2 && height<nlist)
+     pos = 1 + start*(height-2)/nlist;
  twSetColorAttr(help_cset.main);
  for(i = 0;i < height;i++)
  {
    twGotoXY(1,i + 1);
-   if(i == 0) twPutChar(start ? TWC_UP_ARROW : TWC_DEF_FILLER);
-   else
-     if(i == height - 1) twPutChar(start + height < nlist ? TWC_DN_ARROW : TWC_DEF_FILLER);
-   twGotoXY(2,i + 1);
+   if (i == 0)
+       twPutChar(start ? TWC_UP_ARROW : TWC_DEF_FILLER);
+   else if(i == height-1)
+       twPutChar(start + height < nlist ? TWC_DN_ARROW : TWC_DEF_FILLER);
+   else if (i == pos)
+       twPutChar(TWC_THUMB);
+   else twPutChar(TWC_DEF_FILLER);
+  twGotoXY(2,i + 1);
    twPutChar(TWC_SV);
    hlpPaintLine(win,i,names[i + start],0);
  }
  twRefreshWin(win);
 }
-
-extern void drawEmptyListPrompt( void );
-extern void drawListPrompt( void );
-extern void drawOrdListPrompt( void );
-extern void drawSearchListPrompt( void );
 
 typedef char *lpstr;
 
@@ -196,15 +197,20 @@ static int __NEAR__ __FASTCALL__ __hlpListBox(char * * names,unsigned nlist,cons
    ch = GetEvent(drawHelpListPrompt,wlist);
    if(ch == KE_ESCAPE || ch == KE_F(10)) { ret = -1; break; }
    if(ch == KE_ENTER)                    { ret = start + cursor; break; }
-   if(ch != KE_F(7)) scursor = -1;
+   if(ch!=KE_F(7) && ch!=KE_SHIFT_F(7))  scursor = -1;
    switch(ch)
    {
-     case KE_F(7): /** perform binary search in list */
+     case KE_F(7): /** perform binary search in help */
+     case KE_SHIFT_F(7):
              {
                static char searchtxt[21] = "";
                static unsigned char searchlen = 0;
                static unsigned sflg = SF_NONE;
-               if(SearchDialog(SD_SIMPLE, searchtxt,&searchlen,&sflg))
+
+               if (!(ch==KE_SHIFT_F(7) && searchlen) &&
+                   !SearchDialog(SD_SIMPLE,searchtxt,&searchlen,&sflg))
+                   break;
+
                {
                   int direct,ii;
                   tBool found;

@@ -63,11 +63,13 @@ typedef enum
 #define TWC_DN_ARROW          ''   /**< Down arrow character */
 #define TWC_LT_ARROW          ''   /**< Left arrow character */
 #define TWC_RT_ARROW          ''   /**< Right arrow character */
+#define TWC_THUMB             '\xFE'/**< Thumb character */
 #else
 #define TWC_UP_ARROW          '^'   /**< Up arrow character */
 #define TWC_DN_ARROW          'v'   /**< Down arrow character */
 #define TWC_LT_ARROW          '<'   /**< Left arrow character */
 #define TWC_RT_ARROW          '>'   /**< Right arrow character */
+#define TWC_THUMB             '#'   /**< Thumb character */
 #endif
 
 #define TWC_RADIO_CHAR        '*'   /**< Character for radio buttons */

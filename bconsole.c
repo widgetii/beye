@@ -569,7 +569,7 @@ static void __NEAR__ __FASTCALL__ PaintLine(unsigned i,const char *name,
                                             tBool isOrdinal,
                                             tBool useAcc,tBool is_hl)
 {
-  size_t namelen, alignlen;
+  size_t namelen;
   char buffer[__TVIO_MAXSCREENWIDTH];
   memset(buffer,TWC_DEF_FILLER,sizeof(buffer));
   namelen = strlen(name);
@@ -580,15 +580,19 @@ static void __NEAR__ __FASTCALL__ PaintLine(unsigned i,const char *name,
     if(endptr)
     {
       unsigned len, rlen;
+      // write name
       len = endptr - name;
-      alignlen = strlen(endptr+1) + 1;
-      if(alignlen > mord_width) alignlen = mord_width;
       rlen = len;
-      if(len > width - alignlen-2) rlen = width - alignlen-5;
-      memcpy((char *)buffer,name,rlen);
-      if(len > width - alignlen-2) memcpy((char *)buffer+rlen,"...", 3);
-      buffer[width - alignlen - 1] = '@';
-      memcpy((char *)&buffer[width - alignlen],&name[len + 1],min(alignlen,namelen-(len+1)));
+      if(len > width - mord_width-1)
+          rlen = width - mord_width-3;
+      memcpy(buffer,name,rlen);
+      if(len > rlen) memcpy(buffer+rlen,"..", 2);           // using 2 dots now -XF
+      // write ordinal. it's left aligned now -XF
+      buffer[width - mord_width - 1] = '@';
+      len = rlen = namelen - (len+1);
+      if(rlen > mord_width) rlen = mord_width - 2;
+      memcpy(&buffer[width - mord_width], endptr+1, rlen);
+      if(len > rlen) memcpy(buffer+width-mord_width+rlen,"..", 2);
     }
   }
   else memcpy((char *)buffer,name,min(namelen,width));
@@ -637,17 +641,23 @@ static void __NEAR__ __FASTCALL__ Paint(TWindow *win,const char ** names,
                                         tBool isOrdinal,tBool useAcc,
                                         unsigned cursor)
 {
- unsigned i;
+ unsigned i, pos = 0;
  twUseWin(win);
  twFreezeWin(win);
  width -= 3;
+ if (height>2 && height<nlist)
+     pos = 1 + (start+cursor)*(height-2)/nlist;
  for(i = 0;i < height;i++)
  {
    twSetColorAttr(menu_cset.main);
    twGotoXY(1,i + 1);
-   if(i == 0) twPutChar(start ? TWC_UP_ARROW : TWC_DEF_FILLER);
-   else
-     if(i == height - 1) twPutChar(start + height < nlist ? TWC_DN_ARROW : TWC_DEF_FILLER);
+   if (i == 0)
+       twPutChar(start ? TWC_UP_ARROW : TWC_DEF_FILLER);
+   else if(i == height-1)
+       twPutChar(start + height < nlist ? TWC_DN_ARROW : TWC_DEF_FILLER);
+   else if (i == pos)
+       twPutChar(TWC_THUMB);
+   else twPutChar(TWC_DEF_FILLER);
    twGotoXY(2,i + 1);
    twPutChar(TWC_SV);
    twSetColorAttr(menu_cset.item.active);
@@ -748,12 +758,15 @@ static int __NEAR__ __FASTCALL__ __ListBox(const char ** names,unsigned nlist,un
        if(j > mord_width) mord_width = j;
      }
    }
-   if(mord_width > (unsigned)(tvioWidth-4)) mord_width = (unsigned)(tvioWidth-4);
-   if(mordstr_width > (unsigned)(tvioWidth-2)-mord_width-1) mordstr_width = (unsigned)(tvioWidth-2)-mord_width-1;
+   // name now has higher priority than ordinal -XF
+   if(mordstr_width > (unsigned)(tvioWidth-10))
+       mordstr_width = (unsigned)(tvioWidth-10);
+   if(mord_width > (unsigned)(tvioWidth-4)-mordstr_width-1)
+       mord_width = (unsigned)(tvioWidth-4)-mordstr_width-1;
    mwidth = mordstr_width+mord_width+1;
  }
  mwidth += 4;
- if(mwidth > (unsigned)(tvioWidth-2)) mwidth = tvioWidth-2;
+ if(mwidth > (unsigned)(tvioWidth-1)) mwidth = tvioWidth-1;         // maximal width increased to tvioWidth-1 -XF
  height = nlist < (unsigned)(tvioHeight - 4) ? nlist : tvioHeight - 4;
  wlist = CrtLstWndnls(title,mwidth-1,height);
  if((assel & LB_SELECTIVE) == LB_SELECTIVE) twSetFooterAttr(wlist," [ENTER] - Go ",TW_TMODE_RIGHT,dialog_cset.selfooter);
@@ -780,7 +793,7 @@ static int __NEAR__ __FASTCALL__ __ListBox(const char ** names,unsigned nlist,un
    ch = GetEvent(isOrdinal ? drawOrdListPrompt : (assel & LB_SORTABLE) ? drawListPrompt : drawSearchListPrompt,wlist);
    if(ch == KE_ESCAPE || ch == KE_F(10)) { ret = -1; break; }
    if(ch == KE_ENTER)                    { ret = start + cursor; break; }
-   if(ch != KE_F(7)) scursor = -1;
+   if(ch!=KE_F(7) && ch!=KE_SHIFT_F(7))  scursor = -1;
    switch(ch)
    {
      case KE_F(2):
@@ -831,11 +844,16 @@ static int __NEAR__ __FASTCALL__ __ListBox(const char ** names,unsigned nlist,un
               }
               break;
      case KE_F(7): /** perform binary search in list */
+     case KE_SHIFT_F(7):
              {
                static char searchtxt[21] = "";
                static unsigned char searchlen = 0;
                static unsigned sflg = SF_NONE;
-               if(SearchDialog(SD_SIMPLE,searchtxt,&searchlen,&sflg))
+
+               if (!(ch==KE_SHIFT_F(7) && searchlen) &&
+                   !SearchDialog(SD_SIMPLE,searchtxt,&searchlen,&sflg))
+                   break;
+
                {
                   int direct, cache[UCHAR_MAX];
                   tBool found;

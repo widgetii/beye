@@ -35,6 +35,59 @@ static void __NEAR__ __FASTCALL__ ShowFunKey(const char * key,const char * text)
  twPutS(text);
 }
 
+static const char * ftext[] = { "1"," 2"," 3"," 4"," 5"," 6"," 7"," 8"," 9","10" };
+
+static void __NEAR__ __FASTCALL__ drawControlKeys(int flg)
+{
+  char ckey;
+  if(flg & KS_SHIFT) ckey = 'S';
+  else
+    if(flg & KS_ALT) ckey = 'A';
+    else
+      if(flg & KS_CTRL) ckey = 'C';
+      else              ckey = ' ';
+  twGotoXY(1,1);
+  twSetColorAttr(prompt_cset.control);
+  twPutChar(ckey);
+}
+
+void __FASTCALL__ __drawMultiPrompt(const char *norm[], const char *shift[], const char *alt[], const char *ctrl[])
+{
+  TWindow *using;
+  int flg = __kbdGetShiftsKey();
+  int i;
+  const char * cptr;
+  using = twUsedWin();
+  twUseWin(HelpWnd);
+  twFreezeWin(HelpWnd);
+  twGotoXY(2,1);
+  for(i = 0;i < 10;i++)
+  {
+    /* todo: it might be better to ensure that if
+       text!=NULL then text[i]!=NULL, rather than
+       checking it all the time
+     */
+    if (flg & KS_SHIFT)
+        cptr = shift && shift[i] ? shift[i] : "      ";
+    else if (flg & KS_ALT)
+        cptr = alt && alt[i] ? alt[i] : "      ";
+    else if (flg & KS_CTRL)
+        cptr = ctrl && ctrl[i] ? ctrl[i] : "      ";
+    else cptr = norm && norm[i] ? norm[i] : "      ";
+
+    ShowFunKey(ftext[i],cptr);
+  }
+  drawControlKeys(flg);
+  twRefreshWin(HelpWnd);
+  twUseWin(using);
+}
+
+void __FASTCALL__ __drawSinglePrompt(const char *prmt[])
+{
+  __drawMultiPrompt(prmt, NULL, NULL, NULL);
+}
+
+
 static const char * ShiftFxText[] =
 {
   "ModHlp",
@@ -63,72 +116,11 @@ static const char * FxText[] =
   "Quit  "
 };
 
-static const char * __NEAR__ __FASTCALL__ gettextfx( int i )
-{
-  if(i == 3) return activeMode->misckey_name ? activeMode->misckey_name() : "      ";
-  else
-    if(i == 7) return detectedFormat->showHdr || IsNewExe() ? "Header" : "      ";
-    else
-    return FxText[i];
-}
-
-static const char * ftext[] = { "1"," 2"," 3"," 4"," 5"," 6"," 7"," 8"," 9","10" };
-
-static void __NEAR__ __FASTCALL__ drawControlKeys(int flg)
-{
-  char ckey;
-  if(flg & KS_SHIFT) ckey = 'S';
-  else
-    if(flg & KS_ALT) ckey = 'A';
-    else
-      if(flg & KS_CTRL) ckey = 'C';
-      else              ckey = ' ';
-  twGotoXY(1,1);
-  twSetColorAttr(prompt_cset.control);
-  twPutChar(ckey);
-}
-
 void drawPrompt( void )
 {
-  TWindow * using;
-  int flg = __kbdGetShiftsKey();
-  int i;
-  using = twUsedWin();
-  twUseWin(HelpWnd);
-  twFreezeWin(HelpWnd);
-  twGotoXY(2,1);
-  for(i = 0;i < 10;i++)
-  {
-    ShowFunKey(ftext[i],
-               (flg & KS_ALT) ? (detectedFormat->prompt[i] ? detectedFormat->prompt[i] : "      ")
-                           : (flg & KS_CTRL) ? (activeMode->prompt[i] ? activeMode->prompt[i] : "      ")
-                           : (flg & KS_SHIFT) ? ShiftFxText[i]
-                           : !(flg & KS_CTRL_MASK) ? gettextfx(i)
-                           : "      ");
-  }
-  drawControlKeys(flg);
-  twRefreshWin(HelpWnd);
-  twUseWin(using);
-}
-
-void __FASTCALL__ __drawSinglePrompt(const char *prmt[])
-{
-  TWindow *using;
-  int flg = __kbdGetShiftsKey();
-  int i;
-  const char * cptr;
-  using = twUsedWin();
-  twUseWin(HelpWnd);
-  twFreezeWin(HelpWnd);
-  twGotoXY(2,1);
-  for(i = 0;i < 10;i++)
-  {
-    cptr = (!(flg & KS_CTRL_MASK)) ? prmt[i] : "      ";
-    ShowFunKey(ftext[i],cptr);
-  }
-  drawControlKeys(flg);
-  twRefreshWin(HelpWnd);
-  twUseWin(using);
+  FxText[3] = activeMode->misckey_name ? activeMode->misckey_name() : NULL;
+  FxText[7] = detectedFormat->showHdr || IsNewExe() ? "Header" : NULL;
+  __drawMultiPrompt(FxText, ShiftFxText, detectedFormat->prompt, activeMode->prompt);
 }
 
 static const char * fetext[] =
@@ -203,24 +195,7 @@ void drawEmptyListPrompt( void )
 
 void drawAsmEdPrompt( void )
 {
-  TWindow * using;
-  int flg = __kbdGetShiftsKey();
-  int i;
-  const char * cptr;
-  using = twUsedWin();
-  twUseWin(HelpWnd);
-  twFreezeWin(HelpWnd);
-  twGotoXY(2,1);
-  for(i = 0;i < 10;i++)
-  {
-    if(!(flg & KS_CTRL_MASK)) cptr = fetext[i];
-    else   if(flg & KS_CTRL)  cptr = casmtext[i];
-           else            cptr = "      ";
-    ShowFunKey(ftext[i],cptr);
-  }
-  drawControlKeys(flg);
-  twRefreshWin(HelpWnd);
-  twUseWin(using);
+  __drawMultiPrompt(fetext, NULL, NULL, casmtext);
 }
 
 static const char * ordlisttxt[] =
@@ -265,6 +240,20 @@ static const char * searchlisttxt[] =
   "Escape"
 };
 
+static const char * shlisttxt[] =
+{
+  "      ",
+  "      ",
+  "      ",
+  "      ",
+  "      ",
+  "      ",
+  "NextSr",
+  "      ",
+  "      ",
+  "      "
+};
+
 static const char * helptxt[] =
 {
   "Licenc",
@@ -295,17 +284,17 @@ static const char * helplisttxt[] =
 
 void drawListPrompt( void )
 {
-   __drawSinglePrompt(listtxt);
+  __drawMultiPrompt(listtxt, shlisttxt, NULL, NULL);
 }
 
 void drawOrdListPrompt( void )
 {
-   __drawSinglePrompt(ordlisttxt);
+  __drawMultiPrompt(ordlisttxt, shlisttxt, NULL, NULL);
 }
 
 void drawSearchListPrompt( void )
 {
-   __drawSinglePrompt(searchlisttxt);
+  __drawMultiPrompt(searchlisttxt, shlisttxt, NULL, NULL);
 }
 
 void drawHelpPrompt( void )
@@ -315,7 +304,7 @@ void drawHelpPrompt( void )
 
 void drawHelpListPrompt( void )
 {
-  __drawSinglePrompt(helplisttxt);
+  __drawMultiPrompt(helplisttxt, shlisttxt, NULL, NULL);
 }
 
 typedef struct tagvbyte
