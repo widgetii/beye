@@ -402,16 +402,36 @@ static void __NEAR__ __FASTCALL__ SearchPaint(TWindow *wdlg,int flags,
  TWindow *using = twUsedWin();
  twUseWin(wdlg);
  twSetColorAttr(dialog_cset.group.active);
+ if(sf_flags & SF_ASHEX) twSetColorAttr(dialog_cset.group.disabled);
+ else twSetColorAttr(dialog_cset.group.active);
  twGotoXY(4,4); twPutChar(GetBool(sf_flags & SF_CASESENS));
+ twSetColorAttr(dialog_cset.group.active);
  twGotoXY(4,5); twPutChar(GetBool(sf_flags & SF_WORDONLY));
  twGotoXY(4,6); twPutChar(GetBool(sf_flags & SF_REVERSE));
  twGotoXY(46,4); twPutChar(GetBool(sf_flags & SF_ASHEX));
- if(!(flags & SD_ALLFEATURES)) twSetColorAttr(dialog_cset.group.disabled);
+ twSetColorAttr((!(flags & SD_ALLFEATURES) || sf_flags & SF_ASHEX)?dialog_cset.group.disabled:dialog_cset.group.active); 
  twGotoXY(46,5); twPutChar(GetBool(sf_flags & SF_WILDCARDS));
- if(((flags & SD_ALLFEATURES) && activeMode->search_engine))
- {
-   twGotoXY(46,6); twPutChar(GetBool(sf_flags & SF_PLUGINS));
- }
+ twSetColorAttr(!((flags & SD_ALLFEATURES) && activeMode->search_engine)?dialog_cset.group.disabled:dialog_cset.group.active); 
+ twGotoXY(46,6); twPutChar(GetBool(sf_flags & SF_PLUGINS));
+ twSetColorAttr(dialog_cset.main);
+ twUseWin(using);
+}
+
+static void __NEAR__ __FASTCALL__ SearchUpdate(TWindow *wdlg,int _flags,
+                                              unsigned sf_flags)
+{
+ TWindow *using = twUsedWin();
+ twUseWin(wdlg);
+ twSetColorAttr((sf_flags & SF_ASHEX)?dialog_cset.group.disabled:dialog_cset.group.active);
+ twGotoXY(2,4); twPutS(msgFindOpt[0]);
+ twSetColorAttr(dialog_cset.group.active);
+ twGotoXY(2,5); twPutS(msgFindOpt[1]);
+ twGotoXY(2,6); twPutS(msgFindOpt[2]);
+ twGotoXY(44,4); twPutS(msgFindOpt2[0]);
+ twSetColorAttr((!(_flags & SD_ALLFEATURES) || sf_flags & SF_ASHEX)?dialog_cset.group.disabled:dialog_cset.group.active); 
+ twGotoXY(44,5); twPutS(msgFindOpt2[1]);
+ twSetColorAttr(!((_flags & SD_ALLFEATURES) && activeMode->search_engine)?dialog_cset.group.disabled:dialog_cset.group.active); 
+ twGotoXY(44,6); twPutS(msgFindOpt2[2]);
  twSetColorAttr(dialog_cset.main);
  twUseWin(using);
 }
@@ -444,7 +464,8 @@ tBool __FASTCALL__ SearchDialog(int _flags, char * searchbuff,
   tRelCoord X1,Y1,X2,Y2;
   unsigned x[2] = { 0, 0 };
   int rret, active;
-  tBool update,ret;
+  tBool ret;
+  int update;
   char attr[2] = { __ESS_FILLER_7BIT | __ESS_WANTRETURN | __ESS_ENABLEINSERT | __ESS_NON_C_STR,
                    __ESS_WANTRETURN | __ESS_ASHEX | __ESS_NON_C_STR };
   char ebuff1[MAX_SEARCH_SIZE],ebuff2[MAX_SEARCH_SIZE*3];
@@ -464,15 +485,7 @@ tBool __FASTCALL__ SearchDialog(int _flags, char * searchbuff,
   twinDrawFrameAttr(37,4,42,6,TW_UP3D_FRAME,dialog_cset.main);
   twGotoXY(38,5); twPutS("BASE");
   twGotoXY(2,1);  twPutS(TYPE_STR);
-  twSetColorAttr(dialog_cset.group.active);
-  for(i = 0;i < 3;i++) { twGotoXY(2,i + 4); twPutS(msgFindOpt[i]); }
-  for(i = 0;i < 3;i++)
-  {
-    if((!(_flags & SD_ALLFEATURES) && i > 0) || (i > 1 && !activeMode->search_engine))
-                        twSetColorAttr(dialog_cset.group.disabled);
-    twGotoXY(44,i + 4); twPutS(msgFindOpt2[i]);
-  }
-  twSetColorAttr(dialog_cset.main);
+  SearchUpdate(hwnd,_flags,*sf_flags);
   legal[0] = NULL;
   legal[1] = &legalchars[2];
   ebuff1[0] = ebuff2[0] = '\0';
@@ -486,49 +499,49 @@ tBool __FASTCALL__ SearchDialog(int _flags, char * searchbuff,
   rret = 2;
   ret = True;
   SearchPaint(hwnd,_flags,*sf_flags);
-  update = True;
+  update = 1;
   while(1)
   {
-    twUseWin(ewnd);
     mlen[0] = MAX_SEARCH_SIZE;
     mlen[1] = MAX_SEARCH_SIZE*3;
     active = *sf_flags & SF_ASHEX ? 1 : 0;
     flags = attr[active];
     if(!update) flags |= __ESS_NOREDRAW;
+    twUseWin(ewnd);
     ch = eeditstring(ebuff[active],legal[active],&mlen[active],
                      active ? (*searchlen)*3 : *searchlen,
                      &x[active],flags,NULL, drawSearchPrompt);
-    update = True;
+    update = 1;
     switch(ch)
     {
        case KE_ENTER    : if(searchlen) { rret = 1; ret = True; } else { rret = 0; ret = False; } break;
        case KE_F(10)    :
        case KE_ESCAPE   : rret = 0; ret = False; break;
-       case KE_F(2)     : *sf_flags ^= SF_CASESENS;
-                          update = False;
+       case KE_F(2)     : if(!(*sf_flags&SF_ASHEX)) *sf_flags ^= SF_CASESENS;
+                          update = 0;
                           break;
        case KE_F(3)     : *sf_flags ^= SF_WORDONLY;
-                          update = False;
+                          update = 0;
                           break;
        case KE_F(4)     : *sf_flags ^= SF_REVERSE;
-                          update = False;
+                          update = 0;
                           break;
        case KE_F(1)     : hlpDisplay(7);
-                          update = False;
+                          update = 0;
                           break;
        case KE_F(5)     : *sf_flags ^= SF_ASHEX;
-                          update = True;
+                          update = 2;
                           break;
-       case KE_F(6)     : if(_flags & SD_ALLFEATURES) *sf_flags ^= SF_WILDCARDS;
-                          update = False;
+       case KE_F(6)     : if(!(*sf_flags&SF_ASHEX) && (_flags & SD_ALLFEATURES)) *sf_flags ^= SF_WILDCARDS;
+                          update = 0;
                           break;
        case KE_F(7)     : if(_flags & SD_ALLFEATURES && activeMode->search_engine)
                           *sf_flags ^= SF_PLUGINS;
-                          update = False;
+                          update = 0;
                           break;
        case KE_LEFTARROW:
        case KE_RIGHTARROW:
-                          update = False;
+                          update = 0;
                           break;
        default : break;
     }
@@ -542,8 +555,10 @@ tBool __FASTCALL__ SearchDialog(int _flags, char * searchbuff,
     ExpandHex(ebuff[1],(unsigned char *)searchbuff,*searchlen,0);
     mlen[1] = (*searchlen)*3;
     for(i = 0;i < 2;i++) if(x[i] > mlen[i]) x[i] = mlen[i];
+    if(update>1) SearchUpdate(hwnd,_flags,*sf_flags);
     SearchPaint(hwnd,_flags,*sf_flags);
   }
+  if(*sf_flags & SF_ASHEX) *sf_flags &= ~(SF_CASESENS|SF_WILDCARDS);
   CloseWnd(ewnd);
   CloseWnd(hwnd);
   return ret;
