@@ -168,7 +168,7 @@ void __FASTCALL__ __vioWriteBuff(tAbsCoord x, tAbsCoord y, const tvioBuff *buff,
 {
 #define	LEN(x) (x << 4)
     unsigned char cache_pb[LEN(VMAX_X)];
-    unsigned char *pb, *addr;
+    unsigned char *pb, *dpb, *addr;
 
 /*    if (!len) return; */
 
@@ -192,7 +192,7 @@ void __FASTCALL__ __vioWriteBuff(tAbsCoord x, tAbsCoord y, const tvioBuff *buff,
 
     } else {
 	unsigned i;
-	unsigned char c;
+	unsigned char c,slen;
 	unsigned mode = 0, old_mode = -1;
 	tAbsCoord xx, yy;
 
@@ -200,8 +200,7 @@ void __FASTCALL__ __vioWriteBuff(tAbsCoord x, tAbsCoord y, const tvioBuff *buff,
 
 	gotoxy(x, y);
 
-	memset(pb, 0, LEN(len));
-
+	dpb=pb;
 	for (i = 0; i < len; i++) {
 	    c = buff->chars[i];
 #define cp buff->oem_pg[i]
@@ -226,17 +225,38 @@ void __FASTCALL__ __vioWriteBuff(tAbsCoord x, tAbsCoord y, const tvioBuff *buff,
 			    (output_G1 ? "\016" : "\033(U"):
 			    (output_G1 ? "\017" : "\033(K");
 
-		if (output_G1 && old_mode != mode) strcat(pb, map);
+		if (output_G1 && old_mode != mode)
+		{
+		    strcpy(dpb, map);
+		    dpb += strlen(map);
+		}
 		old_mode = mode;
 	    }
 	    
 	    if (!c) c = ' '; else if (!printable(c)) c = '.';
 
 	    if ((ca != buff->attrs[i - 1] && i) || i == len || !i)
-		strcat(pb, _2ansi(ca));
-	    strncat(pb, &c, 1);
+	    {
+		unsigned char *ptr;
+		ptr = _2ansi(ca);
+		strcpy(dpb, ptr);
+		dpb += strlen(ptr);
+	    }
+	    *dpb=c; dpb++;
 	}
-	twrite(pb);
+	*dpb=0;
+	/* Note: twRefreshWin() may pass HUGE buffer here.
+	   But some stupid terminals can write only a few KB
+	   per call! So this loop is required as workaround for them */
+	dpb=pb;
+	slen=strlen(dpb);
+	while(slen)
+	{
+	    unsigned stored;
+	    stored = twrite(dpb);
+	    dpb+=stored;
+	    slen-=stored;
+	}
 	gotoxy(xx, yy);
     }
     if (pb != cache_pb) free(pb);
