@@ -36,7 +36,7 @@ Table of Contents
 4. Optimization notes
 4.1. A few words about calling conventions
 4.2. Source code optimization notes
-4.3. Tests of performance
+4.3. Performance tests
 5. Final chapter
 
 0. Preamble
@@ -45,8 +45,8 @@ Table of Contents
 new plugin and addon can be easily added to the project,  as  well  as
 removed  from  the  project.  As  interaction  facility  with  OS  and
 computer, BIEW uses own library named biewlib. There are  two  reasons
-of birth and existence of biewlib:
-- Project was born in 16-bit DOS environment with poor development kit
+of creation and existence of biewlib:
+- Project was started in 16-bit DOS environment with poor development kit
 - Portability to non-POSIX systems
 
 1. Hierarchical structure
@@ -77,248 +77,244 @@ of birth and existence of biewlib:
 
 1.1. How it works
 -----------------
-   If you want acquaint with details of  sourcecodes  interaction  you
+   If you want acquaint with details of  sourcecodes  interaction, you
 should install DOXYGEN to which are oriented commentaries  of  project
 sources. Interaction in short:
 
-- At program start control is riched of main function that is  defined
+- At program start control is passed to main function that is  defined
   in biew.c. Here program initializes itself, analyses  command  line,
   reads .ini file, creates general windows,  initializes  plugins  and
-  addons and puts control to mainloop.c file.
-- In module mainloop.c is defined basic message loop  of  program.  It
-  works similar "GetMessage - DispatchMessage" loop  from  Win3.1  SDK
-  with realized callback function.
-- After receiving EXIT message loop returns control to main  function.
-  After getting control main function  of  program  deinitializes  the
-  program, saves variables  in  .ini  file,  disconnects  plugins  and
-  addons, destroys all global objects and terminates an execution.
+  addons and passes control to mainloop.c file.
+- In module mainloop.c basic message loop  of  program is defined . It
+  works similar to "GetMessage - DispatchMessage" loop from Win3.1 SDK
+  with implemented callback function.
+- After receiving EXIT, message loop returns control to main function.
+  Then, main function deinitializes the program,  saves  variables  in
+  .ini file,  disconnects  plugins  and  addons, destroys  all  global
+  objects and terminates.
 
-All other modules is auxiliary for this loop.
+All other modules are auxiliary to this loop.
 
-1.2. Understanding of plugins and addons
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    Now in project exist tree classes an plugins:
+1.2. Understanding plugins and addons
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    There are three classes of plugins:
 - autolevel
 - I level
 - II level
 
-   Plugins of autolevel, basically, are designed for the  file  format
-support. Plugins of this class are automatic plugins. This means:
-- You can not see and find them in the menu, prompts and e.t.c.
-- You can not activate such plugins at your opinion.
-During initialization BIEW performs survey of autolevel  plugin  about
-viewing file format and assign first plugin that is  known  with  this
-format as server of opened file.  This  plugin  is  turned  to  active
-state. All other plugins of this class are turned in unplugged  state.
-Only way to see what plugin of  autolevel  is  active  it  call  "File
-information" utility and read information  about  detected  format  of
-file.
+   Plugins of autolevel, basically, are designed for the given file
+format support. Plugins of this class are automatic. This means:
+- you can't see and find them in the menu, dialogs and e.t.c.
+- you can't activate such plugins on demand.
+During initialization  BIEW  queries  autolevel  plugins about format
+of the given file, and sets first plugin that understands this format
+as a server of the given file. This plugin is turned to active state,
+all other plugins of this class are turned to inactive state.
+The only way to see what autolevel plugin is currently active is to call
+"File information" utility and see information about detected file format.
 
-  Plugins of I level are work horses of project.  They  present  main
-view modes of file. Plugins of this class either as II level  are  not
+
+  Plugins of I level are "work horses" of project.  They  present main
+view modes of file. Plugins of this class (either as II-level) are not
 automatic plugins. This means:
-- You can see and find them in menu, prompts and e.t.c.
-- You can activate such plugins at your opinion.
+- you can see and find them in menu, dialogs and e.t.c.
+- you can activate such plugins on demand.
 
-During initialization BIEW performs survey of  plugin  I  level  about
-who first will be able to handle with the viewing file. Main  goal  of
-such survey is realization of attempt  to  separate  text  and  binary
-files. Anyway, plugins of  I  level  can  be  selected  and  activated
-through the menu. When plugin of I level is activated by  the  program
-or user it performs surveys and initialization  an  plugins  of  level
-II, which are connected with level I plugins only.
+During initialization  BIEW queries  I-level plugins  to find out  which
+one will be able to handle the given file.  Main goal  of  such query is
+an attempt to separate text and binary files.  Anyway,  I-level  plugins
+can be selected and activated via menu. When I-level plugin is activated
+by  the  program  or  user,  it queries and initializes II-level plugins
+which communicate only with I-level plugins.
 
-In principle, in the future can be added plugins of level  III,  which
-will connected with plugins of II level only and e.t.c. ad infinitum.
+Eventually, III-level plugins which will communicate with II-level can
+be added and e.t.c. ad infinitum.
 
-Example  for  understanding  of   differences   between   plugins   of
-autolevel, I level and II level:
+An example to understand differences between autolevel, I-level and
+II-level plugins:
 1. We have opened a file of Windows PE format.
-2.  Plugin  for  PE  format  will  accepted  as  server  for  binaries
-structure of this file. (In principle, we must have a possibility  for
-viewing this file as NE or any other format,  but  if  user  is  aware
-about it then one must to edit  signature  of  file  and  restart  the
-program  or  reread  a  file.  I.e.  basically,   such   features   is
-meaningless).
-3. How to look this file. Program detects  this  file  as  binary  and
-automatically  assigns  binary  mode  viewer.   But   we   must   have
-possibility of change a viewing mode and user can to do  this  through
-the menu.
+2.  Plugin  for PE  format  will be accepted  as a server  for  binary
+structure of this file. (In principle, we should have a possibility to
+view this file as NE or any other format, but if user is aware  of it,
+then he can edit the signature  of the file  and  restart  the program
+or reread the file. I.e. basically, such feature is meaningless).
+3. How to view this file. Program detects  this  file  as  binary  and
+automatically  assigns  binary  mode  viewer. But user must be able to
+to change viewing mode and he can do this via menu.
 4. User selects disassembler mode. In general, PE format  is  designed
 for Intel-32 architecture and disassembler plugin of I  level,  making
-request to active plugin of autolevel (PE format)  will know  of  this
-and assigned ix86 disassembler by default for this file. But  we  must
-have possibility of changing disassembler on any other, and  user  can
-to do it by using menu. But  in  this  case  all  such  work  performs
-plugin of I level (disassembler plugin).
-5. User wants to resolve all internal references in the  viewing  file
-and get full disassembling dump of file. Plugin of I level performs of
-this work. It communicates with plugin of  autolevel which knows  this
-format. Plugin of I level in this  case  is  facility  of  interaction
-between plugin of level II  and  plugin  of  autolevel.  By  the  way,
-plugin of level II also is aware about  references  resolving  but  it
-builds all requests for plugin of I level.
-6. User wants to save result into the file. File utility  also  builds
-all requests to plugin of level  I and this plugin performs  all  work
-for creating connection between plugins of other levels,  but  outputs
-result into the file stream instead of the  screen.
-   Resume: Role of plugins level I is realization of common  interface
-between the program and plugins of other levels  and  containing  some
-common function for  plugins  of  next  level,  which  abstracts  such
-plugins from some media specific features.
+request to active plugin of autolevel (PE format) finds this out,  and
+assigns ix86 disassembler by default for this file.  But user  must be
+able to change disassembler to any other, and he can do this via menu.
+However in this case all such work is performed  by the I-level plugin
+(disassembler plugin).
+5. User wants  to resolve  all internal references  in the viewed file
+and get  full disassember dump  of the file.  I-level plugin does this
+job.  It communicates  with autolevel plugin  which knows this format.
+I-level plugin  in  this case  is a facility  of  interaction  between
+plugin of level II and plugin  of  autolevel.  By  the  way, plugin of
+level II also is aware  about reference resolving  but  it builds  all
+requests for I-leve plugin.
+6. User wants to save result into a file.  File  utility  also  builds
+all requests to I-level plugin,  and this plugin  performs all work of
+creating connection between plugins of other levels,  but  outputs
+result into a file stream instead of the  screen.
+   Resume: Role of  I-level plugins is  an implementation  of a common
+interface between program and plugins of other levels, and containing
+some common function for  plugins  of  next  level,  which  abstracts
+such plugins from some system specific features.
    In terms of C++ plugin of level I provides  an  interface  of  base
 class for plugins of next level.
 
   In contrast with plugins, addons are modules, which  do  not  change
 properties of program and only add some useful features into it.  They
-always  are  selected  through  the  menu  at  user  opinion.  Program
-interface of addons is too simple  and  can  be  understood  from  the
-source code of program.
+always are selected via menu  at  user  opinion.  Program interface of
+addons is quite simple  and can  be  understood  from  the source code
+of the program.
 
 1.3. Why biewlib
 ~~~~~~~~~~~~~~~~~~
-   As  this  is  described  above  exist  two  reasons  of  birth  and
-existence of biewlib:
-- Project was born in 16-bit DOS environment with poor development kit
+   As said above,  there  are  two  reasons  of  creation and existence
+of biewlib:
+
+- Project was started in 16-bit DOS environment with poor development kit
 - Portability to non-POSIX systems
-  Biewlib does not pretend on the  place  of  substitute  C  and  many
-other existence libraries. Unfortunately, many topics in biewlib  were
-born as facility of fighting with errors  of  standard  libraries  and
-discrepancy of  properties  their  functions  to  documentation.  Some
-parts of biewlib were born as facility of  rehabilitation of  dead  or
-abandoned libraries. For this existed history  reasons.  When  project
-was born there were a lot of  unknown  today  companies  with  popular
-products. Part from them now in the WindZone,  part  are  acquired  by
-the others. If separate biewlib on parts that will be got following:
+
+  Biewlib does not pretend  to substitute libc  and  other libraries.
+Unfortunately, many functions in biewlib  were created as a  facility
+of struggling with errors of standard libraries and discrepancy of
+properties of their functions with documentation. Some biewlib parts
+were created as a facility of rehabilitation of dead  or abandoned
+libraries. There were historical reasons for this.  When  project was
+started, there were a lot of  unknown  today  companies  with  popular
+products. Some of them are now in the WindZone, some are acquired  by
+the others. So, biewlib consists of:
 - bbio     - a facility of  caching  the  binary  streams  (Family  of
              functions, working with FILE * streams in  many  IDE  (at
              least in early  versions)  contain  errors  when  working
              with binary files.
-- biewlib  - contains   functions,   which   are   implemented    with
-             difference  in  posix  and  ms-compatible  libraries  and
-             small kit, eager to  increase,  useful  utilities,  being
-             absent in all C-libraries.
-- file_ini - an unique library for work with .ini files.
+- biewlib  - contains functions  which  are implemented differently in
+             posix  and  ms-compatible  libraries,  and  a  small (but
+	     increasing) kit of useful functions  that  are  absent in
+	     all C-libraries.
+- file_ini - an unique library to handle .ini files.
 - pmalloc -  implements some useful mechanisms of work with the memory
              in the preemptive mode. (May be I not right - but  I  did
-             not find of facilities in the standard kit an  libraries,
+             not find of facilities in the standard kit of  libraries,
              signalizing to program on  the  lack  of  memory  in  the
              system).
 - twin -     a window library  that  is  compatible  by  functionality
              with the window library of TopSpeed C JPI  (window.h)  to
              which project was oriented from begin. (It  seems  to  me
-             that mostly easier to create  a  full  analogue  of  this
+             that  it is easier to create  a  full  analogue  of  this
              library instead porting the project under other  windows.
-             In additional I had own library of  windows  -  I  vastly
-             increased it and make it portable).
-sysdep/ -    all that is  located  in  this  subdirectory  needed  for
+             In addition, I had my own window library -  I've expanded
+	     it vastly and made it portable).
+sysdep/ -    all that is located in  this  subdirectory is needed  for
              implementation of lowlevel  interface  to  the  operating
              system. I hope - here all so understandable. May be  only
-             one question - why fileio.c?  Strangely,  but  even  port
-             gcc under os/2 - emx-0.9c(d) is kept an error  when works
-             with   files   through   open,   read,   write,    close.
+             one question - why fileio.c?  Strange, but even  port  of
+             gcc under os/2 - emx-0.9c(d) has error  when working with
+             files through   open,   read,   write,    close.
              Consequently  fileio  (either  as  all   others)   -   is
              guarantee of stable work  of project  independently  from
              IDE.
-   Certainly, biew uses standard functions from C libraries, but  this
-in general ANSI compatible  functions  (ISO  -  too  narrow  for  such
-project, as biew, POSIX - in many versions of C-libraries  implemented
-or with bugs or with errors). Anyway, using  subset  of  functions  in
-biew does not cause problems at  recompiling  it  under  MSC,  Watcom,
-TopSpeed and many ports of gcc. Though  -  certainly,  if  working  of
-some functions  causes  suspicions,  the  more  correct  to  take  its
-implementation from stable working  project  with  the  open  sources,
-than reject a  development  system  (Example:  qsort  -  lfind,  which
-happen to take from the project  djgpp.)  or  search  and  correct  an
-error by hand.
+   Certainly, BIEW uses standard functions from C libraries, but these
+are in general ANSI compatible functions  (ISO is too narrow for  such
+project, and POSIX in some versions of C-libraries is implemented with
+bugs or with errors). Anyway, using this subset  of  functions in BIEW
+doesn't cause problems when recompiling it under MSC, Watcom, TopSpeed
+and many ports of gcc. However (certainly)  if  some  function  causes
+trouble,  the  more  correct  way is to  take  its implementation from
+a stable open source project,  than  to  reject the development system
+(example: qsort - lfind, which are  taken from djgpp.), or to find and
+fix the error manually.
 
 
 2. How to expand or port the project
 ====================================
 
-    In general project is expandable on tree ways:
-- Adding and register new plugin.
-- Adding and register new addon.
-- Porting a project under new computing architecture and/or OS.
-    All other cases are  rewriting  an  ideology  of  project  and/or
-patching mistakes and errors.
+    In general project is expandable in three ways:
+- Adding and registering new plugin.
+- Adding and registering new addon.
+- Porting project under new computing architecture and/or OS.
+    All other cases are rewriting of project ideology and/or bugfixes.
 
-2.1. Creation a pluggins and addons
------------------------------------
+2.1. Creating plugins and addons
+--------------------------------
 
-   For creating of new plugin or addon  is  necessary  to  create  the
-object, whose interface must be implemented through  the  corresponded
-structure. Though such variant is  not  the  most  ideal   for  future
-extension of  possibilities  of  such  objects,  but  this  scheme  is
-chosen as facility of  program  parts  interaction,   additionally  it
-does not exclude  a  possibility  of  implementation  of  objects,  as
-external modules in the manner of  dynamically  linked  libraries  and
-e.t.c.
-  For creating plugins of any level always  possible  using  of  empty
-template, which is submitted for each level:
+   To  create  a  new  plugin  or  addon  it is necessary to create an
+object whose interface will be implemented through  the  correspondent
+structure.  Though this way is not the most ideal for future extension
+of features of such objects,  this  scheme  was  chosen as facility of
+interaction  of  program  pieces,  additionally  it does not exclude a
+possibility of implementation  of  objects  as external modules in the
+manner of shared (dynamically linked) libraries and e.t.c.
+  To create plugins of any level it is always possible to use an empty
+template which is submitted for each level:
 - autolevel: plugins/bin/bin.c
 - level I: plugins/binmode.c
 - level II:
   - disassembler:              plugins/disasm/null_da.c
   - national language support: plugins/nls/russian.c
-  Practically, all (except russian.c) files contain  a  minimum  level
-of functionality, which is allowed for objects of such class.
-  The file reg_form.h contains declaration of  interfaces,  and  their
-full description, for plugins (except  of  level  II  and  above)  and
+  Practically,  all  files (except russian.c)  contain  minimum  level
+of functionality which is allowed for objects of such class.
+  The file reg_form.h contains declaration  of  interfaces  and  their
+full description  for plugins (except  of  level  II  and  above)  and
 addons.
-  Description of interface for  plugins  of  II  level  is  located in
-corresponding header files for plugins level I.
-  As accepted in rules, all files, which implement interfaces must  be
+  Description of interface  for  plugins  of  level II  is  located in
+corresponding header files for plugins of level I.
+  As accepted in rules, all files  which implement interfaces must  be
 located in corresponding thematic directories  and  contain  not  more
-than one interface per file. In the future  this  will  enable  detach
-their into the separate modules.
-  After writing of source code there is the last thing that needed  to
-do: to correct corresponding  makefiles  with  the  aid  of  which  is
-planned to build the project.
+than one interface per file. In the future  this  will allow to detach
+them into separate modules.
+  After writing source code, there is the last thing needed to be done:
+add your file(s) to correspondent makefile(s) so that your code will be
+built.
 
 2.2. Project porting
 --------------------
 
-   Problem of porting a project one of  the  most  light.  All  system
-depended  parts  of  the  project  is   located   in   the   directory
+   The task of porting a project one of the  most  easiest. All system
+depended  parts  of  the  project  are  located   in   the   directory
 'biewlib/sysdep'. Structure of  subdirectories  is  built  as  CPU/OS.
-Exception from this rule is 'generic' subdirectory,  where  inheres  a
-code, which can be used on any platforms. Within of this  subdirectory
-also are located subdirectories 'posix' and 'unix'. Directory  'posix'
-contains a implementation of  functions,  which  are  common  for  all
-fully posix-compatible operating systems. POSIX can not be  completely
+Exception from this rule  is  'generic'  subdirectory,  where  inheres
+code which can be used on any platforms. Within this subdirectory also
+are located subdirectories  'posix'  and  'unix'.  'posix' contains an
+implementation  of  functions  which  are  common  for  all completely
+POSIX-compatible  operating  systems.  POSIX  can  not  be  completely
 implemented  in  terms  of  itself,  so  a  compilation   using   just
-TARGET_OS=posix can not  be  complete.  Directory  'unix'  contains  a
+TARGET_OS=posix  will  not  complete.  Directory  'unix'  contains  an
 implementation of all functions for  fully  unix-compatible  operating
 systems.  Most  Unix   systems   are   fundamentally   very   similar.
 Unfortunately, unified standard, like  POSIX,  for  implementation  of
 console (however either  as  graphics)  applications  does  not  exist
-today, and if it will  appear,  stays  a  lot  of  existing  operating
-system (or at least development systems), which  will  not  compatible
-with it. In this connexion, it was  necessary  to  implement  invented
-standard separately  for  each  operating  system.  (If  OS  is  fully
-unix-compatible, then hardly needed to  port  project,  though  hardly
-somebody will happy to wait of program reactions in this model).
-   All system depended  functions  well  documented  in  corresponding
-header files, that is located in biewlib and its subdirectories.
-   If during project porting some  file  can  be  taken  from  existed
-implementation, it can be easy made  by including this  file  in  anew
-created.
+today; and even if it will appear, a lot of existing operating systems
+(or at least development systems) which will be not compatible with it
+will stay. In this connexion, it was necessary to  implement  invented
+standard separately  for  each  operating  system.  (If an OS is fully
+unix-compatible it is hardly needed to port project, though a "native"
+port could be perform much better).
+   All system depended functions are well documented  in  corresponding
+header files which are located in biewlib and its subdirectories.
+   If during project porting some  file  can  be  taken  from  existing
+implementation, it can be easy accomplished by including this file from
+anew created.
 Example:
-The file /biewlib/sysdep/ia32/linux/fileio.c contains a single line:
+/biewlib/sysdep/ia32/linux/fileio.c contains a single line:
 #include "biewlib/sysdep/generic/linux/fileio.c"
-   Thereby,  these  are  implemented  portable  on  any  file  systems
-"symbolic links". After writing of  source  code  there  is  the  last
-thing that needed to do: to correct corresponding makefiles  with  the
-aid of which is planned to build the project.
+   Thus are implemented portable  to any file systems "symbolic links".
+After writing source code,  there  is the last thing needed to be done:
+add your file(s) to correspondent makefile(s) so that your code will be
+built.
 
 3. Source code notes
 ====================
 
    History of project is beginning in  DOS  environment.  Project  was
-born and for a long time  existed  in  DOS.  In  this  connexion,  are
-accepted following rules of source code development:
-- All source of  project  has  written  in  ibm-866  code  page  (equ:
+born and for a long time  existed  in  DOS.  In  this  connexion,  the
+following rules of source code development should be followed:
+- All source of  project  are  written  in  ibm-866  code  page  (equ:
   ibm-437 + russian letters).
 - All names of files must be in 8.3 model, no symlinks e.t.c  (Project
   builds in DOS environment).
@@ -326,14 +322,14 @@ accepted following rules of source code development:
 3.1. Placing of sources
 -----------------------
 
-  Directory where sources will be placed  do  not  matter.  All  paths
-which used in project are relative.
+  Directory where sources will be placed  does not  matter.  All paths
+used in the project are relative.
 
 3.2. Source layout
 ------------------
 
-  Hierarchy of source tree is very simple. Top level is  started  from
-directory where source code is located. Following picture  illustrated
+  Hierarchy of source tree is very simple. Top level is started from
+directory where source code is located.  The following picture shows
 source tree layout:
 
 /          - top level contains entry point routine and common utilities
@@ -359,68 +355,65 @@ tools      - contains auxiliary utilities
   The process of building the project is  driven  by  makefile,  which
 uses features of GNU make utility. The makefile is not  very  complex,
 and you probably want to try to understand it. All rules  are  defined
-in makefile.inc file. Makefile included this file to itself  and  does
+in makefile.inc file. Makefile includes this file into itself and does
 not contain any OS and CPU specific information. All what you must  to
 do during porting project it add OS and  CPU  specific  sections  into
-makefile.inc using previously declared sections as template. After  it
-you  can  change  values  of  TARGET_OS  and  TAGET_PLATFORM  to   the
-preferred values.
+makefile.inc using previously declared sections as template. Then, you
+can change values of TARGET_OS and TAGET_PLATFORM to preferred values.
 
 4. Optimization notes
 =====================
 
-   Task  of  optimization  of  any   program   requires   a   separate
-interpretation. Each program has their own fine places  which  require
-special optimization for the qualitative speedup of project.
-   Of course biew -  interactive  program,  therefore  interchange  by
-information with console will thin place for it.  In  any  case,  best
-facility  for  searching  such  places  in  each  separate  event   is
-profiler, but today some function is already known as  possible  brake
-for project and after their  optimization  seriously  accelerating  of
-project is possible:
+   Task of optimization of any program needs separate interpretation.
+Each  program  has  its  own  subtle  places  which  require  special
+optimization for qualitative speedup of project.
+   Of course BIEW is an interactive program,  therefore interchange of
+information with console will be a thin place  for it.  In  any  case,
+the best facility for searching such  places  in  each  separate  case
+is profiler, but some functions are already known as potential "brake"
+for the project, and after their optimization  serious acceleration of 
+the project is possible:
 - __MsGetPos
-- __vioGet(Set)CursorPos (it is cached if to  use  twGet(Set)CursorPos
-  instead)
-  Thereby, best  implementation  of  these  and  other  functions  for
-working with the console will  using  of  internal  flags,  that  must
-signalizing about  changing  of  state  observed  (by  this  function)
-objects, which asynchronously change of own state.
-   Optimization of non interactive  part  of  program  needed  special
-measurements by profiler.
+- __vioGet(Set)CursorPos (it is cached when using twGet(Set)CursorPos)
+  Thereby, the best implementation of these and  other  functions  for
+working with the console will be using of  internal flags,  that  must
+signalize about  changing  of  state of observed  (by  this  function)
+objects, which asynchronously changes its own state.
+   Optimization of non-interactive parts of the program needs  special
+measurements with profiler.
    See also 4.3
 
 4.1. A few words about calling conventions
 ------------------------------------------
 
-   Why has happened so that mainstream of programmers  considers  that
-destiny  of  language  C  is  cdecl  calling  convention.   Absolutely
-understandable that K&R  áreated  language  C  on  earliest  stage  of
+   Somewhy it has happened that mainstream of programmers thinks  that
+destiny of C language is  cdecl  calling  convention. It is absolutely
+understandable that K&R created C language  on the earliest  stage  of
 computer industry evolution. The base concept of  accepted  agreements
 about  calling  convention  is implementation of variable  number   of
-arguments (...). But, in first - percent proportion of such  functions
-per the program is too little and secondly - this was a first  edition
-of standard that hereinafter was correctly extended by ANSI  committee
-up to modifiers of call. I do not want to consider these questions  in
-terms  of  non  Intel  architectures,  may  be  there  are  their  own
-particularities, though I am convinced that  on  these  platforms  are
-possible to use fast calling convention.  But  as  far  as  during  of
-writing of this document by the working platforms for the program  are
-ia16 and ia32 architectures, such kind of optimization is  meaningful.
-Certainly it will possible to object to me  that  with  appearance  in
-newest processors of branch prediction, pipelinest and  etc  -  effect
-from similar changes is lost, but in first, this  yet  does  not  mean
-that program will not  work  on  earlier  processor  models.  Secondly
-decreasing of code size (by such  optimization)  always  produces  the
-most effective using of processor caches and in third it  is  not  the
-fact  that  pipelines  and  predictions  reduce  optimization  effects
-towards the zero, they minimize effect of cdecl but in any case  there
-are differences.
-   Be that as it may, in the  code  is  defined  macros  __FASTCALL__,
-with aid of which big part of the project is  modified.  In  principle
-it can be redefined with any value,  but  during  development  of  new
-functions it would be better to use it.
+arguments (...). But, first - percent proportion of such functions per
+program is too small,  and second - this was the first edition  of the
+standard that hereinafter was correctly extended by ANSI  committee up
+to call modifiers. I do not want to consider these questions  in terms
+of non-Intel architectures,  which may have their own particularities,
+though I am convinced  to think  that  it is possible  to use fastcall
+convention on these platforms as well. But,  as main working platforms
+for the project ia16 and ia32 architectures (at the time of writing),
+such kind of optimization is reasonable.  Certainly it is possible  to
+object me that, with appearance of branch prediction, pipelinest, etc.
+in new processors, the effect of such changes becomes lost, but first,
+this yet does not mean that program will not run on earlier  processor
+models; second, decreasing of code size (by such  optimization) always
+produces the most effective use of processor caches; and, third, it is
+not evident that pipelines and predictions reduce optimization effects
+down to zero, they minimize effect of cdecl but in any case  there are
+still some differences.
+   Be that as it may, the project defines macro __FASTCALL__, which is
+involved in big part of the project.  Allthough (theoretically) it can
+be redefined with any value,  it  would  be  better  to  use it during
+development of new functions.
 
-What said Watcom manual about calling conventions:
+What Watcom manual says about calling conventions:
 
 __cdecl:
 Defines the calling convention used by Microsoft compilers.
@@ -536,12 +529,12 @@ Notes:
 4.2. Source code optimization notes
 -----------------------------------
 
-   There are  may  exist  various  interpretations  of  brought  below
-material - as manual about how never need to program or accept  it  as
-guidelines. (While I was reading it seems  to  me  very  strange,  why
-this work must do programmer but not processor).  But  anyway  - these
-are official recommendations from leaders of processors  industry  for
-personal computers and they must be well known.
+   There could be various interpretations of the material brought below:
+as a manual about how to code not, or as a ultimate guideline (it seemed
+to me very strange while I was reading them that this work is being left
+to programmer, and not to processor).  But  anyway  - these are official
+recommendations  from  the  leaders  of  processor industry for personal
+computers and they must be well known.
 
 Intel P-III manual says:               Athlon-K7 manual says:
 
@@ -1016,7 +1009,7 @@ MMF  -        Memory Mapped Files is a technique used to access files
 
 Numbers in few words:
    Up to 5.3.0-pre.2 OS/2 port of program was the  slowest,  but  with
-implementation of new technologies, it  occupied  a  worthy  place  in
+implementation of new technologies  it  occupied  a  worthy  place  in
 comparative performance. Numbers in parenthesis indicate work time  at
 the first start, which means: it does not matter how long  the  OS  is
 working before this program is started, but important is that  program
