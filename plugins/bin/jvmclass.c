@@ -79,6 +79,7 @@ typedef struct ClassFile_s
 ClassFile_t jvm_header;
 
 static BGLOBAL jvm_cache;
+static BGLOBAL pool_cache;
 
 static tBool  __FASTCALL__ jvm_check_fmt( void )
 {
@@ -190,7 +191,10 @@ static void __NEAR__ __FASTCALL__ skip_fields(unsigned nitems,int attr)
 	fpos=bmGetCurrFilePos();
 	if(i==0)
 	{
-	    attr?jvm_header.code_offset:jvm_header.data_offset=sval?fpos+6:fpos;
+	    unsigned long lval;
+	    lval=sval?fpos+6:fpos;
+	    if(attr) jvm_header.code_offset=lval;
+	    else jvm_header.data_offset=lval;
 	}
 	skip_attributes(bmbioHandle(),sval);
     }
@@ -576,11 +580,13 @@ static void __FASTCALL__ jvm_init_fmt( void )
     jvm_header.header_length=bmGetCurrFilePos();
     bmSeek(fpos,BM_SEEK_SET);
     if((jvm_cache = bioDupEx(bmbioHandle(),BBIO_SMALL_CACHE_SIZE)) == &bNull) jvm_cache = bmbioHandle();
+    if((pool_cache = bioDupEx(bmbioHandle(),BBIO_SMALL_CACHE_SIZE)) == &bNull) pool_cache = bmbioHandle();
 }
 
 static void __FASTCALL__ jvm_destroy_fmt(void)
 {
   if(jvm_cache != &bNull && jvm_cache != bmbioHandle()) bioClose(jvm_cache);
+  if(pool_cache != &bNull && pool_cache != bmbioHandle()) bioClose(pool_cache);
 }
 
 static int  __FASTCALL__ jvm_platform( void) { return DISASM_JAVA; }
@@ -863,38 +869,39 @@ static unsigned long __FASTCALL__ jvm_AppendRef(char *str,unsigned long ulShift,
 	    default:
 	    case 1: lidx=bioReadByte(jvm_cache); break;
 	}
-	bioSeek(jvm_cache,jvm_header.constants_offset,BM_SEEK_SET);
-	skip_constant_pool(jvm_cache,lidx-1);
-	utag=bioReadByte(jvm_cache);
+	bioSeek(pool_cache,jvm_header.constants_offset,BM_SEEK_SET);
+	if(lidx<1 || lidx>jvm_header.constant_pool_count) { retrf = RAPREF_NONE; goto bye; }
+	skip_constant_pool(pool_cache,lidx-1);
+	utag=bioReadByte(pool_cache);
 	str=&str[strlen(str)];
 	switch(utag)
 	{
 	    case CONSTANT_STRING:
 	    case CONSTANT_CLASS:
-			get_name(jvm_cache,str,slen);
+			get_name(pool_cache,str,slen);
 			break;
 	    case CONSTANT_FIELDREF:
 	    case CONSTANT_METHODREF:
 	    case CONSTANT_INTERFACEMETHODREF:
-			fpos=bioTell(jvm_cache);
-			sval=bioReadWord(jvm_cache);
+			fpos=bioTell(pool_cache);
+			sval=bioReadWord(pool_cache);
 			sval=FMT_WORD(&sval,1);
-			sval2=bioReadWord(jvm_cache);
+			sval2=bioReadWord(pool_cache);
 			sval2=FMT_WORD(&sval2,1);
-			bioSeek(jvm_cache,jvm_header.constants_offset,BM_SEEK_SET);
-			get_class_name(jvm_cache,sval,str,slen);
+			bioSeek(pool_cache,jvm_header.constants_offset,BM_SEEK_SET);
+			get_class_name(pool_cache,sval,str,slen);
 			strcat(str,".");
 			sl=strlen(str);
 			slen-=sl;
 			str+=sl;
-			bioSeek(jvm_cache,jvm_header.constants_offset,BM_SEEK_SET);
-			skip_constant_pool(jvm_cache,sval2-1);
-			utag=bioReadByte(jvm_cache);
+			bioSeek(pool_cache,jvm_header.constants_offset,BM_SEEK_SET);
+			skip_constant_pool(pool_cache,sval2-1);
+			utag=bioReadByte(pool_cache);
 			if(utag!=CONSTANT_NAME_AND_TYPE) break;
 			goto name_type;
 	    case CONSTANT_INTEGER:
 	    case CONSTANT_FLOAT:
-			lval=bioReadDWord(jvm_cache);
+			lval=bioReadDWord(pool_cache);
 			lval=FMT_DWORD(&lval,1);
 			strcpy(str,utag==CONSTANT_INTEGER?"Integer":"Float");
 			strcat(str,":");
@@ -902,32 +909,32 @@ static unsigned long __FASTCALL__ jvm_AppendRef(char *str,unsigned long ulShift,
 			break;
 	    case CONSTANT_LONG:
 	    case CONSTANT_DOUBLE:
-			lval=bioReadDWord(jvm_cache);
+			lval=bioReadDWord(pool_cache);
 			lval=FMT_DWORD(&lval,1);
-			lval2=bioReadDWord(jvm_cache);
+			lval2=bioReadDWord(pool_cache);
 			lval2=FMT_DWORD(&lval2,1);
-			strcpy(str,utag==CONSTANT_INTEGER?"Integer":"Float");
+			strcpy(str,utag==CONSTANT_INTEGER?"Long":"Double");
 			strcat(str,":");
 			strcat(str,Get8Digit(lval));
 			strcat(str,Get8Digit(lval2));
 			break;
 	    case CONSTANT_NAME_AND_TYPE:
 	    name_type:
-			fpos=bioTell(jvm_cache);
-			get_name(jvm_cache,str,slen);
-			bioSeek(jvm_cache,fpos+2,BM_SEEK_SET);
+			fpos=bioTell(pool_cache);
+			get_name(pool_cache,str,slen);
+			bioSeek(pool_cache,fpos+2,BM_SEEK_SET);
 			strcat(str," ");
 			sl=strlen(str);
 			slen-=sl;
 			str+=sl;
-			get_name(jvm_cache,str,slen);
+			get_name(pool_cache,str,slen);
 			break;
 	    case CONSTANT_UTF8: 
-			sval=bioReadWord(jvm_cache);
+			sval=bioReadWord(pool_cache);
 			sval=FMT_WORD(&sval,1);
 			sl=min(slen,sval);
-			fpos=bioTell(jvm_cache);
-			bioReadBuffer(jvm_cache,str,sl);
+			fpos=bioTell(pool_cache);
+			bioReadBuffer(pool_cache,str,sl);
 			str[sl]='\0';
 			break;
 	    default:	retrf = RAPREF_NONE;
@@ -935,6 +942,7 @@ static unsigned long __FASTCALL__ jvm_AppendRef(char *str,unsigned long ulShift,
 	}
     }
     else retrf = RAPREF_NONE;
+    bye:
     return retrf;
 }
 
