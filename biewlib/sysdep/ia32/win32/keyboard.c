@@ -28,6 +28,11 @@
  * @warning     May not work propertly under some Win32 releases
  * @bug         Under WinNT does not return correct values for some
  *              combinations of keys (like CtrlBkSpace)
+ * @note        added mouse wheel support for Win2k+ (emit Up/Down key event)
+ * @warning     ONE WHEEL SUPPORTED ONLY :-/
+ * @bug         Some wheel processing freezing found
+ * @author      Andrew Golovnia
+ * @date        19.12.2003
 **/
 #include <windows.h>
 #include <limits.h>
@@ -76,15 +81,21 @@ void __FASTCALL__ win32_readNextMessage( void )
     {
       case MOUSE_EVENT:
       {
-          static int buttons = 0;
-          win32_mbuttons = ir.Event.MouseEvent.dwButtonState;
-          if( buttons != win32_mbuttons )
-          {
-              win32_mx = ir.Event.MouseEvent.dwMousePosition.X;
-              win32_my = ir.Event.MouseEvent.dwMousePosition.Y;
-              if(KB_freq < sizeof(KB_Buff)/sizeof(int)) KB_Buff[KB_freq++] = KE_MOUSE;
-              buttons = win32_mbuttons;
-          }
+        static int buttons = 0;
+        win32_mbuttons = ir.Event.MouseEvent.dwButtonState & 0xffff;
+        if( buttons != win32_mbuttons )
+        {
+    	    win32_mx = ir.Event.MouseEvent.dwMousePosition.X;
+            win32_my = ir.Event.MouseEvent.dwMousePosition.Y;
+            if(KB_freq < sizeof(KB_Buff)/sizeof(int)) KB_Buff[KB_freq++] = KE_MOUSE;
+            buttons = win32_mbuttons & 0xffff;
+        }
+        if( ir.Event.MouseEvent.dwEventFlags & MOUSE_WHEELED )
+        {
+            int wheel = ( (int)ir.Event.MouseEvent.dwButtonState ) >> 16;
+            if( wheel < 0 ) KB_Buff[KB_freq++] = KE_DOWNARROW;
+            if( wheel > 0 ) KB_Buff[KB_freq++] = KE_UPARROW;
+        }
       }
       return;
       case KEY_EVENT:
