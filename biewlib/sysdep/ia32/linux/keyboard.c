@@ -1,4 +1,4 @@
-/** 
+/**
  * @namespace   biewlib
  * @file        biewlib/sysdep/ia32/linux/keyboard.c
  * @brief       Linux direct console / vt100 keyboard library
@@ -233,7 +233,7 @@ static eseq S[SEQ_NUM] = {
 {'[', '2', '^', (p1seq *)seq8 },
 };
 
-mevent mouse = {0, 0, 0, 0};
+static mevent mouse = {0, 0, 0, 0};
 
 /*
 

@@ -1,4 +1,4 @@
-/** 
+/**
  * @namespace   biewlib
  * @file        biewlib/sysdep/generic/unix/console.h
  * @brief       unix console internals
@@ -129,8 +129,6 @@
 extern int on_console, terminal, transparent, do_nls;
 extern tBool break_status;
 
-#define TESTFLAG(x,y) (((x) & y) == y)
-
 typedef struct {
     int x;
     int y;
@@ -185,5 +183,7 @@ extern Console console;
 #define	__vioGetCursorType	console.GetCursorType
 #define	__vioSetCursorType	console.SetCursorType
 */
+
+#define TESTFLAG(x,y) (((x) & y) == y)	/* this define should be in other header */
 
 #endif	/* __CONSOLE_H */

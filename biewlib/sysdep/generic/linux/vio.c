@@ -1,4 +1,4 @@
-/** 
+/**
  * @namespace   biewlib
  * @file        biewlib/sysdep/generic/linux/vio.c
  * @brief       general implementation of video i/o functions for linux.
@@ -82,7 +82,7 @@ static unsigned char frames_dumb[0x30] =
 #define _2color(x) __Xlat__(__ansi_color, (x) & 7)
 /* #define _2color(x) (char)__ansi_color[((x) & 7)] */
 
-struct {
+static struct {
     unsigned char last;
     unsigned char color[0x10];
 } tp = { 0 };

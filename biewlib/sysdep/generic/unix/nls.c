@@ -1,4 +1,4 @@
-/** 
+/**
  * @namespace   biewlib
  * @file        biewlib/sysdep/generic/unix/nls.c
  * @brief       This file contains implementation of cyrillic codepages support
@@ -49,10 +49,10 @@ void __FASTCALL__ __nls_OemToOsdep(unsigned char *buff, unsigned int len)
 
 void __FASTCALL__ __nls_OemToFs(unsigned char *buff, unsigned int len)
 {
-	int i;
+    int i;
 
-	for (i = 0; i < len; i++)
-	    if (buff[i] >= 0x80) buff[i] = __Xlat__(alt2koi,buff[i] - 0x80);
+    for (i = 0; i < len; i++)
+	if (buff[i] >= 0x80) buff[i] = __Xlat__(alt2koi,buff[i] - 0x80);
 }
 
 void __FASTCALL__ __nls_CmdlineToOem(unsigned char *buff, unsigned int len)

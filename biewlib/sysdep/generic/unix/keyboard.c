@@ -1,4 +1,4 @@
-/** 
+/**
  * @namespace   biewlib
  * @file        biewlib/sysdep/generic/unix/keyboard.c
  * @brief       slang/curses/vt100 keyboard library
@@ -206,7 +206,7 @@ static struct {
     mouse event
 */
 
-mevent mouse = {0, 0, 0, 0};
+static mevent mouse = {0, 0, 0, 0};
 
 static int	shift_status = 0;	/**< status of shift keys */
 static tBool	mouse_status = True;	/**< mouse state */
@@ -474,11 +474,11 @@ void __FASTCALL__ __init_keyboard(void)
 #ifdef	_CURSES_
     raw();
     noecho();
-    intrflush(stdscr,FALSE);
-    meta(stdscr,TRUE);
+    intrflush(stdscr, FALSE);
+    meta(stdscr, TRUE);
     keypad(stdscr, TRUE);
-    nodelay(stdscr,TRUE);
-/*    notimeout(stdscr,TRUE); */
+    nodelay(stdscr, TRUE);
+/*    notimeout(stdscr,TRUE); */ /* somewhy it blocks read function */
 #ifdef NCURSES_MOUSE_VERSION
     mousemask(REPORT_MOUSE_POSITION | ALL_MOUSE_EVENTS, NULL);
 #endif

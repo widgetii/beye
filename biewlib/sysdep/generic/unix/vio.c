@@ -1,4 +1,4 @@
-/** 
+/**
  * @namespace   biewlib
  * @file        biewlib/sysdep/generic/unix/vio.c
  * @brief       slang/curses/vt100 implementation of screen functions
@@ -48,7 +48,7 @@ static tAbsCoord saveX, saveY, firstX = 0, firstY = 0;
 static unsigned violen;
 static unsigned char *viomem;
 
-struct {
+static struct {
     unsigned char last;
     unsigned char color[0x10];
 } tp = { 0 };
@@ -237,7 +237,7 @@ static char *__FASTCALL__ _2ansi(unsigned char attr)
     return vtmp;
 }
 
-#endif
+#endif	/* _VT100_ */
 
 static unsigned char frames_dumb[0x30] =
 ": %|{+++++|+++++`++}-++++++++-+++++++++++++#%[]~";
@@ -262,11 +262,11 @@ inline static int __FASTCALL__ printable(unsigned char c)
 
 static void gotoxy(int x, int y)
 {
-#ifdef	_CURSES_
-    move(y, x);
-#endif
 #ifdef	_SLANG_
     SLsmg_gotorc(y, x);
+#endif
+#ifdef	_CURSES_
+    move(y, x);
 #endif
 #ifdef	_VT100_
     sprintf(vtmp,"\033[%d;%dH", y + 1, x + 1);

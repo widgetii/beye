@@ -1,4 +1,4 @@
-/** 
+/**
  * @namespace   biewlib
  * @file        biewlib/sysdep/generic/unix/kbd_code.h
  * @brief       This file contains definitions of keyboard codes
@@ -109,8 +109,8 @@
 
 
 /*
-    These are not real keyboard codes on vt100.
-    GetKey() translates escape sequence to these values.
+    these are not real keyboard codes on vt100,
+    GetKey() translates escape sequence to these values
 */
 
 #ifdef	_VT100_
@@ -129,7 +129,7 @@
 #endif
 
 /*
-    do not change below
+    do not edit below
 */
 
 #define ADD_CONTROL	0x010000
