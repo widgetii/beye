@@ -142,7 +142,7 @@ long __FASTCALL__ __FileLength(int handle)
   retval = 0;
   if(stat_ret == 0)
   {
-    if((statbuf.st_mode & S_IFDIR) == S_IFDIR) return 0;
+    if(S_ISDIR(statbuf.st_mode)) return 0;
     else retval = statbuf.st_size;
   }
   if(!retval)
