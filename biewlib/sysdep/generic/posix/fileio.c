@@ -171,7 +171,7 @@ long __FASTCALL__ __FileLength(int handle)
 	     goto loop_end;
            }
 	}
-	loop_end:
+	loop_end:;
   }
   return retval;
 }
