@@ -1202,15 +1202,10 @@ static void __FASTCALL__ txtReadIni( hIniProfile *ini )
     HiLight = (int)strtoul(tmps,NULL,10);
     if(HiLight > 1) HiLight = 1;
   }
-  memset(&syntax_hl,0,sizeof(syntax_hl));
-  /* Fill operator's hash */
-  memset(syntax_hl.op_hash,text_cset.normal,sizeof(syntax_hl.op_hash));
-  if(HiLight && txtDetect()) txtReadSyntaxes();
 }
 
 static void __FASTCALL__ txtSaveIni( hIniProfile *ini )
 {
-  unsigned i;
   char tmps[10];
   sprintf(tmps,"%i",bin_mode);
   biewWriteProfileString(ini,"Biew","Browser","SubSubMode3",tmps);
@@ -1220,20 +1215,6 @@ static void __FASTCALL__ txtSaveIni( hIniProfile *ini )
   sprintf(tmps,"%i",HiLight);
   biewWriteProfileString(ini,"Biew","Browser","SubSubMode9",tmps);
   activeNLS->save_ini(ini);
-  if(syntax_hl.name) free(syntax_hl.name);
-  if(syntax_hl.context)
-  {
-     for(i=0;i<syntax_hl.context_num;i++) { free(syntax_hl.context[i].start_seq); free(syntax_hl.context[i].end_seq); }
-     free(syntax_hl.context);
-  }
-  if(syntax_hl.keyword)
-  {
-     for(i=0;i<syntax_hl.keyword_num;i++) { free(syntax_hl.keyword[i].keyword); }
-     free(syntax_hl.keyword);
-  }
-  PHFree(acontext);
-  acontext_num=0;
-  memset(&syntax_hl,0,sizeof(syntax_hl));
 }
 
 static void __FASTCALL__ txtInit( void )
@@ -1250,6 +1231,7 @@ static void __FASTCALL__ txtInit( void )
    memset(&syntax_hl,0,sizeof(syntax_hl));
    /* Fill operator's hash */
    memset(syntax_hl.op_hash,text_cset.normal,sizeof(syntax_hl.op_hash));
+   if(txtDetect()) txtReadSyntaxes();
 }
 
 static tBool __FASTCALL__ txtShowType( void )
@@ -1263,10 +1245,25 @@ static tBool __FASTCALL__ txtShowType( void )
 
 static void __FASTCALL__ txtTerm( void )
 {
-   PFREE(buff);
-   PFREE(tlines);
-   PFREE(ptlines);
-   if(txtHandle != BMbioHandle()) { bioClose(txtHandle); txtHandle = &bNull; }
+  unsigned i;
+  PFREE(buff);
+  PFREE(tlines);
+  PFREE(ptlines);
+  if(txtHandle != BMbioHandle()) { bioClose(txtHandle); txtHandle = &bNull; }
+  if(syntax_hl.name) free(syntax_hl.name);
+  if(syntax_hl.context)
+  {
+     for(i=0;i<syntax_hl.context_num;i++) { free(syntax_hl.context[i].start_seq); free(syntax_hl.context[i].end_seq); }
+     free(syntax_hl.context);
+  }
+  if(syntax_hl.keyword)
+  {
+     for(i=0;i<syntax_hl.keyword_num;i++) { free(syntax_hl.keyword[i].keyword); }
+     free(syntax_hl.keyword);
+  }
+  PHFree(acontext);
+  acontext_num=0;
+  memset(&syntax_hl,0,sizeof(syntax_hl));
 }
 
 static unsigned __FASTCALL__ txtCharSize( void ) { return activeNLS->get_symbol_size(); }
