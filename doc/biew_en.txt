@@ -168,6 +168,18 @@ exe: biew.exe !.!
 dll: biew.exe !.!
 *:   your default viewer
 
+If You use Midnight Commander, then best edit /usr/lib/mc/mc.ext file:
+
+# Default target for anything not described above
+default/*
+	Open=
+-	View=
++	View=biew %f
+	Drop=
+	Title=%p
+
+### EOF ###
+
 If you are not admirer of different  commanders  and  prefer  to  work
 only with GUI shells (like explorer, PM/2 or KDE),  but  herewith  you
 even so have decided to use BIEW, the best decision is to create  BIEW
@@ -404,7 +416,7 @@ R - REVISION.   When   version  is  stable   then   R.T   is   omited.
     hotfix - extraordinary bug fixing in already released version.
     fp     - fix package
 T - TESTLEVEL. revision level of program.
-‘ - CPU. Indicated for which platform build the program.
+C - CPU. Indicated for which platform build the program.
 O - OS. Indicated for which OS build the program.
 
 
