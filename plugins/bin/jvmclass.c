@@ -18,6 +18,7 @@
 #include <stddef.h>
 #include <limits.h>
 #include <string.h>
+#include <stdio.h>
 
 #include "bconsole.h"
 #include "biewhelp.h"
@@ -677,7 +678,7 @@ static tBool __FASTCALL__ jvm_AddressResolv(char *addr,unsigned long cfpos)
 static void __FASTCALL__ jvm_ReadPubName(BGLOBAL b_cache,const struct PubName *it,
                             char *buff,unsigned cb_buff)
 {
-    bioSeek(b_cache,it->nameoff,SEEK_SET);
+    bioSeek(b_cache,it->nameoff,BM_SEEK_SET);
     get_name(b_cache,buff,cb_buff);
     if(it->addinfo)
     {
