@@ -236,7 +236,7 @@ void __FASTCALL__ ix86_ArgNear(char * str,ix86Param *DisP)
   DisP->codelen += Use32Data ? 4 : 2;
   if(!((DisP->flags & __DISF_SIZEONLY) == __DISF_SIZEONLY))
   {
-    newpos = DisP->CodeAddress + lshift + DisP->codelen;
+    newpos = DisP->DisasmPrefAddr + lshift + DisP->codelen;
     disAppendFAddr(str,DisP->CodeAddress + 1,lshift,newpos,
                    Use32Data ? DISADR_NEAR32 : DISADR_NEAR16,0,DisP->codelen-1);
   }
