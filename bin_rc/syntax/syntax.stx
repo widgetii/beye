@@ -42,6 +42,7 @@ pl=perl.stx
 PL=perl.stx
 pm=perl.stx
 PM=perl.stx
+sql=sql.stx
 
 [Names]
 makefile=makefile.stx
