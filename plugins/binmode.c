@@ -15,6 +15,8 @@
  * @note        Development, fixes and improvements
 **/
 #include <string.h>
+#include <stdlib.h>
+#include <stdio.h>
 
 #include "colorset.h"
 #include "bconsole.h"
@@ -28,6 +30,8 @@
 #include "biewlib/kbd_code.h"
 #include "biewlib/biewlib.h"
 
+static unsigned virtWidthCorr=0;
+
 static unsigned __FASTCALL__ drawBinary( unsigned keycode,unsigned tshift )
 {
  char buffer[__TVIO_MAXSCREENWIDTH];
@@ -40,7 +44,8 @@ static unsigned __FASTCALL__ drawBinary( unsigned keycode,unsigned tshift )
  unsigned long limit,flen,cfp;
  int len;
  cfp  = BMGetCurrFilePos();
- width = BWidth = twGetClientWidth(MainWnd);
+ width = twGetClientWidth(MainWnd);
+ BWidth = twGetClientWidth(MainWnd)-virtWidthCorr;
  height = twGetClientHeight(MainWnd);
  if(cfp != bmocpos || keycode == KE_SUPERKEY || keycode == KE_JUSTFIND)
  {
@@ -51,7 +56,7 @@ static unsigned __FASTCALL__ drawBinary( unsigned keycode,unsigned tshift )
    twFreezeWin(MainWnd);
    for(j = 0;j < height;j++)
    {
-     memset(buffer,TWC_DEF_FILLER,width);
+     memset(buffer,TWC_DEF_FILLER,tvioWidth);
      _index = cfp + j*BWidth;
      len = _index < limit ? BWidth : _index < flen ? (int)(flen - _index) : 0;
      if(len) { lastbyte = _index + len; BMReadBufferEx((void *)buffer,len,_index,BM_SEEK_SET); }
@@ -84,12 +89,12 @@ static void __FASTCALL__ EditBin( void )
 {
  TWindow *ewin;
  if(!BMGetFLength()) { ErrMessageBox(NOTHING_EDIT,NULL); return; }
- ewin = WindowOpen(1,2,tvioWidth,tvioHeight-1,TWS_CURSORABLE);
+ ewin = WindowOpen(1,2,tvioWidth-virtWidthCorr,tvioHeight-1,TWS_CURSORABLE);
  twSetColorAttr(browser_cset.edit.main); twClearWin();
  drawEditPrompt();
  twUseWin(ewin);
  edit_x = edit_y = 0;
- if(editInitBuffs(tvioWidth))
+ if(editInitBuffs(tvioWidth-virtWidthCorr))
  {
    FullEdit(NULL);
    editDestroyBuffs();
@@ -100,22 +105,40 @@ static void __FASTCALL__ EditBin( void )
 
 static void __FASTCALL__ binReadIni( hIniProfile *ini )
 {
-  UNUSED(ini);
+  char tmps[10];
+  biewReadProfileString(ini,"Biew","Browser","VirtWidthCorr","0",tmps,sizeof(tmps));
+  virtWidthCorr = (unsigned)strtoul(tmps,NULL,10);
+  if(virtWidthCorr>tvioWidth-1) virtWidthCorr=tvioWidth-1;
 }
 
 static void __FASTCALL__ binSaveIni( hIniProfile *ini )
 {
+  char tmps[10];
   /** Nullify LastSubMode */
-  iniWriteProfileString(ini,"Biew","Browser","LastSubMode","0");
+  biewWriteProfileString(ini,"Biew","Browser","LastSubMode","0");
+  sprintf(tmps,"%u",virtWidthCorr);
+  biewWriteProfileString(ini,"Biew","Browser","VirtWidthCorr",tmps);
 }
 
 static unsigned __FASTCALL__ binCharSize( void ) { return 1; }
 
+static tBool __FASTCALL__ binIncVirtWidth( void )
+{
+  if(virtWidthCorr) { virtWidthCorr--; return True; }
+  return False;
+}
+
+static tBool __FASTCALL__ binDecVirtWidth( void )
+{
+  if(virtWidthCorr < tvioWidth-1) { virtWidthCorr++; return True; }
+  return False;
+}
+
 REGISTRY_MODE binMode =
 {
   "~Binary mode",
-  { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL },
-  { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL },
+  { NULL, NULL, NULL, NULL, NULL, NULL, "<<<   ", "   >>>", NULL, NULL },
+  { NULL, NULL, NULL, NULL, NULL, NULL, binDecVirtWidth, binIncVirtWidth, NULL, NULL },
   binDetect,
   __MF_NONE,
   drawBinary,

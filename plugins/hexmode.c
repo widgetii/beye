@@ -32,6 +32,8 @@
 #include "biewlib/biewlib.h"
 #include "biewlib/kbd_code.h"
 
+static unsigned virtWidthCorr=0;
+
 typedef char *(__NEAR__ __FASTCALL__ *hexFunc)(unsigned long);
 typedef unsigned char (__NEAR__ __FASTCALL__ *sizeFunc) ( void );
 
@@ -82,7 +84,7 @@ static unsigned __FASTCALL__ drawHex( unsigned keycode,unsigned textshift )
    tAbsCoord height = twGetClientHeight(MainWnd);
    tAbsCoord width = twGetClientWidth(MainWnd);
    twFreezeWin(MainWnd);
-   HWidth = hexViewer[hmode].width();
+   HWidth = hexViewer[hmode].width()-virtWidthCorr;
    if(!(hmocpos == cpos + HWidth || hmocpos == cpos - HWidth)) keycode = KE_SUPERKEY;
    hmocpos = cpos;
    __inc = hexViewer[hmode].size;
@@ -162,6 +164,11 @@ static unsigned long __FASTCALL__ hexPrevLineWidth( void ) { return hexViewer[hm
 static unsigned long __FASTCALL__ hexCurrLineWidth( void ) { return hexViewer[hmode].width()*hexViewer[hmode].size; }
 static const char *  __FASTCALL__ hexMiscKeyName( void ) { return hmode == 1 ? "Modify" : "      "; }
 
+static void __FASTCALL__ __NEAR__ __checkWidthCorr(void)
+{
+  if(virtWidthCorr>hexViewer[hmode].width()-1) virtWidthCorr=hexViewer[hmode].width()-1;
+}
+
 static tBool __FASTCALL__ hexSelectMode( void )
 {
   const char *names[sizeof(hexViewer)/sizeof(hexView)];
@@ -173,6 +180,7 @@ static tBool __FASTCALL__ hexSelectMode( void )
   if(retval != -1)
   {
     hmode = retval;
+    __checkWidthCorr();
     return True;
   }
   return False;
@@ -295,14 +303,14 @@ static void __FASTCALL__ EditHex( void )
  tAbsCoord width = twGetClientWidth(MainWnd);
  if(hmode != 1) return;
  if(!BMGetFLength()) { ErrMessageBox(NOTHING_EDIT,NULL); return; }
- bound = width-hexViewer[hmode].width();
+ bound = width-(hexViewer[hmode].width()-virtWidthCorr);
  ewnd[0] = WindowOpen(11,2,bound,tvioHeight-1,TWS_CURSORABLE);
  twSetColorAttr(browser_cset.edit.main); twClearWin();
  ewnd[1] = WindowOpen(bound+1,2,width,tvioHeight-1,TWS_CURSORABLE);
  twSetColorAttr(browser_cset.edit.main); twClearWin();
  drawEditPrompt();
  has_show[0] = has_show[1] = False;
- if(editInitBuffs(hexViewer[hmode].width()))
+ if(editInitBuffs(hexViewer[hmode].width()-virtWidthCorr))
  {
    edit_x = edit_y = 0;
    while(1)
@@ -341,6 +349,8 @@ void __FASTCALL__ WriteIniAResolv( hIniProfile *ini )
   char tmps[10];
   sprintf(tmps,"%i",hexAddressResolv);
   biewWriteProfileString(ini,"Biew","Browser","SubSubMode6",tmps);
+  sprintf(tmps,"%u",virtWidthCorr);
+  biewWriteProfileString(ini,"Biew","Browser","VirtWidthCorr",tmps);
 }
 
 static void __FASTCALL__ hexReadIni( hIniProfile *ini )
@@ -352,6 +362,9 @@ static void __FASTCALL__ hexReadIni( hIniProfile *ini )
     hmode = (unsigned)strtoul(tmps,NULL,10);
     if(hmode > 3) hmode = 1;
     ReadIniAResolv(ini);
+    biewReadProfileString(ini,"Biew","Browser","VirtWidthCorr","0",tmps,sizeof(tmps));
+    virtWidthCorr = (unsigned)strtoul(tmps,NULL,10);
+    __checkWidthCorr();
   }
 }
 
@@ -361,15 +374,29 @@ static void __FASTCALL__ hexSaveIni( hIniProfile * ini)
   sprintf(tmps,"%i",hmode);
   biewWriteProfileString(ini,"Biew","Browser","LastSubMode",tmps);
   WriteIniAResolv(ini);
+  sprintf(tmps,"%u",virtWidthCorr);
+  biewWriteProfileString(ini,"Biew","Browser","VirtWidthCorr",tmps);
 }
 
 static unsigned __FASTCALL__ hexCharSize( void ) { return 1; }
 
+static tBool __FASTCALL__ hexIncVirtWidth( void )
+{
+  if(virtWidthCorr) { virtWidthCorr--; return True; }
+  return False;
+}
+
+static tBool __FASTCALL__ hexDecVirtWidth( void )
+{
+  if(virtWidthCorr < hexViewer[hmode].width()-1) { virtWidthCorr++; return True; }
+  return False;
+}
+
 REGISTRY_MODE hexMode =
 {
   "~Hexadecimal mode",
-  { NULL, "HexMod", NULL, NULL, NULL, "AResol", NULL, NULL, NULL, NULL },
-  { NULL, hexSelectMode, NULL, NULL, NULL, hexAddressResolution, NULL, NULL, NULL, NULL },
+  { NULL, "HexMod", NULL, NULL, NULL, "AResol", "<<<   ", "   >>>", NULL, NULL },
+  { NULL, hexSelectMode, NULL, NULL, NULL, hexAddressResolution, hexDecVirtWidth, hexIncVirtWidth, NULL, NULL },
   hexDetect,
   __MF_NONE,
   drawHex,
