@@ -522,6 +522,8 @@ void __FASTCALL__ __init_keyboard(void)
     }
 #endif
 
+    keybuf.current = 0;
+
 #ifdef	__ENABLE_SIGIO
     /* everything is ready, start to receive SIGIO */
     signal(SIGIO, (void *)(int) ReadNextEvent); 

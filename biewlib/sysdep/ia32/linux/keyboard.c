@@ -571,6 +571,8 @@ void __FASTCALL__ __init_keyboard(void)
     }
 #endif
 
+    keybuf.current = 0;
+
     signal(SIGIO, (void *)(int) ReadNextEvent);
 }
 
