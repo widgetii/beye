@@ -76,9 +76,9 @@ BIEW/LINUX
 ----------
 
 BIEW/LINUX supports two work modes: console and VT100 compatible terminal.
-In console mode BIEW acts EXACTLY as dos/os2/win32 version, this means that
-you can't switch virtual consoles by pressing ALT+Fx, because these keys
-are used by BIEW -- use CTRL+ALT+Fx combination for that purpose.
+In console mode BIEW acts *exactly* as DOS/OS2/WIN32 version, this means
+that you can't switch virtual consoles by pressing ALT+Fx, because these
+keys are used by BIEW -- use CTRL+ALT+Fx combination for that purpose.
 
 VT100 mode should work on any VT100 compatible terminal.
 
@@ -95,7 +95,7 @@ serial port); on 2.2+ you can simply use magic SysRq key to terminate it.
 Console mode is invoked only:
 
 1) if "Direct console access" flag is enabled (F9)
-2) on pure virtual terminal
+2) on virtual terminal (local console)
 
 In any other case VT100 mode is used.
 
@@ -185,7 +185,7 @@ ChangeLog (Linux/UNIX)
 	added proper pseudographics support on xterms
 	(with G1 charset) and console (with null map),
 	autodetection of vcsaN number,
-	"Save as" codepage convertion fixed.
+	"Save as" codepage conversion fixed.
 - BIEW/SLANG: wrap lines in WriteBuff when buffer length exceeds
 	terminal width - thanks to John Davis for helping me out.
 - BIEW/CURSES: added mouse support (ncurses are required for this),

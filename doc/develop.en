@@ -27,7 +27,7 @@ Table of Contents
 1.2. Understanding of plugins and addons
 1.3. Why biewlib
 2. How to expand or port the project
-2.1. Creation a pluggins and addons
+2.1. Creation a plugins and addons
 2.2. Project porting
 3. Source code notes
 3.1. Placing of sources
@@ -106,13 +106,12 @@ All other modules are auxiliary to this loop.
 format support. Plugins of this class are automatic. This means:
 - you can't see and find them in the menu, dialogs and e.t.c.
 - you can't activate such plugins on demand.
-During initialization  BIEW  queries  autolevel  plugins about format
-of the given file, and sets first plugin that understands this format
-as a server of the given file. This plugin is turned to active state,
-all other plugins of this class are turned to inactive state.
-The only way to see what autolevel plugin is currently active is to call
-"File information" utility and see information about detected file format.
-
+During initialization  BIEW  queries  autolevel  plugins  about format
+of the given file, and sets first plugin that understands  this format
+as a server of the given file. This plugin is turned  to active state,
+all other plugins of this class are turned to inactive state. The only
+way to see what autolevel plugin is currently active  is to call "File
+information" utility and see information about detected file format.
 
   Plugins of I level are "work horses" of project.  They  present main
 view modes of file. Plugins of this class (either as II-level) are not
@@ -149,12 +148,12 @@ able to change disassembler to any other, and he can do this via menu.
 However in this case all such work is performed  by the I-level plugin
 (disassembler plugin).
 5. User wants  to resolve  all internal references  in the viewed file
-and get  full disassember dump  of the file.  I-level plugin does this
+and get  full disassembler dump  of the file. I-level plugin does this
 job.  It communicates  with autolevel plugin  which knows this format.
 I-level plugin  in  this case  is a facility  of  interaction  between
 plugin of level II and plugin  of  autolevel.  By  the  way, plugin of
 level II also is aware  about reference resolving  but  it builds  all
-requests for I-leve plugin.
+requests for I-level plugin.
 6. User wants to save result into a file.  File  utility  also  builds
 all requests to I-level plugin,  and this plugin  performs all work of
 creating connection between plugins of other levels,  but  outputs
@@ -182,11 +181,11 @@ of biewlib:
 
   Biewlib does not pretend  to substitute libc  and  other libraries.
 Unfortunately, many functions in biewlib  were created as a  facility
-of struggling with errors of standard libraries and discrepancy of
-properties of their functions with documentation. Some biewlib parts
-were created as a facility of rehabilitation of dead  or abandoned
+of struggling with errors of standard libraries  and  discrepancy  of
+properties of their functions with documentation.  Some biewlib parts
+were  created  as  facility of rehabilitation  of  dead  or abandoned
 libraries. There were historical reasons for this.  When  project was
-started, there were a lot of  unknown  today  companies  with  popular
+started, there were a lot of unknown  today  companies  with  popular
 products. Some of them are now in the WindZone, some are acquired  by
 the others. So, biewlib consists of:
 - bbio     - a facility of  caching  the  binary  streams  (Family  of
@@ -194,7 +193,7 @@ the others. So, biewlib consists of:
              least in early  versions)  contain  errors  when  working
              with binary files.
 - biewlib  - contains functions  which  are implemented differently in
-             posix  and  ms-compatible  libraries,  and  a  small (but
+             POSIX  and  ms-compatible  libraries,  and  a  small (but
 	     increasing) kit of useful functions  that  are  absent in
 	     all C-libraries.
 - file_ini - an unique library to handle .ini files.
@@ -285,15 +284,15 @@ implementation  of  functions  which  are  common  for  all completely
 POSIX-compatible  operating  systems.  POSIX  can  not  be  completely
 implemented  in  terms  of  itself,  so  a  compilation   using   just
 TARGET_OS=posix  will  not  complete.  Directory  'unix'  contains  an
-implementation of all functions for  fully  unix-compatible  operating
-systems.  Most  Unix   systems   are   fundamentally   very   similar.
+implementation of all functions for  fully  UNIX-compatible  operating
+systems.  Most  UNIX   systems   are   fundamentally   very   similar.
 Unfortunately, unified standard, like  POSIX,  for  implementation  of
 console (however either  as  graphics)  applications  does  not  exist
 today; and even if it will appear, a lot of existing operating systems
 (or at least development systems) which will be not compatible with it
 will stay. In this connexion, it was necessary to  implement  invented
 standard separately  for  each  operating  system.  (If an OS is fully
-unix-compatible it is hardly needed to port project, though a "native"
+UNIX-compatible it is hardly needed to port project, though a "native"
 port could be perform much better).
    All system depended functions are well documented  in  corresponding
 header files which are located in biewlib and its subdirectories.
@@ -400,7 +399,7 @@ though I am convinced  to think  that  it is possible  to use fastcall
 convention on these platforms as well. But,  as main working platforms
 for the project ia16 and ia32 architectures (at the time of writing),
 such kind of optimization is reasonable.  Certainly it is possible  to
-object me that, with appearance of branch prediction, pipelinest, etc.
+object me that,  with appearance of branch prediction, pipelines, etc.
 in new processors, the effect of such changes becomes lost, but first,
 this yet does not mean that program will not run on earlier  processor
 models; second, decreasing of code size (by such  optimization) always
@@ -409,7 +408,7 @@ not evident that pipelines and predictions reduce optimization effects
 down to zero, they minimize effect of cdecl but in any case  there are
 still some differences.
    Be that as it may, the project defines macro __FASTCALL__, which is
-involved in big part of the project.  Allthough (theoretically) it can
+involved in big part of the project.  Although (theoretically)  it can
 be redefined with any value,  it  would  be  better  to  use it during
 development of new functions.
 
@@ -812,7 +811,7 @@ the compiler. For example:             practices for optimizing code for the
   instruction is longer than 7 bytes;
   Pentium R processors with MMXT       avoid:
   technology do not execute a set of   81 C3 FB FF FF FF:  add ebx, -5
-  paired instructions if the first     preffered:
+  paired instructions if the first     prefered:
   instruction is longer than 11 bytes  83 C3 FB:           add ebx, -5
   or the second instruction is longer
   than 7 bytes. Prefixes are not
@@ -965,7 +964,7 @@ lines) */
    }
   }
 
-4.3. Perfomance tests
+4.3. Performance tests
 =====================
 
    When development of 5.3 branch has  begun,  my  main  goal  was  to
@@ -994,7 +993,7 @@ structures (F4)
 | DOS32 on OS/2         | 3 m 13 sec  | N/A        | N/A          |
 +-----------------------------------------------------------------+
 
-Abbrevations:
+Abbreviations:
 5.2.0 mode  - mode present in 5.2.0 version
 MMF  -        Memory Mapped Files is a technique used to access files
               like ordinary RAM (also known as mmap).

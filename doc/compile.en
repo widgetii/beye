@@ -70,5 +70,5 @@ Other binaries of the distribution
 ----------------------------------
 
 All additional binaries and text files required for  the  project  are
-located in the 'bin_rc' subfloder. They work on any  platform  without
+located in the 'bin_rc' subfolder. They work on any  platform  without
 modification or recompilation.
