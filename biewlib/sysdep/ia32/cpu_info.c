@@ -82,7 +82,7 @@ static unsigned __NEAR__ __FASTCALL__ __cpu_type( void )
       "	jz	0f\n"
       "	orl	$0x2000, %0\n"
 "0:\n"
-      "	testl   $0x200000, %%edx\n"
+      "	testl   $0x2000000, %%edx\n"
       "	jz	1f\n"
       "	orl	$0x1000, %0\n"
 "1:\n"

@@ -64,7 +64,7 @@ extern unsigned aux__cpu_type(void);
 	"jz	L0"\
 	"or	eax,2000h"\
 "L0:"\
-	"test	edx,200000h"\
+	"test	edx,2000000h"\
 	"jz	L1"\
 	"or	eax,1000h"\
 "L1:"\
