@@ -132,14 +132,33 @@
     Clone14      = Black:Black
     Clone15      = Black:Black
     Clone16      = Black:Black
-[ Programming ] ; Programming language support (for future)
-  Regular      = Black:Yellow
-  Keyword      = Black:White
-  Const        = Black:LightCyan
-  Preprocessor = Black:LightGreen
-  BadExpr      = Red:Black
-  Punctuation  = Black:LightBlue
-  Comments     = Black:LightGray
+[ Programming ]
+  BadExpr      = Red:Blue
+  <Comments>
+    base       = Black:LightGray
+    extended   = Black:Gray
+    reserved   = Black:Brown
+    alt        = Black:Blue
+  <Keyword>
+    base       = Black:Yellow
+    extended   = Black:LightRed
+    reserved   = Black:Red
+    alt        = Black:White
+  <Constant>
+    base       = Black:LightGreen
+    extended   = Black:LightBlue
+    reserved   = Black:Green
+    alt        = Black:LightMagenta
+  <Operator>
+    base       = Black:White
+    extended   = Black:LightBlue
+    reserved   = Black:LightGreen
+    alt        = Black:LightRed
+  <Preproc>
+    base       = Black:LightRed
+    extended   = Black:LightMagenta
+    reserved   = Black:Blue
+    alt        = Black:Brown
 [ Error ] ; Error message box
   Main         = Red:Yellow
   Border       = Red:LightRed
