@@ -95,7 +95,7 @@ static tBool __FASTCALL__ lmf_check_fmt(void)
 		(h.data_nbytes-DEFSIZE)%4!=0) return False;
 	i=j=(h.data_nbytes-DEFSIZE)/4;
 	xdef_len=h.data_nbytes;
-	if(!bmReadBufferEx(&xdef,h.data_nbytes,6,BM_SEEK_SET)) return False;
+	if(!bmReadBufferEx(&xdef,min(sizeof(lmf_xdef),h.data_nbytes),6,BM_SEEK_SET)) return False;
 	/* Test a definition record */
 	if(DEF.version_no!=400||DEF.code_index>i||DEF.stack_index>i||
 		DEF.heap_index>i||DEF.argv_index>i||DEF.zero2!=0)
