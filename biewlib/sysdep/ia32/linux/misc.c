@@ -17,6 +17,7 @@ extern char rawkb_buf[];
 extern int  rawkb_escape;
 extern unsigned rawkb_len;
 extern unsigned rawkb_mode;
+extern int on_console;
 
 int __FASTCALL__ __inputRawInfo(char *head, char *text)
 {
