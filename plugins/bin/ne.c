@@ -191,16 +191,18 @@ static void __NEAR__ PaintNewHeaderNE_2( void )
            ,GetBool(ne.neFlagsOther & 0x80));
   if(ne.neOperatingSystem == 2)
   {
-    char high,low;
+	/* Correction by Olivier Mengu\u00e9*/
+    unsigned char high,low;
     high = ne.neWindowsVersion >> 8;
-    low  = ne.neWindowsVersion;
+    low  = ne.neWindowsVersion & 0xFF;
+	/* End of correction */
     twSetColorAttr(dialog_cset.addinfo);
     twPrintF("Offset of Fast Load Area       = %04hXH"
              ,ne.neOffsetFastLoadArea); twClrEOL();
     twPrintF("\nLength of Fast Load Area       = %hu"
              ,ne.neLengthFastLoadArea); twClrEOL();
     twPrintF("\nWindows version                = %02hu.%02hu"
-             ,(int)high,(int)low); twClrEOL();
+             ,(unsigned int)high,(unsigned int)low); twClrEOL();
     twPrintF("\n");
   }
   twSetColorAttr(dialog_cset.entry);

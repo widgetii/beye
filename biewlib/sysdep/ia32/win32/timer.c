@@ -80,7 +80,7 @@ static VOID CALLBACK my_callback( UINT _uTimerID, UINT uMessage, DWORD dwUser, D
   if(user_callback) (*user_callback)();
 }
 
-unsigned   __FASTCALL__ __OsSetTimerCallBack(unsigned ms,timer_callback func)
+unsigned   __FASTCALL__ __OsSetTimerCallBack(unsigned ms,timer_callback *func)
 {
   UINT cur_period;
   TIMECAPS tc;
