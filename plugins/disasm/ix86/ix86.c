@@ -53,7 +53,7 @@ const char * ix86_XrxRegs[]  = { "?r0", "?r1", "?r2", "?r3", "?r4", "?r5", "?r6"
 #ifdef INT64_C
 const char * k86_ByteRegs[] = { "al", "cl", "dl", "bl", "sil", "dil", "bpl", "spl", "r8b", "r9b", "r10b", "r11b", "r12b", "r13b", "r14b", "r15b" };
 const char * k86_WordRegs[] = { "ax", "cx", "dx", "bx", "sp", "bp", "si", "di", "r8w", "r9w", "r10w", "r11w", "r12w", "r13w", "r14w", "r15w" };
-const char * k86_DWordRegs[]= { "eax", "ecx", "edx", "ebx", "esp", "ebp", "esi", "edi", "r9d", "r10d", "r11d", "r12d", "r13d", "r14d", "r15d" };
+const char * k86_DWordRegs[]= { "eax", "ecx", "edx", "ebx", "esp", "ebp", "esi", "edi", "r8d", "r9d", "r10d", "r11d", "r12d", "r13d", "r14d", "r15d" };
 const char * k86_QWordRegs[]= { "rax", "rcx", "rdx", "rbx", "rsp", "rbp", "rsi", "rdi", "r8", "r9", "r10", "r11", "r12", "r13", "r14", "r15" };
 const char * k86_XMMXRegs[]  = { "xmm0", "xmm1", "xmm2", "xmm3", "xmm4", "xmm5", "xmm6", "xmm7", "xmm8", "xmm9", "xmm10", "xmm11", "xmm12", "xmm13", "xmm14", "xmm15" };
 /*
@@ -2463,13 +2463,13 @@ static const char * MMXNames[] =
 #ifdef INT64_C
 static const char * CPU64Names[] =
 {
-  "K86-64",
-  "      ",
-  "      ",
-  "      ",
-  "      ",
-  "      ",
-  "      ",
+  " K86-64 ",
+  "       ",
+  "       ",
+  "       ",
+  "       ",
+  "       ",
+  "       ",
   "      ",
   "      ",
   "      "
@@ -2537,6 +2537,22 @@ static void __FASTCALL__ ix86HelpAsm( void )
  }
  PFree(msgAsmText);
  twGotoXY(5,3);
+#ifdef INT64_C
+ if(x86_Bitness == DAB_USE64)
+ {
+   for(i = 0;i < 10;i++)
+   {
+     twSetColorAttr(disasm_cset.cpu_cset[0].clone[i]);
+     twPutS(CPU64Names[i]);
+   }
+   twGotoXY(5,4);
+   twClrEOL();
+   twGotoXY(5,5);
+   twClrEOL();
+ }
+ else
+#endif
+ {
  for(i = 0;i < 10;i++)
  {
    twSetColorAttr(disasm_cset.cpu_cset[0].clone[i]);
@@ -2553,6 +2569,7 @@ static void __FASTCALL__ ix86HelpAsm( void )
  {
    twSetColorAttr(disasm_cset.cpu_cset[2].clone[i]);
    twPutS(MMXNames[i]);
+ }
  }
  do
  {
