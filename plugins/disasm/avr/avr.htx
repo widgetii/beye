@@ -1,0 +1,591 @@
+ Atmel AVR assembly reference 
+ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+³ %BAVR Summary%b                                                             ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
+³                                                                         ³
+³ %IDescription%i                                                             ³
+³                                                                         ³
+³ The AVR Embedded RISC Microcontroller Core is a low-power CMOS 8-bit    ³
+³ microprocessor based on the AVR RISC architecture. By executing power-  ³
+³ ful instructions in a single clock cycle, it achieves throughput app-   ³
+³ roaching 1 MIPS pre MHz.                                                ³
+³                                                                         ³
+³ The AVR core is a real Harward architecture with separeted program and  ³
+³ data memory. Only the data memory can be expanded by externel memory.   ³
+³ The instruction set is non-orthogonal.                                  ³
+³                                                                         ³
+³ The AVR core combines a rich instruction set with the 32 general pur-   ³
+³ pose working registers. Each of the 32 registers is directly conected   ³
+³ to the Arithmetic Logic Unit (ALU). The architecture provides any num-  ³
+³ ber of externel and internal interrupts.                                ³
+³                                                                         ³
+³ The program memory can be implemented in ROM or Flash memory. It is     ³
+³ accessed with a single level of pipelining. While one instruction is    ³
+³ being executed, the next instruction is pre-fetched from the program    ³
+³ memory. All AVR instructions have a single 16-bit word format, meaning  ³
+³ that every program memory address contains a single instruction. During ³
+³ interrupts and subroutine calls, the return address is stored on a      ³
+³ software stack.                                                         ³
+³                                                                         ³
+³ The 8-bit data memory has 16-bit direct addressing. This gives a po-    ³
+³ tential memory space of 64K bytes. The data memory address space in-    ³
+³ cludes the register file, and a 64-address I/O memory space for peri-   ³
+³ pheral functions such as control registers, time-counters and A/D con-  ³
+³ verters. As shown below, the I/O memory space is automatically re-      ³
+³ mapped for access by the register file.                                 ³
+³                                                                         ³
+³  ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿                                                      ³
+³  ³ %BI/O re-mapped%b ³ <ÄÄÄÄÄ¿                                              ³
+³  ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ       ³                                              ³
+³  0            3Fh        ³                                              ³
+³                  ÚÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄ¿                                      ³
+³                  ³               ³                                      ³
+³  ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿  ³
+³  ³ 32 x 8-bit    ³ 64 x 8-bit    ³ regular data memory               ³  ³
+³  ³ register file ³ I/O registers ³ internal and external             ³  ³
+³  ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ  ³
+³  0            1Fh 20h         5Fh 60h                          0FFFFh   ³
+³                                                                         ³
+³                                                                         ³
+³ %IThe General Purpose Register File%i                                       ³
+³                                                                         ³
+³ Although the working register file of the AVR is normally perceived as  ³
+³ being a 32 by 8-bit storage unit, the register file is actually a 16 by ³
+³ 16-bit memory unit. The 16-bit wide data format is necessery to allow   ³
+³ the core to update the 16-bit memory pointers in a single cycle. The    ³
+³ mapping between 32 x 8-bit registers and 16 x 16-bit array addresses is ³
+³ showing below. Registers R31-R30 (the Z-register), R29-R29 (the Y-reg-  ³
+³ ister), and R27-R26 (the X-register) can be used for indirect           ³
+³ addressing.                                                             ³
+³                                                                         ³
+³               ÚÄÄÄÄÄÄÂÄÄÄÄÄÄ¿                  ÚÄÄÄÄÄÄÂÄÄÄÄÄÄ¿          ³
+³               ³ 15:8 ³  7:0 ³                  ³ 15:8 ³  7:0 ³          ³
+³               ÃÄÄÄÄÄÄÅÄÄÄÄÄÄ´                  ÃÄÄÄÄÄÄÅÄÄÄÄÄÄ´          ³
+³  Address: 00h ³   R1 ³   R0 ³      Adress: 08h ³  R17 ³  R16 ³          ³
+³           01h ³   R3 ³   R2 ³              09h ³  R19 ³  R18 ³          ³
+³           02h ³   R5 ³   R4 ³              0Ah ³  R21 ³  R20 ³          ³
+³           03h ³   R7 ³   R6 ³              0Bh ³  R23 ³  R22 ³          ³
+³           04h ³   R9 ³   R8 ³              0Ch ³  R25 ³  R24 ³          ³
+³           05h ³  R11 ³  R10 ³              0Dh ³  R27 ³  R26 ³ X-reg.   ³
+³           06h ³  R13 ³  R12 ³              0Eh ³  R29 ³  R28 ³ Y-reg.   ³
+³           07h ³  R15 ³  R14 ³              0Fh ³  R31 ³  R30 ³ Z-reg.   ³
+³               ÀÄÄÄÄÄÄÁÄÄÄÄÄÄÙ                  ÀÄÄÄÄÄÄÁÄÄÄÄÄÄÙ          ³
+³                                                                         ³
+³                                                                         ³
+³ %IThe Arithmetic Logic Unit%i                                               ³
+³                                                                         ³
+³ The ALU operates in direct connection with all the 32 general purpose   ³
+³ working registers. Within a single clock cycle, ALU operations between  ³
+³ registers are executed. ALU operations are devided into three mail      ³
+³ categories: arithmetic, logic, and bit-functions. It is possible to     ³
+³ implement a hardare multiplier in the arithmetic part of the ALU.       ³
+³                                                                         ³
+³                                                                         ³
+³ %IProgram and Data Addressing Mode%i                                        ³
+³                                                                         ³
+³ The AVR core supports mainlly 4 different addressing modes for program  ³
+³ instruction and data. These include register dirct (one or tow reg-     ³
+³ isters), register indircet (via the X, Y, or Z-register), I/O direct    ³
+³ and relative program addressing (Program Counter plus offset in the     ³
+³ instruction Register).                                                  ³
+³                                                                         ³
+³                                                                         ³
+³ %II/O registers%i                                                           ³
+³                                                                         ³
+³ All the peripheral status, control, and data registers are grouped into ³
+³ a 64-byte I/O space. This can be accessed directly from the register    ³
+³ file, and from within the I/O space of data memory (see above). The re- ³
+³ quired re-mapping between the two address spaces is performed automati- ³
+³ cally by the processor.                                                 ³
+³                                                                         ³
+³ The 16-bit Stack Pointer (SP) is built up from two 8-bit registers in   ³
+³ the I/O space. It points to the area in data memory where the subrou-   ³
+³ tine and interrupt stacks are located. This stack space must be defined ³
+³ by the program before any subroutine calls are executed or interrupts   ³
+³ are enabled.                                                            ³
+³                                                                         ³
+³                                                                         ³
+³ %IInterrupt Handling%i                                                      ³
+³                                                                         ³
+³ A prioritized interrupt module has its control registers in the I/O     ³
+³ space with an additional global interrupt enable bit in the status      ³
+³ register. Each interrupt has a separate interrupt vector in the inter-  ³
+³ rupt vector table at the beginning of the program memory. They are      ³
+³ prioritized by address: the loxer the interrupt vector address, the     ³
+³ higher the priority. So, the highest priority is reserved for the RESET ³
+³ vector at address 0000h. This event will be triggerd by externel force, ³
+³ power-on, brown-out, watchdog, or if possible JTAG AVR reset.           ³
+³                                                                         ³
+ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+³ %BInstruction Set Nomenclature%b                                            ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
+³                                                                         ³
+³ %IStatus Register (SREG)%i                                                  ³
+³                                                                         ³
+³ SREG:  Status Register                                                  ³
+³ C:     Carry Flag                                                       ³
+³ Z:     Zerro Flag                                                       ³
+³ N:     Negative Flag                                                    ³
+³ V:     Two's complement overflow indicator                              ³
+³ S:     N ^ V, For signed tests                                          ³
+³ H:     Half Carry Flag                                                  ³
+³ T:     Transfer bit used by BLD and BST instructions                    ³
+³ I:     Global Interrupt Enable/Disable Flag                             ³
+³                                                                         ³
+³                                                                         ³
+³ %IRegisters and Operands%i                                                  ³
+³                                                                         ³
+³ Rd:    Destination (and source) register in the Register File           ³
+³ Rr:    Source register in the Register File                             ³
+³ R:     Result after instruction is executed                             ³
+³ K:     Constant data                                                    ³
+³ k:     Constant address                                                 ³
+³ b:     Bit in the Register File or I/O Register (3-bit)                 ³
+³ s:     Bit in the Status Register (3-bit)                               ³
+³ X,Y,Z: Indirect Address Register                                        ³
+³        (X=R27:R26, Y=R29:R28, Z=R31:R30)                                ³
+³ P:     I/O location address                                             ³
+³ q:     Displacement for direct addressing (6-bit)                       ³
+³                                                                         ³
+³                                                                         ³
+³ %IRAMPX, RAMPY, RAMPZ%i                                                     ³
+³                                                                         ³
+³ Registers concatenated with X-, Y-, and Z-registers enabling indirect   ³
+³ addressing of the whole data space on MCUs with more than 64K byte data ³
+³ space, and constant data fetch on MCUs with more than 64K byte program  ³
+³ space.                                                                  ³
+³                                                                         ³
+³                                                                         ³
+³ %IRAMPD%i                                                                   ³
+³                                                                         ³
+³ Registers concatenated with the Z-register enabling direct addressing   ³
+³ of the whole data space on MCUs with more than 64K byte program space.  ³
+³                                                                         ³
+³                                                                         ³
+³ %IEIND%i                                                                    ³
+³                                                                         ³
+³ Registers concatenated with the instruction word enabling indirect jump ³
+³ and call to the whole program space on MCUs with more than 64K byte     ³
+³ program space.                                                          ³
+³                                                                         ³
+³                                                                         ³
+³ %IStack%i                                                                   ³
+³                                                                         ³
+³ STACK: Stack for return address and pushed registers                    ³
+³ SP:    Stack Pointer to STACK                                           ³
+³                                                                         ³
+³                                                                         ³
+³ %IFlags%i                                                                   ³
+³                                                                         ³
+³ <=>:   Flag affected by instruction                                     ³
+³ 0:     Flag cleared by instruction                                      ³
+³ 1:     Flag set by instruction                                          ³
+³ -:     Flag not affected by instruction                                 ³
+³                                                                         ³
+ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+³ %B1st AVR Core Generation (avr1)%b                                          ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
+³                                                                         ³
+³ %I--> have Flash ( < 8K )                                                 %i³
+³ %I--> without SRAM                                                        %i³
+³ %I--> without hardware multiplier                                         %i³
+³ %I--> without boot code section                                           %i³
+³ %I--> without JTAG                                                        %i³
+³                                                                         ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
+³ %BAT90S1200 instruction mnemonics -- 89 base instructions%b                 ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
+³ %Iarithmetic and logic instructions%i         ³                             ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ                             ³
+³ ADD    Rd,Rr  [0C00]  Rd <-- Rd + Rr                         Z,C,N,V,S,H³
+³ ADC    Rd,Rr  [1C00]  Rd <-- Rd + Rr + C                     Z,C,N,V,S,H³
+³ SUB    Rd,Rr  [1800]  Rd <-- Rd - Rr                         Z,C,N,V,S,H³
+³ SUBI   Rd,K   [5000]  Rd <-- Rd - K                          Z,C,N,V,S,H³
+³ SBC    Rd,Rr  [0800]  Rd <-- Rd - Rr - C                     Z,C,N,V,S,H³
+³ SBCI   Rd,K   [4000]  Rd <-- Rd - K - C                      Z,C,N,V,S,H³
+³ AND    Rd,Rr  [2000]  Rd <-- Rd && Rr                        Z,N,V,S    ³
+³ ANDI   Rd,K   [7000]  Rd <-- Rd && K                         Z,N,V,S    ³
+³ OR     Rd,Rr  [2800]  Rd <-- Rd || Rr                        Z,N,V,S    ³
+³ ORI    Rd,K   [6000]  Rd <-- Rd || K                         Z,N,V,S    ³
+³ EOR    Rd,Rr  [2400]  Rd <-- Rd ^ Rr                         Z,N,V,S    ³
+³ COM    Rd     [9400]  Rd <-- $FF - Rd                        Z,C,N,V,S  ³
+³ NEG    Rd     [9401]  Rd <-- $00 - Rd                        Z,C,N,V,S,H³
+³ SBR    Rd,K   [6000]  Rd <-- Rd || K                         Z,N,V,S    ³
+³ CBR    Rd,K   [7000]  Rd <-- Rd && ($FF - K)                 Z,N,V,S    ³
+³ INC    Rd     [9403]  Rd <-- Rd + 1                          Z,N,V,S    ³
+³ DEC    Rd     [940A]  Rd <-- Rd - 1                          Z,N,V,S    ³
+³ TST    Rd     [2000]  Rd <-- Rd && Rd                        Z,N,V,S    ³
+³ CLR    Rd     [2400]  Rd <-- Rd ^ Rd                         Z,N,V,S    ³
+³ SER    Rd     [EF0F]  Rd <-- $FF                             None       ³
+³                                                                         ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿                             ³
+³ %Ibranche instructions%i                      ³                             ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ                             ³
+³ RJMP   k      [C000]  PC <-- PC + k + 1                      None       ³
+³ RCALL  k      [D000]  STACK <-- PC + 1, PC <-- PC + k + 1    None       ³
+³ RET           [9508]  PC <-- STACK                           None       ³
+³ RETI          [9518]  PC <-- STACK                           I          ³
+³ CPSE   Rd,Rr  [1000]  Rd = Rr ? PC <-- PC + 2 or 3           None       ³
+³ CP     Rd,Rr  [1400]  Rd - Rr                                Z,C,N,V,S,H³
+³ CPC    Rd,Rr  [0400]  Rd - Rr - C                            Z,C,N,V,S,H³
+³ CPI    Rd,K   [3000]  Rd - K                                 Z,C,N,V,S,H³
+³ SBRC   Rr,b   [FC00]  Rr(b) = 0 ? PC <-- PC + 2 or 3         None       ³
+³ SBRS   Rr,b   [FE00]  Rr(b) = 1 ? PC <-- PC + 2 or 3         None       ³
+³ SBIC   P,b    [9900]  P(b) = 0 ? PC <-- PC + 2 or 3          None       ³
+³ SBIS   P,b    [9B00]  P(b) = 1 ? PC <-- PC + 2 or 3          None       ³
+³ BRBS   s,k    [F000]  SREG(s) = 1 ? PC <-- PC + k + 1        None       ³
+³ BRBC   s,k    [F400]  SREG(s) = 0 ? PC <-- PC + k + 1        None       ³
+³ BREQ   k      [F001]  Z = 1 ? PC <-- PC + k + 1              None       ³
+³ BRNE   k      [F401]  Z = 0 ? PC <-- PC + k + 1              None       ³
+³ BRCS   k      [F000]  C = 1 ? PC <-- PC + k + 1              None       ³
+³ BRCC   k      [F400]  C = 0 ? PC <-- PC + k + 1              None       ³
+³ BRSH   k      [F400]  C = 0 ? PC <-- PC + k + 1              None       ³
+³ BRLO   k      [F000]  C = 1 ? PC <-- PC + k + 1              None       ³
+³ BRMI   k      [F002]  N = 1 ? PC <-- PC + k + 1              None       ³
+³ BRPL   k      [F402]  N = 0 ? PC <-- PC + k + 1              None       ³
+³ BRGE   k      [F404]  N ^ V = 0 ? PC <-- PC + k + 1          None       ³
+³ BRLT   k      [F004]  N ^ V = 1 ? PC <-- PC + k + 1          None       ³
+³ BRHS   k      [F005]  H = 1 ? PC <-- PC + k + 1              None       ³
+³ BRHC   k      [F405]  H = 0 ? PC <-- PC + k + 1              None       ³
+³ BRTS   k      [F006]  T = 1 ? PC <-- PC + k + 1              None       ³
+³ BRTC   k      [F406]  T = 0 ? PC <-- PC + k + 1              None       ³
+³ BRVS   k      [F003]  V = 1 ? PC <-- PC + k + 1              None       ³
+³ BRVC   k      [F403]  V = 0 ? PC <-- PC + k + 1              None       ³
+³ BRIE   k      [F007]  I = 1 ? PC <-- PC + k + 1              None       ³
+³ BRID   k      [F407]  I = 0 ? PC <-- PC + k + 1              None       ³
+³                                                                         ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿                             ³
+³ %Idata transfer instructions%i                ³                             ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ                             ³
+³ MOV    Rd,Rr  [2C00]  Rd <-- Rr                              None       ³
+³ LDI    Rd,K   [E000]  Rd <-- K                               None       ³
+³ LD     Rd,Z   [8000]  Rd <-- (Z)                             None       ³
+³ ST     Z,Rr   [8200]  (Z) <-- Rr                             None       ³
+³ IN     Rd,P   [B000]  Rd <-- P                               None       ³
+³ OUT    P,Rr   [B800]  P <-- Rr                               None       ³
+³                                                                         ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿                             ³
+³ %Ibit and bit-test instructions%i             ³                             ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ                             ³
+³ SBI    P,b    [9A00]  P(b) <-- 1                             None       ³
+³ CBI    P,b    [9800]  P(b) <-- 0                             None       ³
+³ LSL    Rd     [0C00]  Rd(n+1) <-- Rd(n), Rd(0) <-- 0         Z,C,N,V,H  ³
+³ LSR    Rd     [9406]  Rd(n) <-- Rd(n+1), Rd(7) <-- 0         Z,C,N,V    ³
+³ ROL    Rd     [1C00]  Rd(0)<--C, Rd(n+1)<--Rd(n), C<--Rd(7)  Z,C,N,V,H  ³
+³ ROR    Rd     [9407]  Rd(7)<--C, Rd(n)<--Rd(n+1), C<--Rd(0)  Z,C,N,V    ³
+³ ASR    Rd     [9405]  Rd(n)<--Rd(n+1), C<--Rd(0), n = 0..6   Z,C,N,V    ³
+³ SWAP   Rd     [9402]  Rd(3:0)<--Rd(7:4), Rd(7:4)<--Rd(3:0)   Z,C,N,V    ³
+³ BSET   s      [9408]  SREG(s) <-- 1                          SREG(s)    ³
+³ BCLR   s      [9408]  SREG(s) <-- 0                          SREG(s)    ³
+³ BST    Rr,b   [FA00]  T <-- Rr(b)                            T          ³
+³ BLD    Rd,b   [F800]  Rr(b) <-- T                            None       ³
+³ SEC           [9408]  C <-- 1                                C          ³
+³ CLC           [9488]  C <-- 0                                C          ³
+³ SEN           [9428]  N <-- 1                                N          ³
+³ CLN           [94A8]  N <-- 0                                N          ³
+³ SEZ           [9418]  Z <-- 1                                Z          ³
+³ CLZ           [9498]  Z <-- 0                                Z          ³
+³ SEI           [9478]  I <-- 1                                I          ³
+³ CLI           [94F8]  I <-- 0                                I          ³
+³ SES           [9448]  S <-- 1                                S          ³
+³ CLS           [94C8]  S <-- 0                                S          ³
+³ SEV           [9438]  V <-- 1                                V          ³
+³ CLV           [94B8]  V <-- 0                                V          ³
+³ SET           [9468]  T <-- 1                                T          ³
+³ CLT           [94E8]  T <-- 0                                T          ³
+³ SEH           [9458]  H <-- 1                                H          ³
+³ CLH           [94D8]  H <-- 0                                H          ³
+³                                                                         ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿                             ³
+³ %IMCU control instructions%i                  ³                             ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ                             ³
+³ NOP           [0000]  do nothing                             None       ³
+³ SLEEP         [9588]  see specific descr. for Sleep function None       ³
+³ WDR           [95A8]  see specific descr. for watchdog timer None       ³
+³                                                                         ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿                             ³
+³ %Idevice list%i                               ³                             ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ                             ³
+³ at90s1200                                                               ³
+³                                                                         ³
+³                                                                         ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
+³ %BATtiny1x instruction mnemonics -- 90 instructions%b                       ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
+³ %Idata transfer instructions%i                ³  new instructions           ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ                             ³
+³ LPM           [95C8]  R0 <-- (Z)                             None       ³
+³                                                                         ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿                             ³
+³ %Idevice list%i                               ³                             ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ                             ³
+³ attiny10        attiny28                                                ³
+³ attiny11                                                                ³
+³ attiny12                                                                ³
+³ attiny15                                                                ³
+³                                                                         ³
+ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+³ %B2nd AVR Core Generation (avr2)%b                                          ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
+³                                                                         ³
+³ %I--> have Flash ( < 8K )                                                 %i³
+³ %I--> have SRAM                                                           %i³
+³ %I--> without hardware multiplier                                         %i³
+³ %I--> without boot code section                                           %i³
+³ %I--> without JTAG                                                        %i³
+³                                                                         ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
+³ %BAT90S23xx/44xx/85xx instruction mnemonics -- 118 instructions%b           ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
+³ %Iarithmetic and logic instructions%i         ³  new instructions           ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ                             ³
+³ ADIW   Rd,K   [9600]  Rd+1:Rd <-- Rd+1:Rd + K                Z,C,N,V,S  ³
+³ SBIW   Rd,K   [9700]  Rd+1:Rd <-- Rd+1:Rd - K                Z,C,N,V,S  ³
+³                                                                         ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿                             ³
+³ %Ibranche instructions%i                      ³  new instructions           ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ                             ³
+³ IJMP          [9409]  PC <-- Z                               None       ³
+³ ICALL         [9509]  STACK <-- PC + 1, PC <-- Z             None       ³
+³                                                                         ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿                             ³
+³ %Idata transfer instructions%i                ³  new instructions           ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ                             ³
+³ LDS    Rd,k   [9000]  Rd <-- (k)                             None       ³
+³ LD     Rd,X   [900C]  Rd <-- (X)                             None       ³
+³ LD     Rd,X+  [900D]  Rd <-- (X), X <-- X + 1                None       ³
+³ LD     Rd,-X  [900E]  X <-- X - 1, Rd <-- (X)                None       ³
+³ LD     Rd,Y   [8008]  Rd <-- (Y)                             None       ³
+³ LD     Rd,Y+  [9009]  Rd <-- (Y), Y <-- Y + 1                None       ³
+³ LD     Rd,-Y  [900A]  Y <-- Y - 1, Rd <-- (Y)                None       ³
+³ LDD    Rd,Y+q [8008]  Rd <-- (Y + q)                         None       ³
+³ LD     Rd,Z+  [9001]  Rd <-- (Z), Z <-- Z + 1                None       ³
+³ LD     Rd,-Z  [9002]  Z <-- Z - 1, Rd <-- (Z)                None       ³
+³ LDD    Rd,Z+q [8000]  Rd <-- (Z + q)                         None       ³
+³ STS    k,Rr   [9200]  (k) <-- Rr                             None       ³
+³ ST     X,Rr   [920C]  (X) <-- Rr                             None       ³
+³ ST     X+,Rr  [920D]  (X) <-- Rr, X <-- X + 1                None       ³
+³ ST     -X,Rr  [920E]  X <-- X - 1, (X) <-- Rr                None       ³
+³ ST     Y,Rr   [8208]  (Y) <-- Rr                             None       ³
+³ ST     Y+,Rr  [9209]  (Y) <-- Rr, Y <-- Y + 1                None       ³
+³ ST     -Y,Rr  [920A]  Y <-- Y - 1, (Y) <-- Rr                None       ³
+³ STD    Y+q,Rr [8208]  (Y + q) <-- Rr                         None       ³
+³ ST     Z+,Rr  [9201]  (Z) <-- Rr, Z <-- Z + 1                None       ³
+³ ST     -Z,Rr  [9202]  Z <-- Z - 1, (Z) <-- Rr                None       ³
+³ STD    Z+q,Rr [8200]  (Z + q) <-- Rr                         None       ³
+³ PUSH   Rr     [920F]  STACK <-- Rr                           None       ³
+³ POP    Rd     [920F]  Rd <-- STACK                           None       ³
+³                                                                         ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿                             ³
+³ %Idevice list%i                               ³                             ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ                             ³
+³ attiny22        at90s2313       at90s4414       at90s8515               ³
+³ attiny26        at90s2323       at90s4433       at90c8534               ³
+³                 at90s2333       at90s4434       at90s8535               ³
+³                 at90s2343                                               ³
+³                                                                         ³
+³ at86rf401                                                               ³
+³                                                                         ³
+ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+³ %B3rd AVR Core Generation (avr3)%b                                          ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
+³                                                                         ³
+³ %I--> have Flash ( > 8K, < 64K)                                           %i³
+³ %I--> have SRAM                                                           %i³
+³ %I--> without hardware multiplier                                         %i³
+³ %I--> without boot code section                                           %i³
+³ %I--> without JTAG                                                        %i³
+³                                                                         ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
+³ %BATmega603 instruction mnemonics -- 120 instructions%b                     ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
+³ %Ibranche instructions%i                      ³  new instructions           ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ                             ³
+³ JMP    k      [940C]  PC <-- k                               None       ³
+³ CALL   k      [950E]  STACK <-- PC + 1, PC <-- k             None       ³
+³                                                                         ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿                             ³
+³ %Idevice list%i                               ³                             ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ                             ³
+³ atmega603       at43usb355      at76c7113                               ³
+³                                                                         ³
+³                                                                         ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
+³ %BATmega103 instruction mnemonics -- 121 instructions%b                     ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
+³ %Idata transfer instructions%i                ³  new instructions           ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ                             ³
+³ ELPM          [95D8]  R0 <-- (RAMPZ:Z)                       None       ³
+³                                                                         ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿                             ³
+³ %Idevice list%i                               ³                             ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ                             ³
+³ atmega103       at43usb320                                              ³
+³                                                                         ³
+ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+³ %B4th AVR Core Generation (avr4)%b                                          ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
+³                                                                         ³
+³ %I--> have Flash ( < 8K )                                                 %i³
+³ %I--> have SRAM                                                           %i³
+³ %I--> have hardware multiplier                                            %i³
+³ %I--> have optional boot code section                                     %i³
+³ %I--> without JTAG                                                        %i³
+³                                                                         ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
+³ %BATmega8xxx instruction mnemonics -- 128 instructions%b                    ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
+³ %Iarithmetic and logic instructions%i         ³  new instructions           ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ                             ³
+³ MUL    Rd,Rr  [9C00]  R1:R0 <-- Rd x Rr (UU)                 Z,C        ³
+³ MULS   Rd,Rr  [0200]  R1:R0 <-- Rd x Rr (SS)                 Z,C        ³
+³ MULSU  Rd,Rr  [0300]  R1:R0 <-- Rd x Rr (SU)                 Z,C        ³
+³ FMUL   Rd,Rr  [0308]  R1:R0 <-- (Rd x Rr) << 1 (UU)          Z,C        ³
+³ FMULS  Rd,Rr  [0380]  R1:R0 <-- (Rd x Rr) << 1 (SS)          Z,C        ³
+³ FMULSU Rd,Rr  [0388]  R1:R0 <-- (Rd x Rr) << 1 (SU)          Z,C        ³
+³                                                                         ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿                             ³
+³ %Idata transfer instructions%i                ³  new instructions           ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ                             ³
+³ MOVW   Rd,Rr  [0100]  Rd+1:Rd <-- Rr+1:Rr                    None       ³
+³ LPM    Rd,Z   [9004]  Rd <-- (Z)                             None       ³
+³ LPM    Rd,Z+  [9005]  Rd <-- (Z), Z <-- Z + 1                None       ³
+³ SPM           [95E8]  (Z) <-- R1:R0                          None       ³
+³                                                                         ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿                             ³
+³ %Ibranche instructions%i                      ³  %Binvalide instructions%b      ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ                             ³
+³ %SJMP    k    %s                                                            ³
+³ %SCALL   k    %s                                                            ³
+³                                                                         ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿                             ³
+³ %Idata transfer instructions%i                ³  %Binvalide instructions%b      ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ                             ³
+³ %SELPM        %s                                                            ³
+³                                                                         ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿                             ³
+³ %Idevice list%i                               ³                             ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ                             ³
+³ atmega8         atmega83        atmega8515                              ³
+³                 atmega85        atmega8535                              ³
+³                                                                         ³
+ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+³ %B5th AVR Core Generation (avr5)%b                                          ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
+³                                                                         ³
+³ %I--> have Flash ( < 8K )                                                 %i³
+³ %I--> have SRAM                                                           %i³
+³ %I--> have hardware multiplier                                            %i³
+³ %I--> have optional boot code section                                     %i³
+³ %I--> have JTAG (partly, devices with BREAK)                              %i³
+³                                                                         ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
+³ %BATmega16x instruction mnemonics -- 130 instructions%b                     ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
+³ %Ibranche instructions%i                      ³  new instructions           ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ                             ³
+³ JMP    k      [940C]  PC <-- k                               None       ³
+³ CALL   k      [950E]  STACK <-- PC + 1, PC <-- k             None       ³
+³                                                                         ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿                             ³
+³ %Idevice list%i                               ³                             ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ                             ³
+³ atmega161                                                               ³
+³ atmega163                                                               ³
+³                                                                         ³
+³                                                                         ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
+³ %BAT94Kxx instruction mnemonics -- 130 instructions%b                       ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
+³ %Ibranche instructions%i                      ³  new instructions           ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ                             ³
+³ JMP    k      [940C]  PC <-- k                               None       ³
+³ CALL   k      [950E]  STACK <-- PC + 1, PC <-- k             None       ³
+³                                                                         ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿                             ³
+³ %IMCU control instructions%i                  ³  new instructions           ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ                             ³
+³ BREAK         [9598]  see specific descr. for On-Chip-Dbg.   None       ³
+³                                                                         ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿                             ³
+³ %Idata transfer instructions%i                ³  %Binvalide instructions%b      ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ                             ³
+³ %SSPM         %s                                                            ³
+³                                                                         ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿                             ³
+³ %Idevice list%i                               ³                             ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ                             ³
+³ at94k          (at94k05)                                                ³
+³                (at94k10)                                                ³
+³                (at94k40)                                                ³
+³                                                                         ³
+³                                                                         ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
+³ %BATmega323 instruction mnemonics -- 131 instructions%b                     ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
+³ %Ibranche instructions%i                      ³  new instructions           ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ                             ³
+³ JMP    k      [940C]  PC <-- k                               None       ³
+³ CALL   k      [950E]  STACK <-- PC + 1, PC <-- k             None       ³
+³                                                                         ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿                             ³
+³ %IMCU control instructions%i                  ³  new instructions           ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ                             ³
+³ BREAK         [9598]  see specific descr. for On-Chip-Dbg.   None       ³
+³                                                                         ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿                             ³
+³ %Idevice list%i                               ³                             ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ                             ³
+³ atmega16        atmega32        atmega64                                ³
+³ atmega162       atmega323                                               ³
+³ atmega169                                                               ³
+³                                                                         ³
+³                                                                         ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
+³ %BATmega128 instruction mnemonics -- 134 instructions%b                     ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
+³ %Ibranche instructions%i                      ³  new instructions           ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ                             ³
+³ JMP    k      [940C]  PC <-- k                               None       ³
+³ CALL   k      [950E]  STACK <-- PC + 1, PC <-- k             None       ³
+³                                                                         ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿                             ³
+³ %Idata transfer instructions%i                ³  new instructions           ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ                             ³
+³ ELPM          [95D8]  R0 <-- (RAMPZ:Z)                       None       ³
+³ ELPM   Rd,Z   [9006]  Rd <-- (RAMPZ:Z)                       None       ³
+³ ELPM   Rd,Z+  [9007]  Rd <-- (RAMPZ:Z), RAMPZ:Z<--RAMPZ:Z+1  None       ³
+³                                                                         ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿                             ³
+³ %IMCU control instructions%i                  ³  new instructions           ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ                             ³
+³ BREAK         [9598]  see specific descr. for On-Chip-Dbg.   None       ³
+³                                                                         ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿                             ³
+³ %Idevice list%i                               ³                             ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ                             ³
+³ atmega128                                                               ³
+³                                                                         ³
+ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+³ %BThese are for devices that don't exist yet (??? avr6 ???)%b               ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
+³                                                                         ³
+³ %I--> have Flash ( > 128K )                                               %i³
+³                                                                         ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
+³ %B_________ instruction mnemonics -- 132 instructions%b                     ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
+³ %Ibranche instructions%i                      ³  new instructions           ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ                             ³
+³ EIJMP         [9419]  PC(15:0) <-- Z, PC(21:16) <-- EIND     None       ³
+³ EICALL        [9519]  STACK <-- PC + 1,                      None       ³
+³                       PC(15:0) <-- Z, PC(21:16) <-- EIND                ³
+³                                                                         ³
+ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ

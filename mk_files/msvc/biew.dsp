@@ -215,6 +215,10 @@ SOURCE=.\info_win.c
 # End Source File
 # Begin Source File
 
+SOURCE=.\plugins\disasm\avr\avr.c
+# End Source File
+# Begin Source File
+
 SOURCE=.\plugins\disasm\ix86\ix86.c
 # End Source File
 # Begin Source File

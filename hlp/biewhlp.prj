@@ -45,3 +45,5 @@ id = BIEW_HLP v5.3.0
 20001 = ../plugins/disasm/ix86/ix86size.htx
 20002 = ../plugins/disasm/ix86/k86size.htx
 20010 = ../plugins/disasm/null_da.htx
+20020 = ../plugins/disasm/avr/avr.htx
+20021 = ../plugins/disasm/avr/avrsize.htx

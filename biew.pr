@@ -120,6 +120,7 @@
 #compile plugins\nls\russian.c
 
 #compile plugins\disasm\null_da.c
+#compile plugins\disasm\avr\avr.c
 #compile plugins\disasm\ix86\ix86.c
 #compile plugins\disasm\ix86\ix86_fun.c
 #compile plugins\disasm\ix86\ix86_fpu.c

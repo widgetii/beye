@@ -235,6 +235,7 @@ plugins;&
 plugins\bin;&
 plugins\nls;&
 plugins\disasm;&
+plugins\disasm\avr;&
 plugins\disasm\ix86;&
 biewlib;&
 biewlib\sysdep;&

@@ -500,6 +500,7 @@ static const char *__NEAR__ __FASTCALL__ elf_machine(unsigned id)
     case EM_IA_64:	return "Intel IA-64";
     case EM_X86_64:	return "AMD x86-64";
     case EM_VAX:	return "DEC VAX";
+    case EM_AVR:	return "Atmel AVR 8-bit";
     default:		return "Unknown";
   }
 }
