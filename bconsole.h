@@ -145,7 +145,7 @@ extern TWindow *    __FASTCALL__ PercentWnd(const char *text,const char *title);
                                      False -  if user want terminate process */
 extern tBool        __FASTCALL__ ShowPercentInWnd(TWindow *prcntwnd,unsigned n);
 
-extern int          __FASTCALL__ GetEvent(void (*)(void),TWindow *);
+extern int          __FASTCALL__ GetEvent(void (*)(void),int (*)(void),TWindow *);
 extern void         __FASTCALL__ PostEvent(int kbdcode);
 
 extern tBool __FASTCALL__ _lb_searchtext(const char *str,const char *tmpl,

@@ -466,7 +466,7 @@ static unsigned long __FASTCALL__ lmf_ShowHeader( void )
 	twSetColorAttr(dialog_cset.main);
 	while(1)
 	{
-		keycode=GetEvent(drawEmptyPrompt,w);
+		keycode=GetEvent(drawEmptyPrompt,NULL,w);
 		if(keycode==KE_ENTER)
 		{
 			if(DEF.cflags&_PCF_32BIT)

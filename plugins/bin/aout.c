@@ -72,7 +72,7 @@ static unsigned long __FASTCALL__ ShowAOutHeader( void )
            ,*((unsigned long *)&aout.e_drsize));
   while(1)
   {
-    keycode = GetEvent(drawEmptyPrompt,w);
+    keycode = GetEvent(drawEmptyPrompt,NULL,w);
     if(keycode == KE_ENTER) { fpos = *((unsigned long *)&aout.e_entry); break; }
     else
       if(keycode == KE_ESCAPE || keycode == KE_F(10)) break;

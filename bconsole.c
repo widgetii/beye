@@ -63,7 +63,11 @@ void __FASTCALL__ termBConsole( void )
 static int __NEAR__ __FASTCALL__ getkey(int hard, void (*func)(void))
 {
  return KB_freq ? KB_Buff[--KB_freq] :
-                  GetEvent(func ? func : hard ? hard > 1 ? drawAsmEdPrompt : drawEditPrompt : drawEmptyPrompt,NULL);
+                  GetEvent( func ? func : hard ? hard > 1 ? 
+			    drawAsmEdPrompt : drawEditPrompt : drawEmptyPrompt,
+			    func ? func : hard ? hard > 1 ? 
+			    EditAsmActionFromMenu: NULL: NULL,
+			    NULL);
 }
 
 static tBool __NEAR__ __FASTCALL__ ungotkey(int keycode)
@@ -528,7 +532,7 @@ static void __NEAR__ __FASTCALL__ __MessageBox(const char * text,const char * ti
  __MB(text,title,base,frame);
  do
  {
-   evt = GetEvent(drawEmptyPrompt,ErrorWnd);
+   evt = GetEvent(drawEmptyPrompt,NULL,ErrorWnd);
  }
  while(!(evt == KE_ESCAPE || evt == KE_F(10) || evt == KE_SPACE || evt == KE_ENTER));
  twHideWin(ErrorWnd);
@@ -572,11 +576,11 @@ static void __NEAR__ __FASTCALL__ PaintLine(unsigned i,const char *name,
   size_t namelen;
   char buffer[__TVIO_MAXSCREENWIDTH];
   memset(buffer,TWC_DEF_FILLER,sizeof(buffer));
-  namelen = strlen(name);
+  namelen = name?strlen(name):0;
   if(isOrdinal)
   {
     char * endptr;
-    endptr = strrchr(name,LB_ORD_DELIMITER);
+    endptr = name?strrchr(name,LB_ORD_DELIMITER):NULL;
     if(endptr)
     {
       unsigned len, rlen;
@@ -595,7 +599,7 @@ static void __NEAR__ __FASTCALL__ PaintLine(unsigned i,const char *name,
       if(len > rlen) memcpy(buffer+width-mord_width+rlen,"..", 2);
     }
   }
-  else memcpy((char *)buffer,name,min(namelen,width));
+  else if(name) memcpy((char *)buffer,name,min(namelen,width));
   if(useAcc)
   {
     char *st,*ends,*ptr;
@@ -725,7 +729,7 @@ static int __NEAR__ __FASTCALL__ __ListBox(const char ** names,unsigned nlist,un
    for(i = 0;i < nlist;i++)
    {
      unsigned len;
-     len = strlen(names[i]);
+     len = names[i]?strlen(names[i]):0;
      for(j = 0;j < len;j++)
      {
        if(names[i][j] == '~' && names[i][j+1] != '~')
@@ -736,12 +740,12 @@ static int __NEAR__ __FASTCALL__ __ListBox(const char ** names,unsigned nlist,un
      }
    }
  }
- if(!strrchr(names[0],LB_ORD_DELIMITER)) isOrdinal = False;
+ if(names[0]) if(!strrchr(names[0],LB_ORD_DELIMITER)) isOrdinal = False;
  mordstr_width = mord_width = 0;
  if(!isOrdinal) 
    for(i = 0;i < nlist;i++) 
    {
-     j = strlen(names[i]);
+     j = names[i]?strlen(names[i]):0;
      if(j > mwidth) mwidth = j;
    }
  else
@@ -749,7 +753,7 @@ static int __NEAR__ __FASTCALL__ __ListBox(const char ** names,unsigned nlist,un
    char *ord_delimiter;
    for(i = 0;i < nlist;i++) 
    {
-     ord_delimiter = strrchr(names[i], LB_ORD_DELIMITER);
+     ord_delimiter = names[i]?strrchr(names[i], LB_ORD_DELIMITER):NULL;
      if(ord_delimiter)
      {
        j = ord_delimiter - names[i];
@@ -790,7 +794,7 @@ static int __NEAR__ __FASTCALL__ __ListBox(const char ** names,unsigned nlist,un
  for(;;)
  {
    unsigned ch;
-   ch = GetEvent(isOrdinal ? drawOrdListPrompt : (assel & LB_SORTABLE) ? drawListPrompt : drawSearchListPrompt,wlist);
+   ch = GetEvent(isOrdinal ? drawOrdListPrompt : (assel & LB_SORTABLE) ? drawListPrompt : drawSearchListPrompt,NULL,wlist);
    if(ch == KE_ESCAPE || ch == KE_F(10)) { ret = -1; break; }
    if(ch == KE_ENTER)                    { ret = start + cursor; break; }
    if(ch!=KE_F(7) && ch!=KE_SHIFT_F(7))  scursor = -1;
@@ -825,7 +829,7 @@ static int __NEAR__ __FASTCALL__ __ListBox(const char ** names,unsigned nlist,un
                     for(i = 0;i < nlist;i++)
                     {
                       char *p;
-                      p = strchr(names[i],LB_ORD_DELIMITER);
+                      p = names[i]?strchr(names[i],LB_ORD_DELIMITER):NULL;
                       if(p)
                       {
                         *p = 0;
@@ -855,7 +859,7 @@ static int __NEAR__ __FASTCALL__ __ListBox(const char ** names,unsigned nlist,un
                    break;
 
                {
-                  int direct, cache[UCHAR_MAX];
+                  int direct, cache[UCHAR_MAX+1];
                   tBool found;
                   int ii,endsearch,startsearch;
                   searchtxt[searchlen] = 0;
@@ -876,6 +880,8 @@ static int __NEAR__ __FASTCALL__ __ListBox(const char ** names,unsigned nlist,un
                   fillBoyerMooreCache(cache, searchtxt, searchlen, sflg & SF_CASESENS);
                   for(ii = startsearch;ii != endsearch;ii+=direct)
                   {
+		    if(names[ii])
+		    {
                      if(_lb_searchtext(names[ii],searchtxt,searchlen,cache,sflg))
                      {
                         start = scursor = ii;
@@ -886,6 +892,7 @@ static int __NEAR__ __FASTCALL__ __ListBox(const char ** names,unsigned nlist,un
                         found = True;
                         break;
                      }
+		    }
                   }
                   if(!found) scursor = -1;
                   if(scursor == -1) ErrMessageBox(STR_NOT_FOUND,SEARCH_MSG);
@@ -987,7 +994,7 @@ int __FASTCALL__ PageBox(unsigned width,unsigned height,const void ** __obj,unsi
  for(;;)
  {
    unsigned ch;
-   ch = GetEvent(drawEmptyPrompt,wlist);
+   ch = GetEvent(drawEmptyPrompt,NULL,wlist);
    if(ch == KE_ESCAPE || ch == KE_F(10)) { ret = -1; break; }
    if(ch == KE_ENTER)                    { ret = start; break; }
    switch(ch)

@@ -237,7 +237,7 @@ static unsigned long __FASTCALL__ ShowCoff386Header( void )
   twSetColorAttr(dialog_cset.main);
   while(1)
   {
-    keycode = GetEvent(drawEmptyPrompt,w);
+    keycode = GetEvent(drawEmptyPrompt,NULL,w);
     if(keycode == KE_ENTER) { fpos = entry; break; }
     else
       if(keycode == KE_ESCAPE || keycode == KE_F(10)) break;

@@ -68,7 +68,7 @@ static unsigned long __FASTCALL__ ShowSysHeader( void )
  twClrEOL();
  while(1)
  {
-   keycode = GetEvent(drawEmptyPrompt,hwnd);
+   keycode = GetEvent(drawEmptyPrompt,NULL,hwnd);
    if(keycode == KE_ENTER) { fpos = drv.ddStrategyOff; break; }
    else
      if(keycode == KE_CTL_ENTER || keycode == KE_F(5)) { fpos = drv.ddInterruptOff; break; }

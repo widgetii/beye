@@ -152,13 +152,14 @@ static void __NEAR__ __FASTCALL__ __GetEventQue(void (*prompt)(void), TWindow *w
   if(KB_freq < sizeof(KB_Buff)/sizeof(int)) KB_Buff[KB_freq++] = key;
 }
 
-int __FASTCALL__ GetEvent( void (*prompt)(void) ,TWindow * win)
+int __FASTCALL__ GetEvent( void (*prompt)(void),int (*alt_action)(void),TWindow * win)
 {
   int key;
   while(!KB_freq) __GetEventQue(prompt,win);
   key = KB_Buff[0];
   --KB_freq;
   if(KB_freq) memmove(KB_Buff,&KB_Buff[1],KB_freq-1);
+  if(key==KE_TAB && alt_action) key=(*alt_action)();
   return key;
 }
 

@@ -2774,7 +2774,7 @@ static void __FASTCALL__ ix86HelpAsm( void )
  }
  do
  {
-   evt = GetEvent(drawEmptyPrompt,hwnd);
+   evt = GetEvent(drawEmptyPrompt,NULL,hwnd);
  }
  while(!(evt == KE_ESCAPE || evt == KE_F(10)));
  CloseWnd(hwnd);

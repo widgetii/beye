@@ -67,7 +67,7 @@ static unsigned long __FASTCALL__ ShowARCHHeader( void )
   twPrintF("File size      = %s bytes",sout);
   do
   {
-    evt = GetEvent(drawEmptyPrompt,w);
+    evt = GetEvent(drawEmptyPrompt,NULL,w);
   }
   while(!(evt == KE_ESCAPE || evt == KE_F(10)));
   CloseWnd(w);

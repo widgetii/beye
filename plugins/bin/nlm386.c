@@ -122,7 +122,7 @@ static unsigned long __FASTCALL__ ShowNLMHeader( void )
            ,nlm.nlm_flags);
   do
   {
-    keycode = GetEvent(drawEmptyPrompt,w);
+    keycode = GetEvent(drawEmptyPrompt,NULL,w);
     if(keycode == KE_ENTER)
     {
       fpos = nlm.nlm_codeImageOffset + nlm.nlm_codeStartOffset;
@@ -262,7 +262,7 @@ static unsigned long __FASTCALL__ ShowNewNLM( void )
   }
   do
   {
-    keycode = GetEvent(drawEmptyPrompt,w);
+    keycode = GetEvent(drawEmptyPrompt,NULL,w);
     if(keycode == KE_ENTER)
     {
        if(sharedEntry) fpos = sharedEntry + nlm.nlm_codeImageOffset;

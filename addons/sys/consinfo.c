@@ -74,7 +74,7 @@ static void ShowConsInfo( void )
   twRefreshWin(hwnd);
   do
   {
-    evt = GetEvent(drawEmptyPrompt,hwnd);
+    evt = GetEvent(drawEmptyPrompt,NULL,hwnd);
   }
   while(!(evt == KE_ESCAPE || evt == KE_F(10)));
   CloseWnd(hwnd);

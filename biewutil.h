@@ -84,12 +84,15 @@ extern void   drawEditPrompt( void );
 extern void   drawEmptyPrompt( void );
 extern void   drawEmptyListPrompt( void );
 extern void   drawAsmEdPrompt( void );
+extern int    EditAsmActionFromMenu( void );
 extern void   drawListPrompt( void );
 extern void   drawOrdListPrompt( void );
 extern void   drawSearchListPrompt( void );
 extern void   drawHelpPrompt( void );
+extern int    HelpActionFromMenu( void );
 extern void   drawHelpListPrompt( void );
 extern void   drawPrompt( void );
+extern int    MainActionFromMenu(void);
 extern void   About( void );
 
 extern unsigned long __FASTCALL__ WhereAMI(unsigned long ctrl_pos);

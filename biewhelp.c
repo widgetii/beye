@@ -194,7 +194,7 @@ static int __NEAR__ __FASTCALL__ __hlpListBox(char * * names,unsigned nlist,cons
  for(;;)
  {
    unsigned ch;
-   ch = GetEvent(drawHelpListPrompt,wlist);
+   ch = GetEvent(drawHelpListPrompt,NULL,wlist);
    if(ch == KE_ESCAPE || ch == KE_F(10)) { ret = -1; break; }
    if(ch == KE_ENTER)                    { ret = start + cursor; break; }
    if(ch!=KE_F(7) && ch!=KE_SHIFT_F(7))  scursor = -1;

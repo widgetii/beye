@@ -13,6 +13,11 @@
 %ICtrlF1-%i  - Defined by current view mode
 %ICtrlF10%i    (bin, text, hex, disasm).
 
+%BHint%b
+
+%ITAB%i      - calls prompt as menu (Useful for stupid terminals which break
+           some useful FunKeys like %IF1-F4%i etc)
+
 %UBasic keys:%u
 
   %IF1%i - Displayed window "Intro" (About)

@@ -183,7 +183,7 @@ static unsigned long __FASTCALL__ ShowMZHeader( void )
  }
  while(1)
  {
-   keycode = GetEvent(drawEmptyPrompt,hwnd);
+   keycode = GetEvent(drawEmptyPrompt,NULL,hwnd);
    if(keycode == KE_F(5) || keycode == KE_ENTER) { fpos = newcpos; break; }
    else
      if(keycode == KE_ESCAPE || keycode == KE_F(10)) break;

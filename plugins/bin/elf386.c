@@ -598,7 +598,7 @@ static unsigned long __FASTCALL__ ShowELFHeader( void )
            ,ELF_HALF(ELF_EHDR(elf,e_shstrndx)));
   while(1)
   {
-    keycode = GetEvent(drawEmptyPrompt,w);
+    keycode = GetEvent(drawEmptyPrompt,NULL,w);
     if(keycode == KE_ENTER) { fpos = entrya; break; }
     else
       if(keycode == KE_ESCAPE || keycode == KE_F(10)) break;

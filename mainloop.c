@@ -123,7 +123,7 @@ void MainLoop( void )
  while(1)
  {
   unsigned che;
-  ch = GetEvent(drawPrompt,NULL);
+  ch = GetEvent(drawPrompt,MainActionFromMenu,NULL);
   nfp = cfp = OldCurrFilePos = BMGetCurrFilePos();
   flen = BMGetFLength();
   lwidth = activeMode->CurLineWidth();
@@ -306,7 +306,7 @@ void MainLoop( void )
                      twHideWin(TitleWnd);
                      do
                      {
-                        evt = GetEvent(drawEmptyPrompt,NULL);
+                        evt = GetEvent(drawEmptyPrompt,NULL,NULL);
                      }
                      while(!(evt == KE_ESCAPE || evt == KE_F(10) || evt == KE_CTL_(O)));
                      twShowWin(MainWnd);

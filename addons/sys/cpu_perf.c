@@ -44,7 +44,7 @@ static void ShowCPUInfo( void )
    twPrintF("%s", cpu_info);
    do
    {
-     evt = GetEvent(drawEmptyPrompt,win);
+     evt = GetEvent(drawEmptyPrompt,NULL,win);
    }
    while(!(evt == KE_ESCAPE || evt == KE_F(10)));
    CloseWnd(win);

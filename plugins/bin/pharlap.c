@@ -94,7 +94,7 @@ static unsigned long __FASTCALL__ ShowPharLapHeader( void )
            ,nph.plStackSize);
   while(1)
   {
-    keycode = GetEvent(drawEmptyPrompt,w);
+    keycode = GetEvent(drawEmptyPrompt,NULL,w);
     if(keycode == KE_ENTER) { /* fpos = entrypoint*/; break; }
     else
       if(keycode == KE_ESCAPE || keycode == KE_F(10)) break;

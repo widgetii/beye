@@ -48,8 +48,8 @@ extern void   __FASTCALL__ CheckXYBounds( void );
 extern tBool  __FASTCALL__ edit_defaction(int _lastbyte);
 extern void   __FASTCALL__ editSaveContest( void );
 extern tBool  __FASTCALL__ editDefAction(int _lastbyte);
-extern int    __FASTCALL__ FullEdit(TWindow * txtwnd);
-extern tBool  __FASTCALL__ editInitBuffs(unsigned width);
+extern int    __FASTCALL__ FullEdit(TWindow * txtwnd,void (*save)(unsigned char *,unsigned));
+extern tBool  __FASTCALL__ editInitBuffs(unsigned width,unsigned char *buff,unsigned size);
 extern void   __FASTCALL__ editDestroyBuffs( void );
 
 

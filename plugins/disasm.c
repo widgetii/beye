@@ -632,7 +632,7 @@ static void __FASTCALL__ disEdit( void )
  twSetColorAttr(browser_cset.edit.main); twClearWin();
  edit_x = edit_y = 0;
  EditMode = EditMode ? False : True;
- if(editInitBuffs(disMaxCodeLen))
+ if(editInitBuffs(disMaxCodeLen,NULL,0))
  {
    FullAsmEdit(ewnd);
    editDestroyBuffs();

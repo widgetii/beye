@@ -78,7 +78,7 @@ void __FASTCALL__ PaintETitle( int shift,tBool use_shift )
   twUseWin(using);
 }
 
-tBool __FASTCALL__ editInitBuffs(unsigned width)
+tBool __FASTCALL__ editInitBuffs(unsigned width,unsigned char *buff,unsigned size)
 {
  unsigned long flen,cfp,ssize;
  unsigned i,msize;
@@ -98,11 +98,19 @@ tBool __FASTCALL__ editInitBuffs(unsigned width)
  memset(EditorMem.save,TWC_DEF_FILLER,msize);
  flen = BMGetFLength();
  edit_cp = cfp = BMGetCurrFilePos();
- EditorMem.size = (unsigned)((unsigned long)msize > (flen-cfp) ? (flen-cfp) : msize);
  EditorMem.width = width;
- BMReadBufferEx(EditorMem.buff,EditorMem.size,cfp,BM_SEEK_SET);
+ if(buff)
+ {
+    EditorMem.size = size;
+    memcpy(EditorMem.buff,buff,size);
+ }
+ else
+ {
+    EditorMem.size = (unsigned)((unsigned long)msize > (flen-cfp) ? (flen-cfp) : msize);
+    BMReadBufferEx(EditorMem.buff,EditorMem.size,cfp,BM_SEEK_SET);
+    BMSeek(cfp,BM_SEEK_SET);
+ }
  memcpy(EditorMem.save,EditorMem.buff,EditorMem.size);
- BMSeek(cfp,BM_SEEK_SET);
  /** initialize EditorMem.alen */
  ssize = flen-cfp;
  for(i = 0;i < tvioHeight;i++)
@@ -201,7 +209,7 @@ tBool __FASTCALL__ editDefAction(int _lastbyte)
    return redraw;
 }
 
-int __FASTCALL__ FullEdit(TWindow * txtwnd)
+int __FASTCALL__ FullEdit(TWindow * txtwnd,void (*save_func)(unsigned char *,unsigned))
 {
  size_t i,j;
  unsigned mlen;
@@ -264,7 +272,7 @@ int __FASTCALL__ FullEdit(TWindow * txtwnd)
    switch(_lastbyte)
    {
      case KE_F(1)   : ExtHelp(); continue;
-     case KE_F(2)   : editSaveContest();
+     case KE_F(2)   : save_func?save_func(EditorMem.buff,EditorMem.size):editSaveContest();
      case KE_F(10)  :
      case KE_ESCAPE : goto bye;
      case KE_TAB : if(txtwnd) goto bye;

@@ -116,11 +116,57 @@ static const char * FxText[] =
   "Quit  "
 };
 
-void drawPrompt( void )
+static void __NEAR__ fillFxText( void )
 {
   FxText[3] = activeMode->misckey_name ? activeMode->misckey_name() : NULL;
   FxText[7] = detectedFormat->showHdr || IsNewExe() ? "Header" : NULL;
+}
+
+void drawPrompt( void )
+{
+  fillFxText();
   __drawMultiPrompt(FxText, ShiftFxText, detectedFormat->prompt, activeMode->prompt);
+}
+
+static const char * amenu_names[] =
+{
+   "~Base",
+   "~Alternative",
+   "~Format depended",
+   "~Mode depended"
+};
+
+int MainActionFromMenu( void )
+{
+  unsigned nModes;
+  int i;
+  nModes = sizeof(amenu_names)/sizeof(char *);
+  i = SelBoxA(amenu_names,nModes," Select action: ",0);
+  if(i != -1)
+  {
+    switch(i)
+    {
+	default:
+	case 0:
+		fillFxText();
+		i = SelBoxA(FxText,10," Select base action: ",0);
+		if(i!=-1) return KE_F(i+1);
+		break;
+	case 1:
+		i = SelBoxA(ShiftFxText,10," Select alternative action: ",0);
+		if(i!=-1) return KE_SHIFT_F(i+1);
+		break;
+	case 2:
+		i = SelBoxA(detectedFormat->prompt,10," Select format depended action: ",0);
+		if(i!=-1) return KE_ALT_F(i+1);
+		break;
+	case 3:
+		i = SelBoxA(activeMode->prompt,10," Select mode depended action: ",0);
+		if(i!=-1) return KE_CTL_F(i+1);
+		break;
+    }
+  }
+  return 0;
 }
 
 static const char * fetext[] =
@@ -183,6 +229,16 @@ void drawEditPrompt( void )
   __drawSinglePrompt(fetext);
 }
 
+/*
+int EditActionFromMenu( void )
+{
+  int i;
+  i = SelBoxA(fetext,10," Select editor's action: ",0);
+  if(i != -1) return KE_F(i+1);
+  return 0;
+}
+*/
+
 void drawEmptyPrompt( void )
 {
   __drawSinglePrompt(empttext);
@@ -196,6 +252,29 @@ void drawEmptyListPrompt( void )
 void drawAsmEdPrompt( void )
 {
   __drawMultiPrompt(fetext, NULL, NULL, casmtext);
+}
+
+int EditAsmActionFromMenu( void )
+{
+  int i;
+  i = SelBoxA(amenu_names,2," Select asm editor's action: ",0);
+  if(i != -1)
+  {
+    switch(i)
+    {
+	default:
+	case 0:
+		fillFxText();
+		i = SelBoxA(fetext,10," Select base action: ",0);
+		if(i!=-1) return KE_F(i+1);
+		break;
+	case 1:
+		i = SelBoxA(casmtext,10," Select alternative action: ",0);
+		if(i!=-1) return KE_CTL_F(i+1);
+		break;
+    }
+  }
+  return 0;
 }
 
 static const char * ordlisttxt[] =
@@ -300,6 +379,14 @@ void drawSearchListPrompt( void )
 void drawHelpPrompt( void )
 {
   __drawSinglePrompt(helptxt);
+}
+
+int HelpActionFromMenu( void )
+{
+  int i;
+  i = SelBoxA(helptxt,10," Select help action: ",0);
+  if(i != -1) return KE_F(i+1);
+  return 0;
 }
 
 void drawHelpListPrompt( void )
@@ -427,7 +514,7 @@ void About( void )
  while(1)
  {
    int ch;
-   ch = GetEvent(drawHelpPrompt,hwnd);
+   ch = GetEvent(drawHelpPrompt,HelpActionFromMenu,hwnd);
    switch(ch)
    {
       case KE_ESCAPE:
@@ -520,7 +607,7 @@ unsigned long __FASTCALL__ WhereAMI(unsigned long ctrl_pos)
   while(1)
   {
     int ch;
-    ch = GetEvent(drawEmptyPrompt,hwnd);
+    ch = GetEvent(drawEmptyPrompt,NULL,hwnd);
     switch(ch)
     {
       case KE_F(10):

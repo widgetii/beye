@@ -1176,7 +1176,7 @@ static tBool FileInfo( void )
            ,(unsigned)statbuf.st_gid);
   do
   {
-    evt = GetEvent(drawEmptyPrompt,wnd);
+    evt = GetEvent(drawEmptyPrompt,NULL,wnd);
   }
   while(!(evt == KE_ESCAPE || evt == KE_F(10)));
   CloseWnd(wnd);

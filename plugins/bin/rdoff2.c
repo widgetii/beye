@@ -44,7 +44,7 @@ static unsigned long __FASTCALL__ rdoff2_ShowHeader( void )
   while(1)
   {
     int keycode;
-    keycode = GetEvent(drawEmptyPrompt,w);
+    keycode = GetEvent(drawEmptyPrompt,NULL,w);
     switch(keycode)
     {
 /*
