@@ -126,6 +126,7 @@ static void __NEAR__ PaintNewHeaderLX_1(void)
            "  %s\n"
            "  [%c] Module is not loadable (contains errors)\n"
            "  Module type is : %s\n"
+           "  [%c] Symmetric Multi Processor mode disabled\n"
            "  [%c] Per-process library termination\n"
            "Number of pages                  = %08lXH\n"
            "EIP objects number               = %08lXH\n"
@@ -147,6 +148,7 @@ static void __NEAR__ PaintNewHeaderLX_1(void)
            ,GetPMWinAPI((unsigned)(lxe.lx.lxModuleFlags))
            ,GetBool((lxe.lx.lxModuleFlags & 0x00002000L) == 0x00002000L)
            ,__getOSModType(((lxe.lx.lxModuleFlags & 0x00038000L) >> 15) & 0x07)
+           ,GetBool((lxe.lx.lxModuleFlags & 0x00080000L) == 0x00080000L)
            ,GetBool((lxe.lx.lxModuleFlags & 0x40000000L) == 0x40000000L)
            ,lxe.lx.lxPageCount
            ,lxe.lx.lxEIPObjectNumbers
@@ -396,6 +398,7 @@ static void __NEAR__ __FASTCALL__ objpaintLX(const LX_OBJECT *nam)
           "   [%c] Big/Default bit setting (80x86 specific)\n"
           "   [%c] Object is conforming for code (80x86 specific)\n"
           "   [%c] Object I/O privilege level (80x86 specific)\n"
+          "   [%c] Object is loadable to High Memory (>512MiB)\n"
           "Object page map index                = %lu\n"
           "Number of entries in object page map = %lu"
           ,nam->o32_size
@@ -416,6 +419,7 @@ static void __NEAR__ __FASTCALL__ objpaintLX(const LX_OBJECT *nam)
           ,GetBool((nam->o32_flags & 0x00002000L) == 0x00002000L)
           ,GetBool((nam->o32_flags & 0x00004000L) == 0x00004000L)
           ,GetBool((nam->o32_flags & 0x00008000L) == 0x00008000L)
+          ,GetBool((nam->o32_flags & 0x00010000L) == 0x00010000L)
           ,nam->o32_pagemap
           ,nam->o32_mapsize);
 }

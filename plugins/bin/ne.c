@@ -119,7 +119,7 @@ static void __NEAR__ PaintNewHeaderNE_1( void )
            "   %s\n"
            "   [%c]  First segment contains code that loads API (Bound Family/API)\n"
            "   [%c]  Linker detects errors at link time, but still creates module\n"
-           "   [%c]  < Module must located in EMS >\n"
+           "   [%c]  Win: [Module must located in EMS] OS/2: [SMP mode disabled]\n"
            "   [%c]  Module is library (DLL)\n"
            "DS (DGROUP)                    = %hu\n"
            "HEAPSIZE                       = %hu\n"
