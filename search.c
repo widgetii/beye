@@ -188,7 +188,7 @@ static unsigned long __NEAR__ __FASTCALL__ ___lfind(const char *sfrom,
         }
       }
       else { findptr = start; cond = True; }
-      if(biewFlg & SF_WORDONLY && cond)
+      if((biewFlg & SF_WORDONLY) && cond)
       {
         if(start && !(flags & __LF_NOLEFT))
         {
@@ -319,12 +319,16 @@ static unsigned long __NEAR__ __FASTCALL__ ___adv_find(const char *sfrom,
                    has_question = True;
                    goto still;
          case '*': while(cbuff[i] == '*') i++;
-                   flags = __LF_NORMAL | __LF_NOLEFT;
-                   goto still;
+                   pattern_size = orig_slen-i;
+                   memmove(cbuff, &pattern[i], pattern_size);
+                   biewFlg &= ~SF_REVERSE;
+          	   found_st = ___adv_find(sfrom, sfromlen,_found+last_search_len,slen, scache, cbuff, pattern_size, biewFlg);
+                   (*slen)++;
+                   goto exit;
          default: break;
        }
        start=_found+last_search_len+t_count;
-       biewFlg = ~SF_REVERSE; /* Anyway: we have found a first subsequence.
+       biewFlg &= ~SF_REVERSE; /* Anyway: we have found a first subsequence.
                                  For searching with using template need
                                  only forward search technology. */
        pattern_size = orig_slen;
@@ -340,15 +344,15 @@ static unsigned long __NEAR__ __FASTCALL__ ___adv_find(const char *sfrom,
       {
         if(found_st == ULONG_MAX) break;
         pattern_size = orig_slen;
-        if(orig_direct & SF_REVERSE) biewFlg &= ~SF_REVERSE;
-        else                         biewFlg |= SF_REVERSE;
+        if(orig_direct & SF_REVERSE) biewFlg |= SF_REVERSE;
+        else                         biewFlg &= SF_REVERSE;
         start = biewFlg & SF_REVERSE ? stable_found-1 : stable_found+1;
         memcpy(cbuff,pattern,pattern_size);
         found_st = ULONG_MAX;
         goto restart;
       }
     }
-    if(i >= orig_slen-1) break;
+    if(i >= orig_slen) break;
   }
   if(found_st == ULONG_MAX) found_st = 0;
   /* Special case if last character is wildcard */
