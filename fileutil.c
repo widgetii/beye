@@ -880,10 +880,12 @@ static void __NEAR__ __FASTCALL__ EndianifyBlock(char * buff,unsigned len, int t
     switch(type)
     {
       default:
+
 #ifdef INT64_C
       case 3: *((tUInt64 *)buff) = ByteSwapLL(*((tUInt64 *)buff));
               break;
 #endif
+
       case 2: *((tUInt32 *)buff) = ByteSwapL(*((tUInt32 *)buff));
               break;
       case 1:
@@ -968,7 +970,7 @@ static void __NEAR__ __FASTCALL__ TranslateBlock(char * buff,unsigned len, const
   unsigned i;
   for(i = 0;i < len;i++)
   {
-    buff[i] = __Xlat__(xlt, buff[i]);
+    buff[i] = __Xlat__(xlt, (int)buff[i]);
   }
 }
 
