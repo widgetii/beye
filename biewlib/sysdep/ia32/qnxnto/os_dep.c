@@ -13,6 +13,7 @@
  * @author      Andrew Golovnia
  * @since       2003
  * @note        Development, fixes and improvements
+ * @note        Big thanks to Mike Gorchak for icongen program
 **/
 
 #include <stdio.h>
@@ -26,7 +27,7 @@
 #include <sys/netmgr.h>
 #include <sys/neutrino.h>
 
-
+#include "ph_icon.h"
 #include "biewlib/biewlib.h"
 
 #define LIBDIR "/usr/share"
