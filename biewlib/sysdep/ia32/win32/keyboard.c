@@ -46,6 +46,10 @@ static int KB_Buff[64];
 static unsigned char KB_freq = 0;
 static int shiftkeys = 0;
 
+#ifndef MOUSE_WHEELED
+#define MOUSE_WHEELED	4 /*Windows NT and Windows Me/98/95:  This value is not supported.*/
+#endif
+
 HANDLE hIn;
 tBool hInputTrigger = False;
 extern OSVERSIONINFO win32_verinfo;

@@ -23,6 +23,7 @@
 #include <windows.h>
 #include <stdlib.h>
 #include <string.h>
+#include <errno.h>
 #include "biewlib/biewlib.h"
 
 tAbsCoord tvioWidth,tvioHeight;
