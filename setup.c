@@ -188,7 +188,7 @@ void Setup(void)
      case KE_ESCAPE: ret = 0; goto exit;
      case KE_ENTER: ret = 1; goto exit;
      case KE_SHIFT_TAB:
-     case KE_TAB:   active = active++;
+     case KE_TAB:   active++;
 		    if(active>2) active=0;
                     twUseWin(ewnd[active]);
                     continue;
