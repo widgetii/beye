@@ -999,8 +999,8 @@ ix86_MMOpcodes ix86_660F_PentiumTable[256] =
   /*0x79*/ { NULL, NULL, IX86_UNKMMX },
   /*0x7A*/ { NULL, NULL, IX86_UNKMMX },
   /*0x7B*/ { NULL, NULL, IX86_UNKMMX },
-  /*0x7C*/ { NULL, NULL, IX86_UNKMMX },
-  /*0x7D*/ { NULL, NULL, IX86_UNKMMX },
+  /*0x7C*/ { "haddpd", ix86_ArgXMMXnD, IX86_P5MMX },
+  /*0x7D*/ { "hsubpd", ix86_ArgXMMXnD, IX86_P5MMX },
   /*0x7E*/ { "movd", ix86_ArgXMMXRD, IX86_P4MMX },
   /*0x7F*/ { "movdqa", ix86_ArgXMMXD, IX86_P4MMX },
   /*0x80*/ { NULL, NULL, IX86_UNKMMX },
@@ -1083,7 +1083,7 @@ ix86_MMOpcodes ix86_660F_PentiumTable[256] =
   /*0xCD*/ { NULL, NULL, IX86_UNKMMX },
   /*0xCE*/ { NULL, NULL, IX86_UNKMMX },
   /*0xCF*/ { NULL, NULL, IX86_UNKMMX },
-  /*0xD0*/ { NULL, NULL, IX86_UNKMMX },
+  /*0xD0*/ { "addsubpd", ix86_ArgXMMXnD, IX86_P5MMX },
   /*0xD1*/ { "psrlw", ix86_ArgXMMXnD, IX86_P4MMX },
   /*0xD2*/ { "psrld", ix86_ArgXMMXnD, IX86_P4MMX },
   /*0xD3*/ { "psrlq", ix86_ArgXMMXnD, IX86_P4MMX },
@@ -1153,7 +1153,7 @@ ix86_MMOpcodes ix86_F20F_PentiumTable[256] =
   /*0x0F*/ { NULL, NULL, IX86_UNKMMX },
   /*0x10*/ { "movsd", ix86_ArgXMMXnD, IX86_P4MMX },
   /*0x11*/ { "movsd", ix86_ArgXMMXD, IX86_P4MMX },
-  /*0x12*/ { NULL, NULL, IX86_UNKMMX },
+  /*0x12*/ { "movddup", ix86_ArgXMMXnD, IX86_P5MMX },
   /*0x13*/ { NULL, NULL, IX86_UNKMMX },
   /*0x14*/ { NULL, NULL, IX86_UNKMMX },
   /*0x15*/ { NULL, NULL, IX86_UNKMMX },
@@ -1259,8 +1259,8 @@ ix86_MMOpcodes ix86_F20F_PentiumTable[256] =
   /*0x79*/ { NULL, NULL, IX86_UNKMMX },
   /*0x7A*/ { NULL, NULL, IX86_UNKMMX },
   /*0x7B*/ { NULL, NULL, IX86_UNKMMX },
-  /*0x7C*/ { NULL, NULL, IX86_UNKMMX },
-  /*0x7D*/ { NULL, NULL, IX86_UNKMMX },
+  /*0x7C*/ { "haddps", ix86_ArgXMMXnD, IX86_P5MMX },
+  /*0x7D*/ { "hsubps", ix86_ArgXMMXnD, IX86_P5MMX },
   /*0x7E*/ { NULL, NULL, IX86_UNKMMX },
   /*0x7F*/ { NULL, NULL, IX86_UNKMMX },
   /*0x80*/ { NULL, NULL, IX86_UNKMMX },
@@ -1343,7 +1343,7 @@ ix86_MMOpcodes ix86_F20F_PentiumTable[256] =
   /*0xCD*/ { NULL, NULL, IX86_UNKMMX },
   /*0xCE*/ { NULL, NULL, IX86_UNKMMX },
   /*0xCF*/ { NULL, NULL, IX86_UNKMMX },
-  /*0xD0*/ { NULL, NULL, IX86_UNKMMX },
+  /*0xD0*/ { "addsubps", ix86_ArgXMMXnD, IX86_P5MMX },
   /*0xD1*/ { NULL, NULL, IX86_UNKMMX },
   /*0xD2*/ { NULL, NULL, IX86_UNKMMX },
   /*0xD3*/ { NULL, NULL, IX86_UNKMMX },
@@ -1375,7 +1375,7 @@ ix86_MMOpcodes ix86_F20F_PentiumTable[256] =
   /*0xED*/ { NULL, NULL, IX86_UNKMMX },
   /*0xEE*/ { NULL, NULL, IX86_UNKMMX },
   /*0xEF*/ { NULL, NULL, IX86_UNKMMX },
-  /*0xF0*/ { NULL, NULL, IX86_UNKMMX },
+  /*0xF0*/ { "lddqu", ix86_ArgXMMXnD, IX86_P5MMX },
   /*0xF1*/ { NULL, NULL, IX86_UNKMMX },
   /*0xF2*/ { NULL, NULL, IX86_UNKMMX },
   /*0xF3*/ { NULL, NULL, IX86_UNKMMX },
@@ -1413,11 +1413,11 @@ ix86_MMOpcodes ix86_F30F_PentiumTable[256] =
   /*0x0F*/ { NULL, NULL, IX86_UNKMMX },
   /*0x10*/ { "movss", ix86_ArgXMMXnD, IX86_P3MMX },
   /*0x11*/ { "movss", ix86_ArgXMMXD, IX86_P3MMX },
-  /*0x12*/ { NULL, NULL, IX86_UNKMMX },
+  /*0x12*/ { "movsldup", ix86_ArgXMMXnD, IX86_P5MMX },
   /*0x13*/ { NULL, NULL, IX86_UNKMMX },
   /*0x14*/ { NULL, NULL, IX86_UNKMMX },
   /*0x15*/ { NULL, NULL, IX86_UNKMMX },
-  /*0x16*/ { NULL, NULL, IX86_UNKMMX },
+  /*0x16*/ { "movshdup", ix86_ArgXMMXnD, IX86_P5MMX },
   /*0x17*/ { NULL, NULL, IX86_UNKMMX },
   /*0x18*/ { NULL, NULL, IX86_UNKMMX },
   /*0x19*/ { NULL, NULL, IX86_UNKMMX },
@@ -2499,10 +2499,10 @@ static const char * CPUNames[] =
   "80386 ",
   "80486 ",
   "80586 ",
-  "80686/PII  ",
-  "PIII    ",
-  "P4    ",
-  " ???  "
+  "80686/PII ",
+  "PIII   ",
+  "P4   ",
+  "Prescott "
 };
 
 static const char * FPUNames[] =
@@ -2513,10 +2513,10 @@ static const char * FPUNames[] =
   "80387 ",
   "80487 ",
   "      ",
-  "80687      ",
-  "PIII    ",
-  "P4    ",
-  " ???  "
+  "80687     ",
+  "PIII   ",
+  "P4   ",
+  "Prescott "
 };
 
 static const char * MMXNames[] =
@@ -2527,10 +2527,10 @@ static const char * MMXNames[] =
   "      ",
   "      ",
   "P1MMX ",
-  "K6-2 3dNow ",
-  "PIII/K7 ",
-  "P4    ",
-  " ???  "
+  "K6-2 3dNow",
+  "PIII/K7",
+  "P4   ",
+  "Prescott "
 };
 
 #ifdef IX86_64

@@ -64,7 +64,8 @@ typedef void (__FASTCALL__*ix86_method)(char *encode_str,ix86Param *);
 #define IX86_CPU686  0x00000006UL
 #define IX86_CPU786  0x00000007UL
 #define IX86_CPU886  0x00000008UL
-#define IX86_CPU986  0x00000008UL
+#define IX86_CPU986  0x00000009UL
+#define IX86_CPU1086 0x00000009UL
 
 #define IX86_CPUMASK 0x000000FFUL
 
@@ -77,7 +78,8 @@ typedef void (__FASTCALL__*ix86_method)(char *encode_str,ix86Param *);
 #define IX86_FPU687 0x000006FFUL
 #define IX86_FPU787 0x000007FFUL
 #define IX86_FPU887 0x000008FFUL
-#define IX86_FPU987 0x000008FFUL
+#define IX86_FPU987 0x000009FFUL
+#define IX86_FPU1087 0x000009FFUL
 
 #define IX86_FPUMASK 0x0000FF00UL
 
@@ -85,7 +87,8 @@ typedef void (__FASTCALL__*ix86_method)(char *encode_str,ix86Param *);
 #define IX86_MMX686 0x0006FFFFUL
 #define IX86_MMX786 0x0007FFFFUL
 #define IX86_MMX886 0x0008FFFFUL
-#define IX86_MMX986 0x0008FFFFUL
+#define IX86_MMX986 0x0009FFFFUL
+#define IX86_MMX1086 0x0009FFFFUL
 
 #define IX86_MMXMASK 0x00FF0000UL
 
@@ -106,10 +109,15 @@ typedef void (__FASTCALL__*ix86_method)(char *encode_str,ix86Param *);
 #define IX86_P4FPU     IX86_FPU887
 #define IX86_P4MMX     IX86_MMX886
 
-/* Futured processors */
-#define IX86_UNKCPU    IX86_CPU986
-#define IX86_UNKFPU    IX86_FPU987
-#define IX86_UNKMMX    IX86_MMX986
+/* Prescott processor */
+#define IX86_P5CPU    IX86_CPU986
+#define IX86_P5FPU    IX86_FPU987
+#define IX86_P5MMX    IX86_MMX986
+
+/* Furter processors */
+#define IX86_UNKCPU    IX86_CPU1086
+#define IX86_UNKFPU    IX86_FPU1087
+#define IX86_UNKMMX    IX86_MMX1086
 
 #define IX86_K6        IX86_AMD | IX86_CPU586
 #define IX86_3DNOW     IX86_AMD | IX86_MMX686

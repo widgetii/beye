@@ -1009,7 +1009,11 @@ void  __FASTCALL__ ix86_ExOpCodes(char *str,ix86Param *DisP)
  if(x86_Bitness == DAB_USE64) DisP->pro_clone = ix86_extable[code].flags64;
  else
 #endif
- if(DisP->pro_clone < ix86_extable[code].pro_clone) DisP->pro_clone = ix86_extable[code].pro_clone;
+ if((DisP->pro_clone&IX86_CPUMASK) < (ix86_extable[code].pro_clone&IX86_CPUMASK))
+ {
+	DisP->pro_clone &= ~IX86_CPUMASK;
+	DisP->pro_clone |= ix86_extable[code].pro_clone;
+ }
 }
 
 void  __FASTCALL__ ix86_ArgExGr0(char *str,ix86Param *DisP)
@@ -1046,7 +1050,24 @@ void  __FASTCALL__ ix86_ArgExGr1(char *str,ix86Param *DisP)
         return;
       }
     }
+    else
 #endif
+    {
+      if(DisP->RealCmd[1] == 0xC8)
+      {
+        strcpy(str,"monitor");
+        DisP->codelen++;
+	DisP->pro_clone = IX86_P5CPU&~IX86_CPL0;
+        return;
+      }
+      if(DisP->RealCmd[1] == 0xC9)
+      {
+        strcpy(str,"mwait");
+        DisP->codelen++;
+	DisP->pro_clone = IX86_P5CPU&~IX86_CPL0;
+        return;
+      }
+    }
     strcpy(str,ix86_ExGrp1[rm]);
     TabSpace(str,TAB_POS);
     DisP->codelen++;

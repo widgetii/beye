@@ -655,6 +655,26 @@
 ³ xorpd       [66_0F_57]              Bitwise Logical XOR for Double-FP   ³
 ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
 ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+³                     %BPrescott instruction mnemonics%b                      ³
+³ %BPrescott%b%I is the name for a new (9th in biew terms) generation%i           ³
+³ %Iof IA32 processors which introduces new instructions (unofficially   %i   ³
+³ %Inamed as SSE3)%i                                                          ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
+³ monitor     [0F_01_C8]              Setup monitor address               ³
+³ mwait       [0F_01_C9]              Monitor wait                        ³
+³ fistpp      [DB(DD,DF)/1]           Store Int and pop x87 with trunc    ³
+³ addsubpd    [66_0F_D0/rm]           Packet Double-FP Add/Substract      ³
+³ addsubps    [F2_0F_D0/rm]           Packet Single-FP Add/Substract      ³
+³ haddpd      [66_0F_7C/rm]           Packet Double-FP Horizontal Add     ³
+³ haddps      [F2_0F_7C/rm]           Packet Single-FP Horizontal Add     ³
+³ hsubpd      [66_0F_7D/rm]           Packet Double-FP Horizontal Substr  ³
+³ hsubps      [F2_0F_7D/rm]           Packet Single-FP Horizontal Substr  ³
+³ lddqu       [F2_0F_F0/rm]           Load unaligned 128-bit integer      ³
+³ movddup     [F2_0F_12/rm]           Move one Double-FP and duplicate    ³
+³ movshdup    [F3_0F_16/rm]           Move packet Single-FP High and dup  ³
+³ movsldup    [F3_0F_12/rm]           Move packet Single-FP Low and dup   ³
+ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 ³                                   %BK5%b                                    ³
 ³ %IThe AMD-K5 processor is socket 7-compatible and software-compatible with%i³
 ³ %Ithe %BPentium%b processor. Compatible in this sense means the devices are%i   ³

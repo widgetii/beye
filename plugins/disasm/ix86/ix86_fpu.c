@@ -221,7 +221,7 @@ FPUcall D9rm[8] =
 FPUcall DBrm[8] =
 {
   { FPUint16int32,   "fild" },
-  { FPUld,           "fi???" },
+  { FPUld,           "fistpp" },
   { FPUint16int32st, "fist" },
   { FPUsttword,      "fistp" },
   { FPUld,           "f???" },
@@ -233,7 +233,7 @@ FPUcall DBrm[8] =
 FPUcall DDrm[8] =
 {
   { FPUint64,        "fld" },
-  { FPUld,           "f???" },
+  { FPUld,           "fistpp" },
   { FPUmem64mem32st, "fst" },
   { FPUmem64mem32st, "fstp" },
   { FPUld,           "frstor" },
@@ -245,7 +245,7 @@ FPUcall DDrm[8] =
 FPUcall DFrm[8] =
 {
   { FPUint16int32,   "fild" },
-  { FPUld,           "fi???" },
+  { FPUld,           "fistpp" },
   { FPUint16int32st, "fist" },
   { FPUint16int32st, "fistp" },
   { FPUldtword,      "fbld" },
@@ -376,7 +376,11 @@ void __FASTCALL__ ix86_FPUCmd(char * str,ix86Param *DisP)
                   DisP->pro_clone = IX86_FPU387;
                   FPUst0sti(str,FCMOVnc[(code1 >> 3) & 0x07],code1);
                }
-               else   (*DBrm[rm].f)(str,DBrm[rm].c,DisP);
+               else
+	       {
+		 (*DBrm[rm].f)(str,DBrm[rm].c,DisP);
+		 if(rm==1) DisP->pro_clone = IX86_P5FPU;
+	       }
             }
             break;
    case 0xDC:
@@ -415,7 +419,11 @@ void __FASTCALL__ ix86_FPUCmd(char * str,ix86Param *DisP)
                      DisP->pro_clone = IX86_FPU387;
                      FPUcmdsti_2(str,"fucom","fucomp",code1);
                   }
-                  else     (*DDrm[rm].f)(str,DDrm[rm].c,DisP);
+                  else
+		  {
+		    (*DDrm[rm].f)(str,DDrm[rm].c,DisP);
+		    if(rm==1) DisP->pro_clone = IX86_P5FPU;
+		  }
               break;
             }
             break;
@@ -476,7 +484,11 @@ void __FASTCALL__ ix86_FPUCmd(char * str,ix86Param *DisP)
                   DisP->pro_clone = IX86_FPU387;
                   FPUcmdsti_2(str,"ffreep","f???",code1);
                 }
-                else  (*DFrm[rm].f)(str,DFrm[rm].c,DisP);
+                else
+		{
+		   (*DFrm[rm].f)(str,DFrm[rm].c,DisP);
+		   if(rm==1) DisP->pro_clone = IX86_P5FPU;
+		}
               }
               break;
            }
