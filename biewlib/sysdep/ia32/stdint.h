@@ -54,7 +54,7 @@ typedef unsigned int		tUInt32;
 #ifdef __GNUC__
 __extension__
 typedef unsigned long long int	tUInt64;
-#elif defined _MSC_VER
+#elif defined(_MSC_VER) || defined(__WATCOMC__)
 typedef unsigned __int64 tUInt64;
 #endif
 

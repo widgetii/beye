@@ -130,6 +130,7 @@ sysinfo.obj &
 tstrings.obj &
 ascii.obj &
 consinfo.obj &
+inview.obj &
 cpu_perf.obj &
 dig_conv.obj &
 eval.obj &
@@ -140,6 +141,7 @@ coff386.obj &
 dos_sys.obj &
 elf386.obj &
 le.obj &
+lmf.obj &
 lx.obj &
 mz.obj &
 ne.obj &
@@ -170,6 +172,7 @@ tw_class.obj &
 cpu_info.obj &
 fileio.obj &
 keyboard.obj &
+misc.obj &
 mmfio.obj &
 mouse.obj &
 nls.obj &

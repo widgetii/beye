@@ -14,7 +14,7 @@
  * @since       2000
  * @note        Development, fixes and improvements
 **/
-#ifdef _MSC_VER
+#if defined(_MSC_VER) || defined(__WATCOMC__)
 #define inline __inline
 #endif
 

@@ -145,8 +145,9 @@ void __FASTCALL__ __vioSetCursorPos(tAbsCoord x,tAbsCoord y )
 
 void __FASTCALL__ __vioWriteBuff(tAbsCoord x,tAbsCoord y,const tvioBuff *buff,unsigned len)
 {
-#if 0
+#if 1
 /* I've found bugs in OS/2 on large arrays */
+/* But Max Alekseyev <relf@os2.ru> swears that this block is working with Watcom */
   tUInt16 *resbuff, small_buffer[__TVIO_MAXSCREENWIDTH];
   if(len > tvioWidth)
   {
@@ -178,8 +179,9 @@ void __FASTCALL__ __vioWriteBuff(tAbsCoord x,tAbsCoord y,const tvioBuff *buff,un
 
 void __FASTCALL__ __vioReadBuff(tAbsCoord x,tAbsCoord y,tvioBuff *buff,unsigned len)
 {
-#if 0
+#if 1
 /* I've found bugs in OS/2 on large arrays */
+/* But Max Alekseyev <relf@os2.ru> swears that this block is working with Watcom */
   size_t i,rsize;
   tUInt16 *resbuff, small_buffer[__TVIO_MAXSCREENWIDTH];
   if(len > tvioWidth)
