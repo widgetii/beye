@@ -35,11 +35,15 @@ extern "C" {
  (tUInt16)((tBool)is_big ? ByteSwapS(*(tUInt16 *)(tUInt8 *)cval) : *(tUInt16 *)(tUInt8 *)cval)
 #define  FMT_DWORD(cval,is_big)\
  (tUInt32)((tBool)is_big ? ByteSwapL(*(tUInt32 *)(tUInt8 *)cval) : *(tUInt32 *)(tUInt8 *)cval)
+#define  FMT_QWORD(cval,is_big)\
+ (tUInt64)((tBool)is_big ? ByteSwapLL(*(tUInt64 *)(tUInt8 *)cval) : *(tUInt64 *)(tUInt8 *)cval)
 #else
 #define  FMT_WORD(cval,is_big)\
  (tUInt16)(!(tBool)is_big ? ByteSwapS(*(tUInt16 *)(tUInt8 *)cval) : *(tUInt16 *)(tUInt8 *)cval)
 #define  FMT_DWORD(cval,is_big)\
  (tUInt32)(!(tBool)is_big ? ByteSwapL(*(tUInt32 *)(tUInt8 *)cval) : *(tUInt32 *)(tUInt8 *)cval)
+#define  FMT_QWORD(cval,is_big)\
+ (tUInt64)(!(tBool)is_big ? ByteSwapLL(*(tUInt64 *)(tUInt8 *)cval) : *(tUInt64 *)(tUInt8 *)cval)
 #endif
 
 struct PubName
