@@ -158,10 +158,10 @@ static void __FASTCALL__ HelpHex( void )
    hlpDisplay(1002);
 }
 
-static unsigned long __FASTCALL__ hexPrevPageSize( void ) { return hexViewer[hmode].width()*hexViewer[hmode].size*twGetClientHeight(MainWnd); }
-static unsigned long __FASTCALL__ hexCurrPageSize( void ) { return hexViewer[hmode].width()*hexViewer[hmode].size*twGetClientHeight(MainWnd); }
-static unsigned long __FASTCALL__ hexPrevLineWidth( void ) { return hexViewer[hmode].width()*hexViewer[hmode].size; }
-static unsigned long __FASTCALL__ hexCurrLineWidth( void ) { return hexViewer[hmode].width()*hexViewer[hmode].size; }
+static unsigned long __FASTCALL__ hexPrevPageSize( void ) { return (hexViewer[hmode].width()-virtWidthCorr)*hexViewer[hmode].size*twGetClientHeight(MainWnd); }
+static unsigned long __FASTCALL__ hexCurrPageSize( void ) { return (hexViewer[hmode].width()-virtWidthCorr)*hexViewer[hmode].size*twGetClientHeight(MainWnd); }
+static unsigned long __FASTCALL__ hexPrevLineWidth( void ) { return (hexViewer[hmode].width()-virtWidthCorr)*hexViewer[hmode].size; }
+static unsigned long __FASTCALL__ hexCurrLineWidth( void ) { return (hexViewer[hmode].width()-virtWidthCorr)*hexViewer[hmode].size; }
 static const char *  __FASTCALL__ hexMiscKeyName( void ) { return hmode == 1 ? "Modify" : "      "; }
 
 static void __FASTCALL__ __NEAR__ __checkWidthCorr(void)
@@ -310,7 +310,7 @@ static void __FASTCALL__ EditHex( void )
  twSetColorAttr(browser_cset.edit.main); twClearWin();
  drawEditPrompt();
  has_show[0] = has_show[1] = False;
- if(editInitBuffs(hexViewer[hmode].width()-virtWidthCorr))
+ if(editInitBuffs(hexViewer[hmode].width()-virtWidthCorr,NULL,0))
  {
    edit_x = edit_y = 0;
    while(1)
@@ -324,7 +324,7 @@ static void __FASTCALL__ EditHex( void )
      }
      twUseWin(ewnd[active]);
      if(!active) _lastbyte = FullHexEdit(MainWnd);
-     else        _lastbyte = FullEdit(MainWnd);
+     else        _lastbyte = FullEdit(MainWnd,NULL);
      has_show[active] = True;
      if(_lastbyte == KE_TAB) active = active ? 0 : 1;
      else break;
