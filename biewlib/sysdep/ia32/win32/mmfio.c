@@ -389,7 +389,9 @@ tBool             __FASTCALL__ __mmfIsWorkable( void ) { return True; }
 #include "biewlib/pmalloc.h"
 #include "biewlib/biewlib.h"
 
+#ifndef _MSC_VER
 #error "You've defined __DISABLE_LOWLEVEL_MMF. You can comment out this message, but in this case resulting code will partially workable."
+#endif
 
 struct mmfRecord
 {

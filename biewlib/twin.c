@@ -41,6 +41,8 @@ const char TW_DN3D_FRAME[8] = "\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF";
 #ifdef __TSC__
 #pragma save , call(inline=>on) /** GPF in protmode */
 static void winInternalError( void ) = { 0xFF, 0xFF };
+#elif defined _MSC_VER
+static inline void winInternalError( void ) {};
 #else
 static inline void winInternalError( void ) { (void)0xFFFFFFFF; };
 #endif

@@ -14,6 +14,10 @@
  * @since       2000
  * @note        Development, fixes and improvements
 **/
+#ifdef _MSC_VER
+#define inline __inline
+#endif
+
 #if defined(__DISABLE_ASM) || !defined(__GNUC__) || !defined(__GNUC_MINOR__) || (__GNUC__ < 2 && __GNUC_MINOR__ < 5) || !defined(NDEBUG)
 #include "biewlib/sysdep/generic/_inlines.h"
 #else
