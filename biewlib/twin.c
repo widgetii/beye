@@ -32,7 +32,7 @@ const char TW_THICK_FRAME[8] = { TWC_FL_BLK, TWC_FL_BLK, TWC_FL_BLK, TWC_FL_BLK,
 const char TW_UP3D_FRAME[8] = "\x00\x00\x00\x00\x00\x00\x00\x00";
 const char TW_DN3D_FRAME[8] = "\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF";
 
-#ifndef NDEBUG
+#if !defined(__DISABLE_ASM) && defined(NDEBUG)
 #ifdef __TSC__
 #pragma save , call(inline=>on) /** must be GP in protmode */
 static void winInternalError( void ) = { 0xFF, 0xFF };
