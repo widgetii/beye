@@ -26,7 +26,6 @@ On UNIX systems you may also modify:
 
 TARGET_SCREEN_LIB=
 USE_MOUSE=
-USE_SELECT=
 
 On other systems these variables are meaningless.
 
