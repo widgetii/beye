@@ -2000,6 +2000,13 @@ static void ix86_gettype(DisasmRet *dret,ix86Param *_DisP)
         dret->field = 2;
      }
      else
+     if(insn[0] == 0xFF && insn[1] == 0xA3 && Use32Addr)
+     {
+        dret->pro_clone = __INSNT_JMPPIC;
+        dret->codelen = 4;
+        dret->field = 2;
+     }
+     else
      {
         /* Attempt determine leave insn */
         size_t i;

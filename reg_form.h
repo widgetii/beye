@@ -37,6 +37,7 @@ typedef tBool         __FASTCALL__ (*ModFunc)( void );
 #define APREF_USE_TYPE    0x0001 /**< Append references in detail form if it really present in binary */
 #define APREF_TRY_LABEL   0x0002 /**< Append references in short form even if it not present in binary (smart method) */
 #define APREF_SAVE_VIRT   0x0004 /**< Notifies plugin about preserving of virtual address, if binding is local */
+#define APREF_TRY_PIC     0x0008 /**< Append references in short form assuming that shift is offset in .GOT table where references are binded */
 
 /**
    Appends dissasembler reference to string.

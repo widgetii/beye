@@ -540,6 +540,7 @@ static unsigned long __FASTCALL__ AppendNLMRef(char *str,unsigned long ulShift,i
   RELOC_NLM *rnlm,key;
   unsigned long retrf;
   char buff[400];
+  if(flags & APREF_TRY_PIC) return RAPREF_NONE;
   if(!nlm.nlm_numberOfExternalReferences || nlm.nlm_externalReferencesOffset >= bmGetFLength()) retrf = RAPREF_NONE;
   else
   {

@@ -528,6 +528,7 @@ static unsigned long __FASTCALL__ rdoff_AppendRef(char *str,unsigned long ulShif
   RDOFF_RELOC *rrdoff,key;
   unsigned long ret;
   char buff[400];
+  if(flags & APREF_TRY_PIC) return RAPREF_NONE;
   if(!rdoffReloc) BuildRelocRDOFF();
   if(!rdoffImpNames) ReadImpNameList(bmbioHandle(),MemOutBox);
   if(!PubNames) rdoff_ReadPubNameList(bmbioHandle(),MemOutBox);

@@ -939,6 +939,7 @@ static unsigned long __FASTCALL__ AppendPERef(char *str,unsigned long ulShift,in
   UNUSED(codelen);
   b_cache = pe_cache3;
   retrf = RAPREF_NONE;
+  if(flags & APREF_TRY_PIC) return RAPREF_NONE;
   if(pe.peImportTableRVA || pe.peFixupTableRVA)
   {
     bioSeek(b_cache,

@@ -1056,6 +1056,8 @@ int __FASTCALL__ disAppendFAddr(char * str,long ulShift,long distin,unsigned lon
  /* Prepare insn type */
  if(disNeedRef > NEEDREF_NONE)
  {
+   /* Forward prediction: ulShift = offset of binded field but r_sh is
+      pointer where this field is referenced. */
    memset(disCodeBufPredict,0,disMaxCodeLen*PREDICT_DEPTH);
    bmSeek(r_sh, SEEK_SET);
    bmReadBuffer(disCodeBufPredict,disMaxCodeLen*PREDICT_DEPTH);
@@ -1077,6 +1079,7 @@ int __FASTCALL__ disAppendFAddr(char * str,long ulShift,long distin,unsigned lon
 #endif
  if(disNeedRef > NEEDREF_NONE)
  {
+   if(dret.pro_clone == __INSNT_JMPPIC) goto try_pic; /* skip defaults for PIC */
    flags = APREF_TRY_LABEL;
    if(hexAddressResolv && detectedFormat->AddressResolving) flags |= APREF_SAVE_VIRT;
    if(AppendAsmRef(str,ulShift,flags,codelen,r_sh)) appended = RAPREF_DONE;
@@ -1098,6 +1101,16 @@ int __FASTCALL__ disAppendFAddr(char * str,long ulShift,long distin,unsigned lon
                 while(*modif_to == ' ') modif_to++;
                 *(modif_to-1) = '*';
               }
+              if(!DumpMode && !EditMode) GidAddGoAddress(str,r_sh);
+            }
+       }
+       else
+       if(dret.pro_clone == __INSNT_JMPPIC) /* jmp [ebx+offset] */
+       {
+            try_pic:
+            if(AppendAsmRef(str,r_sh+dret.field,APREF_TRY_PIC,dret.codelen,r_sh))
+            {
+              appended = RAPREF_DONE; /* terminate appending any info anyway */
               if(!DumpMode && !EditMode) GidAddGoAddress(str,r_sh);
             }
        }

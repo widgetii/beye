@@ -1287,6 +1287,25 @@ static unsigned long __FASTCALL__ AppendELFRef(char *str,unsigned long ulShift,i
   unsigned long ret = RAPREF_NONE;
   Elf_Reloc __HUGE__ *erl;
   UNUSED(codelen);
+  if(flags & APREF_TRY_PIC)
+  {
+       unsigned long off_in_got = bmReadDWordEx(ulShift, SEEKF_START);
+       unsigned long dynptr, dyn_ent, got_off;
+       unsigned nitems;
+/** @todo: If "program header" will be lost and will be present "section
+    header" only then we should handle such situation propertly too */
+       dynptr = findPHEntry(PT_DYNAMIC,&nitems);
+       if(dynptr)
+       {
+         dyn_ent = findPHDynEntry(DT_PLTGOT,dynptr,nitems);
+         if(dyn_ent)
+         {
+           got_off = elfVA2PA(dyn_ent);
+           return AppendELFRef(str, got_off + off_in_got, flags & ~APREF_TRY_PIC, codelen, r_sh);
+         }
+       }
+       return RAPREF_NONE;
+  }
   if(!PubNames) elf_ReadPubNameList(bmbioHandle(),MemOutBox);
   if((erl = __found_ElfRel(ulShift)) != NULL)
   {
@@ -1306,9 +1325,12 @@ static unsigned long __FASTCALL__ AppendELFRef(char *str,unsigned long ulShift,i
     {
        if(FindPubName(buff,sizeof(buff),r_sh))
        {
-         strcat(str,buff);
-         if(!DumpMode && !EditMode) GidAddGoAddress(str,r_sh);
-         ret = RAPREF_DONE;
+         if(strlen(buff))
+         {
+           strcat(str,buff);
+           if(!DumpMode && !EditMode) GidAddGoAddress(str,r_sh);
+           ret = RAPREF_DONE;
+         }
        }
     }
   }

@@ -1237,6 +1237,7 @@ static unsigned long __FASTCALL__ AppendNERef(char *str,unsigned long ulShift,in
     unsigned i;
     unsigned long segpos,slength;
     char buff[256];
+    if(flags & APREF_TRY_PIC) return RAPREF_NONE;
     if(ulShift >= CurrSegmentStart && ulShift <= CurrSegmentStart + CurrSegmentLength)
     {
        i = CurrChainSegment - 1;

@@ -530,6 +530,7 @@ static unsigned long __FASTCALL__ coff386_AppendRef(char *str,unsigned long ulSh
   unsigned long ret;
   char buff[400];
   ret = RAPREF_NONE;
+  if(flags & APREF_TRY_PIC) return RAPREF_NONE;
   if(!PubNames) coff_ReadPubNameList(bmbioHandle(),MemOutBox);
   if((COFF_WORD(coff386hdr.f_flags) & F_RELFLG) == F_RELFLG) goto try_pub;
   if(!RelocCoff386) BuildRelocCoff386();
