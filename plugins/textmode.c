@@ -49,6 +49,7 @@ typedef struct tag_keyword_hl_s
 {
     Color color;
     char  *keyword;
+    unsigned len; /* for accelerating */
 }keyword_hl_t;
 
 typedef struct tag_operator_hl_s
@@ -64,6 +65,7 @@ static struct tag_syntax_hl_s
    keyword_hl_t *keyword;
    operator_hl_t*operators;
    unsigned context_num,keyword_num,operator_num;
+   unsigned maxkwd_len;
 }syntax_hl;
 
 acontext_hl_t __HUGE__ *acontext; /* means active context*/
@@ -79,12 +81,37 @@ static unsigned char word_set[UCHAR_MAX+1];
 #define MAX_STRLEN 1000 /**< defines maximal length of string */
 #define is_legal_word_char(ch) ((int)word_set[(unsigned char)ch])
 
+static ColorAttr __NEAR__ __FASTCALL__ hlFindKwd(const char *str,Color col,unsigned *st_len)
+{
+  int found;
+  unsigned i,len;
+  ColorAttr defcol=LOGFB_TO_PHYS(col,BACK_COLOR(text_cset.normal));
+  *st_len=0;
+  for(i=0;i<syntax_hl.keyword_num;i++)
+  {
+    if(str[0]==syntax_hl.keyword[i].keyword[0])
+    {
+	len=syntax_hl.keyword[i].len;
+	found=0;
+	if(len>1) { if(memcmp(&str[1],&syntax_hl.keyword[i].keyword[1],len-1)==0) found=1; }
+	else found=1;
+	if(found)
+	{
+		defcol=LOGFB_TO_PHYS(syntax_hl.keyword[i].color,BACK_COLOR(text_cset.normal));
+		*st_len=len;
+		break;
+	}
+    }
+  }
+  return defcol;
+}
+
 static void __NEAR__ __FASTCALL__ txtMarkupCtx(void)
 {
     long ii,fpos,flen;
     unsigned i,len;
     int found;
-    char tmps[MAX_STRLEN],etmps[MAX_STRLEN],ch;
+    char tmps[MAX_STRLEN],etmps[MAX_STRLEN],ktmps[MAX_STRLEN],ch;
     TWindow *hwnd;
     hwnd=PleaseWaitWnd();
     flen=BMGetFLength();
@@ -96,10 +123,10 @@ static void __NEAR__ __FASTCALL__ txtMarkupCtx(void)
 	ch=BMReadByte();
 	for(i=0;i<syntax_hl.context_num;i++)
 	{
-	    len=strlen(syntax_hl.context[i].start_seq);
 	    if(ch==syntax_hl.context[i].start_seq[0])
 	    {
 		long cpos;
+		len=strlen(syntax_hl.context[i].start_seq);
 		cpos=BMGetCurrFilePos();
 		found=0;
 		if(len>1)
@@ -110,6 +137,22 @@ static void __NEAR__ __FASTCALL__ txtMarkupCtx(void)
 		else found=1;
 		if(found)
 		{
+		    /* avoid context markup if it's equal one of keywords */
+		    unsigned st_len;
+		    long ckpos;
+		    ktmps[0]=ch;
+		    memcpy(&ktmps[1],tmps,len-1);
+		    if(syntax_hl.maxkwd_len>len)
+		    {
+			ckpos=BMGetCurrFilePos();
+			BMReadBuffer(&ktmps[len],syntax_hl.maxkwd_len-len);
+			BMSeek(ckpos,BM_SEEK_SET);
+		    }
+		    hlFindKwd(ktmps,0,&st_len);
+		    if(st_len) found=0;
+		}
+		if(found)
+		{
 		    if(!acontext) acontext=PHMalloc(sizeof(acontext_hl_t));
 		    else	  acontext=PHRealloc(acontext,sizeof(acontext_hl_t)*(acontext_num+1));
 		    acontext[acontext_num].color=LOGFB_TO_PHYS(syntax_hl.context[i].color,BACK_COLOR(text_cset.normal));
@@ -118,10 +161,6 @@ static void __NEAR__ __FASTCALL__ txtMarkupCtx(void)
 		    ii+=len;
 		    BMSeek(ii,BM_SEEK_SET);
 		    /* try find end */
-		    if(strcmp(syntax_hl.context[i].end_seq,"\\n") == 0) strcpy(etmps,"\n");
-		    else
-		    if(strcmp(syntax_hl.context[i].end_seq,"\\t") == 0) strcpy(etmps,"\t");
-		    else
 		    strcpy(etmps,syntax_hl.context[i].end_seq);
 		    len=strlen(etmps);
 		    for(;ii<flen;ii++)
@@ -157,6 +196,40 @@ static void __NEAR__ __FASTCALL__ txtMarkupCtx(void)
     }    
     BMSeek(fpos,BM_SEEK_SET);
     CloseWnd(hwnd);
+}
+
+static void unfmt_str(unsigned char *str)
+{
+   long result;
+   unsigned base,i;
+   char *src,*dest,ch,temp[MAX_STRLEN];
+   src=dest=str;
+   while(*src)
+   {
+	ch=*src;
+	src++;
+	if(ch == '\\')
+	{
+	    if(*src== '\\');
+	    else
+	    if(*src=='n') { src++; ch='\n'; }
+	    else
+	    if(*src=='t') { src++; ch='\t'; }
+	    else
+	    {
+		base=10;
+		i=0;
+		if(*src=='0') { src++; base=8; }
+		if(*src=='x' || *src=='X') { base=16; src++; while(isxdigit(*src)) temp[i++]=*src++; }
+		else { while(isdigit(*src)) temp[i++]=*src++; }
+		temp[i]=0;
+		result=strtol(temp,NULL,base);
+		ch=result;
+	    }
+	}
+	*dest++=ch;
+   }
+   *dest=0;
 }
 
 static tBool __FASTCALL__ txtFiUserFunc1(IniInfo * info)
@@ -200,6 +273,7 @@ static tBool __FASTCALL__ txtFiUserFunc1(IniInfo * info)
 	*p=0;
 	softmode=0;
 	if(strcmp(info->subsection,"Soft")==0) softmode=1;
+	unfmt_str(info->value);
 	ilen=strlen(info->value);
 	fpos=BMGetCurrFilePos();
 	BMSeek(off,BM_SEEK_SET);
@@ -225,7 +299,62 @@ static tBool __FASTCALL__ txtFiUserFunc1(IniInfo * info)
   return False;
 }
 
-extern Color __FASTCALL__ getColorByName(const char *name,Color defval,tBool *has_err);
+static Color __NEAR__ __FASTCALL__ getCtxColorByName(const char *subsection,const char *item,Color cdef,tBool *err)
+{
+    *err=0;
+    if(strcmp(subsection,"Comments")==0)
+    {
+	if(strcmp(item,"base")==0) return prog_cset.comments.base;
+	if(strcmp(item,"extended")==0) return prog_cset.comments.extended;
+	if(strcmp(item,"reserved")==0) return prog_cset.comments.reserved;
+	if(strcmp(item,"alt")==0) return prog_cset.comments.alt;
+	ErrMessageBox("Unknown context class definition",item);
+    }
+    else if(strcmp(subsection,"Preproc")==0)
+    {
+	if(strcmp(item,"base")==0) return prog_cset.preproc.base;
+	if(strcmp(item,"extended")==0) return prog_cset.preproc.extended;
+	if(strcmp(item,"reserved")==0) return prog_cset.preproc.reserved;
+	if(strcmp(item,"alt")==0) return prog_cset.preproc.alt;
+	ErrMessageBox("Unknown context class definition",item);
+    }
+    else if(strcmp(subsection,"Constants")==0)
+    {
+	if(strcmp(item,"base")==0) return prog_cset.constants.base;
+	if(strcmp(item,"extended")==0) return prog_cset.constants.extended;
+	if(strcmp(item,"reserved")==0) return prog_cset.constants.reserved;
+	if(strcmp(item,"alt")==0) return prog_cset.constants.alt;
+	ErrMessageBox("Unknown context class definition",item);
+    }
+    else ErrMessageBox("Unknown context subsection definition",subsection);
+    *err=1;
+    return cdef;
+}
+
+static Color __NEAR__ __FASTCALL__ getKwdColorByName(const char *item,Color cdef,tBool *err)
+{
+    *err=0;
+    if(strcmp(item,"base")==0) return prog_cset.keywords.base;
+    if(strcmp(item,"extended")==0) return prog_cset.keywords.extended;
+    if(strcmp(item,"reserved")==0) return prog_cset.keywords.reserved;
+    if(strcmp(item,"alt")==0) return prog_cset.keywords.alt;
+    ErrMessageBox("Unknown keyword class definition",item);
+    *err=1;
+    return cdef;
+}
+
+static Color __NEAR__ __FASTCALL__ getOpColorByName(const char *item,Color cdef,tBool *err)
+{
+    *err=0;
+    if(strcmp(item,"base")==0) return prog_cset.operators.base;
+    if(strcmp(item,"extended")==0) return prog_cset.operators.extended;
+    if(strcmp(item,"reserved")==0) return prog_cset.operators.reserved;
+    if(strcmp(item,"alt")==0) return prog_cset.operators.alt;
+    ErrMessageBox("Unknown keyword class definition",item);
+    *err=1;
+    return cdef;
+}
+
 extern char last_skin_error[];
 static char *last_syntax_err="";
 static tBool __FASTCALL__ txtFiUserFunc2(IniInfo * info)
@@ -251,7 +380,7 @@ static tBool __FASTCALL__ txtFiUserFunc2(IniInfo * info)
   if(strcmp(info->section,"Context")==0)
   {
      Color col;
-     col = getColorByName(info->item,cdef,&err);
+     col = getCtxColorByName(info->subsection,info->item,cdef,&err);
      if(!err)
      {
        if(!syntax_hl.context) syntax_hl.context=malloc(sizeof(context_hl_t));
@@ -261,6 +390,8 @@ static tBool __FASTCALL__ txtFiUserFunc2(IniInfo * info)
        if(!p) { last_syntax_err="Missed separator in context definition"; return True; }
        *p=0;
        p+=3;
+       unfmt_str(info->value);
+       unfmt_str(p);
        syntax_hl.context[syntax_hl.context_num].start_seq=malloc(strlen(info->value)+1);
        strcpy(syntax_hl.context[syntax_hl.context_num].start_seq,info->value);
        syntax_hl.context[syntax_hl.context_num].end_seq=malloc(strlen(p)+1);
@@ -272,14 +403,18 @@ static tBool __FASTCALL__ txtFiUserFunc2(IniInfo * info)
   if(strcmp(info->section,"Keywords")==0)
   {
      Color col;
-     col = getColorByName(info->item,cdef,&err);
+     col = getKwdColorByName(info->item,cdef,&err);
      if(!err)
      {
        if(!syntax_hl.keyword) syntax_hl.keyword=malloc(sizeof(keyword_hl_t));
        else syntax_hl.keyword=realloc(syntax_hl.keyword,sizeof(keyword_hl_t)*(syntax_hl.keyword_num+1));
        syntax_hl.keyword[syntax_hl.keyword_num].color=col;
-       syntax_hl.keyword[syntax_hl.keyword_num].keyword=malloc(strlen(info->value)+1);
+       unfmt_str(info->value);
+       syntax_hl.keyword[syntax_hl.keyword_num].len=strlen(info->value);
+       syntax_hl.keyword[syntax_hl.keyword_num].keyword=malloc(syntax_hl.keyword[syntax_hl.keyword_num].len+1);
        strcpy(syntax_hl.keyword[syntax_hl.keyword_num].keyword,info->value);
+       if(syntax_hl.keyword[syntax_hl.keyword_num].len > syntax_hl.maxkwd_len)
+		syntax_hl.maxkwd_len=syntax_hl.keyword[syntax_hl.keyword_num].len;
        syntax_hl.keyword_num++;
      }
      else last_syntax_err=last_skin_error;
@@ -287,13 +422,14 @@ static tBool __FASTCALL__ txtFiUserFunc2(IniInfo * info)
   if(strcmp(info->section,"Operators")==0)
   {
      Color col;
-     col = getColorByName(info->item,cdef,&err);
+     col = getOpColorByName(info->item,cdef,&err);
      if(!err)
      {
        if(!syntax_hl.operators) syntax_hl.operators=malloc(sizeof(operator_hl_t));
        else syntax_hl.operators=realloc(syntax_hl.operators,sizeof(operator_hl_t)*(syntax_hl.operator_num+1));
        syntax_hl.operators[syntax_hl.operator_num].color=col;
-       if(strlen(info->value)>2) { last_syntax_err="Too long operator has been found"; return True; }
+       unfmt_str(info->value);
+       if(strlen(info->value)>1) { last_syntax_err="Too long operator has been found"; return True; }
        syntax_hl.operators[syntax_hl.operator_num]._operator=info->value[0];
        syntax_hl.operator_num++;
      }
@@ -359,31 +495,6 @@ static ColorAttr __NEAR__ __FASTCALL__ hlFindOp(char ch,Color col)
     {
 	defcol=LOGFB_TO_PHYS(syntax_hl.operators[i].color,BACK_COLOR(text_cset.normal));
 	break;
-    }
-  }
-  return defcol;
-}
-
-static ColorAttr __NEAR__ __FASTCALL__ hlFindKwd(const char *str,Color col,unsigned *st_len)
-{
-  int found;
-  unsigned i,len;
-  ColorAttr defcol=LOGFB_TO_PHYS(col,BACK_COLOR(text_cset.normal));
-  *st_len=0;
-  for(i=0;i<syntax_hl.keyword_num;i++)
-  {
-    len=strlen(syntax_hl.keyword[i].keyword);
-    if(str[0]==syntax_hl.keyword[i].keyword[0])
-    {
-	found=0;
-	if(len>1) { if(memcmp(&str[1],&syntax_hl.keyword[i].keyword[1],len-1)==0) found=1; }
-	else found=1;
-	if(found)
-	{
-		defcol=LOGFB_TO_PHYS(syntax_hl.keyword[i].color,BACK_COLOR(text_cset.normal));
-		*st_len=len;
-		break;
-	}
     }
   }
   return defcol;
