@@ -75,6 +75,7 @@ const char * k86_XMMXRegs[]  = { "xmm0", "xmm1", "xmm2", "xmm3", "xmm4", "xmm5",
 */
 unsigned char k86_REX;
 int has_REX; /* is required for accessing to ah-dh registers */
+tBool has67_in64;
 #endif
 
 #ifdef INT64_C
@@ -2048,6 +2049,13 @@ static void ix86_gettype(DisasmRet *dret,ix86Param *_DisP)
               goto RepeateByPrefix;
  }
  get_type:
+#ifdef INT64_C
+  if(x86_Bitness == DAB_USE64)
+  {
+    Use32Addr=1;
+    if(((k86_REX & 0x0F)>>3) != 0) Use32Data=1;
+  }
+#endif
    if((insn[0] & 0xF6) == 0xC2)
    {
      dret->pro_clone = __INSNT_RET;
@@ -2369,6 +2377,9 @@ static DisasmRet __FASTCALL__ ix86Disassembler(unsigned long ulShift,
 #ifdef INT64_C
  if(x86_Bitness == DAB_USE64)
  {
+   has67_in64 = (Use32Addr == 0);
+   Use32Addr = 1; /* there is no way to use 16-bit addresing in 64-bit mode */
+   if(Use64) Use32Data=1; /* 66h prefix is ignored if REX prefix is present*/
    if(ix86_table[code].flags64 & K64_DEF32)
    {
      if(Use64) strcpy(Ret.str,ix86_table[code].name64);

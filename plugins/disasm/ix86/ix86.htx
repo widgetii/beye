@@ -917,6 +917,7 @@
 ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
 ³ xmm0, xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7                          ³
 ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 ³               %BAthlon64 (aka x86-64) instruction mnemonics%b               ³
 ³ %IIntroduces 64-bit backward-compatible architecture which expands CPU    %i³
 ³ %Ito access 64-bit address space and perform 64-bit operations.           %i³
@@ -962,7 +963,6 @@
 ³ xmm0, xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7                          ³
 ³ xmm8, xmm9, xmm10, xmm11, xmm12, xmm13, xmm14, xmm15                    ³
 ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
-ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 ³               %IDecoding instructions%i                                     ³
 ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
@@ -1038,28 +1038,56 @@
 ³ Prefixes  REX  COP  ModRM  SIB  Disp  Imm                               ³
 ³  0-4      0-1  1-2  0-1    0-1  0-4   0-8 <= 15 bytes                   ³
 ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
-³ Examples: USE64;  F0 66 41 64 C7 A4 82 12 34 56 78 12 34 56 78          ³
-³                   lock mov dword [fs:rax*4+r10-78563412H],78563412H     ³
-³           USE64;  F0 41 64 C7 A4 82 12 34 56 78 12 34 56 78             ³
-³                   lock mov qword [fs:rax*4+r10-78563412H],78563412H     ³
-³           USE64;  48 68 12 34 56 78 90 AB CD EF                         ³
+³ Examples: USE64;  F0 %U66 41%u 64 C7 A4 82 12 34 56 78 12 34                ³
+³                   lock mov %Iword%i [fs:rax*4+r10+78563412H],3412H          ³
+³                                                                         ³
+³           USE64;  F0 %U41%u 64 C7 A4 82 12 34 56 78 12 34 56 78             ³
+³                   lock mov %Idword%i [fs:rax*4+r10+78563412H],78563412H     ³
+³                                                                         ³
+³           USE64;  F0 %U67 41%u 64 C7 A4 82 12 34 56 78 12 34 56 78          ³
+³                   lock mov %Idword%i [fs:eax*4+r10d+78563412H],78563412H    ³
+³                                                                         ³
+³           USE64;  F0 %U67 49%u 64 C7 A4 82 12 34 56 78 12 34 56 78          ³
+³                   lock mov %Iqword%i [fs:eax*4+r10d+78563412H],78563412H    ³
+³                                                                         ³
+³           USE64;  F0 %U49%u 64 C7 A4 82 12 34 56 78 12 34 56 78             ³
+³                   lock mov %Iqword%i [fs:rax*4+r10+78563412H],78563412H     ³
+³                                                                         ³
+³           USE64;  4%U8%u 68 %U12 34 56 78 90 AB CD EF%u                         ³
 ³                   push EFCDAB9078563412H                                ³
-³           USE64;  41 56                                                 ³
+³                                                                         ³
+³           USE64;  4%U1%u 56                                                 ³
 ³                   push r14d                                             ³
+³                                                                         ³
 ³           USE64;  49 56                                                 ³
 ³                   push r14                                              ³
-³           USE64;  49 A1 12 34 56 78 90 AB CD EF                         ³
+³                                                                         ³
+³           USE64;  %U49 A1%u 12 34 56 78 90 AB CD EF                         ³
 ³                   mov rax,[EFCDAB9078563412H]                           ³
-³           USE64;  44 89 25 9C 35 10 00                                  ³
-³                   mov [rip+0010359C], r12d                              ³
+³                                                                         ³
+³           USE64;  4%U9%u B9 %U12 34 56 78 90 AB CD EF%u                         ³
+³                   mov r9,EFCDAB9078563412H                              ³
+³                                                                         ³
+³           USE64;  44 89 %U25%u 9C 35 10 00                                  ³
+³                   mov [%Irip%i+0010359C], r12d                              ³
+³                                                                         ³
+³           USE64;  %U66 67 45%u 89 23                                        ³
+³                   mov [r11d], r12w                                      ³
+³                                                                         ³
 ³           USE64;  FF C9                                                 ³
 ³                   dec ecx                                               ³
-³           USE64;  49 FF C7                                              ³
+³                                                                         ³
+³           USE64;  49 %UFF C7%u                                              ³
 ³                   inc r15                                               ³
-³           USE64;  66 66 66 90                                           ³
+³                                                                         ³
+³           USE64;  %U66 66 66%u 90                                           ³
 ³                   nop                                                   ³
-³           USE64;  41 8B 4D 00                                           ³
+³                                                                         ³
+³           USE64;  41 8B %U4%uD 00                                           ³
 ³                   mov  ecx, [r13+00] ; r13 addressing limitations       ³
+³                                                                         ³
+³           USE64;  49 8B %U04 25%u 12 34 56 78                               ³
+³                   mov  rax, [+78563412] ; using absolute 32-bit address ³
 ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
 ³ %IREX%i decoding:                                                           ³
 ³ REX uses the range from 40H upto 4FH codes:                             ³
@@ -1084,32 +1112,32 @@
 ³ %IModRM%i                : MODe Registers or Memory              (optional) ³
 ³                        7 6  |  5 4 3  |  2 1 0                          ³
 ³                        MOD  | REG/COP+|   R/M                           ³
-³ÉÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÑÍÍËÍÍÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÑÍÍÍÍÑÍÍÍÍÑÍÍÍÍÍ»³
-³º MOD   ³00,01,10    ³11º         ³       Custom        ³ FPU³ MMX³ SSE º³
-³º       ÃÄÄÄÄÄÄÄÄÄÄÄÄ´  º         ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÅÄÄÄÄÅÄÄÄÄÄ¶³
-³ºrex.b*8³  Address   ³  º reg.r*8 ³                     ³ /rm³/reg³ /rm º³
-³º+R/M   ³   Size     ³  º  +REG   ³     DataSize        ³    ³    ³     º³
-³ÇÄÄÄÄÂÄÄÅÄÄÄÄÄÄÂÄÄÄÄÄ´  ÇÄÄÄÄÂÄÄÄÄÅÄÄÂÄÄÄÄÂÄÄÄÄÂÄÄÄÄÂÄÄÄÅÄÄÄÄÅÄÄÄÄÅÄÄÄÄÄ¶³
-³ºBin ³Hx³   32 ³ 64  ³  ºBin ³Hex ³8 ³  8 ³ 16 ³ 32 ³ 64³ 80 ³ 64 ³ 128 º³
-³ÇÄÄÄÄÁÄÄÅÄÄÄÄÄÄÅÄÄÄÄÄÅÄÄ×ÄÄÄÄÁÄÄÄÄÅÄÄÅÄÄÄÄÅÄÄÄÄÅÄÄÄÄÅÄÄÄÅÄÄÄÄÅÄÄÄÄÅÄÄÄÄÄ¶³
-³º0000 00³ [eax]³[rax]³ Rº0000 0|00³ah³ al ³  ax³ ecx³rax³ st0³ mm0³xmm0 º³
-³º0001 01³ [ecx]³[rcx]³  º0001 0|08³ch³ cl ³  cx³ ecx³rcx³ st1³ mm1³xmm1 º³
-³º0010 02³ [edx]³[rdx]³ Eº0010 0|10³dh³ dl ³  dx³ edx³rdx³ st2³ mm2³xmm2 º³
-³º0011 03³ [ebx]³[rbx]³  º0011 0|18³bh³ bl ³  bx³ ebx³rbx³ st3³ mm3³xmm3 º³
-³º0100 04³  SIB ³ SIB ³ Gº0100 0|20³  ³ spl³  sp³ esp³rsp³ st4³ mm4³xmm4 º³
-³º0101 05³   *  ³  *  ³  º0101 0|28³  ³ bpl³  bp³ ebp³rbp³ st5³ mm5³xmm5 º³
-³º0110 06³ [esi]³[rsi]³ iº0110 0|30³  ³ sil³  si³ esi³rsi³ st6³ mm6³xmm6 º³
-³º0111 07³ [edi]³[rdi]³  º0111 0|38³  ³ dil³  di³ edi³rdi³ st7³ mm7³xmm7 º³
-³º1000 08³ [r8d]³[r8] ³ sº1000 1|00³  ³ r8b³ r8w³ r8d³r8 ³    ³    ³xmm8 º³
-³º1001 09³ [r9d]³[r9] ³  º1001 1|08³  ³ r9b³ r9w³ r9d³r9 ³    ³    ³xmm9 º³
-³º1010 0A³[r10d]³[r10]³ tº1010 1|10³  ³r10b³r10w³r10d³r10³    ³    ³xmm10º³
-³º1011 0B³[r11d]³[r11]³  º1011 1|18³  ³r11b³r11w³r11d³r11³    ³    ³xmm11º³
-³º1100 0C³[r12d]³[r12]³ eº1100 1|20³  ³r12b³r12w³r12d³r12³    ³    ³xmm12º³
-³º1101 0D³  *   ³  *  ³  º1101 1|28³  ³r13b³r13w³r13d³r13³    ³    ³xmm13º³
-³º1110 0E³[r14d]³[r14]³ rº1110 1|30³  ³r14b³r14w³r14d³r14³    ³    ³xmm14º³
-³º1111 0F³[r15d]³[r15]³  º1111 1|38³  ³r15b³r15w³r15d³r15³    ³    ³xmm15º³
-³ÈÍÍÍÍÍÍÍÏÍÍÍÍÍÍÏÍÍÍÍÍÏÍÍÊÍÍÍÍÍÍÍÍÍÏÍÍÏÍÍÍÍÏÍÍÍÍÏÍÍÍÍÏÍÍÍÏÍÍÍÍÏÍÍÍÍÏÍÍÍÍÍ¼³
-³  * rip+disp32 if MOD == 00 [(e)bp] otherwise                            ³
+³ÉÍÍÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÑÍÍËÍÍÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÑÍÍÍÑÍÍÍÑÍÍÍÍÍ»³
+³º MOD     ³00,01,10    ³11º         ³       Custom        ³FPU³MMX³ SSE º³
+³º         ÃÄÄÄÄÄÄÄÄÄÄÄÄ´  º         ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÅÄÄÄÅÄÄÄÅÄÄÄÄÄ¶³
+³ºrex.b*8  ³  Address   ³  º reg.r*8 ³                     ³/rm³reg³ /rm º³
+³º+R/M     ³   Size     ³  º  +REG   ³     DataSize        ³   ³   ³     º³
+³ÇÄÄÄÄÂÄÄÄÄÅÄÄÄÄÄÄÂÄÄÄÄÄ´  ÇÄÄÄÄÂÄÄÄÄÅÄÄÂÄÄÄÄÂÄÄÄÄÂÄÄÄÄÂÄÄÄÅÄÄÄÅÄÄÄÅÄÄÄÄÄ¶³
+³ºBin ³Hex ³   32 ³ 64  ³  ºBin ³Hex ³8 ³  8 ³ 16 ³ 32 ³ 64³80 ³64 ³ 128 º³
+³ÇÄÄÄÄÁÄÄÄÄÅÄÄÄÄÄÄÅÄÄÄÄÄÅÄÄ×ÄÄÄÄÁÄÄÄÄÅÄÄÅÄÄÄÄÅÄÄÄÄÅÄÄÄÄÅÄÄÄÅÄÄÄÅÄÄÄÅÄÄÄÄÄ¶³
+³º0000 0|00³ [eax]³[rax]³ Rº0000 0|00³ah³ al ³  ax³ ecx³rax³st0³mm0³xmm0 º³
+³º0001 0|01³ [ecx]³[rcx]³  º0001 0|08³ch³ cl ³  cx³ ecx³rcx³st1³mm1³xmm1 º³
+³º0010 0|02³ [edx]³[rdx]³ Eº0010 0|10³dh³ dl ³  dx³ edx³rdx³st2³mm2³xmm2 º³
+³º0011 0|03³ [ebx]³[rbx]³  º0011 0|18³bh³ bl ³  bx³ ebx³rbx³st3³mm3³xmm3 º³
+³º0100 0|04³  SIB ³ SIB ³ Gº0100 0|20³  ³ spl³  sp³ esp³rsp³st4³mm4³xmm4 º³
+³º0101 0|05³   *  ³  *  ³  º0101 0|28³  ³ bpl³  bp³ ebp³rbp³st5³mm5³xmm5 º³
+³º0110 0|06³ [esi]³[rsi]³ iº0110 0|30³  ³ sil³  si³ esi³rsi³st6³mm6³xmm6 º³
+³º0111 0|07³ [edi]³[rdi]³  º0111 0|38³  ³ dil³  di³ edi³rdi³st7³mm7³xmm7 º³
+³º1000 1|00³ [r8d]³[r8] ³ sº1000 1|00³  ³ r8b³ r8w³ r8d³r8 ³   ³   ³xmm8 º³
+³º1001 1|01³ [r9d]³[r9] ³  º1001 1|08³  ³ r9b³ r9w³ r9d³r9 ³   ³   ³xmm9 º³
+³º1010 1|02³[r10d]³[r10]³ tº1010 1|10³  ³r10b³r10w³r10d³r10³   ³   ³xmm10º³
+³º1011 1|03³[r11d]³[r11]³  º1011 1|18³  ³r11b³r11w³r11d³r11³   ³   ³xmm11º³
+³º1100 1|04³  SIB ³ SIB ³ eº1100 1|20³  ³r12b³r12w³r12d³r12³   ³   ³xmm12º³
+³º1101 1|05³  *   ³  *  ³  º1101 1|28³  ³r13b³r13w³r13d³r13³   ³   ³xmm13º³
+³º1110 1|06³[r14d]³[r14]³ rº1110 1|30³  ³r14b³r14w³r14d³r14³   ³   ³xmm14º³
+³º1111 1|07³[r15d]³[r15]³  º1111 1|38³  ³r15b³r15w³r15d³r15³   ³   ³xmm15º³
+³ÈÍÍÍÍÍÍÍÍÍÏÍÍÍÍÍÍÏÍÍÍÍÍÏÍÍÊÍÍÍÍÍÍÍÍÍÏÍÍÏÍÍÍÍÏÍÍÍÍÏÍÍÍÍÏÍÍÍÏÍÍÍÏÍÍÍÏÍÍÍÍÍ¼³
+³  * rip+disp32 if MOD == 00; [(e)bp] otherwise                           ³
 ³  if MOD == 00 |00 Full address = R/M                                    ³
 ³  if MOD == 01 |40 Full address = R/M + disp8                            ³
 ³  if MOD == 10 |80 Full address = R/M + disp32                           ³
@@ -1128,7 +1156,7 @@
 ³   ³0001 0|08³ [ecx*2**SS]³ [rcx*2**SS]³ ³0001 0|01³  [ecx] ³  [rcx] ³   ³
 ³   ³0010 0|10³ [edx*2**SS]³ [rdx*2**SS]³ ³0010 0|02³  [edx] ³  [rdx] ³   ³
 ³   ³0011 0|18³ [ebx*2**SS]³ [rbx*2**SS]³ ³0011 0|03³  [ebx] ³  [rbx] ³   ³
-³   ³0100 0|20³            ³            ³ ³0100 0|04³  [esp] ³  [rsp] ³   ³
+³   ³0100 0|20³            ³            ³ ³0100 0|04³ *[esp] ³ *[rsp] ³   ³
 ³   ³0101 0|28³ [ebp*2**SS]³ [rbp*2**SS]³ ³0101 0|05³  [ebp] ³  [rbp] ³   ³
 ³   ³0110 0|30³ [esi*2**SS]³ [rsi*2**SS]³ ³0110 0|06³  [esi] ³  [rsi] ³   ³
 ³   ³0111 0|38³ [edi*2**SS]³ [rdi*2**SS]³ ³0111 0|07³  [edi] ³  [rdi] ³   ³
@@ -1136,11 +1164,12 @@
 ³   ³1001 1|08³ [r9d*2**SS]³  [r9*2**SS]³ ³1001 1|01³  [r9d] ³   [r9] ³   ³
 ³   ³1010 1|10³[r10d*2**SS]³ [r10*2**SS]³ ³1010 1|02³ [r10d] ³  [r10] ³   ³
 ³   ³1011 1|18³[r11d*2**SS]³ [r11*2**SS]³ ³1011 1|03³ [r11d] ³  [r11] ³   ³
-³   ³1100 1|20³            ³            ³ ³1100 1|04³ [r12d] ³  [r12] ³   ³
+³   ³1100 1|20³            ³            ³ ³1100 1|04³*[r12d] ³ *[r12] ³   ³
 ³   ³1101 1|28³[r13d*2**SS]³ [r13*2**SS]³ ³1101 1|05³ [r13d] ³  [r13] ³   ³
 ³   ³1110 1|30³[r14d*2**SS]³ [r14*2**SS]³ ³1110 1|06³ [r14d] ³  [r14] ³   ³
 ³   ³1111 1|38³[r15d*2**SS]³ [r15*2**SS]³ ³1111 1|07³ [r15d] ³  [r15] ³   ³
 ³   ÀÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÙ ÀÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÙ   ³
+³     * disp32 if MOD == 0  (same as in 32-bit mode)                      ³
 ³                    Full address = IAddress + BAddr                      ³
 ³                                                                         ³
 ³ %IDisp%i                 : DISPlacement(8,32)                    (optional) ³

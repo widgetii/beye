@@ -341,8 +341,7 @@ static void __NEAR__ __FASTCALL__ getSIBRegs(char * base,char * scale,char * _in
 #ifdef INT64_C
      if(x86_Bitness == DAB_USE64)
      {
-         /* trickly: use32 is set by default. If it's unset then there is 67 prefix */
-         use64 = Use32Addr?1:0;
+         use64 = has67_in64?0:1;
          brex = (k86_REX&2)>>1;
      }
 #endif
@@ -354,8 +353,7 @@ static void __NEAR__ __FASTCALL__ getSIBRegs(char * base,char * scale,char * _in
 #ifdef INT64_C
      if(x86_Bitness == DAB_USE64)
      {
-         /* trickly: use32 is set by default. If it's unset then there is 67 prefix */
-         use64 = Use32Addr?1:0;
+         use64 = has67_in64?0:1;
          brex = (k86_REX&1)>>0;
      }
 #endif
@@ -404,7 +402,7 @@ char * __FASTCALL__ ix86_getModRM(tBool w,unsigned char mod,unsigned char rm,ix8
 #ifdef INT64_C
    if(x86_Bitness == DAB_USE64)
    {
-      cptr = Use32Addr ? k86_QWordRegs[REX_reg(k86_REX&1,rm)] : k86_DWordRegs[REX_reg(k86_REX&1,rm)];
+      cptr = !has67_in64 ? k86_QWordRegs[REX_reg(k86_REX&1,rm)] : k86_DWordRegs[REX_reg(k86_REX&1,rm)];
    }
    else
 #endif

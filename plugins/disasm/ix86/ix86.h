@@ -188,6 +188,7 @@ extern const char * k86_QWordRegs[];
 extern const char * k86_XMMXRegs[];
 extern unsigned char k86_REX;
 extern int has_REX;
+extern tBool has67_in64;
 #endif
 extern const char * ix86_SegRegs[];
 extern const char * ix86_CrxRegs[];
