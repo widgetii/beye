@@ -255,6 +255,10 @@ SOURCE=.\plugins\bin\dos_sys.c
 # End Source File
 # Begin Source File
 
+SOURCE=.\plugins\bin\lmf.c
+# End Source File
+# Begin Source File
+
 SOURCE=.\plugins\bin\mz.c
 # End Source File
 # Begin Source File
@@ -448,6 +452,10 @@ SOURCE=.\kbd_code.h
 # Begin Source File
 
 SOURCE=.\biewlib\sysdep\ia32\win32\kbd_code.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\plugins\bin\lmf.h
 # End Source File
 # Begin Source File
 
