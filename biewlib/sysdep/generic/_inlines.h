@@ -71,13 +71,13 @@ extern "C" {
                 /** Changes byte order in 64-bit number */
 #ifndef ByteSwapLL
 #ifndef _MSC_VER /* Olivier Mengue <dolmen@bigfoot.com> */
-#define ByteSwapLL(x)\
+static inline tUInt64 ByteSwapLL(x)\
 { union { tUInt64 __ll;		     		\
 	  tUInt32 __l[2]; } __w, __r;		\
 	 __w.__ll = (x);			\
 	 __r.__l[0] = ByteSwapL (__w.__l[1]);	\
 	 __r.__l[1] = ByteSwapL (__w.__l[0]);	\
-	 __r.__ll; }
+	 return __r.__ll; }
 #else
 /* Microsoft specific*/
 #define ByteSwapLL(x) MSVC_ByteSwapLL(x)
