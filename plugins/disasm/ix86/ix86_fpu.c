@@ -379,7 +379,11 @@ void __FASTCALL__ ix86_FPUCmd(char * str,ix86Param *DisP)
                else
 	       {
 		 (*DBrm[rm].f)(str,DBrm[rm].c,DisP);
-		 if(rm==1) DisP->pro_clone = IX86_P5FPU;
+		 if(rm==1
+#ifdef IX86_64
+		  && x86_Bitness != DAB_USE64
+#endif
+		 ) DisP->pro_clone = IX86_P5FPU;
 	       }
             }
             break;
@@ -422,7 +426,11 @@ void __FASTCALL__ ix86_FPUCmd(char * str,ix86Param *DisP)
                   else
 		  {
 		    (*DDrm[rm].f)(str,DDrm[rm].c,DisP);
-		    if(rm==1) DisP->pro_clone = IX86_P5FPU;
+		    if(rm==1
+#ifdef IX86_64
+		  && x86_Bitness != DAB_USE64
+#endif
+		    ) DisP->pro_clone = IX86_P5FPU;
 		  }
               break;
             }
@@ -487,7 +495,11 @@ void __FASTCALL__ ix86_FPUCmd(char * str,ix86Param *DisP)
                 else
 		{
 		   (*DFrm[rm].f)(str,DFrm[rm].c,DisP);
-		   if(rm==1) DisP->pro_clone = IX86_P5FPU;
+		   if(rm==1
+#ifdef IX86_64
+		  && x86_Bitness != DAB_USE64
+#endif
+		   ) DisP->pro_clone = IX86_P5FPU;
 		}
               }
               break;

@@ -172,7 +172,14 @@ typedef struct tag_ix86ExOpcodes
 typedef struct tag_ix86MMOpcodes
 {
   const char *  name;
+#ifdef IX86_64
+  const char *  name64;
+#endif
   ix86_method   method;
+#ifdef IX86_64
+  ix86_method   method64;
+  unsigned long flags64;
+#endif
   unsigned long pro_clone;
 }ix86_MMOpcodes;
 
