@@ -119,7 +119,8 @@ typedef void (__FASTCALL__*ix86_method)(char *encode_str,ix86Param *);
 
 #define K64_ATHLON	0x00000000UL
 #define K64_CLONEMASK	0x00FFFFFFUL
-#define K64_NOCOMPAT	0x01000000UL /* means insnshas no 16 or 32 bit forms */
+#define K64_NOCOMPAT	0x01000000UL /* means insns has no 16 or 32 bit forms */
+#define K64_DEF32	0x02000000UL /* means insns size depends on default data size but not address size */
 
 typedef struct tag_ix86opcodes
 {

@@ -917,6 +917,52 @@
 ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
 ³ xmm0, xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7                          ³
 ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+³               %BAthlon64 (aka x86-64) instruction mnemonics%b               ³
+³ %IIntroduces 64-bit backward-compatible architecture which expands CPU    %i³
+³ %Ito access 64-bit address space and perform 64-bit operations.           %i³
+³ %IThis CPU supports all instructions which were introdused in %BPentium4%b and%i³
+³ %I%BAthlon-K7%b processors and introduces new features described below        %i³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
+³ %IList of new instructions:                                               %i³
+³ movsxd     [63/rm]            Move with Sign-Extend Doubleword          ³
+³ swapgs     [OF_01_F8]         Swap GS with KernelGSBase MSR             ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
+³ %IList of invalide instructions:                                          %i³
+³ aaa        [37]   das        [2F]    pop es     [07]  sahf       [9E]   ³
+³ aad        [D5]   inc/dec    [40-4F] pop ss     [17]  lahf       [9F]   ³
+³ aam        [D4]   into       [CE]    popa       [61]  salc       [D6]   ³
+³ aas        [3F]   jmp far    [EA]    push cs    [0E]  sysenter   [0F_34]³
+³ arpl       [63]   lahf       [9F]    push ds    [1E]  sysexit    [0F_35]³
+³ bound      [62]   lds        [C5]    push es    [06]                    ³
+³ call far   [9A]   les        [C4]    push ss    [16]                    ³
+³ daa        [27]   pop ds     [1F]    pusha      [60]                    ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
+³ %IThe segments %BCS:, DS:, ES:%b are treated as NULL prefixes%i                 ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
+³ %IThe new set of registers:%i                                               ³
+³ %IGPR 64-bit registers:%i                                                   ³
+³ %BByte regiters:%b                                                          ³
+³ ah, dh, ch, dh %Ican be accessed without REX only%i                         ³
+³ al, dl, cl, dl, sil, dil, bpl, spl,                                     ³
+³ r8b, r9b, r10b, r11b, r12b, r13b, r14b, r15b                            ³
+³ %BWord regiters:%b                                                          ³
+³ ax, dx, cx, dx, si, di, bp, sp,                                         ³
+³ r8w, r9w, r10w, r11w, r12w, r13w, r14w, r15w                            ³
+³ %BDword regiters:%b                                                         ³
+³ eax, edx, ecx, edx, esi, edi, ebp, esp,                                 ³
+³ r8d, r9d, r10d, r11d, r12d, r13d, r14d, r15d                            ³
+³ %BQword regiters:%b                                                         ³
+³ rax, rdx, rcx, rdx, rsi, rdi, rbp, rsp,                                 ³
+³ r8, r9, r10, r11, r12, r13, r14, r15                                    ³
+³ %IFPU registers%i                                                           ³
+³ st(0), st(1), st(2), st(3), st(4), st(5), st(6), st(7)                  ³
+³ %IMMX registers%i                                                           ³
+³ mm0, mm1, mm2, mm3, mm4, mm5, mm6, mm7                                  ³
+³ %ISSE 128-bit registers:%i                                                  ³
+³ xmm0, xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7                          ³
+³ xmm8, xmm9, xmm10, xmm11, xmm12, xmm13, xmm14, xmm15                    ³
+ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 ³               %IDecoding instructions%i                                     ³
 ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
@@ -985,6 +1031,120 @@
 ³                                                                         ³
 ³ %IDisp%i                 : DISPlacement(8,16,32)                 (optional) ³
 ³ %IImm%i                  : IMMediate   (8,16,32)                 (optional) ³
+ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+³               %IInstruction decoding in 64-bit mode%i                       ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
+³ Prefixes  REX  COP  ModRM  SIB  Disp  Imm                               ³
+³  0-4      0-1  1-2  0-1    0-1  0-4   0-8 <= 15 bytes                   ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
+³ Examples: USE64;  F0 66 41 64 C7 A4 82 12 34 56 78 12 34 56 78          ³
+³                   lock mov dword [fs:rax*4+r10-78563412H],78563412H     ³
+³           USE64;  F0 41 64 C7 A4 82 12 34 56 78 12 34 56 78             ³
+³                   lock mov qword [fs:rax*4+r10-78563412H],78563412H     ³
+³           USE64;  48 68 12 34 56 78 90 AB CD EF                         ³
+³                   push EFCDAB9078563412H                                ³
+³           USE64;  41 56                                                 ³
+³                   push r14d                                             ³
+³           USE64;  49 56                                                 ³
+³                   push r14                                              ³
+³           USE64;  49 A1 12 34 56 78 90 AB CD EF                         ³
+³                   mov rax,[EFCDAB9078563412H]                           ³
+³           USE64;  44 89 25 9C 35 10 00                                  ³
+³                   mov [rip+0010359C], r12d                              ³
+³           USE64;  FF C9                                                 ³
+³                   dec ecx                                               ³
+³           USE64;  49 FF C7                                              ³
+³                   inc r15                                               ³
+³           USE64;  66 66 66 90                                           ³
+³                   nop                                                   ³
+³           USE64;  41 8B 4D 00                                           ³
+³                   mov  ecx, [r13+00] ; r13 addressing limitations       ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
+³ %IREX%i decoding:                                                           ³
+³ REX uses the range from 40H upto 4FH codes:                             ³
+³ %BBits%b   definition:                                                      ³
+³ %I4-7%i    0100 means REX prefex is present                                 ³
+³ %I3%i      rex.w (extension to the operand Width)                           ³
+³ %I2%i      rex.r (extension to the ModRM/REG)                               ³
+³ %I1%i      rex.x (extsnsion to the SIB indeX)                               ³
+³ %I0%i      rex.b (extension to the Base)                                    ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
+³ %IPrefixes%i  up to 4 of : rep, repne, lock, 66H, 67H, fs:, gs:  (optional) ³
+³ %IREX%i                  : 40H-4FH                               (optional) ³
+³ %UCOP%u                  : Code OPeration                        see above  ³
+³                          xxxxxxdw                                       ³
+³                                ³À Word                                  ³
+³                                ³    0 - DataSize = 8         (optional) ³
+³                                ³    1 - DataSize = (32)16               ³
+³                                À Direction                   (optional) ³
+³                                   0 - op   r/m,reg                      ³
+³                                   1 - op   reg,r/m                      ³
+³                                                                         ³
+³ %IModRM%i                : MODe Registers or Memory              (optional) ³
+³                        7 6  |  5 4 3  |  2 1 0                          ³
+³                        MOD  | REG/COP+|   R/M                           ³
+³ÉÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÑÍÍËÍÍÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÑÍÍÍÍÑÍÍÍÍÑÍÍÍÍÍ»³
+³º MOD   ³00,01,10    ³11º         ³       Custom        ³ FPU³ MMX³ SSE º³
+³º       ÃÄÄÄÄÄÄÄÄÄÄÄÄ´  º         ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÅÄÄÄÄÅÄÄÄÄÄ¶³
+³ºrex.b*8³  Address   ³  º reg.r*8 ³                     ³ /rm³/reg³ /rm º³
+³º+R/M   ³   Size     ³  º  +REG   ³     DataSize        ³    ³    ³     º³
+³ÇÄÄÄÄÂÄÄÅÄÄÄÄÄÄÂÄÄÄÄÄ´  ÇÄÄÄÄÂÄÄÄÄÅÄÄÂÄÄÄÄÂÄÄÄÄÂÄÄÄÄÂÄÄÄÅÄÄÄÄÅÄÄÄÄÅÄÄÄÄÄ¶³
+³ºBin ³Hx³   32 ³ 64  ³  ºBin ³Hex ³8 ³  8 ³ 16 ³ 32 ³ 64³ 80 ³ 64 ³ 128 º³
+³ÇÄÄÄÄÁÄÄÅÄÄÄÄÄÄÅÄÄÄÄÄÅÄÄ×ÄÄÄÄÁÄÄÄÄÅÄÄÅÄÄÄÄÅÄÄÄÄÅÄÄÄÄÅÄÄÄÅÄÄÄÄÅÄÄÄÄÅÄÄÄÄÄ¶³
+³º0000 00³ [eax]³[rax]³ Rº0000 0|00³ah³ al ³  ax³ ecx³rax³ st0³ mm0³xmm0 º³
+³º0001 01³ [ecx]³[rcx]³  º0001 0|08³ch³ cl ³  cx³ ecx³rcx³ st1³ mm1³xmm1 º³
+³º0010 02³ [edx]³[rdx]³ Eº0010 0|10³dh³ dl ³  dx³ edx³rdx³ st2³ mm2³xmm2 º³
+³º0011 03³ [ebx]³[rbx]³  º0011 0|18³bh³ bl ³  bx³ ebx³rbx³ st3³ mm3³xmm3 º³
+³º0100 04³  SIB ³ SIB ³ Gº0100 0|20³  ³ spl³  sp³ esp³rsp³ st4³ mm4³xmm4 º³
+³º0101 05³   *  ³  *  ³  º0101 0|28³  ³ bpl³  bp³ ebp³rbp³ st5³ mm5³xmm5 º³
+³º0110 06³ [esi]³[rsi]³ iº0110 0|30³  ³ sil³  si³ esi³rsi³ st6³ mm6³xmm6 º³
+³º0111 07³ [edi]³[rdi]³  º0111 0|38³  ³ dil³  di³ edi³rdi³ st7³ mm7³xmm7 º³
+³º1000 08³ [r8d]³[r8] ³ sº1000 1|00³  ³ r8b³ r8w³ r8d³r8 ³    ³    ³xmm8 º³
+³º1001 09³ [r9d]³[r9] ³  º1001 1|08³  ³ r9b³ r9w³ r9d³r9 ³    ³    ³xmm9 º³
+³º1010 0A³[r10d]³[r10]³ tº1010 1|10³  ³r10b³r10w³r10d³r10³    ³    ³xmm10º³
+³º1011 0B³[r11d]³[r11]³  º1011 1|18³  ³r11b³r11w³r11d³r11³    ³    ³xmm11º³
+³º1100 0C³[r12d]³[r12]³ eº1100 1|20³  ³r12b³r12w³r12d³r12³    ³    ³xmm12º³
+³º1101 0D³  *   ³  *  ³  º1101 1|28³  ³r13b³r13w³r13d³r13³    ³    ³xmm13º³
+³º1110 0E³[r14d]³[r14]³ rº1110 1|30³  ³r14b³r14w³r14d³r14³    ³    ³xmm14º³
+³º1111 0F³[r15d]³[r15]³  º1111 1|38³  ³r15b³r15w³r15d³r15³    ³    ³xmm15º³
+³ÈÍÍÍÍÍÍÍÏÍÍÍÍÍÍÏÍÍÍÍÍÏÍÍÊÍÍÍÍÍÍÍÍÍÏÍÍÏÍÍÍÍÏÍÍÍÍÏÍÍÍÍÏÍÍÍÏÍÍÍÍÏÍÍÍÍÏÍÍÍÍÍ¼³
+³  * rip+disp32 if MOD == 00 [(e)bp] otherwise                            ³
+³  if MOD == 00 |00 Full address = R/M                                    ³
+³  if MOD == 01 |40 Full address = R/M + disp8                            ³
+³  if MOD == 10 |80 Full address = R/M + disp32                           ³
+³  if MOD == 11 |C0 Full address = REG                                    ³
+³                                                                         ³
+³ %RSIB%r                  :  Scale sibling, Index,  Base          (optional) ³
+³                        7 6  |  5 4 3  |  2 1 0                          ³
+³                         SS  |  Index  |  Base                           ³
+³   ÚÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿ ÚÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿   ³
+³   ³ rex.x*8 ³                         ³ ³ rex.b*8 ³                 ³   ³
+³   ³ +Index  ³         IAddress        ³ ³ +Base   ³      BAddr      ³   ³
+³   ÃÄÄÄÄÂÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄ´ ÃÄÄÄÄÂÄÄÄÄÅÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄ´   ³
+³   ³Bin ³Hex ³     32     ³     64     ³ ³Bin ³Hex ³    32  ³   64   ³   ³
+³   ÃÄÄÄÄÁÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄ´ ÃÄÄÄÄÁÄÄÄÄÅÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄ´   ³
+³   ³0000 0|00³ [eax*2**SS]³ [rax*2**SS]³ ³0000 0|00³  [eax] ³  [rax] ³   ³
+³   ³0001 0|08³ [ecx*2**SS]³ [rcx*2**SS]³ ³0001 0|01³  [ecx] ³  [rcx] ³   ³
+³   ³0010 0|10³ [edx*2**SS]³ [rdx*2**SS]³ ³0010 0|02³  [edx] ³  [rdx] ³   ³
+³   ³0011 0|18³ [ebx*2**SS]³ [rbx*2**SS]³ ³0011 0|03³  [ebx] ³  [rbx] ³   ³
+³   ³0100 0|20³            ³            ³ ³0100 0|04³  [esp] ³  [rsp] ³   ³
+³   ³0101 0|28³ [ebp*2**SS]³ [rbp*2**SS]³ ³0101 0|05³  [ebp] ³  [rbp] ³   ³
+³   ³0110 0|30³ [esi*2**SS]³ [rsi*2**SS]³ ³0110 0|06³  [esi] ³  [rsi] ³   ³
+³   ³0111 0|38³ [edi*2**SS]³ [rdi*2**SS]³ ³0111 0|07³  [edi] ³  [rdi] ³   ³
+³   ³1000 1|00³ [r8d*2**SS]³  [r8*2**SS]³ ³1000 1|00³  [r8d] ³   [r8] ³   ³
+³   ³1001 1|08³ [r9d*2**SS]³  [r9*2**SS]³ ³1001 1|01³  [r9d] ³   [r9] ³   ³
+³   ³1010 1|10³[r10d*2**SS]³ [r10*2**SS]³ ³1010 1|02³ [r10d] ³  [r10] ³   ³
+³   ³1011 1|18³[r11d*2**SS]³ [r11*2**SS]³ ³1011 1|03³ [r11d] ³  [r11] ³   ³
+³   ³1100 1|20³            ³            ³ ³1100 1|04³ [r12d] ³  [r12] ³   ³
+³   ³1101 1|28³[r13d*2**SS]³ [r13*2**SS]³ ³1101 1|05³ [r13d] ³  [r13] ³   ³
+³   ³1110 1|30³[r14d*2**SS]³ [r14*2**SS]³ ³1110 1|06³ [r14d] ³  [r14] ³   ³
+³   ³1111 1|38³[r15d*2**SS]³ [r15*2**SS]³ ³1111 1|07³ [r15d] ³  [r15] ³   ³
+³   ÀÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÙ ÀÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÙ   ³
+³                    Full address = IAddress + BAddr                      ³
+³                                                                         ³
+³ %IDisp%i                 : DISPlacement(8,32)                    (optional) ³
+³ %IImm%i                  : IMMediate   (8,16,32,64)              (optional) ³
 ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
 ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 ³                             %ICPU families%i                                ³

@@ -468,7 +468,12 @@ char * __FASTCALL__ ix86_getModRM(tBool w,unsigned char mod,unsigned char rm,ix8
             {
               disp_long:
 #ifdef INT64_C
-		 if(x86_Bitness == DAB_USE64 && is_disponly) strcat(ix86_modrm_ret,"rip");
+		 if(x86_Bitness == DAB_USE64 && is_disponly)
+		 {
+		   strcat(ix86_modrm_ret,"rip");
+		   as_sign = True;
+		   is_disponly = False;
+		 }
 #endif
               if(!Use32Addr)
               {
@@ -935,12 +940,7 @@ void __FASTCALL__ ix86_InOut(char * str,ix86Param *DisP)
 {
   const char *arg,*reg1,*reg2,*regptr,*dig;
   char i;
-  tBool use64;
-  use64 = 0;
-#ifdef INT64_C
-  if(x86_Bitness == DAB_USE64) use64 = Use64;
-#endif
-  regptr = k86_getREG(0,DisP->RealCmd[0] & 0x01,0,use64);
+  regptr = k86_getREG(0,DisP->RealCmd[0] & 0x01,0,0);
   dig = Get2Digit(DisP->RealCmd[1]);
   i = DisP->RealCmd[0] & 0x08;
   if(!i) DisP->codelen++;

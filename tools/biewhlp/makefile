@@ -58,8 +58,8 @@ TARGET = biewhlp
 #                Please not modify contents below                        #
 ##########################################################################
 
-INCS = -I.
-LIBS = -L./biewlib -lbiew $(OS_LIBS)
+INCS = -I. -I../../
+LIBS = -L../../biewlib -lbiew $(OS_LIBS)
 OBJS =\
 biewhlp.o
 all: $(TARGET)

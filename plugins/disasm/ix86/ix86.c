@@ -196,9 +196,9 @@ ix86_Opcodes ix86_table[256] =
   /*0x6A*/ DECLARE_BASE_INSN("push","push","push",ix86_ArgSInt,ix86_ArgSInt,IX86_CPU186,K64_ATHLON),
   /*0x6B*/ DECLARE_BASE_INSN("imul","imul","imul",ix86_ArgRegRMDigit,ix86_ArgRegRMDigit,IX86_CPU186,K64_ATHLON),
   /*0x6C*/ DECLARE_BASE_INSN("insb","insb","insb",NULL,NULL,IX86_CPU186,K64_ATHLON),
-  /*0x6D*/ DECLARE_BASE_INSN("insw","insd","insq",NULL,NULL,IX86_CPU186,K64_ATHLON),
+  /*0x6D*/ DECLARE_BASE_INSN("insw","insd","insd",NULL,NULL,IX86_CPU186,K64_ATHLON),
   /*0x6E*/ DECLARE_BASE_INSN("outsb","outsb","outsb",NULL,NULL,IX86_CPU186,K64_ATHLON),
-  /*0x6F*/ DECLARE_BASE_INSN("outsw","outsd","outsq",NULL,NULL,IX86_CPU186,K64_ATHLON),
+  /*0x6F*/ DECLARE_BASE_INSN("outsw","outsd","outsd",NULL,NULL,IX86_CPU186,K64_ATHLON),
   /*0x70*/ DECLARE_BASE_INSN("jo","jo","jo",ix86_ArgShort,ix86_ArgShort,IX86_CPU086,K64_ATHLON),
   /*0x71*/ DECLARE_BASE_INSN("jno","jno","jno",ix86_ArgShort,ix86_ArgShort,IX86_CPU086,K64_ATHLON),
   /*0x72*/ DECLARE_BASE_INSN("jc","jc","jc",ix86_ArgShort,ix86_ArgShort,IX86_CPU086,K64_ATHLON),
@@ -239,8 +239,8 @@ ix86_Opcodes ix86_table[256] =
   /*0x95*/ DECLARE_BASE_INSN("xchg","xchg","xchg",ix86_ArgAXIReg,ix86_ArgAXIReg,IX86_CPU086,K64_ATHLON),
   /*0x96*/ DECLARE_BASE_INSN("xchg","xchg","xchg",ix86_ArgAXIReg,ix86_ArgAXIReg,IX86_CPU086,K64_ATHLON),
   /*0x97*/ DECLARE_BASE_INSN("xchg","xchg","xchg",ix86_ArgAXIReg,ix86_ArgAXIReg,IX86_CPU086,K64_ATHLON),
-  /*0x98*/ DECLARE_BASE_INSN("cbw","cwde","cdqe",NULL,NULL,IX86_CPU086,K64_ATHLON),
-  /*0x99*/ DECLARE_BASE_INSN("cwd","cdq","cqo",NULL,NULL,IX86_CPU086,K64_ATHLON),
+  /*0x98*/ DECLARE_BASE_INSN("cbw","cwde","cdqe",NULL,NULL,IX86_CPU086,K64_ATHLON|K64_DEF32),
+  /*0x99*/ DECLARE_BASE_INSN("cwd","cdq","cqo",NULL,NULL,IX86_CPU086,K64_ATHLON|K64_DEF32),
   /*0x9A*/ DECLARE_BASE_INSN("callf16","callf32","???",ix86_ArgFar,ix86_ArgFar,IX86_CPU086,K64_ATHLON),
   /*0x9B*/ DECLARE_BASE_INSN("wait","wait","wait",NULL,NULL,IX86_CPU086,K64_ATHLON),
   /*0x9C*/ DECLARE_BASE_INSN("pushfw","pushfd","pushfq",NULL,NULL,IX86_CPU086,K64_ATHLON|K64_NOCOMPAT),
@@ -252,17 +252,17 @@ ix86_Opcodes ix86_table[256] =
   /*0xA2*/ DECLARE_BASE_INSN("mov","mov","mov",ix86_ArgAXMem,ix86_ArgAXMem,IX86_CPU086,K64_ATHLON),
   /*0xA3*/ DECLARE_BASE_INSN("mov","mov","mov",ix86_ArgAXMem,ix86_ArgAXMem,IX86_CPU086,K64_ATHLON),
   /*0xA4*/ DECLARE_BASE_INSN("movsb","movsb","movsb",NULL,NULL,IX86_CPU086,K64_ATHLON),
-  /*0xA5*/ DECLARE_BASE_INSN("movsw","movsd","movsq",NULL,NULL,IX86_CPU086,K64_ATHLON),
+  /*0xA5*/ DECLARE_BASE_INSN("movsw","movsd","movsq",NULL,NULL,IX86_CPU086,K64_ATHLON|K64_DEF32),
   /*0xA6*/ DECLARE_BASE_INSN("cmpsb","cmpsb","cmpsb",NULL,NULL,IX86_CPU086,K64_ATHLON),
-  /*0xA7*/ DECLARE_BASE_INSN("cmpsw","cmpsd","cmpsq",NULL,NULL,IX86_CPU086,K64_ATHLON),
+  /*0xA7*/ DECLARE_BASE_INSN("cmpsw","cmpsd","cmpsq",NULL,NULL,IX86_CPU086,K64_ATHLON|K64_DEF32),
   /*0xA8*/ DECLARE_BASE_INSN("test","test","test",ix86_ArgAXDigit,ix86_ArgAXDigit,IX86_CPU086,K64_ATHLON),
   /*0xA9*/ DECLARE_BASE_INSN("test","test","test",ix86_ArgAXDigit,ix86_ArgAXDigit,IX86_CPU086,K64_ATHLON),
   /*0xAA*/ DECLARE_BASE_INSN("stosb","stosb","stosb",NULL,NULL,IX86_CPU086,K64_ATHLON),
-  /*0xAB*/ DECLARE_BASE_INSN("stosw","stosd","stosq",NULL,NULL,IX86_CPU086,K64_ATHLON),
+  /*0xAB*/ DECLARE_BASE_INSN("stosw","stosd","stosq",NULL,NULL,IX86_CPU086,K64_ATHLON|K64_DEF32),
   /*0xAC*/ DECLARE_BASE_INSN("lodsb","lodsb","lodsb",NULL,NULL,IX86_CPU086,K64_ATHLON),
-  /*0xAD*/ DECLARE_BASE_INSN("lodsw","lodsd","lodsq",NULL,NULL,IX86_CPU086,K64_ATHLON),
+  /*0xAD*/ DECLARE_BASE_INSN("lodsw","lodsd","lodsq",NULL,NULL,IX86_CPU086,K64_ATHLON|K64_DEF32),
   /*0xAE*/ DECLARE_BASE_INSN("scasb","scasb","scasb",NULL,NULL,IX86_CPU086,K64_ATHLON),
-  /*0xAF*/ DECLARE_BASE_INSN("scasw","scasd","scasq",NULL,NULL,IX86_CPU086,K64_ATHLON),
+  /*0xAF*/ DECLARE_BASE_INSN("scasw","scasd","scasq",NULL,NULL,IX86_CPU086,K64_ATHLON|K64_DEF32),
   /*0xB0*/ DECLARE_BASE_INSN("mov","mov","mov",ix86_ArgIRegDigit,ix86_ArgIRegDigit,IX86_CPU086,K64_ATHLON),
   /*0xB1*/ DECLARE_BASE_INSN("mov","mov","mov",ix86_ArgIRegDigit,ix86_ArgIRegDigit,IX86_CPU086,K64_ATHLON),
   /*0xB2*/ DECLARE_BASE_INSN("mov","mov","mov",ix86_ArgIRegDigit,ix86_ArgIRegDigit,IX86_CPU086,K64_ATHLON),
@@ -2369,6 +2369,14 @@ static DisasmRet __FASTCALL__ ix86Disassembler(unsigned long ulShift,
 #ifdef INT64_C
  if(x86_Bitness == DAB_USE64)
  {
+   if(ix86_table[code].flags64 & K64_DEF32)
+   {
+     if(Use64) strcpy(Ret.str,ix86_table[code].name64);
+     else
+     if(!Use32Data) strcpy(Ret.str,ix86_table[code].name16);
+     else           strcpy(Ret.str,ix86_table[code].name32);
+   }
+   else
    if(Use32Addr || (ix86_table[code].flags64 & K64_NOCOMPAT))
                  strcpy(Ret.str,ix86_table[code].name64);
    else          strcpy(Ret.str,ix86_table[code].name32);
@@ -2653,7 +2661,7 @@ static tBool __FASTCALL__ x86Select_Bitness( void )
 
 static int __FASTCALL__ ix86MaxInsnLen( void ) { return MAX_IX86_INSN_LEN; }
 static int __FASTCALL__ ix86GetBitness( void ) { return BITNESS; }
-static char __FASTCALL__ ix86GetClone(unsigned long clone) { return ix86CloneSNames[(clone >> 24) & 0xFF]; }
+static char __FASTCALL__ ix86GetClone(unsigned long clone) { if(x86_Bitness == DAB_USE64) return 'a'; else return ix86CloneSNames[(clone >> 24) & 0xFF]; }
 
 extern char *ix86_Katmai_buff;
 extern char *ix86_appstr;
