@@ -39,6 +39,7 @@ typedef enum { False = 0, True = 1 }tBool; /**< This is the data type used to re
 extern "C" {
 #endif
 
+#define TESTFLAG(x,y) (((x) & (y)) == (y)) /**< Test y bits in x */
 #define UNUSED(x) ((void)(x)) /**< Removes warning about unused arguments */
 
 typedef int tCompare; /**< This is the data type used to represent comparition results */
