@@ -438,7 +438,7 @@ static void __FASTCALL__ RENAME(InterleaveBuffers)(tUInt32 limit,
       delta = ((tUInt32)evenptr)&(REGMM_SIZE-1);
       if(delta) delta=REGMM_SIZE-delta;
       nlimit=(limit-delta)/step;
-      freq+=delta+(nlimit*step);
+      freq=delta+(nlimit*step);
       while(delta)
       {
 	*destbuffptr++ = *evenptr++;
@@ -452,7 +452,7 @@ static void __FASTCALL__ RENAME(InterleaveBuffers)(tUInt32 limit,
 	 __asm __volatile("movq	(%0), %%mm0\n\t"
 	       "movq	8(%0), %%mm2\n\t"
 	       ::"r"(evenptr):"memory");
-	 evenptr+=REGMM_SIZE;
+	 evenptr+=step;
 	 __asm __volatile("movq	%%mm0, %%mm1\n\t"
 	       "movq	%%mm2, %%mm3\n\t"
 	       "punpckhbw (%0), %%mm0\n\t"	       
@@ -462,13 +462,13 @@ static void __FASTCALL__ RENAME(InterleaveBuffers)(tUInt32 limit,
 	 __asm __volatile("punpcklbw (%0), %%mm1\n\t"
 	       "punpcklbw 8(%0), %%mm3\n\t"
 	       ::"r"(oddptr):"memory");
-	 oddptr+=REGMM_SIZE;
+	 oddptr+=step;
 	 __asm __volatile("movq	%%mm0, 8(%0)\n\t"
 	       "movq	%%mm1, (%0)\n\t"
 	       "movq	%%mm2, 24(%0)\n\t"
-	       "movq	%%mm3, 16(%0)":
-	      "=r"(destbuffptr)::"memory");
-	 destbuffptr+=REGMM_SIZE*2;
+	       "movq	%%mm3, 16(%0)"
+	      ::"r"(destbuffptr):"memory");
+	 destbuffptr+=step*2;
       }
       __asm __volatile("emms":::"memory");
   }
@@ -510,7 +510,7 @@ static void __FASTCALL__ RENAME(CharsToShorts)(tUInt32 limit,
       delta = ((tUInt32)evenptr)&(REGMM_SIZE-1);
       if(delta) delta=REGMM_SIZE-delta;
       nlimit=(limit-delta)/step;
-      freq+=delta+(nlimit*step);
+      freq=delta+(nlimit*step);
       while(delta)
       {
 	*destbuffptr++ = *evenptr++;
@@ -525,7 +525,7 @@ static void __FASTCALL__ RENAME(CharsToShorts)(tUInt32 limit,
 	 __asm __volatile("movq	(%0),%%mm0\n\t"
 	       "movq	8(%0),%%mm2"
 	       ::"r"(evenptr):"memory");
-	 evenptr+=REGMM_SIZE;
+	 evenptr+=step;
 	 __asm __volatile("movq	%%mm0, %%mm1\n\t"
 	       "movq	%%mm2, %%mm3\n\t"
 	       "punpckhbw %%mm7, %%mm0\n\t"
@@ -539,8 +539,8 @@ static void __FASTCALL__ RENAME(CharsToShorts)(tUInt32 limit,
 	       "movq	%%mm1, (%0)\n\t"
 	       "movq	%%mm2, 24(%0)\n\t"
 	       "movq	%%mm3, 16(%0)"
-	       :"=r"(destbuffptr)::"memory");
-	 destbuffptr+=REGMM_SIZE*2;
+	       ::"r"(destbuffptr):"memory");
+	 destbuffptr+=step*2;
       }
       __asm __volatile("emms":::"memory");
   }
@@ -581,7 +581,7 @@ static void __FASTCALL__ RENAME(ShortsToChars)(tUInt32 limit,
       delta=((tUInt32)destbuffptr)&(REGMM_SIZE-1);
       if(delta) delta=REGMM_SIZE-delta;
       nlimit=(limit-delta)/step;
-      freq+=delta+(nlimit*step);
+      freq=delta+(nlimit*step);
       while(delta)
       {
 	*destbuffptr++ = *srcptr;
@@ -599,11 +599,11 @@ static void __FASTCALL__ RENAME(ShortsToChars)(tUInt32 limit,
 	 __asm __volatile("packuswb (%0), %%mm0\n\t"
 	       "packuswb 8(%0), %%mm1"
 	       ::"g"(&srcptr[REGMM_SIZE]):"memory");
-	 srcptr+=REGMM_SIZE*2;
+	 srcptr+=step*2;
 	 __asm __volatile("movq	%%mm0, (%0)\n\t"
 	       "movq	%%mm1, 8(%0)\n\t"
-	       :"=r"(destbuffptr)::"memory");
-	 destbuffptr+=REGMM_SIZE;
+	       ::"r"(destbuffptr):"memory");
+	 destbuffptr+=step;
       }
       __asm __volatile("emms":::"memory");
   }
