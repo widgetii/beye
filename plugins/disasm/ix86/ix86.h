@@ -49,7 +49,7 @@ typedef struct tagix86Param
   unsigned char codelen;
 }ix86Param;
 
-extern tBool Use32Addr,Use32Data,UseMMXSet,UseXMMXSet;
+extern tBool Use32Addr,Use32Data,UseMMXSet,UseXMMXSet,Use64;
 extern char * SJump[];
 typedef void (__FASTCALL__*ix86_method)(char *encode_str,ix86Param *);
 
@@ -117,12 +117,22 @@ typedef void (__FASTCALL__*ix86_method)(char *encode_str,ix86Param *);
 #define IX86_CYRIX686MMX IX86_CYRIX | IX86_MMX586
 #define IX86_UNKCYRIX  IX86_CYRIX | IX86_CPU686
 
+#define K64_ATHLON	0x00000000UL
+#define K64_CLONEMASK	0x00FFFFFFUL
+
 typedef struct tag_ix86opcodes
 {
   const char *  name16;
   const char *  name32;
+#ifdef INT64_C
+  const char *  name64;
+#endif
   ix86_method   method;
   unsigned long pro_clone;
+#ifdef INT64_C
+  ix86_method   method64;
+  unsigned long flags64;
+#endif
 }ix86_Opcodes;
 
 typedef struct tag_ix86ExOpcodes
@@ -138,6 +148,7 @@ typedef struct tag_ix3dNowopcodes
   unsigned long pro_clone;
 }ix86_3dNowopcodes;
 
+extern unsigned x86_Bitness;
 
 extern ix86_Opcodes ix86_table[];
 extern ix86_ExOpcodes ix86_extable[];
@@ -153,6 +164,15 @@ extern const char * ix86_WordRegs[];
 extern const char * ix86_DWordRegs[];
 extern const char * ix86_MMXRegs[];
 extern const char * ix86_XMMXRegs[];
+#ifdef INT64_C
+extern const char * k86_ByteRegs[];
+extern const char * k86_WordRegs[];
+extern const char * k86_DWordRegs[];
+extern const char * k86_QWordRegs[];
+extern const char * k86_XMMXRegs[];
+extern unsigned char k86_REX;
+extern int has_REX;
+#endif
 extern const char * ix86_SegRegs[];
 extern const char * ix86_CrxRegs[];
 extern const char * ix86_DrxRegs[];

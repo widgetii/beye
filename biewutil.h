@@ -66,9 +66,10 @@ extern char * __FASTCALL__ Get4Digit(tUInt16);
 extern char * __FASTCALL__ Get4SignDig(tInt16);
 extern char * __FASTCALL__ Get8Digit(tUInt32);
 extern char * __FASTCALL__ Get8SignDig(tInt32);
-extern char * __FASTCALL__ Get2DigitS(unsigned char *);
-extern char * __FASTCALL__ Get4DigitS(unsigned char *);
-extern char * __FASTCALL__ Get8DigitS(unsigned char *);
+#ifdef INT64_C
+extern char * __FASTCALL__ Get16Digit(tUInt64);
+extern char * __FASTCALL__ Get16SignDig(tInt64);
+#endif
 extern char * __FASTCALL__ GetBinary(char val);
 
 extern int      __FASTCALL__ ExpandHex(char * dest,const unsigned char * src,int size,char hard);

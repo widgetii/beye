@@ -135,12 +135,14 @@ extern DisasmRet Disassembler(unsigned long ulShift,MBuffer buffer,unsigned flag
 extern char * __FASTCALL__ TabSpace(char * str,unsigned nSpace);
 extern void   __FASTCALL__ disSetModifier(char *str,const char *modf);
 
+#define DISARG_LLONG    0x0080U /**< signed 8-byte value */
 #define DISARG_LONG     0x0040U /**< signed 4-byte value */
 #define DISARG_SHORT    0x0020U /**< signed 2-byte value */
 #define DISARG_CHAR     0x0010U /**< signed 1-byte value */
 #define DISARG_BYTE     0x0001U /**< unsigned 1-byte value */
 #define DISARG_WORD     0x0002U /**< unsigned 2-byte value */
 #define DISARG_DWORD    0x0004U /**< unsigned 4-byte value */
+#define DISARG_QWORD    0x0008U /**< unsigned 8-byte value */
 /* Contsants for references predictions */
 #define DISARG_IMM      0x1000U /**< Immediate argument */
 #define DISARG_DISP     0x2000U /**< Argument is displacement only */

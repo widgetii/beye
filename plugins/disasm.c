@@ -968,6 +968,30 @@ int __FASTCALL__ disAppendDigits(char *str,unsigned long ulShift,int flags,
     {
      switch(dig_type)
      {
+#ifdef INT64_C
+      case DISARG_LLONG:  appstr = Get16SignDig(*(tInt64 *)defval);
+                         if(type & DISARG_IMM &&
+                            disNeedRef >= NEEDREF_PREDICT &&
+                            dis_severity < DISCOMSEV_STRING &&
+                            isprint(((unsigned char *)defval)[0]) &&
+                            isprint(((unsigned char *)defval)[1]) &&
+                            isprint(((unsigned char *)defval)[2]) &&
+                            isprint(((unsigned char *)defval)[3]) &&
+                            isprint(((unsigned char *)defval)[4]) &&
+                            isprint(((unsigned char *)defval)[5]) &&
+                            isprint(((unsigned char *)defval)[6]) &&
+                            isprint(((unsigned char *)defval)[7]))
+                            sprintf(comments,"\"%c%c%c%c%c%c%c%c\""
+                                            ,((unsigned char *)defval)[0]
+                                            ,((unsigned char *)defval)[1]
+                                            ,((unsigned char *)defval)[2]
+                                            ,((unsigned char *)defval)[3]
+                                            ,((unsigned char *)defval)[4]
+                                            ,((unsigned char *)defval)[5]
+                                            ,((unsigned char *)defval)[6]
+                                            ,((unsigned char *)defval)[7]);
+                         break;
+#endif
       case DISARG_LONG:  appstr = Get8SignDig(*(long *)defval);
                          if(type & DISARG_IMM &&
                             disNeedRef >= NEEDREF_PREDICT &&
@@ -1031,6 +1055,30 @@ int __FASTCALL__ disAppendDigits(char *str,unsigned long ulShift,int flags,
                                             ,((unsigned char *)defval)[2]
                                             ,((unsigned char *)defval)[3]);
                          break;
+#ifdef INT64_C
+      case DISARG_QWORD: appstr = Get16Digit(*(tUInt64 *)defval);
+                         if(type & DISARG_IMM &&
+                            disNeedRef >= NEEDREF_PREDICT &&
+                            dis_severity < DISCOMSEV_STRING &&
+                            isprint(((unsigned char *)defval)[0]) &&
+                            isprint(((unsigned char *)defval)[1]) &&
+                            isprint(((unsigned char *)defval)[2]) &&
+                            isprint(((unsigned char *)defval)[3]) &&
+                            isprint(((unsigned char *)defval)[4]) &&
+                            isprint(((unsigned char *)defval)[5]) &&
+                            isprint(((unsigned char *)defval)[6]) &&
+                            isprint(((unsigned char *)defval)[7]))
+                            sprintf(comments,"\"%c%c%c%c%c%c%c%c\""
+                                            ,((unsigned char *)defval)[0]
+                                            ,((unsigned char *)defval)[1]
+                                            ,((unsigned char *)defval)[2]
+                                            ,((unsigned char *)defval)[3]
+                                            ,((unsigned char *)defval)[4]
+                                            ,((unsigned char *)defval)[5]
+                                            ,((unsigned char *)defval)[6]
+                                            ,((unsigned char *)defval)[7]);
+                         break;
+#endif
     }
     strcat(str,appstr);
    }

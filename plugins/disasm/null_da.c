@@ -33,7 +33,10 @@ static const char *width_names[] =
 {
    "~Byte",
    "~Word",
-   "~Double word"
+   "~Double word" 
+#ifdef INT64_C
+   , "~Quad word"
+#endif
 };
 
 static tBool __FASTCALL__ nulSelect_width( void )
@@ -78,6 +81,12 @@ static DisasmRet __FASTCALL__ nulDisassembler(unsigned long ulShift,
               type = DISARG_DWORD;
               cl = 4;
               break;
+#ifdef INT64_C
+      case 3: preface = "dq ";
+              type = DISARG_QWORD;
+              cl = 8;
+              break;
+#endif
     }
     ret.codelen = cl;
     strcpy(outstr,preface);
@@ -85,7 +94,15 @@ static DisasmRet __FASTCALL__ nulDisassembler(unsigned long ulShift,
   }
   else
     if(flags & __DISF_GETTYPE) ret.pro_clone = __INSNT_ORDINAL;
-    else ret.codelen = nulWidth ? nulWidth > 1 ? 4 : 2 : 1;
+    else
+    switch(nulWidth)
+    {
+      case 0: ret.codelen = 1; break;
+      default:
+      case 1: ret.codelen = 2; break;
+      case 2: ret.codelen = 4; break;
+      case 3: ret.codelen = 8; break;
+    }
   return ret;
 }
 
@@ -94,7 +111,7 @@ static void  __FASTCALL__ nulHelpAsm( void )
   hlpDisplay(20010);
 }
 
-static int    __FASTCALL__ nulMaxInsnLen( void ) { return 4; }
+static int    __FASTCALL__ nulMaxInsnLen( void ) { return 8; }
 static ColorAttr __FASTCALL__ nulGetAsmColor( unsigned long clone )
 {
   UNUSED(clone);
@@ -128,7 +145,7 @@ static void __FASTCALL__ nulReadIni( hIniProfile *ini )
   {
     biewReadProfileString(ini,"Biew","Browser","SubSubMode3","1",tmps,sizeof(tmps));
     nulWidth = (int)strtoul(tmps,NULL,10);
-    if(nulWidth > 2) nulWidth = 0;
+    if(nulWidth > 3) nulWidth = 0;
   }
 }
 

@@ -41,14 +41,43 @@ char *ix86_Katmai_buff;
 #define getSREG(sreg) (ix86_SegRegs[(unsigned char)sreg])
 #define getTile(DisP) __getTile(DisP,DisP->RealCmd[0] & 0x01,DisP->RealCmd[0] & 0x02)
 
-static const char * __FASTCALL__ ix86_getREG(unsigned char reg,tBool w)
+#ifdef INT64_C
+#define REX_reg(rex,reg) (reg|((rex&1)<<3))
+#endif
+
+static const char * __FASTCALL__ k86_getREG(unsigned char reg,tBool w,tBool rex, tBool use64)
 {
+#ifdef INT64_C
+ if(UseXMMXSet) return x86_Bitness==DAB_USE64?k86_XMMXRegs[REX_reg(rex,reg)]:ix86_XMMXRegs[reg];
+ else
+   if(UseMMXSet)  return ix86_MMXRegs[reg];
+   else
+     if(!w) return (x86_Bitness==DAB_USE64&&has_REX)?k86_ByteRegs[REX_reg(rex,reg)]:ix86_ByteRegs[reg];
+     else 
+     if(x86_Bitness==DAB_USE64)
+      return use64?k86_QWordRegs[REX_reg(rex,reg)]:Use32Data?k86_DWordRegs[REX_reg(rex,reg)]:k86_WordRegs[REX_reg(rex,reg)];
+     else return Use32Data ? ix86_DWordRegs[reg] : ix86_WordRegs[reg];
+#else
  if(UseXMMXSet) return ix86_XMMXRegs[reg];
  else
    if(UseMMXSet)  return ix86_MMXRegs[reg];
    else
      if(!w) return ix86_ByteRegs[reg];
      else   return Use32Data ? ix86_DWordRegs[reg] : ix86_WordRegs[reg];
+ rex=rex;
+#endif
+}
+
+
+static const char * __FASTCALL__ ix86_getREG(unsigned char reg,tBool w)
+{
+ tBool rex;
+#ifdef INT64_C
+ rex = (k86_REX&4)>>2;
+#else
+ rex=0;
+#endif
+ return k86_getREG(reg, w, rex, Use64);
 }
 
 static char * __NEAR__ __FASTCALL__ GetDigitsApp(unsigned char loc_off,
@@ -68,7 +97,10 @@ static char * __NEAR__ __FASTCALL__ GetDigitsApp(unsigned char loc_off,
 #define Get4SignDigApp(loc_off,DisP) GetDigitsApp(loc_off,DisP,2,DISARG_SHORT)
 #define Get8DigitApp(loc_off,DisP)   GetDigitsApp(loc_off,DisP,4,DISARG_DWORD)
 #define Get8SignDigApp(loc_off,DisP) GetDigitsApp(loc_off,DisP,4,DISARG_LONG)
-
+#ifdef INT64_C
+#define Get16DigitApp(loc_off,DisP)   GetDigitsApp(loc_off,DisP,8,DISARG_QWORD)
+#define Get16SignDigApp(loc_off,DisP) GetDigitsApp(loc_off,DisP,8,DISARG_LLONG)
+#endif
 static char * __NEAR__ __FASTCALL__ Get2SquareDig(unsigned char loc_off,ix86Param *DisP,tBool as_sign)
 {
   char *ptr = ix86_apistr;
@@ -116,6 +148,25 @@ static char * __NEAR__ __FASTCALL__ Get8SquareDig(unsigned char loc_off,ix86Para
   }
   return ix86_apistr;
 }
+
+#ifdef INT64_C
+static char * __NEAR__ __FASTCALL__ Get16SquareDig(unsigned char loc_off,ix86Param *DisP,tBool as_sign,tBool is_disponly)
+{
+  char *ptr = ix86_apistr;
+  char *rets;
+  unsigned type;
+  *ptr = 0;
+  if(!((DisP->flags & __DISF_SIZEONLY) == __DISF_SIZEONLY))
+  {
+    type = as_sign ? DISARG_LLONG : DISARG_QWORD;
+    type |= is_disponly ? DISARG_DISP : DISARG_IDXDISP;
+    rets = GetDigitsApp(loc_off,DisP,8,type);
+    if(!(rets[0] == '+' || rets[0] == '-')) *ptr++ = '+';
+    strcpy(ptr,rets);
+  }
+  return ix86_apistr;
+}
+#endif
 
 void __FASTCALL__ ix86_ArgES(char *str,ix86Param *param)
 {
@@ -194,9 +245,20 @@ void __FASTCALL__ ix86_ArgDWord(char *str,ix86Param *DisP)
 static char * __FASTCALL__ ix86_GetDigitTile(ix86Param* DisP,char wrd,char sgn,unsigned char loc_off)
 {
   int cl,type;
-  cl = wrd ? ( Use32Data ? 4 : 2 ) : 1;
+#ifdef INT64_C
+  int do_64;
+  do_64 = 0;
+  if(x86_Bitness == DAB_USE64 && wrd == -1) /* special case for */
+    do_64 = 1;
+#endif
+  cl = do_64 ? 8 : wrd ? ( Use32Data ? 4 : 2 ) : 1;
   if(!((DisP->flags & __DISF_SIZEONLY) == __DISF_SIZEONLY))
   {
+#ifdef INT64_C
+    if(do_64)
+      type = sgn ? DISARG_LLONG : DISARG_QWORD;
+    else
+#endif
     type = sgn ? wrd ? ( Use32Data ? DISARG_LONG : DISARG_SHORT ) : DISARG_CHAR:
                  wrd ? ( Use32Data ? DISARG_DWORD : DISARG_WORD ) : DISARG_BYTE;
     type |= DISARG_IMM;
@@ -274,9 +336,35 @@ static void __NEAR__ __FASTCALL__ getSIBRegs(char * base,char * scale,char * _in
   }
   else scale[0] = 0;
   if(ind == 4) _index[0] = 0;
-  else         strcpy(_index,ix86_getREG(ind,True));
+  else 
+  {
+#ifdef INT64_C
+     if(x86_Bitness == DAB_USE64)
+     {
+         tBool use64;
+         /* trickly: use32 is set by default. If it's unset then there is 67 prefix */
+         use64 = Use32Addr?1:0;
+         strcpy(_index,k86_getREG(ind,True,(k86_REX&2)>>1,use64));
+     }
+     else
+#endif
+     strcpy(_index,ix86_getREG(ind,True));
+  }
   if(bas == 5 && *mod == 0) { base[0] = 0; *mod = 2; }
-  else         strcpy(base,ix86_getREG(bas,True));
+  else
+  {
+#ifdef INT64_C
+     if(x86_Bitness == DAB_USE64)
+     {
+         tBool use64;
+         /* trickly: use32 is set by default. If it's unset then there is 67 prefix */
+         use64 = Use32Addr?1:0;
+         strcpy(base,k86_getREG(bas,True,(k86_REX&1)>>0,use64));
+     }
+     else
+#endif
+    strcpy(base,ix86_getREG(bas,True));
+  }
   Use32Data = use32data;
   UseMMXSet = useMMX;
   UseXMMXSet = useXMMX;
@@ -317,6 +405,13 @@ char * __FASTCALL__ ix86_getModRM(tBool w,unsigned char mod,unsigned char rm,ix8
  if(rm == 4 && Use32Addr) cptr = ConstrSibMod(ret1,base,_index,scale,DisP->RealCmd[2],&new_mode);
  else
  {
+#ifdef INT64_C
+   if(x86_Bitness == DAB_USE64)
+   {
+      cptr = Use32Addr ? k86_QWordRegs[REX_reg(k86_REX&1,rm)] : k86_DWordRegs[REX_reg(k86_REX&1,rm)];
+   }
+   else
+#endif
    cptr = Use32Addr ? ix86_DWordRegs[rm] : ix86_A16[rm];
 #if 0
    is_stack = Use32Addr ? rm == 4 || rm == 5 : rm == 2 || rm == 3 || rm == 6;
@@ -560,6 +655,9 @@ void __FASTCALL__ ix86_ArgIRegDigit(char * str,ix86Param *DisP)
   char w = (DisP->RealCmd[0] >> 3 ) & 0x01;
   char reg = (DisP->RealCmd[0]) & 0x07;
   strcat(str,ix86_getREG(reg,w));
+#ifdef INT64_C
+  if(x86_Bitness == DAB_USE64 && Use64 && w) w = -1;
+#endif
   ix86_CStile(str,ix86_GetDigitTile(DisP,w,0,1));
 }
 
@@ -735,13 +833,31 @@ void __FASTCALL__ ix86_ArgAXMem(char *str,ix86Param *DisP)
 {
   unsigned char d = DisP->RealCmd[0] & 0x02;
   const char *mem,*reg;
-  mem = Use32Addr ? Get8SquareDig(1,DisP,False,True) : Get4SquareDig(1,DisP,False,True);
+#ifdef INT64_C
+  unsigned char sav_REX;
+  sav_REX = k86_REX;
+  if(x86_Bitness == DAB_USE64 && Use64)
+    mem = Get16SquareDig(1,DisP,False,True);
+  else
+#endif
+    mem = Use32Addr ? Get8SquareDig(1,DisP,False,True) : Get4SquareDig(1,DisP,False,True);
   strcpy(ix86_appstr,ix86_segpref);
   ix86_segpref[0] = 0;
   strcat(ix86_appstr,"[");
   strcat(ix86_appstr,mem);
   strcat(ix86_appstr,"]");
+#ifdef INT64_C
+  if(x86_Bitness == DAB_USE64 && Use64) k86_REX=0;
+#endif
   reg = ix86_getREG(0,DisP->RealCmd[0] & 0x01);
+#ifdef INT64_C
+  if(x86_Bitness == DAB_USE64 && Use64) k86_REX=sav_REX;
+#endif
+#ifdef INT64_C
+  if(x86_Bitness == DAB_USE64 && Use64)
+    DisP->codelen = 9;
+  else
+#endif
   DisP->codelen = Use32Addr ? 5 : 3;
   strcat(str,d ? ix86_appstr : reg);
   ix86_CStile(str,d ? reg : ix86_appstr);
@@ -807,6 +923,15 @@ void  __FASTCALL__ ix86_ArgExGr1(char *str,ix86Param *DisP)
     unsigned char mod = (DisP->RealCmd[1] & 0xC0) >> 6;
     unsigned char buf,ptr;
     tBool word;
+#ifdef INT64_C
+    if(x86_Bitness == DAB_USE64)
+    {
+      if(DisP->RealCmd[1] == 0xF8)
+      strcpy(str,"swapgs");
+      DisP->codelen++;
+      return;
+    }
+#endif
     strcpy(str,ix86_ExGrp1[rm]);
     TabSpace(str,TAB_POS);
     DisP->codelen++;

@@ -83,7 +83,7 @@ char * __FASTCALL__ Get2SignDig(tInt8 val)
 
 char * __FASTCALL__ Get4Digit(tUInt16 val)
 {
-  static char rstr[5];
+  static char rstr[5] = "    ";
   const char *legs = &legalchars[2];
   unsigned char v;
   v = val>>8;
@@ -94,7 +94,7 @@ char * __FASTCALL__ Get4Digit(tUInt16 val)
 
 char * __FASTCALL__ Get4SignDig(tInt16 val)
 {
-  static char rstr[6];
+  static char rstr[6] = "     ";
   const char *legs = &legalchars[2];
   unsigned char v;
   rstr[0] = val >= 0 ? '+' : '-';
@@ -107,7 +107,7 @@ char * __FASTCALL__ Get4SignDig(tInt16 val)
 
 char * __FASTCALL__ Get8Digit(tUInt32 val)
 {
-  static char rstr[9];
+  static char rstr[9] = "        ";
   const char *legs = &legalchars[2];
   unsigned char v;
   v = val>>24;
@@ -122,7 +122,7 @@ char * __FASTCALL__ Get8Digit(tUInt32 val)
 
 char * __FASTCALL__ Get8SignDig(tInt32 val)
 {
-  static char rstr[10];
+  static char rstr[10] = "         ";
   const char *legs = &legalchars[2];
   unsigned char v;
   rstr[0] = val >= 0 ? '+' : '-';
@@ -136,6 +136,56 @@ char * __FASTCALL__ Get8SignDig(tInt32 val)
   GET2DIGIT(&rstr[7],legs,val);
   return rstr;
 }
+
+#ifdef INT64_C
+char * __FASTCALL__ Get16Digit(tUInt64 val)
+{
+  static char rstr[17] = "                ";
+  const char *legs = &legalchars[2];
+  unsigned char v;
+  v = val>>56;
+  GET2DIGIT(rstr,legs,v);
+  v = val>>48;
+  GET2DIGIT(&rstr[2],legs,v);
+  v = val>>40;
+  GET2DIGIT(&rstr[4],legs,v);
+  v = val>>32;
+  GET2DIGIT(&rstr[6],legs,v);
+  v = val>>24;
+  GET2DIGIT(&rstr[8],legs,v);
+  v = val>>16;
+  GET2DIGIT(&rstr[10],legs,v);
+  v = val>>8;
+  GET2DIGIT(&rstr[12],legs,v);
+  GET2DIGIT(&rstr[14],legs,val);
+  return rstr;
+}
+
+char * __FASTCALL__ Get16SignDig(tInt64 val)
+{
+  static char rstr[18] = "                 ";
+  const char *legs = &legalchars[2];
+  unsigned char v;
+  rstr[0] = val >= 0 ? '+' : '-';
+  if(val < 0) val = -val;
+  v = val>>56;
+  GET2DIGIT(&rstr[1],legs,v);
+  v = val>>48;
+  GET2DIGIT(&rstr[3],legs,v);
+  v = val>>40;
+  GET2DIGIT(&rstr[5],legs,v);
+  v = val>>32;
+  GET2DIGIT(&rstr[7],legs,v);
+  v = val>>24;
+  GET2DIGIT(&rstr[9],legs,v);
+  v = val>>16;
+  GET2DIGIT(&rstr[11],legs,v);
+  v = val>>8;
+  GET2DIGIT(&rstr[13],legs,v);
+  GET2DIGIT(&rstr[15],legs,val);
+  return rstr;
+}
+#endif
 
 static char __NEAR__ __FASTCALL__ GetHexAnalog(char val)
 {
