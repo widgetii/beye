@@ -14,7 +14,7 @@
  * @since       2000
  * @note        Development, fixes and improvements
 **/
-#if !defined(__GNUC__) || !defined(__GNUC_MINOR__) || (__GNUC__ < 2 && __GNUC_MINOR__ < 5) || !defined(NDEBUG)
+#if defined(__DISABLE_ASM) || !defined(__GNUC__) || !defined(__GNUC_MINOR__) || (__GNUC__ < 2 && __GNUC_MINOR__ < 5) || !defined(NDEBUG)
 #include "biewlib/sysdep/generic/_inlines.h"
 #else
 #ifndef ___INLINES_H

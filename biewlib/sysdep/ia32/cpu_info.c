@@ -32,7 +32,7 @@
 #define __HAVE_MMX    0x2000
 #define __HAVE_SSE    0x1000
 
-#if defined(__GNUC__) && defined(NDEBUG) && !defined(__BEOS__)
+#if !defined(__DISABLE_ASM) && (defined(__GNUC__) && defined(NDEBUG))
 
 static unsigned __NEAR__ __FASTCALL__ __cpu_type( void )
 {
@@ -743,11 +743,6 @@ static unsigned long __NEAR__ __FASTCALL__ __SSEOPS_std(volatile unsigned *count
 
 #else
 
-#include <stdio.h>
-
-void __FillCPUInfo(char *buff,unsigned cbBuff,void (*percent_callback)(int))
-{
-	sprintf(buff,"\n\n\n\n\n         CPU info currently N/A under current compiled BIEW");
-}
+#include "biewlib/sysdep/generic/cpu_info.c"
 
 #endif

@@ -82,7 +82,7 @@ If you have questions please contact with me: Nick Kurshev: nickols_k@mail.ru.
 // 3dnow memcpy support from kernel 2.4.2
 //  by Pontscho/fresh!mindworkz
 
-#if defined( HAVE_MMX2 ) || defined( HAVE_3DNOW ) || defined( HAVE_MMX )
+#if !defined(__DISABLE_ASM) && (defined( HAVE_MMX2 ) || defined( HAVE_3DNOW ) || defined( HAVE_MMX ))
 
 #undef HAVE_MMX1
 #if defined(HAVE_MMX) && !defined(HAVE_MMX2) && !defined(HAVE_3DNOW) && !defined(HAVE_SSE)
@@ -373,4 +373,3 @@ void * fast_memset(void * to, int val, size_t len)
 }
 
 #endif /* #if defined( HAVE_MMX2 ) || defined( HAVE_3DNOW ) || defined( HAVE_MMX ) */
-
