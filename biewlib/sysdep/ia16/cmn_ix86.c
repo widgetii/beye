@@ -400,8 +400,8 @@ void __FillCPUInfo(char *buff,unsigned cbBuff,void (*percent_callback)(int))
 "           [%c] - Ser.Num        [%c] - CLFLUSH        [%c] - reserved\n"
 "           [%c] - Debug Trace    [%c] - ACPI           [%c] - Intel MMX\n"
 "           [%c] - fxsave/fxrstor [%c] - SSE            [%c] - SSE2\n"
-"           [%c] - Self Snoop     [%c] - reserved       [%c] - AutoClockCtrl\n"
-"           [%c] - reserved       [%c] - reserved\n"
+"           [%c] - Self Snoop     [%c] - Hyper-Thread   [%c] - AutoClockCtrl\n"
+"           [%c] - reserved       [%c] - Pend. Brk. En\n"
             ,stepping
             ,model
             ,family
