@@ -39,6 +39,8 @@
 #include "biewlib/kbd_code.h"
 #include "biewlib/pmalloc.h"
 
+#define ARRAY_SIZE(x)       (sizeof(x)/sizeof(x[0]))
+
 static PE_ADDR * peVA = NULL;
 static PEHEADER pe;
 static PERVA *peDir;
@@ -204,7 +206,7 @@ static void __NEAR__ PaintNewHeaderPE_1( void )
 
 static void __NEAR__ PaintNewHeaderPE_2( void )
 {
-  static const char * __pesubsyst[] =
+  static const char * subSystem[] =
   {
     "Unknown",
     "Native",
@@ -213,7 +215,14 @@ static void __NEAR__ PaintNewHeaderPE_2( void )
     "OS/2 GUI",
     "OS/2 Character",
     "Posix GUI",
-    "Posix Character"
+    "Posix Character",
+    "Win9x Driver",
+    "Windows CE",
+    "EFI application",
+    "EFI boot service driver",
+    "EFI runtime driver",
+    "EFI ROM",
+    "X-Box",
   };
 
   twPrintF("File align                     = %08lXH\n"
@@ -223,7 +232,7 @@ static void __NEAR__ PaintNewHeaderPE_2( void )
            "Image size                     = %lu bytes\n"
            "Header size                    = %lu bytes\n"
            "File checksum                  = %08lXH\n"
-           "NT subsystem                   = %s\n"
+           "Subsystem                      = %s\n"
            "DLL Flags :                      [%04hXH]\n"
            " [%c] Per-Process Library initialization\n"
            " [%c] Per-Process Library termination\n"
@@ -241,7 +250,7 @@ static void __NEAR__ PaintNewHeaderPE_2( void )
            ,pe.peImageSize
            ,pe.peHeaderSize
            ,pe.peFileChecksum
-           ,pe.peSubSystem <= 0x0007 ? __pesubsyst[pe.peSubSystem] : "Unknown"
+           ,pe.peSubSystem < ARRAY_SIZE(subSystem) ? subSystem[pe.peSubSystem] : "Unknown"
            ,pe.peDLLFlags
            ,GetBool(pe.peDLLFlags & 0x0001)
            ,GetBool(pe.peDLLFlags & 0x0002)
@@ -299,44 +308,55 @@ static void __FASTCALL__ ObjPaintPE(TWindow * win,const void ** names,unsigned s
  twSetTitleAttr(win,buffer,TW_TMODE_CENTER,dialog_cset.title);
  twSetFooterAttr(win,PAGEBOX_SUB,TW_TMODE_RIGHT,dialog_cset.selfooter);
  twGotoXY(1,1);
+
+ memcpy(buffer, objs->oName, 8);
+ buffer[8] = 0;
+
  twPrintF("Object Name                    = %8s\n"
           "Virtual Size                   = %lX bytes\n"
           "RVA (relative virtual address) = %08lX\n"
           "Physical size                  = %08lX bytes\n"
           "Physical offset                = %08lX bytes\n"
-          "<Pointer to relocations>       = %08lX\n"
-          "<Pointer to line numbers>      = %08lX\n"
-          "<Number of relocations>        = %hu\n"
-          "<Number of line numbers>       = %hu\n"
+          "<Relocations>                  = %hu at %08lX\n"
+          "<Line numbers>                 = %hu at %08lX\n"
           "FLAGS: %lX\n"
-          "   [%c] Code object\n"
-          "   [%c] Initialized data object\n"
-          "   [%c] Uninitialized data object\n"
-          "   [%c] Object must not be cashed\n"
-          "   [%c] Object is not pageable\n"
-          "   [%c] Object is shared\n"
-          "   [%c] Executable object\n"
-          "   [%c] Readable object\n"
-          "   [%c] Writable object"
-          ,objs->oName
+          "   [%c] Executable code          "   "   [%c] Shared object\n"
+          "   [%c] Initialized data         "   "   [%c] Executable object\n"
+          "   [%c] Uninitialized data       "   "   [%c] Readable object\n"
+          "   [%c] Contains COMDAT          "   "   [%c] Writable object\n"
+          "   [%c] Contains comments or other info\n"
+          "   [%c] Won't become part of the image\n"
+          "   [%c] Contains extended relocations\n"
+          "   [%c] Discardable as needed\n"
+          "   [%c] Must not be cashed\n"
+          "   [%c] Not pageable\n"
+          "   Alignment                   = %u %s\n"
+
+          ,buffer
           ,objs->oVirtualSize
           ,objs->oRVA
           ,objs->oPhysicalSize
           ,objs->oPhysicalOffset
-          ,objs->oRelocPtr
-          ,objs->oLineNumbPtr
           ,objs->oNReloc
+          ,objs->oRelocPtr
           ,objs->oNLineNumb
+          ,objs->oLineNumbPtr
           ,objs->oFlags
-          ,GetBool((objs->oFlags & 0x00000020UL) == 0x00000020UL)
-          ,GetBool((objs->oFlags & 0x00000040UL) == 0x00000040UL)
-          ,GetBool((objs->oFlags & 0x00000080UL) == 0x00000080UL)
-          ,GetBool((objs->oFlags & 0x04000000UL) == 0x04000000UL)
-          ,GetBool((objs->oFlags & 0x08000000UL) == 0x08000000UL)
-          ,GetBool((objs->oFlags & 0x10000000UL) == 0x10000000UL)
-          ,GetBool((objs->oFlags & 0x20000000UL) == 0x20000000UL)
-          ,GetBool((objs->oFlags & 0x40000000UL) == 0x40000000UL)
-          ,GetBool((objs->oFlags & 0x80000000UL) == 0x80000000UL));
+
+          ,GetBool(objs->oFlags & 0x00000020UL), GetBool(objs->oFlags & 0x10000000UL)
+          ,GetBool(objs->oFlags & 0x00000040UL), GetBool(objs->oFlags & 0x20000000UL)
+          ,GetBool(objs->oFlags & 0x00000080UL), GetBool(objs->oFlags & 0x40000000UL)
+          ,GetBool(objs->oFlags & 0x00001000UL), GetBool(objs->oFlags & 0x80000000UL)
+          ,GetBool(objs->oFlags & 0x00000200UL)
+          ,GetBool(objs->oFlags & 0x00000800UL)
+          ,GetBool(objs->oFlags & 0x01000000UL)
+          ,GetBool(objs->oFlags & 0x02000000UL)
+          ,GetBool(objs->oFlags & 0x04000000UL)
+          ,GetBool(objs->oFlags & 0x08000000UL)
+
+          ,objs->oFlags&0x00F00000 ? 1 << (((objs->oFlags&0x00F00000)>>20)-1) : 0
+          ,objs->oFlags&0x00F00000 ? "byte(s)" : "(default)");
+
  twRefreshFullWin(win);
 }
 
@@ -467,7 +487,7 @@ static tBool __FASTCALL__  __ReadImpContPE(BGLOBAL handle,memArray * obj,unsigne
     char stmp[300];
     tBool is_eof;
     sprintf(stmp,".%08X: ", VA);
-    VA += 4; /* sizeof(unsigned) ?*/
+    VA += 4;
     Hint = bioReadDWord(handle);
     if(!(Hint & 0x80000000UL))
     {
@@ -539,7 +559,7 @@ static unsigned long __FASTCALL__ ShowModRefPE( void )
 
 static ExportTablePE et;
 
-static void writeExportVA(unsigned long va, BGLOBAL handle, char *buf, unsigned long bufsize)
+static void __inline writeExportVA(unsigned long va, BGLOBAL handle, char *buf, unsigned long bufsize)
 {
     // check for forwarded export
     if (va>=peDir[PE_EXPORT].rva && va<peDir[PE_EXPORT].rva+peDir[PE_EXPORT].size)
@@ -679,7 +699,7 @@ static tBool __FASTCALL__ PEReadRVAs(BGLOBAL handle, memArray * obj, unsigned nn
       "~Bound Import Table  ",
       "Import ~Adress Table ",
       "Dela~y Import Table  ",
-      "~COM                 ",
+      "~COM+                ",
       "Reser~ved            "
   };
 
@@ -688,7 +708,7 @@ static tBool __FASTCALL__ PEReadRVAs(BGLOBAL handle, memArray * obj, unsigned nn
     char foo[80];
 
     sprintf(foo, "%s  %08lX  %8lu",
-        i<sizeof(rvaNames)/sizeof(rvaNames[0]) ? rvaNames[i] : "Unknown             ",
+        i<ARRAY_SIZE(rvaNames) ? rvaNames[i] : "Unknown             ",
         peDir[i].rva,
         peDir[i].size);
     if (!ma_AddString(obj, foo, True))
