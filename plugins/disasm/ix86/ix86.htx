@@ -1112,7 +1112,7 @@
 ³ %IREX%i decoding:                                                           ³
 ³ REX uses the range from 40H upto 4FH codes:                             ³
 ³ %BBits%b   definition:                                                      ³
-³ %I4-7%i    0100 means REX prefex is present                                 ³
+³ %I4-7%i    0100 means REX prefix is present                                 ³
 ³ %I3%i      rex.w (extension to the operand Width)                           ³
 ³ %I2%i      rex.r (extension to the ModRM/REG)                               ³
 ³ %I1%i      rex.x (extsnsion to the SIB indeX)                               ³
