@@ -16,6 +16,7 @@
  * @note        Development, fixes and improvements
 **/
 #include <stddef.h>
+#include <limits.h>
 #include <string.h>
 
 #include "bconsole.h"
@@ -68,9 +69,15 @@ typedef struct ClassFile_s
     unsigned long fields_offset;
     unsigned long methods_offset;
     unsigned long attributes_offset;
+/* meta data: */
+    unsigned long data_offset;
+    unsigned long code_offset;
+    unsigned long attrcode_offset;
 }ClassFile_t;
 
 ClassFile_t jvm_header;
+
+static BGLOBAL jvm_cache;
 
 static tBool  __FASTCALL__ jvm_check_fmt( void )
 {
@@ -169,15 +176,21 @@ static void __NEAR__ __FASTCALL__ skip_attributes(BGLOBAL handle,unsigned nitems
     }
 }
 
-static void __NEAR__ __FASTCALL__ skip_fields(unsigned nitems)
+static void __NEAR__ __FASTCALL__ skip_fields(unsigned nitems,int attr)
 {
     unsigned i;
+    unsigned long fpos;
     for(i=0;i<nitems;i++)
     {
 	unsigned short sval;
 	bmSeek(6,BM_SEEK_CUR);
 	sval=bmReadWord();
 	sval=FMT_WORD(&sval,1);
+	fpos=bmGetCurrFilePos();
+	if(i==0)
+	{
+	    attr?jvm_header.code_offset:jvm_header.data_offset=sval?fpos+6:fpos;
+	}
 	skip_attributes(bmbioHandle(),sval);
     }
 }
@@ -522,6 +535,9 @@ static void __FASTCALL__ jvm_init_fmt( void )
     unsigned long fpos;
     unsigned short sval;
     jvm_header.magic=0xCAFEBABE;
+    jvm_header.attrcode_offset=-1;
+    jvm_header.code_offset=-1;
+    jvm_header.data_offset=-1;
     fpos=bmGetCurrFilePos();
     bmSeek(4,BM_SEEK_SET);
     sval=bmReadWord();
@@ -545,19 +561,27 @@ static void __FASTCALL__ jvm_init_fmt( void )
     sval=bmReadWord();
     jvm_header.fields_count=FMT_WORD(&sval,1);
     jvm_header.fields_offset=bmGetCurrFilePos();
-    skip_fields(jvm_header.fields_count);
+    skip_fields(jvm_header.fields_count,0);
     sval=bmReadWord();
     jvm_header.methods_count=FMT_WORD(&sval,1);
     jvm_header.methods_offset=bmGetCurrFilePos();
-    skip_fields(jvm_header.fields_count); /* methods have the same struct as fields */
+    skip_fields(jvm_header.fields_count,1); /* methods have the same struct as fields */
     sval=bmReadWord();
+    jvm_header.attrcode_offset=0;
     jvm_header.attributes_count=FMT_WORD(&sval,1);
     jvm_header.attributes_offset=bmGetCurrFilePos();
+    if(jvm_header.attributes_count) jvm_header.attrcode_offset=jvm_header.attributes_offset;
     skip_attributes(bmbioHandle(),sval);
     jvm_header.header_length=bmGetCurrFilePos();
     bmSeek(fpos,BM_SEEK_SET);
+    if((jvm_cache = bioDupEx(bmbioHandle(),BBIO_SMALL_CACHE_SIZE)) == &bNull) jvm_cache = bmbioHandle();
 }
-static void __FASTCALL__ jvm_destroy_fmt(void) {}
+
+static void __FASTCALL__ jvm_destroy_fmt(void)
+{
+  if(jvm_cache != &bNull && jvm_cache != bmbioHandle()) bioClose(jvm_cache);
+}
+
 static int  __FASTCALL__ jvm_platform( void) { return DISASM_JAVA; }
 
 static void __NEAR__ __FASTCALL__ decode_acc_flags(unsigned flags, char *str)
@@ -616,6 +640,303 @@ static unsigned long __FASTCALL__ ShowJvmHeader( void )
     return entry;
 }
 
+static unsigned long __FASTCALL__ jvm_VA2PA(unsigned long va)
+{
+  return  va + jvm_header.code_offset;
+}
+
+static unsigned long __FASTCALL__ jvm_PA2VA(unsigned long pa)
+{
+  return pa >= jvm_header.code_offset ? pa - jvm_header.code_offset : 0L;
+}
+
+static tBool __FASTCALL__ jvm_AddressResolv(char *addr,unsigned long cfpos)
+{
+  tBool bret = True;
+  if(cfpos >= jvm_header.methods_offset)
+  {
+    addr[0]='.';
+    strcpy(&addr[1],Get8Digit(jvm_PA2VA(cfpos)));
+  }
+  else
+/*
+  if(cfpos >= jvm_header.attributes_offset) sprintf(addr,"Attr:%s",Get4Digit(cfpos-jvm_header.attributes_offset));
+  else
+    if(cfpos >= jvm_header.methods_offset) sprintf(addr,"Code:%s",Get4Digit(cfpos-jvm_header.methods_offset));
+    else
+*/
+	if(cfpos >= jvm_header.fields_offset) sprintf(addr,"Data:%s",Get4Digit(cfpos-jvm_header.fields_offset));
+	else
+	    if(cfpos >= jvm_header.interfaces_offset) sprintf(addr,"Imp :%s",Get4Digit(cfpos-jvm_header.interfaces_offset));
+	    else
+		if(cfpos >= jvm_header.constants_offset) sprintf(addr,"Pool:%s",Get4Digit(cfpos-jvm_header.constants_offset));
+		else sprintf(addr,"Hdr :%s",Get4Digit(cfpos));
+  return bret;
+}
+
+static void __FASTCALL__ jvm_ReadPubName(BGLOBAL b_cache,const struct PubName *it,
+                            char *buff,unsigned cb_buff)
+{
+    bioSeek(b_cache,it->nameoff,SEEK_SET);
+    get_name(b_cache,buff,cb_buff);
+    if(it->addinfo)
+    {
+	char *s_end;
+	strcat(buff,".");
+	s_end=buff+strlen(buff);
+	bioSeek(b_cache,it->addinfo,SEEK_SET);
+	get_name(b_cache,s_end,cb_buff-(s_end-buff));
+    }
+}
+
+static void __FASTCALL__ jvm_ReadPubNameList(BGLOBAL handle,void (__FASTCALL__ *mem_out)(const char *))
+{
+ unsigned long fpos,len;
+ unsigned i;
+ struct PubName jvm_pn;
+ unsigned short acount,flg;
+ if(!PubNames)
+   if(!(PubNames = la_Build(0,sizeof(struct PubName),mem_out))) return;
+/* Lookup fields */
+ bioSeek(handle,jvm_header.fields_offset,BM_SEEK_SET);
+ for(i = 0;i < jvm_header.fields_count;i++)
+ {
+    fpos=bioTell(handle);
+    flg=bioReadWord(handle);
+    flg=FMT_WORD(&flg,1);
+    jvm_pn.nameoff = bioTell(handle);
+    jvm_pn.addinfo=0;
+    bioSeek(handle,fpos+6,BM_SEEK_SET);
+    acount=bioReadWord(handle);
+    acount=FMT_WORD(&acount,1);
+    for(i=0;i<acount;i++)
+    {
+	fpos=bioTell(handle);
+	jvm_pn.addinfo=fpos;
+	bioSeek(handle,fpos+2,BM_SEEK_SET);
+	len=bioReadDWord(handle);
+	len=FMT_DWORD(&len,1);
+	jvm_pn.pa = bioTell(handle);
+	jvm_pn.attr    = flg & 0x0008 ? SC_LOCAL : SC_GLOBAL;
+	if(!la_AddData(PubNames,&jvm_pn,mem_out)) break;
+	bioSeek(handle,len,BM_SEEK_CUR);
+	if(bioEOF(handle)) break;
+    }
+    if(!acount)
+    {
+	jvm_pn.pa      = bioTell(handle);
+	jvm_pn.attr    = flg & 0x0008 ? SC_LOCAL : SC_GLOBAL;
+	if(!la_AddData(PubNames,&jvm_pn,mem_out)) break;
+    }
+    if(bioEOF(handle)) break;
+ }
+/* Lookup methods */
+ bioSeek(handle,jvm_header.methods_offset,BM_SEEK_SET);
+ for(i=0;i<jvm_header.fields_count;i++)
+ {
+    fpos=bioTell(handle);
+    flg=bioReadWord(handle);
+    flg=FMT_WORD(&flg,1);
+    jvm_pn.nameoff = bioTell(handle);
+    bioSeek(handle,fpos+6,BM_SEEK_SET);
+    acount=bioReadWord(handle);
+    acount=FMT_WORD(&acount,1);
+    for(i=0;i<acount;i++)
+    {
+	fpos=bioTell(handle);
+	jvm_pn.addinfo=fpos;
+	bioSeek(handle,fpos+2,BM_SEEK_SET);
+	len=bioReadDWord(handle);
+	len=FMT_DWORD(&len,1);
+	jvm_pn.pa = bioTell(handle);
+	jvm_pn.attr    = flg & 0x0008 ? SC_LOCAL : SC_GLOBAL;
+	if(!la_AddData(PubNames,&jvm_pn,mem_out)) break;
+	bioSeek(handle,len,BM_SEEK_CUR);
+	if(bioEOF(handle)) break;
+    }
+    if(!acount)
+    {
+	jvm_pn.pa      = bioTell(handle);
+	jvm_pn.attr    = flg & 0x0008 ? SC_LOCAL : SC_GLOBAL;
+	if(!la_AddData(PubNames,&jvm_pn,mem_out)) break;
+    }
+    if(bioEOF(handle)) break;
+ }
+ if(PubNames->nItems) la_Sort(PubNames,fmtComparePubNames);
+}
+
+static unsigned long __FASTCALL__ jvm_GetPubSym(char *str,unsigned cb_str,unsigned *func_class,
+                           unsigned long pa,tBool as_prev)
+{
+  return fmtGetPubSym(bmbioHandle(),str,cb_str,func_class,pa,as_prev,
+                      jvm_ReadPubNameList,
+                      jvm_ReadPubName);
+}
+
+static unsigned __FASTCALL__ jvm_GetObjAttr(unsigned long pa,char *name,unsigned cb_name,
+                      unsigned long *start,unsigned long *end,int *_class,int *bitness)
+{
+  unsigned ret;
+  UNUSED(cb_name);
+  *start = 0;
+  *end = bmGetFLength();
+  *_class = OC_NOOBJECT;
+  *bitness = DAB_USE16;
+  name[0] = 0;
+  if(pa < jvm_header.data_offset)
+  {
+    *end =jvm_header.data_offset;
+    ret = 0;
+  }
+  else
+    if(pa >= jvm_header.data_offset && pa < jvm_header.methods_offset)
+    {
+      *_class = OC_DATA;
+      *start = jvm_header.data_offset;
+      *end = jvm_header.methods_offset;
+      ret = 1;
+    }
+    else
+    if(pa >= jvm_header.methods_offset && pa < jvm_header.code_offset)
+    {
+      *_class = OC_NOOBJECT;
+      *start = jvm_header.methods_offset;
+      *end = jvm_header.code_offset;
+      ret = 2;
+    }
+    else
+    if(pa >= jvm_header.code_offset && pa < jvm_header.attributes_offset)
+    {
+      *_class = OC_CODE;
+      *start = jvm_header.code_offset;
+      *end = jvm_header.attributes_offset;
+      ret = 3;
+    }
+    else
+    if(pa >= jvm_header.attributes_offset && pa < jvm_header.attrcode_offset)
+    {
+      *_class = OC_NOOBJECT;
+      *start = jvm_header.attributes_offset;
+      *end = jvm_header.attrcode_offset;
+      ret = 4;
+    }
+    else
+    {
+      unsigned long fpos,len;
+      fpos=bmGetCurrFilePos();
+      bmSeek(jvm_header.attributes_offset,BM_SEEK_SET);
+      get_name(bmbioHandle(),name,cb_name);
+      bmSeek(fpos+2,BM_SEEK_SET);
+      len=bmReadDWord();
+      len=FMT_DWORD(&len,1);
+      bmSeek(fpos,BM_SEEK_SET);
+      *_class = OC_CODE;
+      *start = jvm_header.attributes_offset+6;
+      *end = *start+len;
+      ret = 5;
+    }
+  return ret;
+}
+
+static int __FASTCALL__ jvm_bitness(unsigned long off)
+{
+    UNUSED(off);
+    return DAB_USE16;
+}
+
+static unsigned long __FASTCALL__ jvm_AppendRef(char *str,unsigned long ulShift,int flags,int codelen,unsigned long r_sh)
+{
+ unsigned long  retrf = RAPREF_DONE;
+ unsigned slen=1000; /* According on disasm/java/java.c */
+    if((flags & APREF_TRY_LABEL)!=APREF_TRY_LABEL)
+    {
+	unsigned long lidx,lval,lval2,fpos;
+	unsigned sl;
+	unsigned short sval,sval2;
+	unsigned char utag;
+	bioSeek(jvm_cache,ulShift,BM_SEEK_SET);
+	switch(codelen)
+	{
+	    case 4: lidx=bioReadDWord(jvm_cache); lidx=FMT_DWORD(&lidx,1); break;
+	    case 2: sval=bioReadWord(jvm_cache); lidx=FMT_WORD(&sval,1); break;
+	    default:
+	    case 1: lidx=bioReadByte(jvm_cache); break;
+	}
+	bioSeek(jvm_cache,jvm_header.constants_offset,BM_SEEK_SET);
+	skip_constant_pool(jvm_cache,lidx-1);
+	utag=bioReadByte(jvm_cache);
+	str=&str[strlen(str)];
+	switch(utag)
+	{
+	    case CONSTANT_STRING:
+	    case CONSTANT_CLASS:
+			get_name(jvm_cache,str,slen);
+			break;
+	    case CONSTANT_FIELDREF:
+	    case CONSTANT_METHODREF:
+	    case CONSTANT_INTERFACEMETHODREF:
+			fpos=bioTell(jvm_cache);
+			sval=bioReadWord(jvm_cache);
+			sval=FMT_WORD(&sval,1);
+			sval2=bioReadWord(jvm_cache);
+			sval2=FMT_WORD(&sval2,1);
+			bioSeek(jvm_cache,jvm_header.constants_offset,BM_SEEK_SET);
+			get_class_name(jvm_cache,sval,str,slen);
+			strcat(str,".");
+			sl=strlen(str);
+			slen-=sl;
+			str+=sl;
+			bioSeek(jvm_cache,jvm_header.constants_offset,BM_SEEK_SET);
+			skip_constant_pool(jvm_cache,sval2-1);
+			utag=bioReadByte(jvm_cache);
+			if(utag!=CONSTANT_NAME_AND_TYPE) break;
+			goto name_type;
+	    case CONSTANT_INTEGER:
+	    case CONSTANT_FLOAT:
+			lval=bioReadDWord(jvm_cache);
+			lval=FMT_DWORD(&lval,1);
+			strcpy(str,utag==CONSTANT_INTEGER?"Integer":"Float");
+			strcat(str,":");
+			strcat(str,Get8Digit(lval));
+			break;
+	    case CONSTANT_LONG:
+	    case CONSTANT_DOUBLE:
+			lval=bioReadDWord(jvm_cache);
+			lval=FMT_DWORD(&lval,1);
+			lval2=bioReadDWord(jvm_cache);
+			lval2=FMT_DWORD(&lval2,1);
+			strcpy(str,utag==CONSTANT_INTEGER?"Integer":"Float");
+			strcat(str,":");
+			strcat(str,Get8Digit(lval));
+			strcat(str,Get8Digit(lval2));
+			break;
+	    case CONSTANT_NAME_AND_TYPE:
+	    name_type:
+			fpos=bioTell(jvm_cache);
+			get_name(jvm_cache,str,slen);
+			bioSeek(jvm_cache,fpos+2,BM_SEEK_SET);
+			strcat(str," ");
+			sl=strlen(str);
+			slen-=sl;
+			str+=sl;
+			get_name(jvm_cache,str,slen);
+			break;
+	    case CONSTANT_UTF8: 
+			sval=bioReadWord(jvm_cache);
+			sval=FMT_WORD(&sval,1);
+			sl=min(slen,sval);
+			fpos=bioTell(jvm_cache);
+			bioReadBuffer(jvm_cache,str,sl);
+			str[sl]='\0';
+			break;
+	    default:	retrf = RAPREF_NONE;
+			break;
+	}
+    }
+    else retrf = RAPREF_NONE;
+    return retrf;
+}
+
 REGISTRY_BIN jvmTable =
 {
   "Java's ClassFile",
@@ -625,15 +946,15 @@ REGISTRY_BIN jvmTable =
   jvm_init_fmt,
   jvm_destroy_fmt,
   ShowJvmHeader,
-  NULL,
-  NULL,
+  jvm_AppendRef,
+  fmtSetState,
   jvm_platform,
-  NULL,
-  NULL,
-  NULL,
-  NULL,
-  NULL,
-  NULL,
+  jvm_bitness,
+  jvm_AddressResolv,
+  jvm_VA2PA,
+  jvm_PA2VA,
+  jvm_GetPubSym,
+  jvm_GetObjAttr,
   NULL,
   NULL
 };

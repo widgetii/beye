@@ -247,7 +247,7 @@ java_codes_t java_codes[256]=
   /*0xC2*/ { "monitorenter", NULL, 0 },
   /*0xC3*/ { "monitorexit", NULL, 0 },
   /*0xC4*/ { "wide", NULL, 0/*!!! <- multiplier 2 for operands */ },
-  /*0xC5*/ { "multianewarray", NULL, 0x03 | JVM_OBJREF2 | JVM_CONST2 },
+  /*0xC5*/ { "multianewarray", NULL, 0x03 | JVM_OBJREF2 | JVM_CONST1 },
   /*0xC6*/ { "ifnull", NULL, 0x02 | JVM_CODEREF },
   /*0xC7*/ { "ifnonnull", NULL, 0x02 | JVM_CODEREF },
   /*0xC8*/ { "goto_w", NULL, 0x04 | JVM_CODEREF },
@@ -320,23 +320,55 @@ static DisasmRet __FASTCALL__ javaDisassembler(unsigned long ulShift,
   memset(&ret,0,sizeof(ret));
   ret.str = outstr;
   idx=0;
-  if(buffer[idx]==0xC4) { idx++; mult=2; }
+  if(buffer[idx]==0xC4)
+  {
+    idx++;
+    mult=2;
+  }
   else mult=1;
-  if(!((flags & __DISF_SIZEONLY) == __DISF_SIZEONLY))
-		    strcpy(outstr,java_codes[buffer[idx]].name);
   jflags=java_codes[buffer[idx]].flags;
   tail=jflags & JVM_TAIL;
+  tail *= mult;
+  if(flags & __DISF_GETTYPE)
+  {
+    ret.pro_clone = __INSNT_ORDINAL;
+    ret.codelen=ret.field=0;
+    switch(buffer[idx])
+    {
+	case 0xA9:
+	case 0xAC:
+	case 0xAD:
+	case 0xAE:
+	case 0xAF:
+	case 0xB0:
+	case 0xB1:  ret.pro_clone = __INSNT_RET;
+		    ret.codelen = tail;
+		    ret.field = tail?idx+1:0;
+		    break;
+	default: break;
+    }
+    return ret;
+  }
+  if(!((flags & __DISF_SIZEONLY) == __DISF_SIZEONLY))
+		    strcpy(outstr,java_codes[buffer[idx]].name);
+  if(mult==2 && !((flags & __DISF_SIZEONLY) == __DISF_SIZEONLY))
+  {
+    if((jflags & JVM_OBJREF1)==JVM_OBJREF1) { jflags &= ~JVM_OBJREF1; jflags |= JVM_OBJREF2; }
+    else
+    if((jflags & JVM_OBJREF2)==JVM_OBJREF2) { jflags &= ~JVM_OBJREF2; jflags |= JVM_OBJREF4; }
+    if((jflags & JVM_CONST1)==JVM_CONST1) { jflags &= ~JVM_CONST1; jflags |= JVM_CONST2; }
+    else
+    if((jflags & JVM_CONST2)==JVM_CONST2) { jflags &= ~JVM_CONST2; jflags |= JVM_CONST4; }
+  }
   idx++;
   if(tail)
   {
 	if(!((flags & __DISF_SIZEONLY) == __DISF_SIZEONLY))
 		TabSpace(outstr,TAB_POS);
-	tail *= mult;
 	if(!((flags & __DISF_SIZEONLY) == __DISF_SIZEONLY))
 	{
 	    switch(tail)
 	    {
-		default:
 		case 1:
 		    if(jflags & JVM_OBJREFMASK) strcat(outstr,"#");
 		    strcat(outstr,Get2Digit(buffer[idx]));
@@ -346,45 +378,68 @@ static DisasmRet __FASTCALL__ javaDisassembler(unsigned long ulShift,
 		    unsigned short sval;
 		    unsigned long newpos;
 		    sval=FMT_WORD(&buffer[idx],1);
-		    if(jflags & JVM_CODEREF)
+		    if((jflags & JVM_CODEREF)==JVM_CODEREF && sval)
 		    {
-			newpos = ulShift + (signed short)sval + 3;
+			newpos = ulShift + (signed short)sval;
 			disAppendFAddr(outstr,ulShift + 1,sval,
 					newpos,DISADR_NEAR16,0,2);
 		    }
 		    else
+		    if((jflags & JVM_OBJREF1)==JVM_OBJREF1)
+		    {
+			strcat(outstr,"#");
+			strcat(outstr,Get2Digit(buffer[idx]));
+			strcat(outstr,",");
+			strcat(outstr,Get2Digit(buffer[idx+1]));
+		    }
+		    else
 		    if(jflags & JVM_OBJREFMASK)
-		    disAppendDigits(outstr,ulShift,
+		    disAppendDigits(outstr,ulShift+idx,
 			APREF_USE_TYPE,2,&sval,DISARG_WORD);
 		    else strcat(outstr,Get4Digit(sval));
 		    break;
 		}
+		default:
 		case 4: 
 		{
 		    unsigned long lval;
 		    unsigned long newpos;
 		    lval=FMT_DWORD(&buffer[idx],1);
-		    if(jflags & JVM_CODEREF)
+		    if((jflags & JVM_CODEREF)==JVM_CODEREF && lval)
 		    {
-			newpos = ulShift + (signed long)lval + 5;
+			newpos = ulShift + (signed long)lval;
 			disAppendFAddr(outstr,ulShift + 1,lval,
 					newpos,DISADR_NEAR32,0,4);
 		    }
 		    else
+		    if((jflags & JVM_OBJREF2)==JVM_OBJREF2)
+		    {
+			unsigned short sval;
+			sval=FMT_WORD(&buffer[idx],1);
+			disAppendDigits(outstr,ulShift,
+				    APREF_USE_TYPE,2,&sval,DISARG_WORD);
+			strcat(outstr,",");
+			if((jflags & JVM_CONST1)==JVM_CONST1) strcat(outstr,Get2Digit(buffer[idx+2]));
+			else
+			{
+			    sval=FMT_WORD(&buffer[idx+2],1);
+			    strcat(outstr,Get4Digit(sval));
+			}
+		    }
+		    else
 		    if(jflags & JVM_OBJREFMASK)
-		    disAppendDigits(outstr,ulShift,
+		    disAppendDigits(outstr,ulShift+idx,
 			APREF_USE_TYPE,4,&lval,DISARG_DWORD);
 		    else strcat(outstr,Get8Digit(lval));
 		    break;
 		}
 		case 8: 
-		    disAppendDigits(outstr,ulShift,
+		    disAppendDigits(outstr,ulShift+idx,
 			APREF_USE_TYPE,8,&buffer[idx],DISARG_QWORD);
 		    break;
 	    }
 	}
   }
-  if(flags & __DISF_GETTYPE) ret.pro_clone = __INSNT_ORDINAL;
   ret.codelen=tail+idx;
   return ret;
 }
