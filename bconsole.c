@@ -178,11 +178,17 @@ int __FASTCALL__ eeditstring(char *s,const char *legal, unsigned *maxlength,unsi
                            }
                        }
                        break;
-   case KE_DEL : if (pos < len && !(attr & __ESS_HARDEDIT) && !ashex)
+   case KE_DEL : if (pos < len && !(attr & __ESS_HARDEDIT))
                     {
                       attr &= ~__ESS_NOREDRAW;
                       memmove(&s[pos], &s[pos+1], len - pos);
                       len--;
+                         if(ashex)
+                           if(!isSpace(pos) && pos > 2)
+                           {
+                             memmove(&s[pos], &s[pos+2], len - pos);
+                             len-=2;
+                           }
                     }
                     break;
    case KE_CTL_BKSPACE:
