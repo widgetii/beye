@@ -73,12 +73,11 @@ static unsigned char frames_vt100[0x30] =
 static unsigned char frames_dumb[0x30] =
 ": %|{+++++|+++++`++}-++++++++-+++++++++++++#%[]~";
 
-#define	_addr(x, y)	(viomem + (x) + (y) * tvioWidth)
 #define twrite(x)	write(out_fd, (x), strlen(x))
-
-#define _bg(x) ((x) >> 4)
-#define _fg(x) ((x) & 0x0f)
-#define _2color(x) __Xlat__(__ansi_color, (x) & 7)
+#define _addr(x, y)	(viomem + (x) + (y) * tvioWidth)
+#define _bg(x)		((x) >> 4)
+#define _fg(x)		((x) & 0x0f)
+#define _2color(x)	__Xlat__(__ansi_color, (x) & 7)
 /* #define _2color(x) (char)__ansi_color[((x) & 7)] */
 
 static struct {
