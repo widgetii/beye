@@ -20,10 +20,11 @@ See BUGS section below.
 As BIEW can use slang or curses screen library, it is possible to run it
 (well, at least to try :) on all platforms supported by these libraries.
 
-I have tested this release with following OS'es on IA-32:
+This release was tested on following OS'es on IA-32:
 
     Linux 2.0/2.4	(BIEW/SLANG, BIEW/CURSES, BIEW/VT100, BIEW/LINUX: ok)
     FreeBSD 4.4		(BIEW/SLANG, BIEW/CURSES: ok)
+    OpenBSD 3.0		(BIEW/SLANG, BIEW/CURSES: weird)
     BeOS 4.5		(BIEW/VT100: weird, but better than nothing)
 
 Any (un)successful reports of trying BIEW on other OS'es and architectures
@@ -102,6 +103,15 @@ Note that BIEW/LINUX was designed primarily for local console use,
 it is not recommended to use this version remotely (over serial
 lines or telnet sessions), use BIEW/SLANG or BIEW/CURSES instead.
 
+
+*BSD
+----
+
+On BSD systems slang library is often built to work via curses.
+Unless you are using native slang build, you may have problems
+with BIEW/SLANG. Therefore use BIEW/CURSES in such a case.
+
+
 BeOS
 ----
 
@@ -159,6 +169,10 @@ sorts of weirdness can happen.
 
 ChangeLog (Linux/UNIX)
 ----------------------
+
+5.3.2
+
+- compiler warnings cleanup
 
 5.3.1
 
