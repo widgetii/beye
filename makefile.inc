@@ -74,15 +74,18 @@ ifeq ($(TARGET_OS),win32)
 endif
 ifeq ($(TARGET_OS),beos)
  HOST=beos
- CDEFOS=-D__BEOS__ -D__UNIX__ -D__OS_NAME__='"BeOS"' -D_VT100_ -D__OS__="beos" -Ubeos
- CDEFOS+=-DHAVE_TERMINAL_OUT=1 -DDATADIR='"/boot/home/config/lib"' -D__DISABLE_MMF -D__DISABLE_ASM
+ CDEFOS=-D__BEOS__ -D__UNIX__ -D__OS_NAME__='"BeOS"' -D__OS__="beos" -Ubeos
+ CDEFOS+=-D_VT100_ -DHAVE_TERMINAL_OUT=1 -DDATADIR='"/boot/home/config/lib"' -D__DISABLE_MMF -D__DISABLE_ASM
  OSLDEF=
  OS_LIBS=
 endif
 ifeq ($(TARGET_OS),linux)
  HOST=linux
- CDEFOS=-D__LINUX__ -D__UNIX__ -D__OS_NAME__='"Linux"' -D_VT100_ -D__OS__="linux" -Ulinux
- CDEFOS+=-DHAVE_TERMINAL_OUT=1
+ CDEFOS=-D__LINUX__ -D__UNIX__ -D__OS_NAME__='"Linux"' -D__OS__="linux" -Ulinux
+ CDEFOS+=-D_VT100_ -DHAVE_TERMINAL_OUT=1
+ ifdef PREFIX
+  CDEFOS+=-DPREFIX='"$(PREFIX)"'
+ endif
  OSLDEF=
  OS_LIBS=
  ifeq ($(USE_MOUSE),n)
@@ -113,7 +116,9 @@ ifeq ($(TARGET_OS),unix)
      OSNAME=Unix/Curses
    endif
  endif
-
+ ifdef PREFIX
+  CDEFOS+=-DPREFIX='"$(PREFIX)"'
+ endif
  ifeq ($(USE_MOUSE),y)
   CDEFOS += -DHAVE_MOUSE
  endif
