@@ -13,6 +13,7 @@
 
 
 [Extensions]
+awk=awk.stx
 htm=html.stx
 html=html.stx
 for=fortran.stx
