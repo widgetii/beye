@@ -947,10 +947,18 @@ tBool __FASTCALL__ FiCommandProcessorStd( const char * cmd )
  {
    char * bracket;
    char _v[FI_MAXSTRLEN+1];
+   char pfile[FILENAME_MAX+1],*pfp,*pfp2;
    bracket = __FiCBString(&str.str[str.iptr]);
    FiExpandAllVar(bracket,_v);
    fdeb_save = fi_Debug_Str;
-   (*FiFileProcessor)(_v);
+   /* make path if no path specified */
+   strcpy(pfile,FiFileNames[FiFilePtr-1]);
+   pfp=strrchr(pfile,'\\');
+   pfp2=strrchr(pfile,'/');
+   pfp=max(pfp,pfp2);
+   if(pfp && !(strchr(_v,'\\') || strchr(_v,'/'))) strcpy(pfp+1,_v);
+   else    strcpy(pfile,_v);
+   (*FiFileProcessor)(pfile);
    fi_Debug_Str = fdeb_save;
    PFREE(bracket);
    goto Exit_CP;
@@ -1142,22 +1150,21 @@ tBool __FASTCALL__ FiStringProcessorStd(char * curr_str)
     else
     if(FiisItem(curr_str))
     {
-      char buffer[FI_MAXSTRLEN+1],bufferv[FI_MAXSTRLEN+1];
+      char buffer[FI_MAXSTRLEN+1];
       tBool retval;
       IniInfo info;
-      item = __FiCItem(curr_str);
+      FiExpandAllVar(curr_str,buffer);
+      item = __FiCItem(buffer);
       retval = False;
       if(item[0])
       {
-       val = __FiCValue(curr_str);
-       FiExpandAllVar(val,buffer);
-       FiExpandAllVar(item,bufferv);
+       val = __FiCValue(buffer);
        if(curr_sect) info.section = curr_sect;
        else info.section = "";
        if(curr_subsect) info.subsection = curr_subsect;
        else info.subsection = "";
-       info.item = bufferv;
-       info.value = buffer;
+       info.item = item;
+       info.value = val;
        retval = (*proc)(&info);
        PFREE(val);
       }
