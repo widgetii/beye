@@ -76,7 +76,9 @@ What's todo:
   (this will start 6.x series)
 + Add support for dynamically linked plugins and addons.          (NOT URGENTLY)
   (this will in 6.x series)
-+ Fully featured Java support                               (AS FAR AS POSSIBLE)
++ Filters for text-mode (like rtf-view)			    (IN THE NEAR FUTURE)
++ User defined structures (like dbf-view)			  (NOT URGENTLY)
+
 
 Sweet dreams:                                                   (DISTANT FUTURE)
 ~~~~~~~~~~~~~
