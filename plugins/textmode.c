@@ -111,7 +111,7 @@ static void __NEAR__ __FASTCALL__ txtMarkupCtx(void)
     long ii,fpos,flen;
     unsigned i,len;
     int found;
-    char tmps[MAX_STRLEN],etmps[MAX_STRLEN],ktmps[MAX_STRLEN],ch;
+    char tmps[MAX_STRLEN],etmps[MAX_STRLEN],ktmps[MAX_STRLEN],ch,chn;
     TWindow *hwnd;
     hwnd=PleaseWaitWnd();
     flen=BMGetFLength();
@@ -121,18 +121,33 @@ static void __NEAR__ __FASTCALL__ txtMarkupCtx(void)
     for(ii=0;ii<flen;ii++)
     {
 	ch=BMReadByte();
+	if(ch=='\r') ch='\n';
 	for(i=0;i<syntax_hl.context_num;i++)
 	{
-	    if(ch==syntax_hl.context[i].start_seq[0])
+	    unsigned ss_idx;
+	    ss_idx=0;
+	    if(syntax_hl.context[i].start_seq[0]=='\n')
+	    {
+		if(ii==0) ss_idx=1;
+		else
+		{ 
+		    long ccpos;
+		    ccpos=BMGetCurrFilePos();
+		    chn=BMReadByteEx(ii-1,BM_SEEK_SET);
+		    BMSeek(ccpos, BM_SEEK_SET);
+		    if(chn=='\n' || chn=='\r') ss_idx=1;
+		}
+	    }
+	    if(ch==syntax_hl.context[i].start_seq[ss_idx])
 	    {
 		long cpos;
 		len=strlen(syntax_hl.context[i].start_seq);
 		cpos=BMGetCurrFilePos();
 		found=0;
-		if(len>1)
+		if(len>(ss_idx+1))
 		{
-		    BMReadBuffer(tmps,len-1);
-		    if(memcmp(tmps,&syntax_hl.context[i].start_seq[1],len-1)==0) found=1;
+		    BMReadBuffer(tmps,len-(ss_idx+1));
+		    if(memcmp(tmps,&syntax_hl.context[i].start_seq[ss_idx+1],len-(ss_idx+1))==0) found=1;
 		}
 		else found=1;
 		if(found)
@@ -141,11 +156,11 @@ static void __NEAR__ __FASTCALL__ txtMarkupCtx(void)
 		    unsigned st_len;
 		    long ckpos;
 		    ktmps[0]=ch;
-		    memcpy(&ktmps[1],tmps,len-1);
-		    if(syntax_hl.maxkwd_len>len)
+		    memcpy(&ktmps[1],tmps,len-(ss_idx+1));
+		    if(syntax_hl.maxkwd_len>(len-ss_idx))
 		    {
 			ckpos=BMGetCurrFilePos();
-			BMReadBuffer(&ktmps[len],syntax_hl.maxkwd_len-len);
+			BMReadBuffer(&ktmps[len],syntax_hl.maxkwd_len-(len-ss_idx));
 			BMSeek(ckpos,BM_SEEK_SET);
 		    }
 		    hlFindKwd(ktmps,0,&st_len);
@@ -156,7 +171,7 @@ static void __NEAR__ __FASTCALL__ txtMarkupCtx(void)
 		    if(!acontext) acontext=PHMalloc(sizeof(acontext_hl_t));
 		    else	  acontext=PHRealloc(acontext,sizeof(acontext_hl_t)*(acontext_num+1));
 		    acontext[acontext_num].color=LOGFB_TO_PHYS(syntax_hl.context[i].color,BACK_COLOR(text_cset.normal));
-		    acontext[acontext_num].start_off=ii;
+		    acontext[acontext_num].start_off=ii-ss_idx;
 		    acontext[acontext_num].end_off=flen;
 		    ii+=len;
 		    BMSeek(ii,BM_SEEK_SET);
@@ -301,32 +316,23 @@ static tBool __FASTCALL__ txtFiUserFunc1(IniInfo * info)
 
 static Color __NEAR__ __FASTCALL__ getCtxColorByName(const char *subsection,const char *item,Color cdef,tBool *err)
 {
+    PrgWordCSet *cset;
     *err=0;
-    if(strcmp(subsection,"Comments")==0)
-    {
-	if(strcmp(item,"base")==0) return prog_cset.comments.base;
-	if(strcmp(item,"extended")==0) return prog_cset.comments.extended;
-	if(strcmp(item,"reserved")==0) return prog_cset.comments.reserved;
-	if(strcmp(item,"alt")==0) return prog_cset.comments.alt;
-	ErrMessageBox("Unknown context class definition",item);
-    }
-    else if(strcmp(subsection,"Preproc")==0)
-    {
-	if(strcmp(item,"base")==0) return prog_cset.preproc.base;
-	if(strcmp(item,"extended")==0) return prog_cset.preproc.extended;
-	if(strcmp(item,"reserved")==0) return prog_cset.preproc.reserved;
-	if(strcmp(item,"alt")==0) return prog_cset.preproc.alt;
-	ErrMessageBox("Unknown context class definition",item);
-    }
-    else if(strcmp(subsection,"Constants")==0)
-    {
-	if(strcmp(item,"base")==0) return prog_cset.constants.base;
-	if(strcmp(item,"extended")==0) return prog_cset.constants.extended;
-	if(strcmp(item,"reserved")==0) return prog_cset.constants.reserved;
-	if(strcmp(item,"alt")==0) return prog_cset.constants.alt;
-	ErrMessageBox("Unknown context class definition",item);
-    }
+    cset=NULL;
+    if(strcmp(subsection,"Comments")==0) cset=&prog_cset.comments;
+    else if(strcmp(subsection,"Preproc")==0) cset=&prog_cset.preproc;
+    else if(strcmp(subsection,"Constants")==0) cset=&prog_cset.constants;
+    else if(strcmp(subsection,"Keywords")==0) cset=&prog_cset.keywords;
+    else if(strcmp(subsection,"Operators")==0) cset=&prog_cset.operators;
     else ErrMessageBox("Unknown context subsection definition",subsection);
+    if(cset)
+    {
+	if(strcmp(item,"base")==0) return cset->base;
+	if(strcmp(item,"extended")==0) return cset->extended;
+	if(strcmp(item,"reserved")==0) return cset->reserved;
+	if(strcmp(item,"alt")==0) return cset->alt;
+	ErrMessageBox("Unknown context class definition",item);
+    }
     *err=1;
     return cdef;
 }
@@ -1178,11 +1184,12 @@ static void __FASTCALL__ txtReadIni( hIniProfile *ini )
     HiLight = (int)strtoul(tmps,NULL,10);
     if(HiLight > 1) HiLight = 1;
  }
- if(HiLight) txtReadSyntaxes();
+ if(HiLight && txtDetect()) txtReadSyntaxes();
 }
 
 static void __FASTCALL__ txtSaveIni( hIniProfile *ini )
 {
+  unsigned i;
   char tmps[10];
   sprintf(tmps,"%i",bin_mode);
   biewWriteProfileString(ini,"Biew","Browser","SubSubMode3",tmps);
@@ -1192,6 +1199,21 @@ static void __FASTCALL__ txtSaveIni( hIniProfile *ini )
   sprintf(tmps,"%i",HiLight);
   biewWriteProfileString(ini,"Biew","Browser","SubSubMode9",tmps);
   activeNLS->save_ini(ini);
+  if(syntax_hl.name) free(syntax_hl.name);
+  if(syntax_hl.context)
+  {
+     for(i=0;i<syntax_hl.context_num;i++) { free(syntax_hl.context[i].start_seq); free(syntax_hl.context[i].end_seq); }
+     free(syntax_hl.context);
+  }
+  if(syntax_hl.keyword)
+  {
+     for(i=0;i<syntax_hl.keyword_num;i++) { free(syntax_hl.keyword[i].keyword); }
+     free(syntax_hl.keyword);
+  }
+  if(syntax_hl.operators) free(syntax_hl.operators);
+  PHFree(acontext);
+  acontext_num=0;
+  memset(&syntax_hl,0,sizeof(syntax_hl));
 }
 
 static void __FASTCALL__ txtInit( void )
@@ -1209,26 +1231,10 @@ static void __FASTCALL__ txtInit( void )
 
 static void __FASTCALL__ txtTerm( void )
 {
-   unsigned i;
    PFREE(buff);
    PFREE(tlines);
    PFREE(ptlines);
    if(txtHandle != BMbioHandle()) { bioClose(txtHandle); txtHandle = &bNull; }
-   if(syntax_hl.name) free(syntax_hl.name);
-   if(syntax_hl.context)
-   {
-     for(i=0;i<syntax_hl.context_num;i++) { free(syntax_hl.context[i].start_seq); free(syntax_hl.context[i].end_seq); }
-     free(syntax_hl.context);
-   }
-   if(syntax_hl.keyword)
-   {
-     for(i=0;i<syntax_hl.keyword_num;i++) { free(syntax_hl.keyword[i].keyword); }
-     free(syntax_hl.keyword);
-   }
-   if(syntax_hl.operators) free(syntax_hl.operators);
-   PHFree(acontext);
-   acontext_num=0;
-   memset(&syntax_hl,0,sizeof(syntax_hl));
 }
 
 static unsigned __FASTCALL__ txtCharSize( void ) { return activeNLS->get_symbol_size(); }
