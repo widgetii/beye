@@ -129,7 +129,7 @@ static BGLOBAL __NEAR__ __FASTCALL__ ReopenSeek(__filesize_t dist)
 int __FASTCALL__ fmtShowList( GetNumItems gni,ReadItems ri,const char * title,int flags,unsigned * ordinal)
 {
  int ret;
- tBool bool;
+ tBool bval;
  BGLOBAL handle;
  unsigned nnames;
  memArray * obj;
@@ -139,9 +139,9 @@ int __FASTCALL__ fmtShowList( GetNumItems gni,ReadItems ri,const char * title,in
  nnames = gni ? (*gni)(handle) : (unsigned)-1;
  if(!(obj = ma_Build(nnames,True))) goto exit;
  w = PleaseWaitWnd();
- bool = (*ri)(handle,obj,nnames);
+ bval = (*ri)(handle,obj,nnames);
  CloseWnd(w);
- if(bool)
+ if(bval)
  {
    if(!obj->nItems) { NotifyBox(NOT_ENTRY,title); goto exit; }
    if(flags)

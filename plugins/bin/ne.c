@@ -369,7 +369,7 @@ static __filesize_t __FASTCALL__ ShowModRefNE( void )
 {
  BGLOBAL handle;
  int ret;
- tBool bool;
+ tBool bval;
  unsigned nnames;
  __filesize_t fret;
  memArray * obj;
@@ -380,9 +380,9 @@ static __filesize_t __FASTCALL__ ShowModRefNE( void )
  if(!(nnames = ne.neModuleReferenceTableCount)) { NotifyBox(NOT_ENTRY,MOD_REFER); return fret; }
  if(!(obj = ma_Build(nnames,True))) goto exit;
  w = PleaseWaitWnd();
- bool = __ReadModRefNamesNE(handle,obj);
+ bval = __ReadModRefNamesNE(handle,obj);
  CloseWnd(w);
- if(bool)
+ if(bval)
  {
    while(1)
    {
