@@ -67,7 +67,7 @@ static tBool ChSize( void )
        BMReRead();
        return ret;
     }
-    else ErrMessageBox("New length has invalid value",NULL);
+    else ErrMessageBox("Invalid new length",NULL);
   }
  }
  return False;
@@ -161,7 +161,7 @@ static tBool InsDelBlock( void )
     BGLOBAL bHandle;
     char *fname;
     fpos = BMGetCurrFilePos();
-    if(start > BMGetFLength()) { ErrMessageBox("Can not start outside the file",NULL); return 0; }
+    if(start > BMGetFLength()) { ErrMessageBox("Start is outside of file",NULL); return 0; }
     if(!psize) return 0;
     if(psize < 0) if(start+labs(psize) > BMGetFLength()) { ErrMessageBox("Use change size operation instead of block deletion",NULL); return 0; }
     fname = BMName();
@@ -280,7 +280,7 @@ static tBool FStore( void )
  DumpMode = True;
  ff_startpos = BMGetCurrFilePos();
  if(!ff_len) ff_len = BMGetFLength() - ff_startpos;
- if(GetFStoreDlg(" Store information to File ",ff_fname,&flags,&ff_startpos,&ff_len,FILE_PRMT))
+ if(GetFStoreDlg(" Store information to file ",ff_fname,&flags,&ff_startpos,&ff_len,FILE_PRMT))
  {
   endpos = ff_startpos + ff_len;
   endpos = endpos > BMGetFLength() ? BMGetFLength() : endpos;
@@ -463,7 +463,7 @@ static tBool FStore( void )
           if(obj_class == OC_NOOBJECT)
           {
             unsigned long diff;
-            fprintf(fout,"; L%08lXH-L%08lXH - is no object\n",obj_start,obj_end);
+            fprintf(fout,"; L%08lXH-L%08lXH - no object\n",obj_start,obj_end);
             dret.codelen = min(UCHAR_MAX,obj_end - ff_startpos);
             /** some functions can placed in virtual area of objects
                 mean at end of true data, but before next object */
@@ -622,7 +622,7 @@ static tBool FStore( void )
        }
        if(!dret.codelen)
        {
-         ErrMessageBox("Internal Fatal error"," Put structures ");
+         ErrMessageBox("Internal fatal error"," Put structures ");
          goto dis_exit;
        }
        ff_startpos += dret.codelen;
@@ -652,7 +652,7 @@ static tBool FStore( void )
    CloseWnd(progress_wnd);
    BMSeek(cpos,BM_SEEK_SET);
   }
-  else  ErrMessageBox("Start > end position!",NULL);
+  else  ErrMessageBox("Start position > end position!",NULL);
  }
  PFREE(tmp_buff);
  DumpMode = False;
@@ -665,7 +665,7 @@ static tBool FRestore( void )
  tBool ret;
  ret = False;
  flags = FSDLG_NOMODES;
- if(GetFStoreDlg(" Restore information from File ",ff_fname,&flags,&ff_startpos,&ff_len,FILE_PRMT))
+ if(GetFStoreDlg(" Restore information from file ",ff_fname,&flags,&ff_startpos,&ff_len,FILE_PRMT))
  {
    unsigned long flen,lval;
    int handle;
@@ -737,7 +737,7 @@ static tBool FRestore( void )
      BMSeek(cpos,BM_SEEK_SET);
      ret = True;
    }
-   else ErrMessageBox("Start > end position!",NULL);
+   else ErrMessageBox("Start position > end position!",NULL);
  }
  return ret;
 }
@@ -801,7 +801,7 @@ static tBool CryptBlock( void )
    lval = endpos - ff_startpos;
    endpos = lval > flen ? flen + ff_startpos : endpos;
    endpos = endpos > BMGetFLength() ? BMGetFLength() : endpos;
-   if(!pass[0]) { ErrMessageBox("Password can not be empty",NULL); return False; }
+   if(!pass[0]) { ErrMessageBox("Password can't be empty",NULL); return False; }
    if(endpos > ff_startpos)
    {
      unsigned long wsize,cwpos;
@@ -851,7 +851,7 @@ static tBool CryptBlock( void )
      BMSeek(cpos,BM_SEEK_SET);
      ret = True;
    }
-   else ErrMessageBox("Start > end position!",NULL);
+   else ErrMessageBox("Start position > end position!",NULL);
  }
  return ret;
 }
@@ -960,7 +960,7 @@ static tBool ReverseBlock( void )
      BMSeek(cpos,BM_SEEK_SET);
      ret = True;
    }
-   else ErrMessageBox("Start > end position!",NULL);
+   else ErrMessageBox("Start position > end position!",NULL);
  }
  return ret;
 }
@@ -1016,14 +1016,14 @@ static tBool XLatBlock( void )
      }
      if(bioFLength(xHandle) != 320)
      {
-       ErrMessageBox("Size of xlat file is not 320 byte", NULL);
+       ErrMessageBox("Size of xlat file is not 320 bytes", NULL);
        bioClose(xHandle);
        return False;
      }
      bioReadBuffer(xHandle,xlt, 16);
      if(memcmp(xlt, "Biew Xlat Table.", 16) != 0)
      {
-       ErrMessageBox("It seems that the xlat file is corrupted", NULL);
+       ErrMessageBox("It seems that xlat file is corrupt", NULL);
        bioClose(xHandle);
        return False;
      }
@@ -1069,7 +1069,7 @@ static tBool XLatBlock( void )
      BMSeek(cpos,BM_SEEK_SET);
      ret = True;
    }
-   else ErrMessageBox("Start > end position!",NULL);
+   else ErrMessageBox("Start position > end position!",NULL);
  }
  return ret;
 }
@@ -1158,7 +1158,7 @@ static tBool FileInfo( void )
            "Modification time             = %s"
            "Last access time              = %s"
            "Device containing file        = %u\n"
-           "File serial number            = %u\n"
+           "File serial (inode) number    = %u\n"
            "Number of hard links to file  = %u\n"
            "User ID of the file owner     = %u\n"
            "Group ID of the file owner    = %u"

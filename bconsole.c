@@ -787,11 +787,11 @@ static int __NEAR__ __FASTCALL__ __ListBox(const char ** names,unsigned nlist,un
                 goto restart;
               }
               break;
-     case KE_F(4): /** save contest to a disk */
+     case KE_F(4): /** save content to disk */
               {
                 char ofname[256];
                 ofname[0] = 0;
-                if(GetStringDlg(ofname," Save info to the file : "," [ENTER] - Proceed ",NAME_MSG))
+                if(GetStringDlg(ofname," Save info to file : "," [ENTER] - Proceed ",NAME_MSG))
                 {
                   FILE * out;
                   out = fopen(ofname,"wt");

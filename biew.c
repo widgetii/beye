@@ -52,7 +52,7 @@ static tBool UseIniFile=True;
 char biew_help_name[FILENAME_MAX+1] = "";
 char biew_skin_name[FILENAME_MAX+1] = "";
 extern char last_skin_error[];
-char biew_scheme_name[256] = "Build-in";
+char biew_scheme_name[256] = "Built-in";
 static char biew_ini_ver[32];
 unsigned long biew_vioIniFlags = 0L;
 unsigned long biew_twinIniFlags = 0L;
@@ -509,7 +509,7 @@ int main( int argc, char *argv[] )
  initBConsole(biew_vioIniFlags,biew_twinIniFlags);
  ErrorWnd = WindowOpen(1,1,50,16,TWS_NONE | TWS_NLSOEM);
  if(ErrorWnd) twSetTitleAttr(ErrorWnd," Error ",TW_TMODE_CENTER,error_cset.border);
- else { printm("fatal error: can not create window"); return EXIT_FAILURE; }
+ else { printm("fatal error: can't create window"); return EXIT_FAILURE; }
  twCentredWin(ErrorWnd,NULL);
  twSetColorAttr(error_cset.main);
  twSetFrameAttr(ErrorWnd,TW_DOUBLE_FRAME,error_cset.border);
@@ -528,7 +528,7 @@ int main( int argc, char *argv[] )
  if(skin_err)
  {
    char sout[256];
-   sprintf(sout,"Detected error in skin file: '%s'",last_skin_error);
+   sprintf(sout,"Error in skin file detected: '%s'",last_skin_error);
    ErrMessageBox(sout,NULL);
  }
  /* We must do it before opening a file because of some RTL has bug

@@ -87,7 +87,7 @@ static void __NEAR__ __FASTCALL__ setup_paint( TWindow *twin )
   twPrintF(" [%c] - Force 7-bit output    "
            ,GetBool((biew_vioIniFlags & __TVIO_FLG_USE_7BIT) == __TVIO_FLG_USE_7BIT));
   twGotoXY(32,6);
-  twPrintF(" [%c] - Apply plugins settings to all files    "
+  twPrintF(" [%c] - Apply plugin settings to all files     "
            ,GetBool(iniSettingsAnywhere));
   twGotoXY(32,7);
   if(!__mmfIsWorkable()) twSetColorAttr(dialog_cset.group.disabled);

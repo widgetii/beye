@@ -32,7 +32,7 @@ unsigned long __FASTCALL__ AppendAsmRef(char *str,unsigned long ulShift,int mode
   {
     if(detectedFormat != &binTable && !warn_displayed)
     {
-      WarnMessageBox("Sorry! References resolving for this format still not supported",NULL);
+      WarnMessageBox("Sorry! Reference resolving for this format is still not supported",NULL);
       warn_displayed = True;
     }
   }

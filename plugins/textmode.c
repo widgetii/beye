@@ -569,7 +569,7 @@ static tBool __FASTCALL__ txtSelectMode( void )
   unsigned nModes;
   int i;
   nModes = sizeof(mod_names)/sizeof(char *);
-  i = SelBoxA(mod_names,nModes," Select viewing page: ",bin_mode);
+  i = SelBoxA(mod_names,nModes," Select text mode: ",bin_mode);
   if(i != -1)
   {
     bin_mode = i;

@@ -144,7 +144,7 @@ static void DigConv( void )
  twSetColorAttr(dialog_cset.editor.active);
  twUseWin(wdlg);
  digit = 0;
- twGotoXY(3,2); twPutS("Convert digits between bases [16, 10, 8, 2]");
+ twGotoXY(3,2); twPutS("Convert numbers between bases [16, 10, 8, 2]");
  DCStaticPaint(wdlg,wbuff,digit);
  oactive = 1;
  active =

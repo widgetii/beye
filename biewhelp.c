@@ -277,7 +277,7 @@ tBool __FASTCALL__ hlpOpen( tBool interact )
   bHelp = biewOpenRO(help_name,BBIO_SMALL_CACHE_SIZE);
   if(bHelp == &bNull)
   {
-    if(interact) errnoMessageBox("Can not open help file",NULL,errno);
+    if(interact) errnoMessageBox("Can't open help file",NULL,errno);
     return False;
   }
   bioSetOptimization(bHelp,BIO_OPT_RANDOM);
@@ -287,7 +287,7 @@ tBool __FASTCALL__ hlpOpen( tBool interact )
   {
     if(interact)
     {
-      ErrMessageBox("Wrong version of help",NULL);
+      ErrMessageBox("Incorrect help version",NULL);
     }
     bioClose(bHelp);
     bHelp = &bNull;

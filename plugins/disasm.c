@@ -388,7 +388,7 @@ static tBool __FASTCALL__ disReferenceResolving( void )
   int retval;
   tBool ret;
   nModes = sizeof(refsdepth_names)/sizeof(char *);
-  retval = SelBoxA(refsdepth_names,nModes," References resolving depth: ",disNeedRef);
+  retval = SelBoxA(refsdepth_names,nModes," Reference resolving depth: ",disNeedRef);
   if(retval != -1)
   {
     disNeedRef = retval;
@@ -561,7 +561,7 @@ static int __NEAR__ __FASTCALL__ FullAsmEdit(TWindow * ewnd)
                        {
                          char code[81];
                          if(GetStringDlg(code,activeDisasm->name,
-                                         NULL,"Input assembler instruction:"))
+                                         NULL,"Enter assembler instruction:"))
                          {
                            aret = (*activeDisasm->asm_f)(code);
                            if(aret.err_code)
@@ -592,7 +592,7 @@ static int __NEAR__ __FASTCALL__ FullAsmEdit(TWindow * ewnd)
                            bioClose(bHandle);
                            BMReRead();
                          }
-                         else errnoMessageBox("Can not reopen",NULL,errno);
+                         else errnoMessageBox("Can't reopen",NULL,errno);
                       }
      case KE_F(10):
      case KE_ESCAPE: goto bye;
@@ -894,7 +894,7 @@ int __FASTCALL__ disAppendDigits(char *str,unsigned long ulShift,int flags,
      {
        strncpy(sout,str,sizeof(sout)-1);
        sout[sizeof(sout)-1] = 0;
-       ErrMessageBox(sout," Detected internal disassembler error ");
+       ErrMessageBox(sout," Internal disassembler error detected ");
        displayed = True;
      }
   }
@@ -1070,7 +1070,7 @@ int __FASTCALL__ disAppendFAddr(char * str,long ulShift,long distin,unsigned lon
      {
        strncpy(sout,str,sizeof(sout)-1);
        sout[sizeof(sout)-1] = 0;
-       ErrMessageBox(sout," Detected internal disassembler error ");
+       ErrMessageBox(sout," Internal disassembler error detected ");
        displayed = True;
      }
   }
@@ -1085,7 +1085,7 @@ int __FASTCALL__ disAppendFAddr(char * str,long ulShift,long distin,unsigned lon
       /*
          Forwarding references.
          Dereferencing ret instruction.
-         Idea and PE release of "Kostya Nosov" <k-nosov@yandex.ru>
+         Idea and PE implementation by "Kostya Nosov" <k-nosov@yandex.ru>
       */
        if(dret.pro_clone == __INSNT_JMPVVT) /* jmp (mod r/m) */
        {

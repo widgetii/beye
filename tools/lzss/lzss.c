@@ -63,7 +63,7 @@ int main(int argc, char *argv[])
 	if (toupper(*argv[1]) == 'E') retcode = Encode();
 	else                          retcode = Decode(infile,NULL,0L,
       	                                               bioFLength(infile));
-      	if(!retcode) fprintf(stderr,"Error allocation memory during operation\n");
+      	if(!retcode) fprintf(stderr,"Error allocating memory during operation\n");
 	bioClose(infile);
 	bioClose(outfile);
         __term_sys();

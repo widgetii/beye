@@ -114,22 +114,22 @@ void __FASTCALL__ FiAErrorCL(int nError) { FiAError(nError,FinCurrString[FiFileP
 
 static const char * list[] = {
  "No errors",
- "Can not open file (bad '#include' statement?).",
- "Too many opened files.",
+ "Can't open file (bad '#include' statement?).",
+ "Too many open files.",
  "Memory exhausted.",
- "Opened 'if' (missing '#endif').",
+ "Open 'if' (missing '#endif').",
  "Missing 'if' for 'endif' statement.",
  "Missing 'if' for 'else' statement.",
  "Unknown '#' directive.",
  "Syntax error in 'if' statement.",
- "Expected opened section or subsection or invalid string.",
+ "Expected open section or subsection, or invalid string.",
  "Bad character on line (possible lost comment).",
  "Bad variable in 'set' or 'delete' statement.",
  "Bad value of variable in 'set' statement.",
  "Unrecognized name of variable in 'delete' statement.",
- "Detected undefined variable (case sensivity?).",
+ "Undefined variable detected (case sensivity?).",
  "Missing 'if' for 'elif' statement.",
- "Opened variable on line (use even number of '%' characters).",
+ "Open variable on line (use even number of '%' characters).",
  "Lost or mismatch character '=' in assigned expression.",
  "",
  "User error."
@@ -689,8 +689,8 @@ char * __FASTCALL__ FiGetNextString(FiHandler h, char * str,unsigned int size,ch
       szTrimLeadingSpace(str);
       /* kill all spaces around punctuations */
       /*
-         Correct me: spaces will sqweezed even inside " " brackets.
-         But it languag depended.
+         Correct me: spaces will be sqweezed even inside " " brackets.
+         But it is language dependent.
          For .ini files it is not significant.
       */
       sret = str;
