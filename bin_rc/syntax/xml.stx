@@ -1,0 +1,15 @@
+;
+; XML syntax definition for biew project
+;
+#nosmart
+
+[General]
+Name=XML syntax
+WSet=
+
+[Context]
+  <Comments>
+    base=<!...>
+  <Constants>
+    base=<...>
+    alt=&...\x3B

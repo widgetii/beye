@@ -1,0 +1,32 @@
+;
+; Template for syntax definition of biew project
+;
+#nosmart
+[General]
+Name=Put name here
+; describes set of character which are used in words
+WSet=ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_0123456789
+
+[Context]
+; marks blocks which should be highlighted
+; allows any special characters through C-syntax like description
+; i.e.: \n - new line
+;       \t - tabulation
+;       \x \0x - hexadecimal value
+;       \0 - oct value
+;       \[1-9] - decimal value
+; Note: Block will be marked only if founded set is not keyword
+  <Comments>
+    base=#...\n
+
+[Keywords]
+; describes whole keywords. Will be highlighted if left and right characters
+; around the word are not contained in WSet.
+base=for
+base=in
+alt=do
+
+[Operators]
+; describes 1-byte operators
+base=$
+base=\x3B

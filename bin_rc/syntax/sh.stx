@@ -7,28 +7,30 @@ Name=Bash's syntax
 WSet=ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_.-0123456789
 
 [Context]
-LightGray=#...\n
-LightGreen="..."
-LightBlue='...'
-LightMagenta=`...`
-Green=EOF...EOF
+  <Comments>
+    base=#...\n
+  <Constants>
+    base="..."
+    extended='...'
+    alt=`...`
+    reserved=EOF...EOF
 
 [Keywords]
-Yellow=for
-Yellow=in
-Yellow=do
-Yellow=done
-Yellow=select
-Yellow=case
-Yellow=esac
-Yellow=if
-Yellow=then
-Yellow=elif
-Yellow=else
-Yellow=fi
-Yellow=while
-Yellow=until
+base=for
+base=in
+base=do
+base=done
+base=select
+base=case
+base=esac
+base=if
+base=then
+base=elif
+base=else
+base=fi
+base=while
+base=until
 
 [Operators]
-White=$
+base=$
 

@@ -1,5 +1,5 @@
 ;
-; C syntax definition for biew project
+; Makefile syntax definition for biew project
 ;
 #nosmart
 [General]
@@ -7,47 +7,50 @@ Name=Makefile's syntax
 WSet=ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_0123456789
 
 [Context]
-LightGray=#...\n
-LightGreen="..."
-LightBlue='...'
-LightMagenta=@...\n
-LightRed=include...\n
+  <Comments>
+    base=#...\n
+  <Constants>
+    base="..."
+    extended='...'
+    alt=@...\n
+  <Preproc>
+    base=include...\n
 
 [Keywords]
-Yellow=endif
-Yellow=else
-Yellow=ifdef
-Yellow=ifndef
-Yellow=if
-Yellow=ifeq
-Yellow=ifneq
-LightGreen=$@
-LightGreen=$*
-LightGreen=$<
-White=.PHONY
-White=.NOEXPORT
+base=endif
+base=else
+base=ifdef
+base=ifndef
+base=if
+base=ifeq
+base=ifneq
+extended=$@
+extended=$*
+extended=$<
+alt=.PHONY
+alt=.NOEXPORT
 
 [Operators]
-White=+
-White=-
-White=*
-White=/
-White=%
-White=>
-White=<
-White=)
-White=(
-White={
-White=}
-White=:
-White==
-White=;
-White=^
-White=|
-White=&
-White=!
-White=,
-White=.
-White=?
-White=$
+base=+
+base=-
+base=*
+base=/
+base=%
+base=>
+base=<
+base=)
+base=(
+base={
+base=}
+base=:
+base==
+base=;
+base=^
+base=|
+base=&
+base=!
+base=,
+base=.
+base=?
+base=$
 

@@ -6,7 +6,8 @@
 ; Offset = bytes-->syntax handler
 0=<HTML-->html.stx
 0=<html-->html.stx
-<Soft>
+0=<?xml-->xml.stx
+<Soft> ; Ignore whitespaces
 0=#!/bin/sh-->sh.stx
 0=#!/bin/bash-->sh.stx
 
@@ -18,6 +19,7 @@ c=c.stx
 h=c.stx
 cpp=c.htx
 hpp=c.htx
+xml=xml.stx
 
 [Names]
 makefile=makefile.stx
