@@ -47,7 +47,7 @@
     can we use SIGIO?
 */
 
-#if defined (_VT100_) && !defined(__BEOS__)
+#if defined (_VT100_) && !defined(__DISABLE_SIGIO)
 #define __ENABLE_SIGIO
 #endif
 

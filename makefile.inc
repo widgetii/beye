@@ -14,7 +14,7 @@
 # given in the file "Licence.en" ("Licence.ru" in russian translation)       #
 # distributed in the BIEW archive.                                           #
 ##############################################################################
-
+# $Id$
 ##############################################################################
 # ATTENTION!!! I use manual method configuring of BIEW project rather than   #
 # 'configure' script technology, because 'configure' script does not work    #
@@ -75,7 +75,11 @@ endif
 ifeq ($(TARGET_OS),beos)
  HOST=beos
  CDEFOS=-D__BEOS__ -D__UNIX__ -D__OS_NAME__='"BeOS"' -D__OS__="beos" -Ubeos
- CDEFOS+=-D_VT100_ -DHAVE_TERMINAL_OUT=1 -DDATADIR='"/boot/home/config/lib"' -D__DISABLE_MMF -D__DISABLE_ASM
+ CDEFOS+=-D_VT100_ -DHAVE_TERMINAL_OUT=1 -DDATADIR='"/boot/home/config/lib"'
+ CDEFOS+=-D__DISABLE_MMF -D__DISABLE_ASM -D__DISABLE_SIGIO
+ ifdef PREFIX
+  CDEFOS+=-DPREFIX='"$(PREFIX)"'
+ endif
  OSLDEF=
  OS_LIBS=
 endif
