@@ -558,7 +558,7 @@ static unsigned long __FASTCALL__ ShowELFHeader( void )
            "ABI version                       = %02XH (%d)\n"
            "Object file type                  = %04XH (%s)\n"
            "Machine architecture              = %04XH (%s)\n"
-           "Object file version               = %08XH (%s)\n"
+           "Object file version               = %08lXH (%s)\n"
 	    ,ELF_EHDR(elf,e_ident[EI_MAG0]),	ELF_EHDR(elf, e_ident[EI_MAG1])
 	    ,ELF_EHDR(elf,e_ident[EI_MAG2]),	ELF_EHDR(elf,e_ident[EI_MAG3])
 	    ,ELF_EHDR(elf,e_ident[EI_MAG0]),	ELF_EHDR(elf,e_ident[EI_MAG1])
@@ -1038,8 +1038,7 @@ static unsigned long get_f_offset(unsigned long r_offset,tUInt32 sh_link)
                   ElfXX_External_Shdr shdr;
                   unsigned long fp;
                   fp = bioTell(handle);
-                  bioSeek(handle,ELF_WORD(ELF_EHDR(elf,e_shoff)),SEEKF_START);
-		  bioSeek(handle,sh_link*ELF_SHDR_SIZE(),SEEKF_CUR);
+                  bioSeek(handle,ELF_WORD(ELF_EHDR(elf,e_shoff))+sh_link*ELF_SHDR_SIZE(),SEEKF_START);
                   bioReadBuffer(handle,&shdr,sizeof(shdr));
 		  bioSeek(handle,fp,SEEKF_START);
 		  f_offset = ELF_WORD(ELF_SHDR(shdr,sh_offset)) + r_offset;
@@ -1059,7 +1058,7 @@ static void __NEAR__ __FASTCALL__ __elfReadRelSection(tUInt32 offset,
   BGLOBAL handle = elfcache,handle2 = namecache;
   size_t i,nitems;
   ElfXX_External_Rel relent;
-  unsigned long fp, sfp;
+  unsigned long fp, sfp, lfp;
   if(!entsize) return;
   fp = bioTell(handle);
   bioSeek(handle,offset,SEEKF_START);
@@ -1068,7 +1067,9 @@ static void __NEAR__ __FASTCALL__ __elfReadRelSection(tUInt32 offset,
   for(i = 0;i < nitems;i++)
   {
     Elf_Reloc erc;
+    lfp=bioTell(handle);
     bioReadBuffer(handle,&relent,sizeof(relent));
+    bioSeek(handle,lfp+ELF_REL_SIZE(),SEEKF_START);
     if(entsize > ELF_REL_SIZE()) bioSeek(handle,entsize-ELF_REL_SIZE(),SEEKF_CUR);
     erc.offset = get_f_offset(ELF_WORD(ELF_REL(relent,r_offset)),info);
     erc.info = ELF_WORD(ELF_REL(relent,r_info));
@@ -1105,7 +1106,7 @@ static void __NEAR__ __FASTCALL__ __elfReadRelaSection(tUInt32 offset,
   BGLOBAL handle = elfcache;
   size_t i,nitems;
   ElfXX_External_Rela relent;
-  unsigned long fp;
+  unsigned long fp, lfp;
   if(!entsize) return;
   fp = bioTell(handle);
   bioSeek(handle,offset,SEEKF_START);
@@ -1113,7 +1114,9 @@ static void __NEAR__ __FASTCALL__ __elfReadRelaSection(tUInt32 offset,
   for(i = 0;i < nitems;i++)
   {
     Elf_Reloc erc;
+    lfp=bioTell(handle);
     bioReadBuffer(handle,&relent,sizeof(relent));
+    bioSeek(handle,lfp+ELF_RELA_SIZE(), SEEKF_START);
     if(entsize > ELF_RELA_SIZE()) bioSeek(handle,entsize-ELF_RELA_SIZE(),SEEKF_CUR);
     erc.offset = get_f_offset(ELF_WORD(ELF_RELA(relent,r_offset)),info);
     erc.info = ELF_WORD(ELF_RELA(relent,r_info));
@@ -1145,8 +1148,11 @@ static void __NEAR__ __FASTCALL__ buildElf386RelChain( void )
     for(i = 0;i < _nitems;i++)
     {
       ElfXX_External_Shdr shdr;
+      unsigned long fp;
       if(IsKbdTerminate() || bioEOF(handle)) break;
+      fp=bioTell(handle);
       bioReadBuffer(handle,&shdr,sizeof(shdr));
+      bioSeek(handle,fp+ELF_SHDR_SIZE(),SEEKF_START);
       switch(ELF_WORD(ELF_SHDR(shdr,sh_type)))
       {
         case SHT_REL: __elfReadRelSection(ELF_WORD(ELF_SHDR(shdr,sh_offset)),
@@ -1471,7 +1477,7 @@ static unsigned long __FASTCALL__ AppendELFRef(char *str,unsigned long ulShift,i
   {
     ret = BuildReferStrElf(str,erl,flags);
   }
-  if(!ret)
+  if(!ret && ELF_HALF(ELF_EHDR(elf,e_type))>ET_REL && codelen>=4)
   {
     if((erl = __found_ElfRel(elfVA2PA(bmReadDWordEx(ulShift,SEEKF_START)))) != NULL)
     {
