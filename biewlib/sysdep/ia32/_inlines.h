@@ -157,205 +157,34 @@ __inline static void __FASTCALL__ __XchgB__(tUInt8 *_val1, tUInt8 *_val2)
 }
 #define __XchgB__ __XchgB__
 
-#ifdef HAVE_MMX
-#define REGMM_SIZE 8 /* In the future it can be safety replaced with 16 for SSE2 */
-
-                /** Resets mmx unit.
-                  * @return         none
-                 **/
-__inline static void __FASTCALL__ mmxEmpty( void )
-{
-  __asm("emms":::"memory");
-}
-#define __MMX_EMPTY mmxEmpty
-                                                       
-                /** Performs interleaving of two buffers into destinition one.
-                  * @return         none
-                  * @param limit    specified size of evenbuffer and oddbuffer
-                  * @param destbuffer specified pointer to the destinition buffer
-                                    where result will be placed.
-                  * @param evenbuffer specified source buffer with even bytes.
-                  * @param offbuffer specified source buffer with odd bytes.
-                  * @note           This code assumed that evenbuffer and
-                                    oddbuffer have same alignment, but
-                                    destbuffer has proportional alignment.
-                 **/
-__inline static void __FASTCALL__ mmxInterleaveBuffers(tUInt32 limit,
+extern void __FASTCALL__ (*InterleaveBuffers_ptr)(tUInt32 limit,
                                     void *destbuffer,
                                     const void *evenbuffer, 
-                                    const void *oddbuffer)
-{
-  register char *destbuffptr;
-  register const char *oddptr, *evenptr;
-  register tUInt32 freq;
-  destbuffptr = (char *)destbuffer;
-  evenptr = (const char *)evenbuffer;
-  oddptr = (const char *)oddbuffer;
-  freq = 0;
-  if(limit>REGMM_SIZE*4-1)
-  {
-      register tUInt32 delta, nlimit;
-      /* Try to align buffers on boundary of REGMM_SIZE */
-      delta = ((tUInt32)evenptr)&(REGMM_SIZE-1);
-      if(delta) delta=REGMM_SIZE-delta;
-      nlimit=(limit-delta)/REGMM_SIZE;
-      freq+=delta+(nlimit*REGMM_SIZE);
-      while(delta)
-      {
-        *destbuffptr++ = *evenptr++;
-        *destbuffptr++ = *oddptr++;
-        delta--;
-      }
-      /* Perform MMX optimized interleaving */
-      while(nlimit)
-      {
-         /* Interleave mmx and cpu instructions */
-         __asm("movq	%0,%%mm0"::"m"(*evenptr):"memory");
-         evenptr+=REGMM_SIZE;
-         __asm("movq	%%mm0, %%mm1\n"
-              "	punpckhbw %0, %%mm0\n"::
-              "m"(*oddptr):"memory");
-         nlimit--;
-         __asm("punpcklbw %0, %%mm1"::"m"(*oddptr):"memory");
-         oddptr+=REGMM_SIZE;
-         __asm("movq	%%mm0, %1\n"
-              "	movq	%%mm1, %0":
-              "=m"(*destbuffptr),"=m"(destbuffptr[REGMM_SIZE])::"memory");
-         destbuffptr+=REGMM_SIZE*2;
-      }
-      __MMX_EMPTY();
-  }
-  /* If tail exists then finish it */
-  while(freq<limit)
-  {
-    *destbuffptr++ = *evenptr++;
-    *destbuffptr++ = *oddptr++;
-    freq++;
-  }
-}
-#define __INTERLEAVE_BUFFERS mmxInterleaveBuffers
+                                    const void *oddbuffer);
+#ifdef InterleaveBuffers
+#undef InterleaveBuffers
+#endif
+#define InterleaveBuffers(a,b,c,d) (*InterleaveBuffers_ptr)(a,b,c,d)
+#define __INTERLEAVE_BUFFERS InterleaveBuffers
 
-                /** Performs conversation string of characters to zero extended
-                    string of short values.
-                  * @return         none
-                  * @param limit    specified size of evenbuffer and oddbuffer
-                  * @param destbuffer specified pointer to the destinition buffer
-                                    where result will be placed.
-                  * @param evenbuffer specified source buffer with even bytes.
-                  * @note           This code assumed that destbuffer has
-		                    proportional alignment to evenbuffer.
-                 **/
-__inline static void __FASTCALL__ mmxCharsToShorts(tUInt32 limit,
+
+extern void __FASTCALL__ (*CharsToShorts_ptr)(tUInt32 limit,
                                              void *destbuffer,
-                                             const void *evenbuffer)
-{
-  register char *destbuffptr;
-  register const char *evenptr;
-  register tUInt32 freq;
-  destbuffptr = (char *)destbuffer;
-  evenptr = (const char *)evenbuffer;
-  freq = 0;
-  if(limit>REGMM_SIZE*4-1)
-  {
-      register tUInt32 delta, nlimit;
-      /* Try to align buffer on boundary of REGMM_SIZE */
-      delta = ((tUInt32)evenptr)&(REGMM_SIZE-1);
-      if(delta) delta=REGMM_SIZE-delta;
-      nlimit=(limit-delta)/REGMM_SIZE;
-      freq+=delta+(nlimit*REGMM_SIZE);
-      while(delta)
-      {
-        *destbuffptr++ = *evenptr++;
-        *destbuffptr++ = 0;
-        delta--;
-      }
-      /* Perform MMX optimized loop */
-      __asm("pxor	%%mm2, %%mm2":::"memory");
-      while(nlimit)
-      {
-         /* Interleave mmx and cpu instructions */
-         __asm("movq	%0,%%mm0"::"m"(*evenptr):"memory");
-         evenptr+=REGMM_SIZE;
-         __asm("movq	%%mm0, %%mm1\n"
-              "	punpckhbw %%mm2, %%mm0\n":::"memory");
-         nlimit--;
-         __asm("punpcklbw %%mm2, %%mm1":::"memory");
-         __asm("movq	%%mm0, %1\n"
-              "	movq	%%mm1, %0":
-              "=m"(*destbuffptr),"=m"(destbuffptr[REGMM_SIZE])::"memory");
-         destbuffptr+=REGMM_SIZE*2;
-      }
-      __MMX_EMPTY();
-  }
-  /* If tail exists then finish it */
-  while(freq<limit)
-  {
-    *destbuffptr++ = *evenptr++;
-    *destbuffptr++ = 0;
-    freq++;
-  }
-}
-#define __CHARS_TO_SHORTS mmxCharsToShorts
+                                             const void *evenbuffer);
+#ifdef CharsToShorts
+#undef CharsToShorts
+#endif
+#define CharsToShorts(a,b,c) (*CharsToShorts_ptr)(a,b,c)
+#define __CHARS_TO_SHORTS CharsToShorts
 
-                /** Performs conversation string of zero extended short values
-                    to string of characters.
-                  * @return         none
-                  * @param limit    specified size of evenbuffer and oddbuffer
-                  * @param destbuffer specified pointer to the destinition buffer
-                                    where result will be placed.
-                  * @param srcbuffer specified source buffer to be converted.
-                  * @note           This code assumed that destbuffer has
-                                    proportional alignment to srcbuffer.
-                  * @warning        This code is danger but we assume that
-                                    'srcbuffer' is consist from interleaving
-                                    zeroes and digits. Example: '02030A0B0C'
-                 **/
-__inline static void __FASTCALL__ mmxShortsToChars(tUInt32 limit,
-                                     void * destbuffer, const void * srcbuffer)
-{
-  register char *destbuffptr;
-  register const char *srcptr;
-  register tUInt32 freq;
-  destbuffptr = (char *)destbuffer;
-  srcptr = (const char *)srcbuffer;
-  freq = 0;
-  if(limit>REGMM_SIZE*4-1)
-  {
-      tUInt32 delta, nlimit;
-      /* Try to align buffers on boundary of REGMM_SIZE */
-      delta=((tUInt32)destbuffptr)&(REGMM_SIZE-1);
-      if(delta) delta=REGMM_SIZE-delta;
-      nlimit=(limit-delta)/REGMM_SIZE;
-      freq+=delta+(nlimit*REGMM_SIZE);
-      while(delta)
-      {
-        *destbuffptr++ = *srcptr;
-        srcptr+=2;
-        delta--;
-      }
-      /* Perform MMX optimized loop */
-      while(nlimit)
-      {
-         /* Interleave mmx and cpu instructions */
-         __asm("movq	%0, %%mm0"::"m"(*srcptr):"memory");
-         nlimit--;
-         __asm("packuswb %0, %%mm0\n"::"m"(srcptr[REGMM_SIZE]):"memory");
-         srcptr+=REGMM_SIZE*2;
-         __asm("movq	%%mm0, %0":"=m"(*destbuffptr)::"memory");
-         destbuffptr+=REGMM_SIZE;
-      }
-      __MMX_EMPTY();
-  }
-  /* If tail exists then finish it */
-  while(freq<limit)
-  {
-    *destbuffptr++ = *srcptr;
-    srcptr+=2;
-    freq++;
-  }
-}
-#define __SHORTS_TO_CHARS mmxShortsToChars
-#endif /* enable mmx */
+extern void __FASTCALL__ (*ShortsToChars_ptr)(tUInt32 limit,
+                                     void * destbuffer, const void * srcbuffer);
+
+#ifdef ShortsToChars
+#undef ShortsToChars
+#endif
+#define ShortsToChars(a,b,c) (*ShortsToChars_ptr)(a,b,c)
+#define __SHORTS_TO_CHARS ShortsToChars
 
 #endif
 #endif

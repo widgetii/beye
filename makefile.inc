@@ -143,26 +143,26 @@ endif
 ifeq ($(TARGET_PLATFORM),i386)
  MACHINE=ia32
  CDEFSYS=-D__MACHINE__=ia32 -D__CPU_NAME__='"i386"' -D__CPU__=386\
-         -D__DEFAULT_DISASM=0 -fno-builtin
+         -D__DEFAULT_DISASM=0 -fno-builtin -DCAN_COMPILE_X86_GAS=1
 endif
 # Note: -m386 and -m486 is depricated in gcc-3.2.1 and will be removed in 
 # gcc-3.3 so let it generates clone independed code here! ;)
 ifeq ($(TARGET_PLATFORM),i486)
  MACHINE=ia32
  CDEFSYS=-D__MACHINE__=ia32  -D__CPU_NAME__='"i486"' -D__CPU__=486\
-         -D__DEFAULT_DISASM=0
+         -D__DEFAULT_DISASM=0 -DCAN_COMPILE_X86_GAS=1
 endif
 ifeq ($(TARGET_PLATFORM),i586)
  MACHINE=ia32
  CDEFSYS=-D__MACHINE__=ia32  -D__CPU_NAME__='"i586"' -D__CPU__=586\
-         -D__DEFAULT_DISASM=0
+         -D__DEFAULT_DISASM=0 -DCAN_COMPILE_X86_GAS=1
 CDEFSYS += $(shell $(CONFIG_SHELL) 'if $(CC) -march=pentium -S -o $(NUL) -xc $(NUL) >$(NUL) 2>&1; then echo "-march=pentium"; else echo "-m486"; fi')
 CDEFSYS += $(shell $(CONFIG_SHELL) 'if $(CC) -fschedule-insns2 -S -o $(NUL) -xc $(NUL) >$(NUL) 2>&1; then echo "-fschedule-insns2"; fi')
 endif
 ifeq ($(TARGET_PLATFORM),i586mmx)
  MACHINE=ia32
  CDEFSYS=-D__MACHINE__=ia32  -D__CPU_NAME__='"i586mmx"' -D__CPU__=586\
-         -D__DEFAULT_DISASM=0 -DHAVE_MMX=1
+         -D__DEFAULT_DISASM=0 -DHAVE_MMX=1 -DCAN_COMPILE_X86_GAS=1
 CDEFSYS += $(shell $(CONFIG_SHELL) 'if $(CC) -march=pentium -S -o $(NUL) -xc $(NUL) >$(NUL) 2>&1; then echo "-march=pentium"; else echo "-m486"; fi')
 CDEFSYS += $(shell $(CONFIG_SHELL) 'if $(CC) -fschedule-insns2 -S -o $(NUL) -xc $(NUL) >$(NUL) 2>&1; then echo "-fschedule-insns2"; fi')
 CDEFSYS += $(shell $(CONFIG_SHELL) 'if $(CC) -mmmx -S -o $(NUL) -xc $(NUL) >$(NUL) 2>&1; then echo "-mmmx"; fi')
@@ -170,14 +170,14 @@ endif
 ifeq ($(TARGET_PLATFORM),i686)
  MACHINE=ia32
  CDEFSYS=-D__MACHINE__=ia32  -D__CPU_NAME__='"i686"' -D__CPU__=686\
-         -D__DEFAULT_DISASM=0
+         -D__DEFAULT_DISASM=0 -DCAN_COMPILE_X86_GAS=1
 CDEFSYS += $(shell $(CONFIG_SHELL) 'if $(CC) -march=pentiumpro -S -o $(NUL) -xc $(NUL) >$(NUL) 2>&1; then echo "-march=pentiumpro"; else echo "-m486"; fi')
 CDEFSYS += $(shell $(CONFIG_SHELL) 'if $(CC) -fschedule-insns2 -S -o $(NUL) -xc $(NUL) >$(NUL) 2>&1; then echo "-fschedule-insns2"; fi')
 endif
 ifeq ($(TARGET_PLATFORM),i686mmx)
  MACHINE=ia32
  CDEFSYS=-D__MACHINE__=ia32  -D__CPU_NAME__='"i686mmx"' -D__CPU__=686\
-         -D__DEFAULT_DISASM=0 -DHAVE_MMX=1
+         -D__DEFAULT_DISASM=0 -DHAVE_MMX=1 -DCAN_COMPILE_X86_GAS=1
 CDEFSYS += $(shell $(CONFIG_SHELL) 'if $(CC) -march=pentiumpro -S -o $(NUL) -xc $(NUL) >$(NUL) 2>&1; then echo "-march=pentiumpro"; else echo "-m486"; fi')
 CDEFSYS += $(shell $(CONFIG_SHELL) 'if $(CC) -fschedule-insns2 -S -o $(NUL) -xc $(NUL) >$(NUL) 2>&1; then echo "-fschedule-insns2"; fi')
 CDEFSYS += $(shell $(CONFIG_SHELL) 'if $(CC) -mmmx -S -o $(NUL) -xc $(NUL) >$(NUL) 2>&1; then echo "-mmmx"; fi')
@@ -185,14 +185,14 @@ endif
 ifeq ($(TARGET_PLATFORM),p3)
  MACHINE=ia32
  CDEFSYS=-D__MACHINE__=ia32  -D__CPU_NAME__='"p3"' -D__CPU__=686\
-         -D__DEFAULT_DISASM=0 -DHAVE_MMX=1 -DHAVE_MMX2=1 -DHAVE_SSE=1
+         -D__DEFAULT_DISASM=0 -DHAVE_MMX=1 -DHAVE_MMX2=1 -DHAVE_SSE=1 -DCAN_COMPILE_X86_GAS=1
 CDEFSYS += $(shell $(CONFIG_SHELL) 'if $(CC) -march=pentiumpro -S -o $(NUL) -xc $(NUL) >$(NUL) 2>&1; then echo "-march=pentiumpro"; else echo "-m486"; fi')
 CDEFSYS += $(shell $(CONFIG_SHELL) 'if $(CC) -fschedule-insns2 -S -o $(NUL) -xc $(NUL) >$(NUL) 2>&1; then echo "-fschedule-insns2"; fi')
 endif
 ifeq ($(TARGET_PLATFORM),p3mmx)
  MACHINE=ia32
  CDEFSYS=-D__MACHINE__=ia32  -D__CPU_NAME__='"p3mmx"' -D__CPU__=686\
-         -D__DEFAULT_DISASM=0 -DHAVE_MMX=1 -DHAVE_MMX2=1 -DHAVE_SSE=1
+         -D__DEFAULT_DISASM=0 -DHAVE_MMX=1 -DHAVE_MMX2=1 -DHAVE_SSE=1 -DCAN_COMPILE_X86_GAS=1
 CDEFSYS += $(shell $(CONFIG_SHELL) 'if $(CC) -march=pentiumpro -S -o $(NUL) -xc $(NUL) >$(NUL) 2>&1; then echo "-march=pentiumpro"; else echo "-m486"; fi')
 CDEFSYS += $(shell $(CONFIG_SHELL) 'if $(CC) -fschedule-insns2 -S -o $(NUL) -xc $(NUL) >$(NUL) 2>&1; then echo "-fschedule-insns2"; fi')
 CDEFSYS += $(shell $(CONFIG_SHELL) 'if $(CC) -mmmx -S -o $(NUL) -xc $(NUL) >$(NUL) 2>&1; then echo "-mmmx"; fi')
@@ -201,7 +201,7 @@ ifeq ($(TARGET_PLATFORM),p4)
  MACHINE=ia32
  CDEFSYS=-D__MACHINE__=ia32  -D__CPU_NAME__='"p4"' -D__CPU__=686\
          -D__DEFAULT_DISASM=0 -DHAVE_MMX=1 -DHAVE_MMX2=1 -DHAVE_SSE=1\
-         -DHAVE_SSE2=1
+         -DHAVE_SSE2=1 -DCAN_COMPILE_X86_GAS=1
 CDEFSYS += $(shell $(CONFIG_SHELL) 'if $(CC) -march=pentiumpro -S -o $(NUL) -xc $(NUL) >$(NUL) 2>&1; then echo "-march=pentiumpro"; else echo "-m486"; fi')
 CDEFSYS += $(shell $(CONFIG_SHELL) 'if $(CC) -fschedule-insns2 -S -o $(NUL) -xc $(NUL) >$(NUL) 2>&1; then echo "-fschedule-insns2"; fi')
 endif
@@ -209,7 +209,7 @@ ifeq ($(TARGET_PLATFORM),p4mmx)
  MACHINE=ia32
  CDEFSYS=-D__MACHINE__=ia32  -D__CPU_NAME__='"p4mmx"' -D__CPU__=686\
          -D__DEFAULT_DISASM=0 -DHAVE_MMX=1 -DHAVE_MMX2=1 -DHAVE_SSE=1\
-         -DHAVE_SSE2=1
+         -DHAVE_SSE2=1 -DCAN_COMPILE_X86_GAS=1
 CDEFSYS += $(shell $(CONFIG_SHELL) 'if $(CC) -march=pentiumpro -S -o $(NUL) -xc $(NUL) >$(NUL) 2>&1; then echo "-march=pentiumpro"; else echo "-m486"; fi')
 CDEFSYS += $(shell $(CONFIG_SHELL) 'if $(CC) -fschedule-insns2 -S -o $(NUL) -xc $(NUL) >$(NUL) 2>&1; then echo "-fschedule-insns2"; fi')
 CDEFSYS += $(shell $(CONFIG_SHELL) 'if $(CC) -mmmx -S -o $(NUL) -xc $(NUL) >$(NUL) 2>&1; then echo "-mmmx"; fi')
@@ -217,21 +217,21 @@ endif
 ifeq ($(TARGET_PLATFORM),k5)
  MACHINE=ia32
  CDEFSYS=-D__MACHINE__=ia32  -D__CPU_NAME__='"amdk5"' -D__CPU__=586\
-         -D__DEFAULT_DISASM=0
+         -D__DEFAULT_DISASM=0 -DCAN_COMPILE_X86_GAS=1
 CDEFSYS += $(shell $(CONFIG_SHELL) 'if $(CC) -march=k5 -S -o $(NUL) -xc $(NUL) >$(NUL) 2>&1; then echo "-march=k5"; else if $(CC) -march=pentium -S -o $(NUL) -xc $(NUL) >$(NUL) 2>&1; then echo "-march=pentium"; else echo "-m486"; fi fi')
 CDEFSYS += $(shell $(CONFIG_SHELL) 'if $(CC) -fschedule-insns2 -S -o $(NUL) -xc $(NUL) >$(NUL) 2>&1; then echo "-fschedule-insns2"; fi')
 endif
 ifeq ($(TARGET_PLATFORM),k6)
  MACHINE=ia32
  CDEFSYS=-D__MACHINE__=ia32  -D__CPU_NAME__='"amdk6"' -D__CPU__=586\
-         -D__DEFAULT_DISASM=0 -DHAVE_MMX=1
+         -D__DEFAULT_DISASM=0 -DHAVE_MMX=1 -DCAN_COMPILE_X86_GAS=1
 CDEFSYS += $(shell $(CONFIG_SHELL) 'if $(CC) -march=k6 -S -o $(NUL) -xc $(NUL) >$(NUL) 2>&1; then echo "-march=k6"; else if $(CC) -march=pentium -S -o $(NUL) -xc $(NUL) >$(NUL) 2>&1; then echo "-march=pentium"; else echo "-m486"; fi fi')
 CDEFSYS += $(shell $(CONFIG_SHELL) 'if $(CC) -fschedule-insns2 -S -o $(NUL) -xc $(NUL) >$(NUL) 2>&1; then echo "-fschedule-insns2"; fi')
 endif
 ifeq ($(TARGET_PLATFORM),k6mmx)
  MACHINE=ia32
  CDEFSYS=-D__MACHINE__=ia32  -D__CPU_NAME__='"k6mmx"' -D__CPU__=586\
-         -D__DEFAULT_DISASM=0 -DHAVE_MMX=1
+         -D__DEFAULT_DISASM=0 -DHAVE_MMX=1 -DCAN_COMPILE_X86_GAS=1
 CDEFSYS += $(shell $(CONFIG_SHELL) 'if $(CC) -march=k6 -S -o $(NUL) -xc $(NUL) >$(NUL) 2>&1; then echo "-march=k6"; else if $(CC) -march=pentium -S -o $(NUL) -xc $(NUL) >$(NUL) 2>&1; then echo "-march=pentium"; else echo "-m486"; fi fi')
 CDEFSYS += $(shell $(CONFIG_SHELL) 'if $(CC) -fschedule-insns2 -S -o $(NUL) -xc $(NUL) >$(NUL) 2>&1; then echo "-fschedule-insns2"; fi')
 CDEFSYS += $(shell $(CONFIG_SHELL) 'if $(CC) -mmmx -S -o $(NUL) -xc $(NUL) >$(NUL) 2>&1; then echo "-mmmx"; fi')
@@ -239,14 +239,14 @@ endif
 ifeq ($(TARGET_PLATFORM),k6_2)
  MACHINE=ia32
  CDEFSYS=-D__MACHINE__=ia32  -D__CPU_NAME__='"amdk6-2"' -D__CPU__=586\
-         -D__DEFAULT_DISASM=0 -DHAVE_MMX=1 -DHAVE_3DNOW=1
+         -D__DEFAULT_DISASM=0 -DHAVE_MMX=1 -DHAVE_3DNOW=1 -DCAN_COMPILE_X86_GAS=1
 CDEFSYS += $(shell $(CONFIG_SHELL) 'if $(CC) -march=k6 -S -o $(NUL) -xc $(NUL) >$(NUL) 2>&1; then echo "-march=k6"; else if $(CC) -march=pentium -S -o $(NUL) -xc $(NUL) >$(NUL) 2>&1; then echo "-march=pentium"; else echo "-m486"; fi fi')
 CDEFSYS += $(shell $(CONFIG_SHELL) 'if $(CC) -fschedule-insns2 -S -o $(NUL) -xc $(NUL) >$(NUL) 2>&1; then echo "-fschedule-insns2"; fi')
 endif
 ifeq ($(TARGET_PLATFORM),k6_2mmx)
  MACHINE=ia32
  CDEFSYS=-D__MACHINE__=ia32  -D__CPU_NAME__='"k6-2mmx"' -D__CPU__=586\
-         -D__DEFAULT_DISASM=0 -DHAVE_MMX=1 -DHAVE_3DNOW=1
+         -D__DEFAULT_DISASM=0 -DHAVE_MMX=1 -DHAVE_3DNOW=1 -DCAN_COMPILE_X86_GAS=1
 CDEFSYS += $(shell $(CONFIG_SHELL) 'if $(CC) -march=k6 -S -o $(NUL) -xc $(NUL) >$(NUL) 2>&1; then echo "-march=k6"; else if $(CC) -march=pentium -S -o $(NUL) -xc $(NUL) >$(NUL) 2>&1; then echo "-march=pentium"; else echo "-m486"; fi fi')
 CDEFSYS += $(shell $(CONFIG_SHELL) 'if $(CC) -fschedule-insns2 -S -o $(NUL) -xc $(NUL) >$(NUL) 2>&1; then echo "-fschedule-insns2"; fi')
 CDEFSYS += $(shell $(CONFIG_SHELL) 'if $(CC) -mmmx -S -o $(NUL) -xc $(NUL) >$(NUL) 2>&1; then echo "-mmmx"; fi')
@@ -255,7 +255,7 @@ ifeq ($(TARGET_PLATFORM),athlon)
  MACHINE=ia32
  CDEFSYS=-D__MACHINE__=ia32  -D__CPU_NAME__='"athlon"' -D__CPU__=686\
          -D__DEFAULT_DISASM=0 -DHAVE_MMX=1 -DHAVE_3DNOW=1 -DHAVE_3DNOWEX=1\
-         -DHAVE_MMX2
+         -DHAVE_MMX2 -DCAN_COMPILE_X86_GAS=1
 CDEFSYS += $(shell $(CONFIG_SHELL) 'if $(CC) -march=athlon -S -o $(NUL) -xc $(NUL) >$(NUL) 2>&1; then echo "-march=athlon"; else if $(CC) -march=pentiumpro -S -o $(NUL) -xc $(NUL) >$(NUL) 2>&1; then echo "-march=pentiumpro"; else echo "-m486"; fi fi')
 CDEFSYS += $(shell $(CONFIG_SHELL) 'if $(CC) -fschedule-insns2 -S -o $(NUL) -xc $(NUL) >$(NUL) 2>&1; then echo "-fschedule-insns2"; fi')
 endif
@@ -263,7 +263,7 @@ ifeq ($(TARGET_PLATFORM),athlon_mmx)
  MACHINE=ia32
  CDEFSYS=-D__MACHINE__=ia32  -D__CPU_NAME__='"athlon-mmx"' -D__CPU__=686\
          -D__DEFAULT_DISASM=0 -DHAVE_MMX=1 -DHAVE_3DNOW=1 -DHAVE_MMX2\
-         -DHAVE_3DNOWEX=1
+         -DHAVE_3DNOWEX=1 -DCAN_COMPILE_X86_GAS=1
 CDEFSYS += $(shell $(CONFIG_SHELL) 'if $(CC) -march=athlon -S -o $(NUL) -xc $(NUL) >$(NUL) 2>&1; then echo "-march=athlon"; else if $(CC) -march=pentiumpro -S -o $(NUL) -xc $(NUL) >$(NUL) 2>&1; then echo "-march=pentiumpro"; else echo "-m486"; fi fi')
 CDEFSYS += $(shell $(CONFIG_SHELL) 'if $(CC) -fschedule-insns2 -S -o $(NUL) -xc $(NUL) >$(NUL) 2>&1; then echo "-fschedule-insns2"; fi')
 CDEFSYS += $(shell $(CONFIG_SHELL) 'if $(CC) -mmmx -S -o $(NUL) -xc $(NUL) >$(NUL) 2>&1; then echo "-mmmx"; fi')
@@ -271,7 +271,7 @@ endif
 ifeq ($(TARGET_PLATFORM),6x86)
  MACHINE=ia32
  CDEFSYS=-D__MACHINE__=ia32  -D__CPU_NAME__='"cyrix6x86"' -D_CPU__=586\
-         -D__DEFAULT_DISASM=0 -DHAVE_MMX=1
+         -D__DEFAULT_DISASM=0 -DHAVE_MMX=1 -DCAN_COMPILE_X86_GAS=1
 CDEFSYS += $(shell $(CONFIG_SHELL) 'if $(CC) -march=6x86 -S -o $(NUL) -xc $(NUL) >$(NUL) 2>&1; then echo "-march=6x86"; else if $(CC) -march=pentium -S -o $(NUL) -xc $(NUL) >$(NUL) 2>&1; then echo "-march=pentium"; else echo "-m486"; fi fi')
 CDEFSYS += $(shell $(CONFIG_SHELL) 'if $(CC) -fschedule-insns2 -S -o $(NUL) -xc $(NUL) >$(NUL) 2>&1; then echo "-fschedule-insns2"; fi')
 CDEFSYS += $(shell $(CONFIG_SHELL) 'if $(CC) -mmmx -S -o $(NUL) -xc $(NUL) >$(NUL) 2>&1; then echo "-mmmx"; fi')
@@ -279,7 +279,7 @@ endif
 ifeq ($(TARGET_PLATFORM),6x86mx)
  MACHINE=ia32
  CDEFSYS=-D__MACHINE__=ia32  -D__CPU_NAME__='"cyrix6x86mx"' -D__CPU__=586\
-         -D__DEFAULT_DISASM=0 -DHAVE_MMX=1
+         -D__DEFAULT_DISASM=0 -DHAVE_MMX=1 -DCAN_COMPILE_X86_GAS=1
 CDEFSYS += $(shell $(CONFIG_SHELL) 'if $(CC) -march=6x86mx -S -o $(NUL) -xc $(NUL) >$(NUL) 2>&1; then echo "-march=6x86mx"; else if $(CC) -march=pentium -S -o $(NUL) -xc $(NUL) >$(NUL) 2>&1; then echo "-march=pentium"; else echo "-m486"; fi fi')
 CDEFSYS += $(shell $(CONFIG_SHELL) 'if $(CC) -fschedule-insns2 -S -o $(NUL) -xc $(NUL) >$(NUL) 2>&1; then echo "-fschedule-insns2"; fi')
 CDEFSYS += $(shell $(CONFIG_SHELL) 'if $(CC) -mmmx -S -o $(NUL) -xc $(NUL) >$(NUL) 2>&1; then echo "-mmmx"; fi')
@@ -322,11 +322,11 @@ CFLAGS += $(shell $(CONFIG_SHELL) 'if $(CC) -fregmove -S -o $(NUL) -xc $(NUL) >$
 CFLAGS += $(shell $(CONFIG_SHELL) 'if $(CC) -foptimize-register-move -S -o $(NUL) -xc $(NUL); then echo "-foptimize-register-move"; fi')
 endif
 ifeq ($(findstring debug,$(compilation)),debug)
-CFLAGS += -g3
+CFLAGS += -g3 -p
 # Was detected problem with pgcc so temporary disable those keys
-#ifeq ($(findstring unix,$(TARGET_OS)),unix)
-#CFLAGS += -p -ax
-#endif
+ifeq ($(findstring unix,$(TARGET_OS)),unix)
+CFLAGS += -p -ax
+endif
 ifeq ($(compilation),max_debug)
 CFLAGS += -fcheck-memory-usage -fstack-check
 CDEFOS += -D__DISABLE_ASM -DDEBUG -UNDEBUG
@@ -364,7 +364,7 @@ CFLAGS += $(shell $(CONFIG_SHELL) 'if $(CC) -Wwrite-strings -S -o $(NUL) -xc $(N
 endif
 LDFLAGS = $(OSLDEF) $(HOST_LDFLAGS)
 ifeq ($(findstring debug,$(compilation)),debug)
-LDFLAGS += -g
+LDFLAGS += -g -p
 else
 LDFLAGS += -s
 endif

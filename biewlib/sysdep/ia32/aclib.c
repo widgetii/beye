@@ -21,355 +21,228 @@
  * @since       2001
  * @note        Development, fixes and improvements
 **/
-
 #include <stddef.h>
+#include <string.h>
+#include "biewlib/sysdep/ia32/fastcopy.h"
+#include "biewlib/sysdep/ia32/stdint.h"
+#include "biewlib/sysdep/ia32/_inlines.h"
+#define BLOCK_SIZE 4096
+#define CONFUSION_FACTOR 0
+//Feel free to fine-tune the above 2, it might be possible to get some speedup with them :)
 
-/*
- * This version of memcpy speedups memory copying up to 5 times
- * on modern cpus (K7, P3). But on K6-2+ cpus it has effect about 25%.
- *
- * This file was born in MPLAYER project. (http://mplayer.sourceforge.net)
- * Special thanks to Arpád GereOffy (A'rpi/ESP-team) <arpi@thot.banki.hu>
- * for improvements and testing, Felix Buenemann <Felix.Buenemann@gmx.de>
- * for testing and Zoltán Ponekker (Pontscho/Fresh!) <pontscho@makacs.poliod.hu>
- * for 3dNow! support which was ignored by me from begin. 
-*/
+//#define STATISTICS
 
-/*
- This part of code was taken by me from Linux-2.4.3 and slightly modified
-for MMX, MMX2, SSE instruction set. I have done it since linux uses page aligned
-blocks but mplayer uses weakly ordered data and original sources can not
-speedup them. Only using PREFETCHNTA and MOVNTQ together have effect!
-
->From IA-32 Intel Architecture Software Developer's Manual Volume 1,
-
-Order Number 245470:
-"10.4.6. Cacheability Control, Prefetch, and Memory Ordering Instructions"
-
-Data referenced by a program can be temporal (data will be used again) or
-non-temporal (data will be referenced once and not reused in the immediate
-future). To make efficient use of the processor's caches, it is generally
-desirable to cache temporal data and not cache non-temporal data. Overloading
-the processor's caches with non-temporal data is sometimes referred to as
-"polluting the caches".
-The non-temporal data is written to memory with Write-Combining semantics.
-
-The PREFETCHh instructions permits a program to load data into the processor
-at a suggested cache level, so that it is closer to the processors load and
-store unit when it is needed. If the data is already present in a level of
-the cache hierarchy that is closer to the processor, the PREFETCHh instruction
-will not result in any data movement.
-But we should you PREFETCHNTA: Non-temporal data fetch data into location
-close to the processor, minimizing cache pollution.
-
-The MOVNTQ (store quadword using non-temporal hint) instruction stores
-packed integer data from an MMX register to memory, using a non-temporal hint.
-The MOVNTPS (store packed single-precision floating-point values using
-non-temporal hint) instruction stores packed floating-point data from an
-XMM register to memory, using a non-temporal hint.
-
-The SFENCE (Store Fence) instruction controls write ordering by creating a
-fence for memory store operations. This instruction guarantees that the results
-of every store instruction that precedes the store fence in program order is
-globally visible before any store instruction that follows the fence. The
-SFENCE instruction provides an efficient way of ensuring ordering between
-procedures that produce weakly-ordered data and procedures that consume that
-data.
-
-If you have questions please contact with me: Nick Kurshev: nickols_k@mail.ru.
-*/
-
-// 3dnow memcpy support from kernel 2.4.2
-//  by Pontscho/fresh!mindworkz
-
-#if !defined(__DISABLE_ASM) && (defined( HAVE_MMX2 ) || defined( HAVE_3DNOW ) || defined( HAVE_MMX ))
-
-#undef HAVE_MMX1
-#if defined(HAVE_MMX) && !defined(HAVE_MMX2) && !defined(HAVE_3DNOW) && !defined(HAVE_SSE)
-/*  means: mmx v.1. Note: Since we added alignment of destinition it speedups
-    of memory copying on PentMMX, Celeron-1 and P2 upto 12% versus
-    standard (non MMX-optimized) version.
-    Note: on K6-2+ it speedups memory copying upto 25% and
-          on K7 and P3 about 500% (5 times). */
-#define HAVE_MMX1
+#ifdef	CAN_COMPILE_X86_GAS
+#define CAN_COMPILE_X86_ASM
 #endif
 
+//Note: we have MMX, MMX2, 3DNOW version there is no 3DNOW+MMX2 one
+//Plain C versions
+//#if !defined (HAVE_MMX) || defined (RUNTIME_CPUDETECT)
+//#define COMPILE_C
+//#endif
+#define USE_MMX		0x00000001UL
+#define USE_MMX2	0x00000002UL
+#define USE_3DNOW	0x00000004UL
+#define USE_3DNOW2	0x00000008UL
+#define USE_SSE		0x00000010UL
+#define USE_SSE2	0x00000020UL
 
-#undef HAVE_K6_2PLUS
-#if !defined( HAVE_MMX2) && defined( HAVE_3DNOW)
-#define HAVE_K6_2PLUS
-#endif
-
-#ifndef HAVE_SSE2
-/*
-   P3 processor has only one SSE decoder so can execute only 1 sse insn per
-   cpu clock, but it has 3 mmx decoders (include load/store unit)
-   and executes 3 mmx insns per cpu clock.
-   P4 processor has some chances, but after reading:
-   http://www.emulators.com/pentium4.htm
-   I have doubts. Anyway SSE2 version of this code can be written better.
-*/
-#undef HAVE_SSE
-#endif
-
-/* for small memory blocks (<256 bytes) this version is faster */
-#define small_memcpy(to,from,n)\
-{\
-register unsigned long int dummy;\
-__asm__ __volatile__(\
-	"rep; movsb"\
-	:"=&D"(to), "=&S"(from), "=&c"(dummy)\
-/* It's most portable way to notify compiler */\
-/* that edi, esi and ecx are clobbered in asm block. */\
-/* Thanks to A'rpi for hint!!! */\
-        :"0" (to), "1" (from),"2" (n)\
-	: "memory");\
-}
-
-/* for small memory blocks (<256 bytes) this version is faster */
-#define small_memset(to,val,n)\
-{\
-register unsigned long int dummy;\
-__asm__ __volatile__(\
-	"rep; stosb"\
-	:"=&D"(to), "=&c"(dummy)\
-        :"0" (to), "1" (n), "a"((char)val)\
-	:"memory");\
-}
-
-#ifdef HAVE_SSE
-#define MMREG_SIZE 16
-#else
-#define MMREG_SIZE 8
-#endif
-
-/* Small defines (for readability only) ;) */
-#ifdef HAVE_K6_2PLUS
-#define PREFETCH "prefetch"
-/* On K6 femms is faster of emms. On K7 femms is directly mapped on emms. */
-#define EMMS     "femms"
-#else
-#define PREFETCH "prefetchnta"
-#define EMMS     "emms"
-#endif
-
-#ifdef HAVE_MMX2
-#define MOVNTQ "movntq"
-#else
-#define MOVNTQ "movq"
-#endif
-
-#ifdef HAVE_MMX1
-#define MIN_LEN 0x800  /* 2K blocks */
-#else
-#define MIN_LEN 0x40  /* 64-byte blocks */
-#endif
-
-void * fast_memcpy(void * to, const void * from, size_t len)
+#ifdef CAN_COMPILE_X86_ASM
+static int _mmx_inited=0;
+static unsigned __mmx_caps=0;
+static inline void do_cpuid(unsigned int ax, unsigned int *p)
 {
-	void *retval;
-	size_t i;
-  	retval = to;
-#ifndef HAVE_MMX1
-        /* PREFETCH has effect even for MOVSB instruction ;) */
+	int a, c;
+
 	__asm__ __volatile__ (
-	        PREFETCH" (%0)\n"
-	        PREFETCH" 64(%0)\n"
-	        PREFETCH" 128(%0)\n"
-        	PREFETCH" 192(%0)\n"
-        	PREFETCH" 256(%0)\n"
-		: : "r" (from) );
-#endif
-        if(len >= MIN_LEN)
-	{
-	  register unsigned long int delta;
-          /* Align destinition to MMREG_SIZE -boundary */
-          delta = ((unsigned long int)to)&(MMREG_SIZE-1);
-          if(delta)
-	  {
-	    delta=MMREG_SIZE-delta;
-	    len -= delta;
-	    small_memcpy(to, from, delta);
-	  }
-	  i = len >> 6; /* len/64 */
-	  len&=63;
-        /*
-           This algorithm is top effective when the code consequently
-           reads and writes blocks which have size of cache line.
-           Size of cache line is processor-dependent.
-           It will, however, be a minimum of 32 bytes on any processors.
-           It would be better to have a number of instructions which
-           perform reading and writing to be multiple to a number of
-           processor's decoders, but it's not always possible.
-        */
-#ifdef HAVE_SSE /* Only P3 (may be Cyrix3) */
-	if(((unsigned long)from) & 15)
-	/* if SRC is misaligned */
-	for(; i>0; i--)
-	{
-		__asm__ __volatile__ (
-		PREFETCH" 320(%0)\n"
-		"movups (%0), %%xmm0\n"
-		"movups 16(%0), %%xmm1\n"
-		"movups 32(%0), %%xmm2\n"
-		"movups 48(%0), %%xmm3\n"
-		"movntps %%xmm0, (%1)\n"
-		"movntps %%xmm1, 16(%1)\n"
-		"movntps %%xmm2, 32(%1)\n"
-		"movntps %%xmm3, 48(%1)\n"
-		:: "r" (from), "r" (to) : "memory");
-		((const unsigned char *)from)+=64;
-		((unsigned char *)to)+=64;
-	}
-	else 
-	/*
-	   Only if SRC is aligned on 16-byte boundary.
-	   It allows to use movaps instead of movups, which required data
-	   to be aligned or a general-protection exception (#GP) is generated.
-	*/
-	for(; i>0; i--)
-	{
-		__asm__ __volatile__ (
-		PREFETCH" 320(%0)\n"
-		"movaps (%0), %%xmm0\n"
-		"movaps 16(%0), %%xmm1\n"
-		"movaps 32(%0), %%xmm2\n"
-		"movaps 48(%0), %%xmm3\n"
-		"movntps %%xmm0, (%1)\n"
-		"movntps %%xmm1, 16(%1)\n"
-		"movntps %%xmm2, 32(%1)\n"
-		"movntps %%xmm3, 48(%1)\n"
-		:: "r" (from), "r" (to) : "memory");
-		((const unsigned char *)from)+=64;
-		((unsigned char *)to)+=64;
-	}
-#else
-	for(; i>0; i--)
-	{
-		__asm__ __volatile__ (
-#ifndef HAVE_MMX1
-        	PREFETCH" 320(%0)\n"
-#endif
-		"movq (%0), %%mm0\n"
-		"movq 8(%0), %%mm1\n"
-		"movq 16(%0), %%mm2\n"
-		"movq 24(%0), %%mm3\n"
-		"movq 32(%0), %%mm4\n"
-		"movq 40(%0), %%mm5\n"
-		"movq 48(%0), %%mm6\n"
-		"movq 56(%0), %%mm7\n"
-		MOVNTQ" %%mm0, (%1)\n"
-		MOVNTQ" %%mm1, 8(%1)\n"
-		MOVNTQ" %%mm2, 16(%1)\n"
-		MOVNTQ" %%mm3, 24(%1)\n"
-		MOVNTQ" %%mm4, 32(%1)\n"
-		MOVNTQ" %%mm5, 40(%1)\n"
-		MOVNTQ" %%mm6, 48(%1)\n"
-		MOVNTQ" %%mm7, 56(%1)\n"
-		:: "r" (from), "r" (to) : "memory");
-		((const unsigned char *)from)+=64;
-		((unsigned char *)to)+=64;
-	}
-#endif /* Have SSE */
-#ifdef HAVE_MMX2
-                /* since movntq is weakly-ordered, a "sfence"
-		 * is needed to become ordered again. */
-		__asm__ __volatile__ ("sfence":::"memory");
-#endif
-#ifndef HAVE_SSE		
-		/* enables to use FPU */
-		__asm__ __volatile__ (EMMS:::"memory");
-#endif		
-	}
-	/*
-	 *	Now do the tail of the block
-	 */
-	if(len) small_memcpy(to, from, len);
-	return retval;
+			  /* See if CPUID instruction is supported ... */
+			  /* ... Get copies of EFLAGS into eax and ecx */
+			  "pushf\n\t"
+			  "popl %0\n\t"
+			  "movl %0, %1\n\t"
+			  
+			  /* ... Toggle the ID bit in one copy and store */
+			  /*     to the EFLAGS reg */
+			  "xorl $0x200000, %0\n\t"
+			  "push %0\n\t"
+			  "popf\n\t"
+			  
+			  /* ... Get the (hopefully modified) EFLAGS */
+			  "pushf\n\t"
+			  "popl %0\n\t"
+			  : "=a" (a), "=c" (c)
+			  :
+			  : "cc" 
+			  );
+    if(a!=c)
+    __asm __volatile
+	("movl %%ebx, %%esi\n\t"
+	 "cpuid\n\t"
+	 "xchgl %%ebx, %%esi"
+	 : "=a" (p[0]), "=S" (p[1]), 
+	   "=c" (p[2]), "=d" (p[3])
+	 : "0" (ax));
+    else p[0]=p[1]=p[2]=p[3]=ax=0;
 }
 
-/* Fast memory set. See comments for fast_memcpy */
-void * fast_memset(void * to, int val, size_t len)
+static void GetCpuCaps( void )
 {
-	void *retval;
-	size_t i;
-	unsigned char mm_reg[MMREG_SIZE], *pmm_reg;
-
-  	retval = to;
-        if(len >= MIN_LEN)
+	unsigned int regs[4];
+	unsigned int regs2[4];
+	_mmx_inited=1;
+	__mmx_caps = 0;
+	do_cpuid(0x00000000, regs); /* get _max_ cpuid level and vendor name*/
+	if (regs[0]>=0x00000001)
 	{
-	  register unsigned long int delta;
-          delta = ((unsigned long int)to)&(MMREG_SIZE-1);
-          if(delta)
-	  {
-	    delta=MMREG_SIZE-delta;
-	    len -= delta;
-	    small_memset(to, val, delta);
-	  }
-	  i = len >> 7; /* len/128 */
-	  len&=127;
-	  pmm_reg = mm_reg;
-	  small_memset(pmm_reg,val,sizeof(mm_reg));
-#ifdef HAVE_SSE /* Only P3 (may be Cyrix3) */
-	__asm__ __volatile__(
-		"movups (%0), %%xmm0\n"
-		:: "r"(mm_reg):"memory");
-	for(; i>0; i--)
-	{
-		__asm__ __volatile__ (
-		"movntps %%xmm0, (%0)\n"
-		"movntps %%xmm0, 16(%0)\n"
-		"movntps %%xmm0, 32(%0)\n"
-		"movntps %%xmm0, 48(%0)\n"
-		"movntps %%xmm0, 64(%0)\n"
-		"movntps %%xmm0, 80(%0)\n"
-		"movntps %%xmm0, 96(%0)\n"
-		"movntps %%xmm0, 112(%0)\n"
-		:: "r" (to) : "memory");
-		((unsigned char *)to)+=128;
+		do_cpuid(0x00000001, regs2);
+		/* general feature flags: */
+		if((regs2[3] & (1 << 23 )) >> 23) __mmx_caps |= USE_MMX;
+		if((regs2[3] & (1 << 25 )) >> 25) __mmx_caps |= USE_SSE;
+		if((regs2[3] & (1 << 26 )) >> 26) __mmx_caps |= USE_SSE2;
+		if(__mmx_caps & USE_SSE) __mmx_caps |= USE_MMX2; /* SSE cpus supports mmxext too */
 	}
+	do_cpuid(0x80000000, regs);
+	if (regs[0]>=0x80000001) {
+		do_cpuid(0x80000001, regs2);
+		if((regs2[3] & (1 << 23 )) >> 23) __mmx_caps |= USE_MMX;
+		if((regs2[3] & (1 << 22 )) >> 22) __mmx_caps |= USE_MMX2;
+		if((regs2[3] & (1 << 31 )) >> 31) __mmx_caps |= USE_3DNOW;
+		if((regs2[3] & (1 << 30 )) >> 30) __mmx_caps |= USE_3DNOW2;
+	}
+}
 #else
-	__asm__ __volatile__(
-		"movq (%0), %%mm0\n"
-		:: "r"(mm_reg):"memory");
-	for(; i>0; i--)
-	{
-		__asm__ __volatile__ (
-		MOVNTQ" %%mm0, (%0)\n"
-		MOVNTQ" %%mm0, 8(%0)\n"
-		MOVNTQ" %%mm0, 16(%0)\n"
-		MOVNTQ" %%mm0, 24(%0)\n"
-		MOVNTQ" %%mm0, 32(%0)\n"
-		MOVNTQ" %%mm0, 40(%0)\n"
-		MOVNTQ" %%mm0, 48(%0)\n"
-		MOVNTQ" %%mm0, 56(%0)\n"
-		MOVNTQ" %%mm0, 64(%0)\n"
-		MOVNTQ" %%mm0, 72(%0)\n"
-		MOVNTQ" %%mm0, 80(%0)\n"
-		MOVNTQ" %%mm0, 88(%0)\n"
-		MOVNTQ" %%mm0, 96(%0)\n"
-		MOVNTQ" %%mm0, 104(%0)\n"
-		MOVNTQ" %%mm0, 112(%0)\n"
-		MOVNTQ" %%mm0, 120(%0)\n"
-		:: "r" (to) : "memory");
-		((unsigned char *)to)+=128;
-	}
-#endif /* Have SSE */
-#ifdef HAVE_MMX2
-                /* since movntq is weakly-ordered, a "sfence"
-		 * is needed to become ordered again. */
-		__asm__ __volatile__ ("sfence":::"memory");
+static int _mmx_inited=1;
+static unsigned __mmx_caps=0;
+static void GetCpuCaps( void ) {}
 #endif
-#ifndef HAVE_SSE		
-		/* enables to use FPU */
-		__asm__ __volatile__ (EMMS:::"memory");
-#endif		
-	}
-	/*
-	 *	Now do the tail of the block
-	 */
-	if(len) small_memset(to, val, len);
-	return retval;
+
+
+#ifdef CAN_COMPILE_X86_ASM
+
+#undef HAVE_MMX
+#undef HAVE_MMX2
+#undef HAVE_3DNOW
+#undef HAVE_SSE
+#define RENAME(a) a ## _C
+#include "biewlib/sysdep/ia32/aclib_template.c"
+
+//MMX versions
+#undef RENAME
+#define HAVE_MMX
+#undef HAVE_MMX2
+#undef HAVE_3DNOW
+#define RENAME(a) a ## _MMX
+#include "biewlib/sysdep/ia32/aclib_template.c"
+
+#if 0 /* TODO: better detection of gas possibilities */
+//MMX2 versions
+#undef RENAME
+#define HAVE_MMX
+#define HAVE_MMX2
+#undef HAVE_3DNOW
+#define RENAME(a) a ## _MMX2
+#include "biewlib/sysdep/ia32/aclib_template.c"
+
+//3DNOW versions
+#undef RENAME
+#define HAVE_MMX
+#undef HAVE_MMX2
+#define HAVE_3DNOW
+#define RENAME(a) a ## _3DNow
+#include "biewlib/sysdep/ia32/aclib_template.c"
+#endif
+
+#endif // CAN_COMPILE_X86_ASM
+
+static void * init_fast_memcpy(void * to, const void * from, size_t len)
+{
+#ifdef CAN_COMPILE_X86_ASM
+	/* ordered per speed fastest first */
+	if(!_mmx_inited) GetCpuCaps();
+//	if(__mmx_caps & USE_MMX2)	fast_memcpy_ptr = fast_memcpy_MMX2;
+//	else if(__mmx_caps & USE_3DNOW)	fast_memcpy_ptr = fast_memcpy_3DNow;
+	else if(__mmx_caps & USE_MMX)	fast_memcpy_ptr = fast_memcpy_MMX;
+	else
+#endif
+	fast_memcpy_ptr = memcpy;
+	return (*fast_memcpy_ptr)(to,from,len);	
+}
+void *(*fast_memcpy_ptr)(void * to, const void * from, size_t len) = init_fast_memcpy;
+
+static void * init_fast_memset(void * to, int filler, size_t len)
+{
+#ifdef CAN_COMPILE_X86_ASM
+	/* ordered per speed fastest first */
+	if(!_mmx_inited) GetCpuCaps();
+//	if(__mmx_caps & USE_MMX2)	fast_memset_ptr = fast_memset_MMX2;
+//	else if(__mmx_caps & USE_3DNOW)	fast_memset_ptr = fast_memset_3DNow;
+	else if(__mmx_caps & USE_MMX)	fast_memset_ptr = fast_memset_MMX;
+	else
+#endif
+	fast_memset_ptr = memset;
+	return (*fast_memset_ptr)(to,filler,len);	
+}
+void *(*fast_memset_ptr)(void * to, int filler, size_t len) = init_fast_memset;
+
+static void __FASTCALL__ init_InterleaveBuffers(tUInt32 limit,
+				    void *destbuffer,
+				    const void *evenbuffer, 
+				    const void *oddbuffer)
+{
+#ifdef CAN_COMPILE_X86_ASM
+	/* ordered per speed fastest first */
+	if(!_mmx_inited) GetCpuCaps();
+//	if(__mmx_caps & USE_MMX2)	InterleaveBuffers_ptr = InterleaveBuffers_MMX2;
+//	else if(__mmx_caps & USE_3DNOW)	InterleaveBuffers_ptr = InterleaveBuffers_3DNow;
+	else if(__mmx_caps & USE_MMX)	InterleaveBuffers_ptr = InterleaveBuffers_MMX;
+	else
+#endif
+	InterleaveBuffers_ptr = InterleaveBuffers_C;
+	(*InterleaveBuffers_ptr)(limit,destbuffer,evenbuffer,oddbuffer);	
 }
 
-#endif /* #if defined( HAVE_MMX2 ) || defined( HAVE_3DNOW ) || defined( HAVE_MMX ) */
+void __FASTCALL__ (*InterleaveBuffers_ptr)(tUInt32 limit,
+				    void *destbuffer,
+				    const void *evenbuffer, 
+				    const void *oddbuffer) = init_InterleaveBuffers;
+
+static void __FASTCALL__ init_CharsToShorts(tUInt32 limit,
+					     void *destbuffer,
+					     const void *evenbuffer)
+{
+#ifdef CAN_COMPILE_X86_ASM
+	/* ordered per speed fastest first */
+	if(!_mmx_inited) GetCpuCaps();
+//	if(__mmx_caps & USE_MMX2)	CharsToShorts_ptr = CharsToShorts_MMX2;
+//	else if(__mmx_caps & USE_3DNOW)	CharsToShorts_ptr = CharsToShorts_3DNow;
+	else if(__mmx_caps & USE_MMX)	CharsToShorts_ptr = CharsToShorts_MMX;
+	else
+#endif
+	CharsToShorts_ptr = CharsToShorts_C;
+	(*CharsToShorts_ptr)(limit,destbuffer,evenbuffer);	
+}
+
+void __FASTCALL__ (*CharsToShorts_ptr)(tUInt32 limit,
+					     void *destbuffer,
+					     const void *evenbuffer) = init_CharsToShorts;
+
+static void __FASTCALL__ init_ShortsToChars(tUInt32 limit,
+					     void *destbuffer,
+					     const void *evenbuffer)
+{
+#ifdef CAN_COMPILE_X86_ASM
+	/* ordered per speed fastest first */
+	if(!_mmx_inited) GetCpuCaps();
+//	if(__mmx_caps & USE_MMX2)	ShortsToChars_ptr = ShortsToChars_MMX2;
+//	else if(__mmx_caps & USE_3DNOW)	ShortsToChars_ptr = ShortsToChars_3DNow;
+	else if(__mmx_caps & USE_MMX)	ShortsToChars_ptr = ShortsToChars_MMX;
+	else
+#endif
+	ShortsToChars_ptr = ShortsToChars_C;
+	(*ShortsToChars_ptr)(limit,destbuffer,evenbuffer);	
+}
+
+void __FASTCALL__ (*ShortsToChars_ptr)(tUInt32 limit,
+					     void *destbuffer,
+					     const void *evenbuffer) = init_ShortsToChars;
