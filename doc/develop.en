@@ -24,17 +24,17 @@ Table of Contents
 0. Preamble
 1. Hierarchical structure
 1.1. How it works
-1.2. Understanding of plugins and addons
+1.2. Understanding plugins and addons
 1.3. Why biewlib
 2. How to expand or port the project
-2.1. Creation a plugins and addons
+2.1. Creating plugins and addons
 2.2. Project porting
 3. Source code notes
-3.1. Placing of sources
+3.1. Source location
 3.2. Source layout
 3.3. GNU Makefile
 4. Optimization notes
-4.1. A few words about calling conventions
+4.1. Few words about calling conventions
 4.2. Source code optimization notes
 4.3. Performance tests
 5. Final chapter
@@ -318,8 +318,8 @@ following rules of source code development should be followed:
 - All names of files must be in 8.3 model, no symlinks e.t.c  (Project
   builds in DOS environment).
 
-3.1. Placing of sources
------------------------
+3.1. Source location
+--------------------
 
   Directory where sources will be placed  does not  matter.  All paths
 used in the project are relative.
@@ -382,7 +382,7 @@ objects, which asynchronously changes its own state.
 measurements with profiler.
    See also 4.3
 
-4.1. A few words about calling conventions
+4.1. Few words about calling conventions
 ------------------------------------------
 
    Somewhy it has happened that mainstream of programmers thinks  that
