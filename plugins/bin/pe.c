@@ -559,7 +559,7 @@ static unsigned long __FASTCALL__ ShowModRefPE( void )
 
 static ExportTablePE et;
 
-static void __inline writeExportVA(unsigned long va, BGLOBAL handle, char *buf, unsigned long bufsize)
+static void inline writeExportVA(unsigned long va, BGLOBAL handle, char *buf, unsigned long bufsize)
 {
     // check for forwarded export
     if (va>=peDir[PE_EXPORT].rva && va<peDir[PE_EXPORT].rva+peDir[PE_EXPORT].size)
