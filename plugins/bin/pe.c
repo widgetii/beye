@@ -101,8 +101,8 @@ static __filesize_t __NEAR__ __FASTCALL__ RVA2Phys(__filesize_t rva)
      each object can contain several pages
      it now contains previous object that contains this page */
  if(!pphys) return 0;
- npages = (rva - obj_rva) / 4096UL;
- poff = (rva - obj_rva) % 4096UL;
+ npages = (rva - obj_rva) / (__filesize_t)4096;
+ poff = (rva - obj_rva) % (__filesize_t)4096;
  ret = pphys + npages*4096UL + poff;
  return ret;
 }
@@ -559,13 +559,14 @@ static __filesize_t __FASTCALL__ ShowModRefPE( void )
 
 static ExportTablePE et;
 
-static void inline writeExportVA(__filesize_t va, BGLOBAL handle, char *buf, unsigned long bufsize)
+static inline void writeExportVA(__filesize_t va, BGLOBAL handle, char *buf, unsigned long bufsize)
 {
     // check for forwarded export
     if (va>=peDir[PE_EXPORT].rva && va<peDir[PE_EXPORT].rva+peDir[PE_EXPORT].size)
         __peReadASCIIZName(handle, RVA2Phys(va), buf, bufsize);
     // normal export
-    else sprintf(buf, ".%08lX", va + pe.peImageBase);
+    else
+    sprintf(buf, ".%08lX", (unsigned long)(va + pe.peImageBase));
 }
 
 static tBool __FASTCALL__ PEExportReadItems(BGLOBAL handle,memArray * obj,unsigned nnames)
@@ -845,7 +846,7 @@ static void __NEAR__ __FASTCALL__ BuildPERefChain( void )
         typeoff = bioReadWord(handle);
         is_eof = bioEOF(handle);
         if(IsKbdTerminate() || is_eof) break;
-        rel.modidx = FILESIZE_MAX;
+        rel.modidx = ULONG_MAX;
         rel.import.type = typeoff >> 12;
         rel.laddr = physoff + (typeoff & 0x0FFF);
         if(!la_AddData(CurrPEChain,&rel,MemOutBox)) goto bye;

@@ -759,6 +759,6 @@ tBool __FASTCALL__ bioEOF(BGLOBAL bHandle)
   BFILE  *obj = MK_FPTR(bHandle);
   tBool retval;
   if(IS_CACHE_VALID(obj) || obj->is_mmf) retval = obj->is_eof;
-  else                                   retval = __OsTell(obj->b.vfb.handle) >= obj->FLength;
+  else                                   retval = (__filesize_t)__OsTell(obj->b.vfb.handle) >= obj->FLength;
   return retval;
 }

@@ -287,10 +287,10 @@ _cdefos="-DDATADIR='\"$_datadir\"'"
 _osldef=
 _oslibs=
 
-if test "$_debug" = "-g3"; then
-_cdefos="-finline-limit-5"
-else
+if test -z "$_debug" ; then
 _osldef="-s"
+else
+_cdefos="-finline-limit-5 $_cdefos"
 fi
 if test "$_profile" || test "$_debug" ; then
   _cdefos="-W -Wall -O2 -fno-builtin $_debug $_profile $_cdefos"

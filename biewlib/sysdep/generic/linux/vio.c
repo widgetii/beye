@@ -36,6 +36,7 @@ static const char rcs_id[] = "$Id$";
 #include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
+#define __USE_BSD
 #include <string.h>
 #include <unistd.h>
 #include <sys/types.h>

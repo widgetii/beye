@@ -142,6 +142,11 @@ Not necessarily BIEW bugs, often just "features" of screen libraries:
 BIEW/SLANG:	strange Eterm behavior (F1-F5 do not work)
 BIEW/CURSES:	1 second delay after single escape (at least with ncurses),
 		strange Eterm behavior (crash on F1-F5)
+BIEW/LINUX:	"I/O possible" signal if you've configured call of biew through
+		Midnight Commander's 'F3' key.
+		Problem: biew opens /dev/tty0 under mc in raw mode instead of /dev/pts/0
+		Result: deadlock of I/O subsystem. Works 'RESET' key only.
+		Workaround: use BIEW/CURSES or BIEW/SLANG versions in such cases.
 
 I think that BIEW/LINUX is the most optimized version (in the meaning
 of CPU time and system calls), especially in console mode.
