@@ -46,11 +46,9 @@ static unsigned long __NEAR__ __FASTCALL__ __get_perf(perf_func fnc,unsigned n_i
   char c_arr[300], *ctrl_arr;
   ctrl_arr = c_arr;
   /* align pointer on 16-byte boundary */
-#ifndef __QNX4__
+
   if((tUInt32)ctrl_arr & 15) ((tUInt32)ctrl_arr) += 16-((tUInt32)ctrl_arr&15);
-#else /*__QNX4__*/
-  if((tUInt32)ctrl_arr & 15) ctrl_arr += 16-((tUInt32)ctrl_arr&15);
-#endif
+
   memset(ctrl_arr,0,sizeof(ctrl_arr));
   if(time_interval)
   {

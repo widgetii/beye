@@ -17,6 +17,11 @@
  * @bug         Limitation of twPrintF using
  * @todo        Accelerate windows interaction algorithm
 **/
+
+#include <string.h>
+#include <stdlib.h>
+#include <stdarg.h>
+#include <stdio.h>
 #include <limits.h>
 #ifdef __GNUC__
 #include <unistd.h>
@@ -32,21 +37,13 @@ const char TW_THICK_FRAME[8] = { TWC_FL_BLK, TWC_FL_BLK, TWC_FL_BLK, TWC_FL_BLK,
 const char TW_UP3D_FRAME[8] = "\x00\x00\x00\x00\x00\x00\x00\x00";
 const char TW_DN3D_FRAME[8] = "\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF";
 
-#if !defined(__DISABLE_ASM) && defined(NDEBUG)
+#ifndef NDEBUG
 #ifdef __TSC__
-#pragma save , call(inline=>on) /** must be GP in protmode */
+#pragma save , call(inline=>on) /** GPF in protmode */
 static void winInternalError( void ) = { 0xFF, 0xFF };
-#pragma restore
 #else
-#ifdef __GNUC__
-#define winInternalError() asm(".short 0xFFFF\n");
-#elif defined(_MSC_VER) /* Microsoft Visual C++ 6.0 */
-#define winInternalError() __asm { __asm _emit 0xFF __asm _emit 0xFF }
-#else
-#define winInternalError() __asm { db 0xFF, 0xFF };
+static inline void winInternalError( void ) = { 0xFFFFFFFF };
 #endif
-#endif
-
 static tBool __NEAR__ __FASTCALL__ test_win(TWindow *win)
 {
  tBool ret;
@@ -58,12 +55,10 @@ static tBool __NEAR__ __FASTCALL__ test_win(TWindow *win)
        *((void **)(win->saved.attrs + win->wsize)) == win->saved.attrs ? True : False;
  return ret;
 }
+#define CHECK_WINS(x) { if(!test_win(x)) winInternalError(); }
+#else
+#define CHECK_WINS(x)
 #endif
-
-#include <string.h>
-#include <stdlib.h>
-#include <stdarg.h>
-#include <stdio.h>
 
 #define IFLG_VISIBLE       0x00000001UL
 #define IFLG_ENABLED       0x00000002UL
@@ -81,12 +76,6 @@ static TWindow *head = NULL;
 static TWindow *cursorwin = NULL;
 
 static unsigned long twin_flags = 0L;
-
-#ifndef NDEBUG
-#define CHECK_WINS(x) { if(!test_win(x)) winInternalError(); }
-#else
-#define CHECK_WINS(x)
-#endif
 
 #define __FIND_OVER(ret,win,x,y)\
 {\

@@ -42,11 +42,9 @@
 typedef signed char		tInt8;
 typedef signed short int	tInt16;
 typedef signed int		tInt32;
-# ifdef __GNUC__
+#ifdef __GNUC__
 __extension__
 typedef signed long long int	tInt64;
-# elif ! __QNX4__
-typedef __int64                 tInt64;
 #endif
 
 /** Unsigned.  */
@@ -56,8 +54,6 @@ typedef unsigned int		tUInt32;
 #ifdef __GNUC__
 __extension__
 typedef unsigned long long int	tUInt64;
-#elif ! __QNX4__
-typedef unsigned __int64        tUInt64;
 #endif
 
 /** Small types.  */
@@ -69,8 +65,6 @@ typedef signed int		tIntLeast32;
 #ifdef __GNUC__
 __extension__
 typedef signed long long int	tIntLeast64;
-#elif ! __QNX4__
-typedef __int64                 tIntLeast64;
 #endif
 
 /** Unsigned.  */
@@ -80,8 +74,6 @@ typedef unsigned int		tUIntLeast32;
 #ifdef __GNUC__
 __extension__
 typedef unsigned long long int	tUIntLeast64;
-#elif ! __QNX4__
-typedef unsigned __int64	tUIntLeast64;
 #endif
 
 /** Fast types.  */
@@ -93,8 +85,6 @@ typedef signed int		tIntFast32;
 #ifdef __GNUC__
 __extension__
 typedef signed long long int	tIntFast64;
-#elif ! __QNX4__
-typedef __int64			tIntFast64;
 #endif
 
 /** Unsigned.  */
@@ -104,8 +94,6 @@ typedef unsigned int		tUIntFast32;
 #ifdef __GNUC__
 __extension__
 typedef unsigned long long int	tUIntFast64;
-#elif ! __QNX4__
-typedef unsigned __int64	tUIntFast64;
 #endif
 
 
@@ -119,9 +107,6 @@ __extension__
 typedef signed long long int	tIntMax;
 __extension__
 typedef unsigned long long int	tUIntMax;
-#elif ! __QNX4__
-typedef __int64			tIntMax;
-typedef unsigned __int64	tUIntMax;
 #endif
 
 /** The ISO C 9X standard specifies that in C++ implementations these
@@ -131,9 +116,6 @@ typedef unsigned __int64	tUIntMax;
 #ifdef __GNUC__
 #define __INT64_C(c)	c ## LL
 #define __UINT64_C(c)	c ## ULL
-#elif ! __QNX4__
-#define __INT64_C(c)	c ## i64
-#define __UINT64_C(c)	c ## Ui64
 #endif
 
 /** Limits of integral types.  */
@@ -142,14 +124,14 @@ typedef unsigned __int64	tUIntMax;
 # define INT8_MIN		(-128)
 # define INT16_MIN		(-32767-1)
 # define INT32_MIN		(-2147483647-1)
-#ifndef __QNX4__
+#ifdef __GNUC__
 # define INT64_MIN		(-__INT64_C(9223372036854775807)-1)
 #endif
 /** Maximum of signed integral types.  */
 # define INT8_MAX		(127)
 # define INT16_MAX		(32767)
 # define INT32_MAX		(2147483647)
-#ifndef __QNX4__
+#ifdef __GNUC__
 # define INT64_MAX		(__INT64_C(9223372036854775807))
 #endif
 
@@ -157,7 +139,7 @@ typedef unsigned __int64	tUIntMax;
 # define UINT8_MAX		(255U)
 # define UINT16_MAX		(65535U)
 # define UINT32_MAX		(4294967295U)
-#ifndef __QNX4__
+#ifndef __GNUC__
 # define UINT64_MAX		(__UINT64_C(18446744073709551615))
 #endif
 
@@ -166,14 +148,14 @@ typedef unsigned __int64	tUIntMax;
 # define INT_LEAST8_MIN		(-128)
 # define INT_LEAST16_MIN	(-32767-1)
 # define INT_LEAST32_MIN	(-2147483647-1)
-#ifndef __QNX4__
+#ifdef __GNUC__
 # define INT_LEAST64_MIN	(-__INT64_C(9223372036854775807)-1)
 #endif
 /** Maximum of signed integral types having a minimum size.  */
 # define INT_LEAST8_MAX		(127)
 # define INT_LEAST16_MAX	(32767)
 # define INT_LEAST32_MAX	(2147483647)
-#ifndef __QNX4__
+#ifdef __GNUC__
 # define INT_LEAST64_MAX	(__INT64_C(9223372036854775807))
 #endif
 
@@ -181,7 +163,7 @@ typedef unsigned __int64	tUIntMax;
 # define UINT_LEAST8_MAX	(255U)
 # define UINT_LEAST16_MAX	(65535U)
 # define UINT_LEAST32_MAX	(4294967295U)
-#ifndef __QNX4__
+#ifdef __GNUC__
 # define UINT_LEAST64_MAX	(__UINT64_C(18446744073709551615))
 #endif
 
@@ -190,14 +172,14 @@ typedef unsigned __int64	tUIntMax;
 # define INT_FAST8_MIN		(-128)
 # define INT_FAST16_MIN		(-2147483647-1)
 # define INT_FAST32_MIN		(-2147483647-1)
-#ifndef __QNX4__
+#ifdef __GNUC__
 # define INT_FAST64_MIN		(-__INT64_C(9223372036854775807)-1)
 #endif
 /** Maximum of fast signed integral types having a minimum size.  */
 # define INT_FAST8_MAX		(127)
 # define INT_FAST16_MAX		(2147483647)
 # define INT_FAST32_MAX		(2147483647)
-#ifndef __QNX4__
+#ifdef __GNUC__
 # define INT_FAST64_MAX		(__INT64_C(9223372036854775807))
 #endif
 
@@ -205,7 +187,7 @@ typedef unsigned __int64	tUIntMax;
 # define UINT_FAST8_MAX		(255U)
 # define UINT_FAST16_MAX	(4294967295U)
 # define UINT_FAST32_MAX	(4294967295U)
-#ifndef __QNX4__
+#ifdef __GNUC__
 # define UINT_FAST64_MAX	(__UINT64_C(18446744073709551615))
 #endif
 
@@ -215,7 +197,7 @@ typedef unsigned __int64	tUIntMax;
 # define INTPTR_MAX		(2147483647)
 # define UINTPTR_MAX		(4294967295U)
 
-#ifndef __QNX4__
+#ifdef __GNUC__
 /** Minimum for largest signed integral type.  */
 # define INTMAX_MIN		(-__INT64_C(9223372036854775807)-1)
 /** Maximum for largest signed integral type.  */
@@ -264,8 +246,6 @@ typedef unsigned __int64	tUIntMax;
 # define INT32_C(c)	c
 #ifdef __GNUC__
 # define INT64_C(c)	c ## LL
-#elif ! __QNX4__
-# define INT64_C(c)	c ## i64
 #endif
 
 /** Unsigned.  */
@@ -274,17 +254,12 @@ typedef unsigned __int64	tUIntMax;
 # define UINT32_C(c)	c ## U
 #ifdef __GNUC__
 # define UINT64_C(c)	c ## ULL
-#elif ! __QNX4__
-# define UINT64_C(c)	c ## Ui64
 #endif
 
 /** Maximal type.  */
 #ifdef __GNUC__
 # define INTMAX_C(c)	c ## LL
 # define UINTMAX_C(c)	c ## ULL
-#elif ! __QNX4__
-# define INTMAX_C(c)	c ## i64
-# define UINTMAX_C(c)	c ## Ui64
 #endif
 
 #endif	/** C++ && constant macros */
