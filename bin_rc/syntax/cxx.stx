@@ -1,0 +1,105 @@
+;
+; C/C++ common syntax definition for biew project
+;
+
+[General]
+WSet=ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_0123456789
+
+[Context]
+  <Comments>
+    base=/*...*/
+    %CPP_CMT%=//...\n
+  <Preproc>
+    base=#...\n
+  <Constants>
+    base="..."
+    extended='...'
+[Keywords]
+base=asm
+base=auto
+base=break
+base=case
+base=char
+base=const
+base=continue
+base=default
+base=do
+base=double
+base=else
+base=enum
+base=extern
+base=float
+base=for
+base=goto
+base=if
+base=inline
+base=int
+base=long
+base=register
+base=return
+base=short
+base=signed
+base=sizeof
+base=static
+base=struct
+base=switch
+base=typedef
+base=union
+base=unsigned
+base=void
+base=volatile
+base=while
+;C++ reserved words
+%CPP_TYPE%=bool
+%CPP_TYPE%=class
+%CPP_TYPE%=const_cast
+%CPP_TYPE%=dynamic_cast
+%CPP_TYPE%=explicit
+%CPP_TYPE%=false
+%CPP_TYPE%=friend
+%CPP_TYPE%=delete
+%CPP_TYPE%=mutable
+%CPP_TYPE%=namespace
+%CPP_TYPE%=new
+%CPP_TYPE%=operator
+%CPP_TYPE%=private
+%CPP_TYPE%=protected
+%CPP_TYPE%=public
+%CPP_TYPE%=reinterpret_cast
+%CPP_TYPE%=static_cast
+%CPP_TYPE%=this
+%CPP_TYPE%=throw
+%CPP_TYPE%=template
+%CPP_TYPE%=true
+%CPP_TYPE%=try
+%CPP_TYPE%=typeid
+%CPP_TYPE%=typename
+%CPP_TYPE%=using
+%CPP_TYPE%=virtual
+%CPP_TYPE%=wchar_t
+
+[Operators]
+base=+
+base=-
+base=*
+base=/
+base=\x25
+base=>
+base=<
+base=)
+base=(
+base={
+base=}
+base=]
+base=[
+base=:
+base==
+base=\x3B
+base=^
+base=|
+base=&
+base=!
+base=,
+base=.
+base=?
+base=~

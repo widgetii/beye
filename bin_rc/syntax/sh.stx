@@ -33,4 +33,4 @@ base=until
 
 [Operators]
 base=$
-
+base=\x3B

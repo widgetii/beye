@@ -1,0 +1,10 @@
+;
+; C++ syntax definition for biew project
+;
+#set CPP_TYPE = base
+#set CPP_CMT = base
+
+[General]
+Name=C++ syntax
+
+#include "cxx.stx"
