@@ -40,6 +40,8 @@ static void winInternalError( void ) = { 0xFF, 0xFF };
 #else
 #ifdef __GNUC__
 #define winInternalError() asm(".short 0xFFFF\n");
+#elif defined(_MSC_VER) /* Microsoft Visual C++ 6.0 */
+#define winInternalError() __asm { __asm _emit 0xFF __asm _emit 0xFF }
 #else
 #define winInternalError() __asm { db 0xFF, 0xFF };
 #endif
