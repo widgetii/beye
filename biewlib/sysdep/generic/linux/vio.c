@@ -16,7 +16,7 @@
 **/
 
 /*
-    Copyright (C) 1999-2001 Konstantin Boldyshev <konst@linuxassembly.org>
+    Copyright (C) 1999-2002 Konstantin Boldyshev <konst@linuxassembly.org>
 
     $Id$
 */
@@ -56,13 +56,12 @@ static const char rcs_id[] = "$Id$";
 tAbsCoord tvioWidth, tvioHeight;
 unsigned tvioNumColors = 16;
 
-int console_flags = 0, on_console = 0, transparent = 0;
+int console_flags = 0, on_console = 0, output_7 = 0, transparent = 0;
 
 static unsigned char __ansi_color[8] = {0,4,2,6,1,5,3,7};
 static tAbsCoord saveX, saveY, firstX, firstY;
 static int cursor_type = __TVIO_CUR_NORM;
-static int viohandle, out_fd, initialized,
-	    output_7 = 0, output_G1 = 0;
+static int viohandle, out_fd, initialized, output_G1 = 0;
 
 static unsigned violen;
 static unsigned char *viomem;
@@ -112,7 +111,7 @@ inline static int __FASTCALL__ printable(unsigned char c)
 {
     int result = !(c < 0x20 || c == 0x7f || c == 0x9b); /* 0x80< c < 0xA0 */
 
-    if (result && terminal == TERM_XTERM)
+    if (result && terminal->type == TERM_XTERM)
 	result = !(
 		c == 0x84 || c == 0x85 || c == 0x88 ||
 		(c >= 0x8D && c <= 0x90) ||
@@ -136,7 +135,7 @@ int __FASTCALL__ __vioGetCursorType( void )
 void __FASTCALL__ __vioSetCursorType(int type)
 {
     cursor_type = type;
-    if	(terminal == TERM_LINUX && (cursor_type == __TVIO_CUR_SOLID || type == __TVIO_CUR_SOLID)) {
+    if	(terminal->type == TERM_LINUX && (cursor_type == __TVIO_CUR_SOLID || type == __TVIO_CUR_SOLID)) {
 	sprintf(vtmp,"\033[?%dc", type == __TVIO_CUR_SOLID ? 7 : 0);
 	twrite(vtmp);
     }
@@ -289,7 +288,7 @@ void __FASTCALL__ __init_vio(unsigned long flags)
 	tvioWidth = w.ws_col;
 	tvioHeight = w.ws_row;
     }
-    output_7 = TESTFLAG(console_flags, __TVIO_FLG_USE_7BIT);
+    if (!output_7) output_7 = TESTFLAG(console_flags, __TVIO_FLG_USE_7BIT);
     if (tvioWidth <= 0) tvioWidth = 80;
     if (tvioHeight <= 0) tvioHeight = 25;
     if (tvioWidth > VMAX_X) tvioWidth = VMAX_X;
@@ -324,10 +323,10 @@ void __FASTCALL__ __init_vio(unsigned long flags)
 	}
     } else {
 	twrite("\033[0m\033[3h");
-	if (terminal != TERM_LINUX) {
+	if (terminal->type != TERM_LINUX) {
 	    do_nls = 1;
 	    output_G1 = 1;
-	    if (terminal == TERM_XTERM) {
+	    if (terminal->type == TERM_XTERM) {
 		twrite("\033[?1000h\033]0;BIEW: Binary vIEWer\007");
 		frames_vt100[0x2B] =
 		frames_vt100[0x2C] =
@@ -350,8 +349,8 @@ void __FASTCALL__ __term_vio(void)
 
     __vioSetCursorType(__TVIO_CUR_NORM);
     if (!on_console) {
-	if (terminal == TERM_XTERM) twrite("\033[?1001r\033[?1000l");
-	if (terminal != TERM_XTERM || transparent)
+	if (terminal->type == TERM_XTERM) twrite("\033[?1001r\033[?1000l");
+	if (terminal->type != TERM_XTERM || transparent)
 	    twrite("\033(K");
 	twrite("\033[3l\033[0m\033[2J");
     }

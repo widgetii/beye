@@ -16,7 +16,7 @@
 **/
 
 /*
-    Copyright (C) 1999-2001 Konstantin Boldyshev <konst@linuxassembly.org>
+    Copyright (C) 1999-2002 Konstantin Boldyshev <konst@linuxassembly.org>
 
     $Id$
 */
@@ -249,7 +249,7 @@ inline static int __FASTCALL__ printable(unsigned char c)
 {
     int result = !(c < 0x20 || c == 0x7f || c == 0x9b); /* 0x80< c < 0xA0 */
 
-    if (result && terminal == TERM_XTERM)
+    if (result && terminal->type == TERM_XTERM)
 	result = !(
 		c == 0x84 || c == 0x85 || c == 0x88 ||
 		(c >= 0x8D && c <= 0x90) ||
@@ -288,7 +288,8 @@ void __FASTCALL__ __vioSetCursorType(int type)
     curs_set(type);
 #endif
 #ifdef	_VT100_
-    if	(terminal == TERM_LINUX && (cursor_status == __TVIO_CUR_SOLID || type == __TVIO_CUR_SOLID)) {
+    if	(terminal->type == TERM_LINUX &&
+	(cursor_status == __TVIO_CUR_SOLID || type == __TVIO_CUR_SOLID)) {
 	sprintf(vtmp,"\033[?%dc", type == __TVIO_CUR_SOLID ? 7 : 0);
 	twrite(vtmp);
     }
@@ -445,7 +446,7 @@ void __FASTCALL__ __init_vio(unsigned long flags)
 
     console_flags = flags;
 
-    output_7 = TESTFLAG(console_flags, __TVIO_FLG_USE_7BIT);
+    if (!output_7) output_7 = TESTFLAG(console_flags, __TVIO_FLG_USE_7BIT);
     do_nls = 1;
 
 #ifdef	_SLANG_
@@ -508,14 +509,10 @@ void __FASTCALL__ __init_vio(unsigned long flags)
     memset(viomem, 0, (violen << 1) + violen);
 
 #ifdef	_VT100_
-    if (terminal != TERM_XTERM || transparent)
+    if (terminal->type != TERM_XTERM || transparent)
 	twrite("\033(K\033)0");
-    if (terminal == TERM_XTERM) {
+    if (terminal->type == TERM_XTERM)
 	twrite("\033[?1001s\033[?1000h\033]0;BIEW: Binary vIEWer\007");
-#ifdef	__BEOS__	/* beterm is (B)roken (E)vil (TERM)inal */
-	output_7 = 1;
-#endif
-    }
     twrite("\033[0m\033[3h");
 #endif
     initialized = 1;
@@ -536,7 +533,7 @@ void __FASTCALL__ __term_vio(void)
     endwin();
 #endif
 #ifdef	_VT100_
-    if (terminal == TERM_XTERM) {
+    if (terminal->type == TERM_XTERM) {
 	twrite("\033[?1001r\033[?1000l");
 	if (transparent) twrite("\033(K");
     }

@@ -16,7 +16,7 @@
 **/
 
 /*
-    Copyright (C) 1999-2001 Konstantin Boldyshev <konst@linuxassembly.org>
+    Copyright (C) 1999-2002 Konstantin Boldyshev <konst@linuxassembly.org>
 
     $Id$
 */
@@ -126,17 +126,23 @@
 #define _PSMIN	0xb0
 #define	_PSMAX	0xdf
 
-extern int on_console, terminal, transparent, do_nls;
-extern tBool break_status;
-
-extern void __FASTCALL__ ReadNextEvent(void);
-
 typedef struct {
     int x;
     int y;
     int buttons;
     int pressed;
 } mevent;
+
+typedef struct {
+    unsigned char *name;
+    unsigned char type;
+} termdesc;
+
+extern int on_console, output_7, transparent, do_nls;
+extern tBool break_status;
+extern termdesc *terminal;
+
+extern void __FASTCALL__ ReadNextEvent(void);
 
 /*
     console plugin
@@ -185,7 +191,5 @@ extern Console console;
 #define	__vioGetCursorType	console.GetCursorType
 #define	__vioSetCursorType	console.SetCursorType
 */
-
-#define TESTFLAG(x,y) (((x) & y) == y)	/* this define should be in other header */
 
 #endif	/* __CONSOLE_H */

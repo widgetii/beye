@@ -85,7 +85,6 @@ __inline static tUInt64 __FASTCALL__ __CONSTFUNC__ ByteSwapLL(tUInt64 x)
                   * @return         byte readed from table \e t at offset \e i
                   * @param t        pointer to 256-byte memory block from which will be readed byte
                   * @param i        index of memory block where byte is to be readed
-                  * @warning        BEOS can not to process EBX in assembler statements
                 **/
 __inline static tUInt8 __FASTCALL__ __CONSTFUNC__ __Xlat__(const tUInt8 *_table, tUInt8 _idx)
 {

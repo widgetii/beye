@@ -16,7 +16,7 @@
 **/
 
 /*
-    Copyright (C) 1999-2001 Konstantin Boldyshev <konst@linuxassembly.org>
+    Copyright (C) 1999-2002 Konstantin Boldyshev <konst@linuxassembly.org>
 
     $Id$
 */
@@ -46,17 +46,11 @@ static const char rcs_id[] = "$Id$";
 #define DATADIR	PREFIX"/share"
 #endif
 
-static char _ini_name[FILENAME_MAX + 1];
-static char _rc_dir_name[FILENAME_MAX + 1];
-
-int terminal = TERM_UNKNOWN;
-
 tBool break_status = False;	/**< CTRL+BREAK flag */
 
-struct {
-    unsigned char *name;
-    unsigned char type;
-} termtab[] = {
+termdesc *terminal = NULL;
+
+static termdesc termtab[] = {
 { "linux",	TERM_LINUX },
 { "console",	TERM_LINUX },
 { "xterm",	TERM_XTERM },
@@ -66,6 +60,9 @@ struct {
 { "vt100",	TERM_VT100 },
 { "ansi",	TERM_ANSI  },
 { NULL,		TERM_UNKNOWN}};
+
+static char _ini_name[FILENAME_MAX + 1];
+static char _rc_dir_name[FILENAME_MAX + 1];
 
 /*
 
@@ -138,17 +135,22 @@ void __FASTCALL__ __init_sys(void)
 
     if (t != NULL)
 	for (i = 0; termtab[i].name != NULL && strcasecmp(t, termtab[i].name); i++);
-    terminal = termtab[i].type;
-    if (terminal == TERM_XTERM) {
-	t = getenv("COLORTERM");
-	if (t != NULL && !strcasecmp(t, "Eterm")) transparent = 1;
-    }
+    terminal = &termtab[i];
+
 #ifdef _VT100_
-    if (terminal == TERM_UNKNOWN) {
+    if (terminal->type == TERM_UNKNOWN) {
         printm("Sorry, I can't handle terminal type '%s'.\nIf you are sure it is vt100 compatible, try setting TERM to vt100:\n\n$ TERM=vt100 biew filename\n\nIf you will not succeed, use slang/curses version of BIEW.\n\n", t);
         exit(2);
     }
 #endif
+	
+    if (i == 5) output_7 = 1;	/* beterm is (B)roken (E)vil (TERM)inal */
+
+    if (terminal->type == TERM_XTERM) {
+	t = getenv("COLORTERM");
+	if (t != NULL && !strcasecmp(t, "Eterm")) transparent = 1;
+    }
+
     umask(0077);
     signal(SIGTERM, cleanup);
     signal(SIGINT,  cleanup);
