@@ -13,7 +13,7 @@
  * @author      Andrew Golovnia
  * @since       2003
  * @note        Development, fixes and improvements
- * @note        Big thanks to Mike Gorchak for tvision-1.0.10-1/src.
+ * @note        Big thanks to Mike Gorchak for tvision source codes.
 **/
 
 #include <Ph.h>
@@ -29,9 +29,6 @@
 #include <sys/types.h>
 #include <sys/mman.h>
 #include <dlfcn.h>
-//#undef buttons
-//#undef color_names
-//#include <Ph.h>
 
 #include "biewlib/biewlib.h"
 
@@ -60,18 +57,18 @@ unsigned violen;
 unsigned char *viomem;
 static struct termios old_term,new_term;		//!!!
 
-static void __FASTCALL__ _putp(char *str)
+void __FASTCALL__ _putp(char *str)
 {
 	if(str) fputs(str,tty_file);
 }
 
-static void __FASTCALL__ __putp(char *str)
+void __FASTCALL__ __putp(char *str)
 {
 	_putp(str);
 	fflush(tty_file);
 }
 
-static void __FASTCALL__ _putbuf(char **p,char *str)
+void __FASTCALL__ _putbuf(char **p,char *str)
 {
 	if(str) strcpy(*p,str);
 	(*p)+=strlen(str);
@@ -125,7 +122,7 @@ void __FASTCALL__ __vioReadBuff(tAbsCoord x,tAbsCoord y,tvioBuff *buff,unsigned 
 
 static int old_fore=-1,old_back=-1;
 
-static void __FASTCALL__ _mapcolor(char **p,int col)
+void __FASTCALL__ _mapcolor(char **p,int col)
 {
 	static const char map[]={0,4,2,6,1,5,3,7};
 	int back,fore;
@@ -146,6 +143,51 @@ static void __FASTCALL__ _mapcolor(char **p,int col)
 	old_back=back;
 }
 
+int PCTable=-1;
+
+void __FASTCALL__ _insertchar(char **p,unsigned char c)
+{
+	if(c<0x80)
+	{
+		if(PCTable!=0)
+		{
+			PCTable=0;
+			_putbuf(p,"\x1B""[11m");
+		}
+	}
+	else
+	{
+		if(PCTable!=1)
+		{
+			PCTable=1;
+			_putbuf(p,"\x1B""[12m");
+		}
+	}
+	if(c==0x1B)
+	{
+		_putbuf(p,"\x1B""[10m");
+		PCTable=-1;
+	    	**p='-';
+		(*p)++;
+	}
+	else
+	{
+		if(c==0) c=0x20;
+		if(c==0x9B)
+		{
+			_putbuf(p,"\x1B""[10m");
+			PCTable=-1;
+			**p=0xA2;
+			(*p)++;
+		}
+		else
+		{
+			**p=c;
+			(*p)++;
+		}
+	}
+}
+
 static int prev_ca=-1;
 
 void __FASTCALL__ __vioWriteBuff(tAbsCoord x,tAbsCoord y,const tvioBuff *buff,unsigned len)
@@ -155,9 +197,10 @@ void __FASTCALL__ __vioWriteBuff(tAbsCoord x,tAbsCoord y,const tvioBuff *buff,un
 	unsigned i;
 	char line[__TVIO_MAXSCREENWIDTH*16+16];
 	char *p;
-	int PCTable=-1;
 
 /*	if(!len) return;*/
+	PCTable=-1;
+	prev_ca=-1;
 	addr=_addr(x,y);
 	memcpy(addr,buff->attrs,len);
 	memcpy(addr+violen,buff->chars,len);
@@ -205,46 +248,8 @@ void __FASTCALL__ __vioWriteBuff(tAbsCoord x,tAbsCoord y,const tvioBuff *buff,un
 				else if(ca==0x70) _putbuf(&p,enter_reverse_mode);
 			}
 		}
-		
-		if(c<0x80)
-		{
-			if(PCTable!=0)
-			{
-				PCTable=0;
-				_putbuf(&p,"\x1B""[11m");
-			}
-		}
-		else
-		{
-			if(PCTable!=1)
-			{
-				PCTable=1;
-				_putbuf(&p,"\x1B""[12m");
-			}
-		}
-		if(c==0x1B)
-		{
-			_putbuf(&p,"\x1B""[10m");
-			PCTable=-1;
-		    	*p='-';
-			p++;
-		}
-		else
-		{
-			if(c==0) c=0x20;
-			if(c==0x9B)
-			{
-				_putbuf(&p,"\x1B""[10m");
-				PCTable=-1;
-				*p=0xA2;
-				p++;
-			}
-			else
-			{
-			        *p=c;
-				p++;
-			}
-		}
+
+		_insertchar(&p,c);
 		*p=0;
 		x++;
 	}
@@ -404,7 +409,7 @@ void __FASTCALL__ __init_vio(unsigned long flags)
 	refresh();
 	timeout(0);
 
-	__putp(enter_pc_charset_mode);
+//	__putp(enter_pc_charset_mode);
 	tcgetattr(tty_fd,&new_term);		//!!!
 	ESCDELAY=1;
 
@@ -421,14 +426,6 @@ void __FASTCALL__ __init_vio(unsigned long flags)
 	memset(viomem,0,violen*3);
 
 	SetGTables();
-
-/*	if(getenv("PHOTON")!=NULL) photon=1;
-	else
-	{
-		photon=0;
-		if(isatty(fileno(stdin))) console=1;
-		else console=0;
-	}*/
 
 	if(init_libph_so()) photon=1;
 	else
@@ -477,3 +474,4 @@ void __FASTCALL__ __term_vio(void)
 void __FASTCALL__ __vioSetTransparentColor(unsigned char value)
 {
 }
+

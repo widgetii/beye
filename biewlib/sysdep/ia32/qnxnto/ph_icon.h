@@ -398,5 +398,3 @@ struct PhABResource
 };
 
 #endif/*__PH_ICON_H__*/
-
-

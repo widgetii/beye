@@ -16,11 +16,8 @@
  * @note        Big thanks to Mike Gorchak for tvision-1.0.10-1/src.
 **/
 
-//#define _STDINT_H
 #include <stdio.h>
 #include <stdlib.h>
-//#include <limits.h>
-//#include <conio.h>
 #include <curses.h>
 #include <devctl.h>
 #include <sys/dcmd_chr.h>
@@ -56,19 +53,10 @@ extern int (*p_PhInputGroup)(PhEvent_t const*);
 extern int (*p_PhQueryCursor)(unsigned short,PhCursorInfo_t*);
 #define so_PhQueryCursor(a,b) (*p_PhQueryCursor)(a,b)
 
+int __FASTCALL__ getms(void);
+
 void __FASTCALL__ __init_keyboard( void )
 {
-/*	ph_ig=0;
-	so_handle=dlopen("libph.so",RTLD_NOW);
-	if(so_handle!=NULL)
-	{
-		p_PhAttach=dlsym(so_handle,"PhAttach");
-		p_PhInputGroup=dlsym(so_handle,"PhInputGroup");
-		p_PhQueryCursor=dlsym(so_handle,"PhQueryCursor");
-		if(p_PhAttach!=NULL&&p_PhInputGroup!=NULL&&p_PhQueryCursor!=NULL)
-			if(so_PhAttach(NULL,NULL)) ph_ig=so_PhInputGroup(NULL);
-	}*/
-
 	__init_mouse();
 	_shift_state=0;
 	raw();
@@ -84,10 +72,6 @@ void __FASTCALL__ __term_keyboard( void )
 	__term_mouse();
 	keypad(stdscr,FALSE);
 	nodelay(stdscr,FALSE);
-
-/*	if(so_handle!=NULL) dlclose(so_handle);
-	so_handle=NULL;*/
-	return;
 }
 
 int __FASTCALL__ __kbdGetShiftsKey( void )
@@ -138,7 +122,7 @@ static int __NEAR__ __FASTCALL__ isShiftKeysChange( int flush_queue )
 int __FASTCALL__ __kbdTestKey( unsigned long flg )
 {
 	int c;
-	
+
 	c=getch();
 /*	if(c!=-1)
 	{
@@ -146,10 +130,16 @@ int __FASTCALL__ __kbdTestKey( unsigned long flg )
 		fprintf(f,"0x%08x - 0x%08x\n",c,_2B(c));
 		fclose(f);
 	}*/
-	if(c==ERR) c=0;
+	if(c==ERR)
+	{
+		c=getms();
+		if(c==KE_MOUSE) return c;
+		c=0;
+	}
+
 	if(isShiftKeysChange(0))
 	{
-		if(c!=ERR) ungetch(c);
+		if(c!=0) ungetch(c);
 		return KE_SHIFTKEYS;
 	}
 	if((!console)&&(!photon)||(photon&&ph_ig==0))
@@ -194,8 +184,8 @@ int __FASTCALL__ __kbdGetKey ( unsigned long flg )
 		if(c==0)
 		{
 			__OsYield();
-//			if(flg==KBD_NONSTOP_ON_MOUSE_PRESS&&_mouse_buttons)
-//				return KE_MOUSE;
+			if(flg==KBD_NONSTOP_ON_MOUSE_PRESS&&_mouse_buttons)
+				return KE_MOUSE;
 		}
 	}
 	while(c==0);
