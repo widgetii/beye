@@ -444,7 +444,9 @@ void __FASTCALL__ __init_vio(unsigned long flags)
 #endif
 
     console_flags = flags;
+
     output_7 = TESTFLAG(console_flags, __TVIO_FLG_USE_7BIT);
+    do_nls = 1;
 
 #ifdef	_SLANG_
     SLtt_get_terminfo();

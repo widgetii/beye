@@ -28,7 +28,7 @@ static const char copyright[] = "$Id$";
 
 #include "biewlib/biewlib.h"
 
-int do_nls = 1;
+int do_nls = 0;
 
 static unsigned char alt2koi[] =
 {
@@ -57,5 +57,5 @@ void __FASTCALL__ __nls_OemToFs(unsigned char *buff, unsigned int len)
 
 void __FASTCALL__ __nls_CmdlineToOem(unsigned char *buff, unsigned int len)
 {
-    (void) buff, (void) len;
+    UNUSED(buff), UNUSED(len);
 }
