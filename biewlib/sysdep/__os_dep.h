@@ -80,6 +80,16 @@ extern int       __FASTCALL__ __kbdTestKey( unsigned long flg );
                     **/
 extern int       __FASTCALL__ __kbdGetShiftsKey( void );
 
+                   /** Describes info about input events.
+                     * @param head            Pointer to header to be filled
+                     * @param text            Pointer to formatted text to be filled
+                     * @return                0 if ESCAPE's functionality key pressed;
+                                              1 if regulare event occured
+                                              -1 if functionality is not implemented(supported).
+                    **/
+extern int       __FASTCALL__ __inputRawInfo(char *head, char *text);
+
+
 #if __WORDSIZE == 16
 typedef unsigned char tAbsCoord; /**< This is the data type used to represent screen-related coordinates */
 #else

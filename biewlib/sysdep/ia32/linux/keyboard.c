@@ -65,7 +65,7 @@ static volatile int shift_status = 0,	/**< status of shift keys */
 		    keypressed[KEYNUM];	/**< indicates whether key is down */
 static tBool mouse_status = True;
 static struct termios sattr, tattr;	/**< terminal attributes */
-static int in_fd;
+int in_fd;
 
 /**
     keyboard FIFO
@@ -76,6 +76,10 @@ static struct {
     int current;
 } keybuf;
 
+char rawkb_buf[KBUFSIZE];
+unsigned rawkb_len; /* size of rawkb_buf*/
+unsigned rawkb_mode=0;
+int rawkb_escape;
 /**
     scancode tables
 */
@@ -314,8 +318,9 @@ void __FASTCALL__ ReadNextEvent(void)
 
 	    do { get(c); } while (c == 0xe0);
 	    if (c == 0xe1) get(c);
-	    if (c == 0xC6) { break_status = True; return; } /* CTRL+BREAK check */
+	    if (c == 0xC6) { break_status = True; if(rawkb_mode) { rawkb_buf[0]=c; rawkb_len=1; rawkb_mode=0; } return; } /* CTRL+BREAK check */
 	    if (c) {
+		if(rawkb_mode) { rawkb_buf[0]=c; rawkb_len=1; }
 		keypressed[c & (KEYNUM - 1)] = c & KEYNUM ? 0 : 1;
 		for (i = 1; i < KSCANSIZE; i++)
 		    if (keypressed[i] &&
@@ -377,19 +382,32 @@ c_end:
 	    
 	    switch(c[0]) {
 		case KE_ESCAPE		: break;
-		case KE_STATUS_RESET	: set_s(0);
-		case KE_STATUS_ALT	: set_s(KS_ALT);;
-		case KE_STATUS_SHIFT	: set_s(KS_SHIFT);
-		case KE_STATUS_CONTROL	: set_s(KS_CTRL);
+		case KE_STATUS_RESET	: if(!rawkb_mode) {set_s(0); } else { rawkb_mode=0; return; }
+		case KE_STATUS_ALT	: if(!rawkb_mode) {set_s(KS_ALT); } else { rawkb_mode=0; return; }
+		case KE_STATUS_SHIFT	: if(!rawkb_mode) {set_s(KS_SHIFT); } else { rawkb_mode=0; return; }
+		case KE_STATUS_CONTROL	: if(!rawkb_mode) {set_s(KS_CTRL); } else { rawkb_mode=0; return; }
 		case 0			: break_status = True; break;
 		case KE_ENTER2		: key = KE_ENTER; break;
 		case KE_BKSPACE2	: key = KE_BKSPACE; break;
 		case KE_C_O		: key = KE_CTL_(O); break;
 		default			: key = c[0];
 	    }
-	    if (key) goto place_key;
+	    if (key) 
+	    {
+		if(rawkb_mode)
+		{
+		    rawkb_buf[0]=c[0];
+		    rawkb_len=1;
+		}
+		goto place_key;
+	    }
 	    for (i = 1; i < SEQ_LEN - 1; i++) {
 		if(get(c[i]) < 0) break;
+	    }
+	    if(rawkb_mode)
+	    {
+		memcpy(rawkb_buf,c,i);
+		rawkb_len=i;
 	    }
 	    if (i < 3) {
 		key = c[0];
@@ -436,7 +454,8 @@ c_end:
 #undef S
 	}
 place_key:
-	ret(key);
+	if(!rawkb_mode) { ret(key); }
+	else { rawkb_escape=(key==KE_ESCAPE&&rawkb_len==1); rawkb_mode=0; }
 #undef set_s
 #undef ret
 }

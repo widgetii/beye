@@ -54,6 +54,7 @@
 #compile %sysdepdir%\keyboard.c
 #compile %sysdepdir%\mmfio.c
 #compile %sysdepdir%\mouse.c
+#compile %sysdepdir%\misc.c
 #compile %sysdepdir%\nls.c
 #compile %sysdepdir%\os_dep.c
 #compile %sysdepdir%\timer.c
@@ -89,6 +90,7 @@
 #compile addons\sys\ascii.c
 #compile addons\sys\consinfo.c
 #compile addons\sys\cpu_perf.c
+#compile addons\sys\inview.c
 #compile addons\tools\dig_conv.c
 #compile addons\tools\eval.c
 

@@ -22,12 +22,14 @@
 
 extern REGISTRY_SYSINFO AsciiTable;
 extern REGISTRY_SYSINFO CPUPerformance;
+extern REGISTRY_SYSINFO InputViewer;
 extern REGISTRY_SYSINFO ConsoleInfo;
 
 static REGISTRY_SYSINFO *toolTable[] =
 {
   &AsciiTable,
   &ConsoleInfo,
+  &InputViewer, 
   &CPUPerformance
 };
 

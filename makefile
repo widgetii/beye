@@ -129,6 +129,7 @@ tstrings.o\
 addons/sys/ascii.o\
 addons/sys/consinfo.o\
 addons/sys/cpu_perf.o\
+addons/sys/inview.o\
 addons/tools/dig_conv.o\
 addons/tools/eval.o\
 plugins/bin/aout.o\
@@ -170,6 +171,7 @@ biewlib/sysdep/$(MACHINE)/$(HOST)/fileio.o\
 biewlib/sysdep/$(MACHINE)/$(HOST)/keyboard.o\
 biewlib/sysdep/$(MACHINE)/$(HOST)/mmfio.o\
 biewlib/sysdep/$(MACHINE)/$(HOST)/mouse.o\
+biewlib/sysdep/$(MACHINE)/$(HOST)/misc.o\
 biewlib/sysdep/$(MACHINE)/$(HOST)/nls.o\
 biewlib/sysdep/$(MACHINE)/$(HOST)/os_dep.o\
 biewlib/sysdep/$(MACHINE)/$(HOST)/timer.o\
@@ -238,6 +240,7 @@ tstrings.o:                   tstrings.c
 addons/sys/ascii.o:           addons/sys/ascii.c
 addons/sys/consinfo.o:        addons/sys/consinfo.c
 addons/sys/cpu_perf.o:        addons/sys/cpu_perf.c
+addons/sys/inview.o:          addons/sys/inview.c
 addons/tools/dig_conv.o:      addons/tools/dig_conv.c
 addons/tools/eval.o:          addons/tools/eval.c
 plugins/bin/aout.o:           plugins/bin/aout.c
@@ -278,6 +281,7 @@ biewlib/sysdep/$(MACHINE)/$(HOST)/fileio.o:   biewlib/sysdep/$(MACHINE)/$(HOST)/
 biewlib/sysdep/$(MACHINE)/$(HOST)/keyboard.o: biewlib/sysdep/$(MACHINE)/$(HOST)/keyboard.c
 biewlib/sysdep/$(MACHINE)/$(HOST)/mmfio.o:    biewlib/sysdep/$(MACHINE)/$(HOST)/mmfio.c
 biewlib/sysdep/$(MACHINE)/$(HOST)/mouse.o:    biewlib/sysdep/$(MACHINE)/$(HOST)/mouse.c
+biewlib/sysdep/$(MACHINE)/$(HOST)/misc.o:     biewlib/sysdep/$(MACHINE)/$(HOST)/misc.c
 biewlib/sysdep/$(MACHINE)/$(HOST)/nls.o:      biewlib/sysdep/$(MACHINE)/$(HOST)/nls.c
 biewlib/sysdep/$(MACHINE)/$(HOST)/os_dep.o:   biewlib/sysdep/$(MACHINE)/$(HOST)/os_dep.c
 biewlib/sysdep/$(MACHINE)/$(HOST)/timer.o:    biewlib/sysdep/$(MACHINE)/$(HOST)/timer.c
