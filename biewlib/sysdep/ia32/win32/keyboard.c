@@ -21,7 +21,7 @@
  * @date        04.04.2000
  * @note        removed slight delay in win9x console bug workaround code
  * @warning     May not work propertly under some Win32 releases
- * @author      Sergey Oblomov <Sergey.Oblomov@intel.com>
+ * @author      Sergey Oblomov <hoopoepg@mail.ru>
  * @date        28.05.2003
  * @note        reworked console's reader to enable clipboard pasting
  *              through SysMenu->Edit->Paste facility of window.

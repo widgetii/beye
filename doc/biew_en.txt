@@ -1095,7 +1095,7 @@ v5.0.2        ! Changes:
                   some vt100 terminals.
                 * reworked console's reader to enable clipboard pasting
                   through SysMenu->Edit->Paste facility of window
-                  (by Sergey Oblomov <Sergey.Oblomov@intel.com>)
+                  (by Sergey Oblomov <hoopoepg@mail.ru>)
                 * Fixed 'CPU performance' tool under DJGPP
 []======================================================================[]
 []  Thank you for your interest.                                        []
