@@ -21,6 +21,11 @@
  * @date        04.04.2000
  * @note        removed slight delay in win9x console bug workaround code
  * @warning     May not work propertly under some Win32 releases
+ * @author      Sergey Oblomov <Sergey.Oblomov@intel.com>
+ * @date        28.05.2003
+ * @note        reworked console's reader to enable clipboard pasting
+ *              through SysMenu->Edit->Paste facility of window.
+ * @warning     May not work propertly under some Win32 releases
  * @bug         Under WinNT does not return correct values for some
  *              combinations of keys (like CtrlBkSpace)
 **/
@@ -51,179 +56,78 @@ static int __FASTCALL__ is_VKCtrl(int code)
          code == VK_SHIFT;
 }
 
-static int __FASTCALL__ is_VKMouse(int code)
-{
-  return code == VK_LBUTTON ||
-         code == VK_RBUTTON ||
-         code == VK_MBUTTON;
-}
-
 extern tAbsCoord win32_mx,win32_my;
 extern int win32_mbuttons;
 
-static int __FASTCALL__ __normalize_keycode(int keycode)
-{
-  int ret;
-  switch(keycode)
-  {
-    case 0x50E0: ret = 0x5000; break;
-    case 0x48E0: ret = 0x4800; break;
-    case 0x4BE0: ret = 0x4B00; break;
-    case 0x4DE0: ret = 0x4D00; break;
-    case 0x47E0: ret = 0x4700; break;
-    case 0x4FE0: ret = 0x4F00; break;
-    case 0x49E0: ret = 0x4900; break;
-    case 0x51E0: ret = 0x5100; break;
-    case 0x52E0: ret = 0x5200; break;
-    case 0x53E0: ret = 0x5300; break;
-    default: ret = keycode;
-  }
-  return ret;
-}
-
 void __FASTCALL__ win32_readNextMessage( void )
 {
-  DWORD total_nread,i;
+  //DWORD total_nread,i;
   int vkeycode,keycode;
-  int is_write = 0;
   INPUT_RECORD ir;
-  GetNumberOfConsoleInputEvents(hIn,&total_nread);
-  for(i = 0;i < total_nread;i++)
+  DWORD nread;
+  hInputTrigger=False;
+
+  PeekConsoleInput( hIn, &ir, 1, &nread );
+  if( nread )
   {
-    DWORD nread;
-    int is_read = 0;
-    if(is_win9x) PeekConsoleInput(hIn,&ir,1,&nread);
-    else         ReadConsoleInput(hIn,&ir,1,&nread);
-    if(!nread) break; /* sometimes happen */
+    ReadConsoleInput(hIn,&ir,1,&nread);
+    //if(!nread) break; /* sometimes happen */
     switch(ir.EventType)
     {
       case MOUSE_EVENT:
       {
-         if(ir.Event.MouseEvent.dwEventFlags == MOUSE_MOVED)
-         {
-            win32_mx = ir.Event.MouseEvent.dwMousePosition.X;
-            win32_my = ir.Event.MouseEvent.dwMousePosition.Y;
-         }
-         else  win32_mbuttons = ir.Event.MouseEvent.dwButtonState;
-         if(KB_freq < sizeof(KB_Buff)/sizeof(int)) KB_Buff[KB_freq++] = KE_MOUSE;
+          static int buttons = 0;
+          win32_mbuttons = ir.Event.MouseEvent.dwButtonState;
+          if( buttons != win32_mbuttons )
+          {
+              win32_mx = ir.Event.MouseEvent.dwMousePosition.X;
+              win32_my = ir.Event.MouseEvent.dwMousePosition.Y;
+              if(KB_freq < sizeof(KB_Buff)/sizeof(int)) KB_Buff[KB_freq++] = KE_MOUSE;
+              buttons = win32_mbuttons;
+          }
       }
-      break;
+      return;
       case KEY_EVENT:
       {
         shiftkeys = ir.Event.KeyEvent.dwControlKeyState;
         vkeycode = ir.Event.KeyEvent.wVirtualKeyCode;
-        if(is_VKMouse(vkeycode))
+
+        if( ir.Event.KeyEvent.wVirtualKeyCode == 27 && ir.Event.KeyEvent.wVirtualScanCode == 1 &&
+            !ir.Event.KeyEvent.uChar.AsciiChar )
+            ir.Event.KeyEvent.uChar.AsciiChar = ir.Event.KeyEvent.wVirtualKeyCode;
+
+        if(is_VKCtrl(vkeycode))
         {
-          if(vkeycode == VK_LBUTTON)
-          {
-            if(ir.Event.KeyEvent.bKeyDown == TRUE) win32_mbuttons |= MS_LEFTPRESS;
-            else                                   win32_mbuttons &= ~MS_LEFTPRESS;
-          }
-          if(vkeycode == VK_RBUTTON)
-          {
-            if(ir.Event.KeyEvent.bKeyDown == TRUE) win32_mbuttons |= MS_RIGHTPRESS;
-            else                                   win32_mbuttons &= ~MS_RIGHTPRESS;
-          }
-          if(vkeycode == VK_MBUTTON)
-          {
-            if(ir.Event.KeyEvent.bKeyDown == TRUE) win32_mbuttons |= MS_MIDDLEPRESS;
-            else                                   win32_mbuttons &= ~MS_MIDDLEPRESS;
-          }
-         if(KB_freq < sizeof(KB_Buff)/sizeof(int)) KB_Buff[KB_freq++] = KE_MOUSE;
-        }
-        if(ir.Event.KeyEvent.bKeyDown == TRUE)
-        {
-          /*
-             We must do this stupid work cause of in win95 - OSR2
-             when CAPSLOCK is ON and ESCAPE key is PRESSED then
-             ...uChar.AsciiChar == 0 for it. I do not know any more such bugs.
-          */
-          if((unsigned char)ir.Event.KeyEvent.uChar.AsciiChar == 0 &&
-             (unsigned char)ir.Event.KeyEvent.wVirtualKeyCode == 27 &&
-             (unsigned char)ir.Event.KeyEvent.wVirtualScanCode == 1 &&
-             is_win9x)
-                   ir.Event.KeyEvent.uChar.AsciiChar = 27;
-          keycode = ((ir.Event.KeyEvent.wVirtualScanCode << 8) & 0xFF00) |
-                    (ir.Event.KeyEvent.uChar.AsciiChar & 0xFF);
-          if(is_VKCtrl(vkeycode))
-          {
-            if(KB_freq < sizeof(KB_Buff)/sizeof(int)) KB_Buff[KB_freq++] = KE_SHIFTKEYS;
-          }
-          else
-          if(KB_freq < sizeof(KB_Buff)/sizeof(int))
-          {
-            if(is_win9x)
-            {
-              if(shiftkeys & SHIFT_PRESSED) keycode |= ADD_SHIFT;
-              else
-                if((shiftkeys & LEFT_CTRL_PRESSED) ||
-                   (shiftkeys & RIGHT_CTRL_PRESSED)) keycode |= ADD_CONTROL;
-                else
-                  if((shiftkeys & LEFT_ALT_PRESSED) ||
-                     (shiftkeys & RIGHT_ALT_PRESSED))  keycode |= ADD_ALT;
-              /*
-                 ReadConsoleInput in win9x don't return correct keycode
-                 for national language letters, so use ReadConsole (it works)
-                 this method can't be enabled in winnt, because it has its own bugs
-              */
-              if((unsigned char)ir.Event.KeyEvent.uChar.AsciiChar>=0x20
-                 && !(keycode & ADD_CONTROL) && !(keycode & ADD_ALT))
-              {
-                char key;
-                /*
-                   Put empty key up event to queue (we'll ignore it later),
-                   otherwise ReadConsole works with delay
-                   if called after PeekConsoleInput and queue is empty
-                */
-                if(!is_write && (i+1 == total_nread))
-                {
-                  memset(&ir.Event.KeyEvent,0,sizeof(ir.Event.KeyEvent));
-                  WriteConsoleInput(hIn,&ir,1,&nread);
-                  is_write = 1;
-                }
-                ReadConsole(hIn,&key,1,&nread,NULL);
-                keycode = (unsigned char)key;
-                if(shiftkeys & SHIFT_PRESSED) keycode |= ADD_SHIFT;
-                /*
-                   Another bug: if control key is pressed (BKSP, TAB, ENTER etc.),
-                   then sometimes ReadConsole return its code instead of code
-                   of current key returned by PeekConsoleInput
-                   Can't do anything smart here, simply ignore obvious bad keys
-                */
-                if(keycode < 0x20) keycode=0;
-                is_read = 1;
-              }
-            }
-            else /* its nt - i.e. all good */
-            {
-              int sk;
-              sk = __kbdGetShiftsKey();
-              keycode = __normalize_keycode(keycode);
-              if(sk & KS_SHIFT) keycode |= ADD_SHIFT;
-              else
-                if(sk & KS_CTRL) keycode |= ADD_CONTROL;
-                else
-                  if(sk & KS_ALT) keycode |= ADD_ALT;
-            }
-            if(keycode)
-              if(KB_freq < sizeof(KB_Buff)/sizeof(int)) KB_Buff[KB_freq++] = keycode;
-          }
+          if(KB_freq < sizeof(KB_Buff)/sizeof(int)) KB_Buff[KB_freq++] = KE_SHIFTKEYS;
         }
         else
-         if(ir.Event.KeyEvent.bKeyDown == FALSE)
-         {
-           if(is_VKCtrl(vkeycode))
-           {
-             if(KB_freq < sizeof(KB_Buff)/sizeof(int)) KB_Buff[KB_freq++] = KE_SHIFTKEYS;
-           }
-         }
+        {
+            if( vkeycode < ' ' )
+                vkeycode = 0;
+            keycode = ((ir.Event.KeyEvent.wVirtualScanCode << 8) & 0xFF00) |
+                      (ir.Event.KeyEvent.uChar.AsciiChar & 0xFF);
+            if(shiftkeys & SHIFT_PRESSED) keycode |= ADD_SHIFT;
+            else
+                if(shiftkeys & (RIGHT_CTRL_PRESSED | LEFT_CTRL_PRESSED)) keycode |= ADD_CONTROL;
+                else
+                    if(shiftkeys & (LEFT_ALT_PRESSED | RIGHT_ALT_PRESSED)) keycode |= ADD_ALT;
+            if(keycode && ir.Event.KeyEvent.bKeyDown)
+                {if(KB_freq < sizeof(KB_Buff)/sizeof(int)) KB_Buff[KB_freq++] = keycode;}
+            else
+              if(KB_freq < sizeof(KB_Buff)/sizeof(int)) KB_Buff[KB_freq++] = KE_SHIFTKEYS;
+        }
       }
-      break;
+      return;
       default: break;
     }
-    if(is_win9x && !is_read) ReadConsoleInput(hIn,&ir,1,&nread);
+//    if(is_win9x && !is_read) ReadConsoleInput(hIn,&ir,1,&nread);
   }
-  hInputTrigger=False;
+  else if( win32_mbuttons )
+  {
+    if(KB_freq < sizeof(KB_Buff)/sizeof(int)) KB_Buff[KB_freq++] = KE_MOUSE;
+  }
+  else
+      Sleep( 1 );
 }
 
 void __FASTCALL__ __init_keyboard( void )
@@ -271,7 +175,7 @@ int __FASTCALL__ __kbdGetKey ( unsigned long flg )
 {
   int ret;
   if(__MsGetBtns() && flg == KBD_NONSTOP_ON_MOUSE_PRESS) return KE_MOUSE;
-  while(!KB_freq) { __OsYield(); win32_readNextMessage(); }
+  while(!KB_freq) { /*__OsYield()*/; win32_readNextMessage(); }
   ret = KB_Buff[0];
   --KB_freq;
   if(KB_freq) memmove(KB_Buff,&KB_Buff[1],KB_freq*sizeof(int));
