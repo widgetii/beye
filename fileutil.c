@@ -271,7 +271,7 @@ static void __NEAR__ __FASTCALL__ make_addr_column(char *buff,__filesize_t offse
 
 static tBool FStore( void )
 {
- __filesize_t flags;
+ unsigned long flags;
  char *tmp_buff;
  __filesize_t endpos,cpos;
  tmp_buff = PMalloc(0x1000);

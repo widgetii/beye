@@ -1,0 +1,488 @@
+#!/bin/sh
+# Configure script for biew project
+#
+
+# Declare useful functions
+
+# Prefer these macros to full length text !
+# These macros only return an error code - NO display is done
+cc_check() {
+  echo >> "$TMPLOG"
+  cat "$TMPC" >> "$TMPLOG"
+  echo >> "$TMPLOG"
+  echo "$_cc $_extraincdir $_extralibdir $TMPC -o $TMPO $@" >> "$TMPLOG"
+  > "$TMPO"
+  ( "$_cc" $_extraincdir $_extralibdir "$TMPC" -o "$TMPO" "$@" ) >> "$TMPLOG" 2>&1
+  TMP="$?"
+  echo >> "$TMPLOG"
+  echo "ldd $TMPO" >> "$TMPLOG"
+  ( ldd "$TMPO" ) >> "$TMPLOG" 2>&1
+  echo >> "$TMPLOG"
+  return "$TMP"
+}
+
+# Display error message, flushes tempfile, exit
+die () {
+  echo
+  echo "Error: $@" >&2
+  echo >&2
+  rm -f "$TMPO" "$TMPC" "$TMPS" "$TMPCPP"
+  echo "Check "$TMPLOG" if you do not understand why it failed."
+  exit 1
+}
+
+# Use this before starting a check
+echocheck() {
+  echo "============ Checking for $@ ============" >> "$TMPLOG"
+  echo ${_echo_n} "Checking for $@ ... ${_echo_c}"
+}
+
+# Use this to echo the results of a check
+echores() {
+  echo "Result is: $@" >> "$TMPLOG"
+  echo "##########################################" >> "$TMPLOG"
+  echo "" >> "$TMPLOG"
+  echo "$@"
+}
+#############################################################################
+
+# Check how echo works in this /bin/sh
+case `echo -n` in
+  -n)	_echo_n=	_echo_c='\c'	;;	# SysV echo
+  *)	_echo_n='-n '	_echo_c=	;;	# BSD echo
+esac
+
+
+# 1st: print out help
+
+for parm in "$@" ; do
+  if test "$parm" = "--help" || test "$parm" = "-help" || test "$parm" = "-h" ; then
+    cat << EOF
+
+Usage: $0 [OPTIONS]...
+
+Configuration:
+  -h, --help             display this help and exit
+
+Installation directories:
+  --prefix=DIR           use this prefix for installing biew [/usr/local]
+  --datadir=DIR          use this prefix for installing machine independent
+                         data files (syntaxes, skins) [PREFIX/share/biew]
+  --libdir=DIR           use this prefix for installing machine dependent
+                         libraries and plugins (for future) [PREFIX/lib/biew]
+
+Base features:
+  --cc=COMPILER          use this C compiler to build biew [gcc]
+  --ld=LINKER            use this LD linker to link biew [ld]
+  --ar=AR                use this AR to build biewlib    [ar]
+  --ranlib=RANLIB        use RANLIB to build indexes on builib [ranlib]
+  --rm=RM                use RM program to cleanup files [rm]
+  --target-system=SYSTEM target system (linux, freebsd, win32, etc)  [auto,unix]
+  --target-arch=ARCH     target architecture (i386, alpha, etc)   [auto,generic]
+  --enable-debug[=1-3]   compile debugging information into biew [disable]
+  --enable-profile       compile profiling information into biew [disable]
+
+Use these options if autodetection fails:
+  --with-extraincdir=DIR   extra headers (curses.h ...) in DIR
+  --with-extralibdir=DIR   extra library files (libncurses.so, ...) in DIR
+  --with-x11incdir=DIR     X headers in DIR
+  --with-x11libdir=DIR     X library files in DIR
+
+EOF
+
+  exit 0
+  fi
+done # for parm in ...
+
+# 2nd: checking for options
+_cc=gcc
+_ld=gcc
+_ar="ar -rcu"
+_ranlib=ranlib
+_rm="rm -f"
+_libext=a
+_libprefix=lib
+test "$CC" && _cc="$CC"
+_prefix="/usr/local"
+_datadir=
+_libdir=
+_target_system=auto
+_target_arch=auto
+_x11incdir=
+_x11libdir=
+_profile=
+_debug=
+for ac_option do
+  case "$ac_option" in
+  --prefix=*)
+    _prefix=`echo $ac_option | cut -d '=' -f 2`
+    ;;
+  --datadir=*)
+    _datadir=`echo $ac_option | cut -d '=' -f 2`
+    ;;
+  --libdir=*)
+    _libdir=`echo $ac_option | cut -d '=' -f 2`
+    ;;
+  --cc=*)
+    _cc=`echo $ac_option | cut -d '=' -f 2`
+    ;;
+  --ld=*)
+    _ld=`echo $ac_option | cut -d '=' -f 2`
+    ;;
+  --disable-profile)
+    _profile=
+    ;;
+  --enable-profile)
+    _profile='-pg'
+    ;;
+  --enable-debug)
+    _debug='-g'
+    ;;
+  --enable-debug=*)
+    _debug=`echo $_echo_n '-g'$_echo_c; echo $ac_option | cut -d '=' -f 2`
+    ;;
+  --ar=*)
+    _ar=`echo $ac_option | cut -d '=' -f 2`
+    ;;
+  --ranlib=*)
+    _ranlib=`echo $ac_option | cut -d '=' -f 2`
+    ;;
+  --rm=*)
+    _rm=`echo $ac_option | cut -d '=' -f 2`
+    ;;
+  --target-system=*)
+    _target_system=`echo $ac_option | cut -d '=' -f 2`
+    ;;
+  --target-arch=*)
+    _target_arch=`echo $ac_option | cut -d '=' -f 2`
+    ;;
+  --with-extraincdir=*)
+    _extraincdir=-I`echo $ac_option | cut -d '=' -f 2`
+    ;;
+  --with-extralibdir=*)
+    _extralibdir=-L`echo $ac_option | cut -d '=' -f 2`
+    ;;
+  --with-x11incdir=*)
+    _x11incdir=-I`echo $ac_option | cut -d '=' -f 2`
+    ;;
+  --with-x11libdir=*)
+    _x11libdir=-L`echo $ac_option | cut -d '=' -f 2`
+    ;;
+  esac
+done
+test -z "$_datadir" && _datadir=$_prefix"/share/biew"
+test -z "$_libdir" && _libdir=$_prefix"/lib/biew"
+
+for I in "$TMPDIR" "$TEMPDIR" "/tmp" ; do
+  test "$I" && break
+done
+
+# Checking for INSTALL
+_install="install"
+$_install --version 1>/dev/null 2>/dev/null || _install=""
+
+
+TMPLOG="config.log"
+$_rm -f "$TMPLOG"
+TMPC="$I/biew-conf-$RANDOM-$$.c"
+TMPCPP="$I/biew-conf-$RANDOM-$$.cpp"
+TMPO="$I/biew-conf-$RANDOM-$$.o"
+TMPS="$I/biew-conf-$RANDOM-$$.S"
+_tee="tee -a $TMPLOG"
+
+echocheck "target OS"
+if test "$_target_system" = auto ; then
+  if test -z "$system_name" ; then
+    # OS name
+    system_name=`/bin/sh --version 2>&1 | sed -n 's/^.*\([(]\)./\1/p'`
+    case "$system_name" in
+	*linux*)
+	    _target_system=linux
+	    ;;
+	*qnx*)
+	    _target_system=qnx
+	    ;;
+	*[cC][yY][gG][wW][iI][nN]*)
+	    _target_system=win32
+	    ;;
+	*[eE][mM][xX]*)
+	    _target_system=os2
+	    ;;
+	*msdosdjgpp*)
+	    _target_system=dos
+            host_arch=ia32
+	    _tee=
+            ;;
+#	|FreeBSD|NetBSD|BSD/OS|OpenBSD|SunOS|BeOS)
+	*)
+	    _target_system=unix
+	    ;;
+  esac
+  else
+    _target_system=unix
+  fi
+fi
+echores "$_target_system"
+
+echocheck "architecture"
+if test "$_target_arch" = auto ; then
+  if test -z "$host_arch" ; then
+  host_arch=`( uname -p ) 2>&1`
+  case "$host_arch" in
+   i386|sparc|ppc|alpha|arm|mips)
+     ;;
+
+   *) # uname -p on Linux returns 'unknown' for the processor type,
+      # OpenBSD returns 'Intel Pentium/MMX ("Genuine Intel" 586-class)'
+
+      # Maybe uname -m (machine hardware name) returns something we
+      # recognize.
+
+      case "`( uname -m ) 2>&1`" in
+      i[3-9]86|x86*) host_arch=ia32 ;;
+      ppc) host_arch=ppc ;;
+      alpha) host_arch=alpha ;;
+      sparc*) host_arch=sparc ;;
+      arm*) host_arch=arm ;;
+      *) host_arch=generic ;;
+    esac
+    ;;
+  esac
+  fi
+else
+  host_arch=$_target_arch
+fi
+echores "$host_arch"
+echo "Detected host..."$system_name
+
+if test -z "$_x11incdir" ; then
+echocheck "X11 headers"
+  for I in /usr/include /usr/X11R6/include /usr/X11/include /usr/openwin/include ; do
+    if test -d "$I/X11" ; then
+      _x11incdir="-I$I"
+      echores "yes (using $I)"
+      break
+    fi
+  done
+fi
+if test -z "$_x11incdir" ; then
+    echores "x11inc not found"
+fi
+
+if test -z "$_x11libdir" ; then
+echocheck "X11 libs"
+  for I in /usr/X11R6/lib /usr/X11/lib /usr/lib32 /usr/openwin/lib ; do
+    if test -d "$I" ; then
+      _x11libdir="-L$I"
+      echores "yes (using $I)"
+      break;
+    fi
+  done
+fi
+if test -z "$_x11libdir" ; then
+    echores "x11lib not found"
+fi
+
+_cdefos="-DDATADIR='\"$_datadir\"'"
+_osldef=
+_oslibs=
+
+if test "$_debug" = "-g3"; then
+_cdefos="-finline-limit-5"
+else
+_osldef="-s"
+fi
+if test "$_profile" || test "$_debug" ; then
+  _cdefos="-W -Wall -O2 -fno-builtin $_debug $_profile $_cdefos"
+  _osldef="$_debug $_profile $_osldef"
+elif test -z "$CFLAGS" ; then
+    _cdefos="-DNDEBUG=1 -O2 -ffast-math -fomit-frame-pointer $_cdefos"
+else
+    _cdefos="-DNBEBUG=1 $CFLAGS $_cdefos"
+fi
+
+if test "$_target_system" = dos ; then
+# disable cc_check call for DJGPP due bugs in bash
+_cdefos="-D__HAVE_PRAGMA_PACK__=1 $_cdefos"
+else
+echocheck "your gcc possibility"
+cat > $TMPC << EOF
+#pragma pack(1)
+int main(void){return 0;}
+EOF
+_ppack=no
+cc_check && _ppack=yes
+if test "$_ppack" = yes ; then 
+    echores "pragma pack(yes)"
+    _cdefos="-D__HAVE_PRAGMA_PACK__=1 $_cdefos"
+else
+    echores "pragma pack(no)"
+    die "Please upgrade your compiler"
+fi
+fi
+
+if test -z "$_x11libdir" ; then
+ _cdefos="$_cdefos"
+else
+  if test -z "$_x11incdir" ; then
+   _cdefos="$_cdefos"
+  else
+    _cdefos="-DHAVE_X11 $_cdefos"
+  fi
+fi
+#Printout operating system
+case "$_target_system" in
+    dos)
+	_cdefos="-D__MSDOS__ -D__OS_NAME__='\"DOS\"' -D__OS__=\"dos\" -Udos $_cdefos"
+	_osldef="--force-exe-suffix $_osldef"
+	;;
+    os2)
+	_cdefos="-D__OS2__ -D__OS_NAME__='\"OS/2\"' -Zomf -D__OS__=\"os2\" -Uos2 $_cdefos"
+# here I want to have static link of glibc instead emx.dll
+	_osldef="-Zexe -Zsmall-conv -Zsys -Zomf -Zstack 1024 $_osldef"
+	_ar="emxomfar -p32 rc"
+	_ranlib=echo
+	_libext=lib
+	_libprefix=
+	;;
+    win32)
+# I named this as win32 because of exists Win386 by Watcom.
+# here I link crtdll.dll instead cygwin1.dll (it's safe)
+	_cdefos="-D__WIN32__ -D__OS_NAME__='\"Win32\"' -mno-cygwin -D__OS__=\"win32\" -Uwin32 $_cdefos"
+	_osldef="-mno-cygwin --force-exe-suffix $_osldef"
+	_oslibs="-lwinmm $_oslibs"
+	;;
+    beos)
+	_cdefos="-D__BEOS__ -D__UNIX__ -D__OS_NAME__='\"BeOS\"' -D__OS__=\"beos\" -Ubeos -D_VT100_ -DHAVE_TERMINAL_OUT=1 -DDATADIR='\"/boot/home/config/lib\"' -D__DISABLE_MMF -D__DISABLE_ASM -D__DISABLE_SIGIO -DPREFIX=\"$_prefix\" $_cdefos"
+	;;
+    linux)
+	_cdefos="-D__LINUX__ -D__UNIX__ -D__OS_NAME__='\"Linux\"' -D__OS__=\"linux\" -Ulinux -D_VT100_ -DHAVE_TERMINAL_OUT=1 -DPREFIX=\"$_prefix\" $_cdefos"
+echocheck "gpm.h"
+	cat > $TMPC << EOF
+	#include <gpm.h>
+	int main(void) {return 0;}
+EOF
+	_gpm=no
+	cc_check -lgpm && _gpm=yes
+	if test "$_gpm" = yes ; then
+	    _cdefos="-DHAVE_MOUSE $_cdefos"
+	    _oslibs="-lgpm $_oslibs"
+	fi
+echores "$_gpm"
+	;;
+    unix)
+	_cdefos="-D__UNIX__ -D__OS__=\"unix\" -Uunix -DHAVE_TERMINAL_OUT=1 $_cdefos"
+echocheck "gpm.h"
+	cat > $TMPC << EOF
+	#include <gpm.h>
+	int main(void) {return 0;}
+EOF
+	_gpm=no
+	cc_check -lgpm && _gpm=yes
+	if test "$_gpm" = yes ; then
+	    _cdefos="-DHAVE_MOUSE $_cdefos"
+	    _oslibs="-lgpm $_oslibs"
+	fi
+echores "$_gpm"
+echocheck "slang.h"
+	cat > $TMPC << EOF
+	#include <slang.h>
+	int main(void) {return 0;}
+EOF
+	_slang=no
+	cc_check -lslang && _slang=yes
+	if test "$_slang" = yes ; then
+	    _cdefos="-D_SLANG_ -D__OS_NAME__='\"Unix/Slang\"' $_cdefos"
+	    _oslibs="-lslang $_oslibs"
+	fi
+echores "$_slang"
+	if test "$_slang" = no; then
+echocheck "curses.h"
+	cat > $TMPC << EOF
+	#include <curses.h>
+	int main(void) {return 0;}
+EOF
+	_curseslib=
+	cc_check -lcurses && _curseslib="-lcurses"
+	if test -z "$_curseslib" ; then
+	    cc_check -lncurses && _curseslib="-lncurses"
+	fi
+	if test "$_curseslib" ; then
+	    _curses=yes
+	    _cdefos="-D_CURSES_ -D__OS_NAME__='\"Unix/Curses\"' $_cdefos"
+	    _oslibs="$_curseslib $_oslibs"
+	else
+	    _curses=no
+	fi
+echores "$_curses"
+	if test "$_curses" = no ; then
+	    echo "Defaulting to VT100"
+	    _cdefos="-D_VT100_ -D__OS_NAME__='\"Unix/VT100\"' $_cdefos"
+	fi
+	fi
+	;;
+    *)
+	;;
+esac
+
+# Printout architecture
+_cdefsys=
+case "$host_arch" in
+  ia32)
+# TODO: enable >386 optimizations here
+  _cdefsys="-D__MACHINE__=ia32 -D__CPU_NAME__='\"ia32\"' -D__CPU__=386 -D__DEFAULT_DISASM=0 -DCAN_COMPILE_X86_GAS=1"
+    ;;
+
+  *)
+    echo "It seems noone has ported biew to your OS or CPU type yet."
+    echo "using $host_arch architecture"
+    ;;
+esac
+
+#Force including of our .h files before standard
+_cdefos="-I. $_cdefos"
+#############################################################################
+echo "Creating config.mak"
+cat > config.mak << EOF
+# -------- Generated by configure -----------
+
+CC=$_cc
+LD=$_ld
+AR=$_ar
+RANLIB=$_ranlib
+RM=$_rm
+INSTALL=$_install
+LIBEXT=$_libext
+LIBPREFIX=$_libprefix
+PREFIX=$_prefix
+DATADIR=$_datadir
+LIBDIR=$_libdir
+HOST=$_target_system
+MACHINE=$host_arch
+CDEFOS=$_cdefos $_extraincdir $_x11incdir
+OSLDEF=$_osldef
+OS_LIBS=$_extralibdir $_x11libdir $_oslibs
+CDEFSYS=$_cdefsys
+EOF
+
+#last: printout configure
+cat << EOF | $_tee
+
+Config files successfully generated by ./configure !
+
+  Install prefix: $_prefix
+  Data directory: $_datadir
+  Lib directory: $_libdir
+  Compiler: $_cc
+  Linker: $_ld
+  Librarian: $_ar
+  Ranlib: $_ranlib
+  Remover: $_rm
+  TARGETS
+    system: $_target_system
+    arch: $host_arch
+ 
+EOF
+
+$_rm -f "$TMPO" "$TMPC" "$TMPS" "$TMPCPP"
+

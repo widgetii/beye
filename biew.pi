@@ -17,10 +17,10 @@
 #pragma define(NDEBUG=>on,__DEFAULT_DISASM=>0)
 #if %model = extended #or %system = os2 #then
   #pragma define(__OS2__=>on)
-  #pragma define(__CPU_NAME__=>'"i286"',__MACHINE=>"i86",__HOST=>"os2")
+  #pragma define(__CPU_NAME__=>'"ia16"',__MACHINE=>"i86",__HOST=>"os2")
 #else
   #pragma define(__MSDOS__=>on)
-  #pragma define(__CPU_NAME__=>'"i86"',__MACHINE=>i86,__HOST=>dos)
+  #pragma define(__CPU_NAME__=>'"ia16"',__MACHINE=>i86,__HOST=>dos)
 #endif
 
 #if %system = dos #then

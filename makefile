@@ -14,84 +14,16 @@
 # This software is redistributable under the licence given in the file       #
 # "Licence" distributed in the BIEW archive.                                 #
 ##############################################################################
-
-##############################################################################
-#  Main configure section of this makefile                                   #
-##############################################################################
-#
-# Please select target platform. Valid values are:
-# For 16-bit Intel: i86 i286 ( still is not supported by gcc )
-# For 32-bit Intel
-#        basic    : i386 i486
-#        gcc-2.9x : i586 i686 p3 p4 k6 k6_2 athlon
-#        pgcc     : i586mmx i686mmx p3mmx p4mmx k5 k6mmx k6_2mmx 6x86 6x86mmx
-#                   athlon_mmx
-# Other platform  : generic
-#-----------------------------------------------------------------------------
-TARGET_PLATFORM=i386
-
-# Please select target operation system. Valid values are:
-# dos, os2, win32, linux, unix, beos, qnx4, qnx6
-#---------------------------------------------------------
-TARGET_OS=unix
-
-# Please add any host specific flags here
-# (like -fcall-used-R -fcall-saved-R -mrtd -mregparm=3 -mreg-alloc=  e.t.c ;-):
-#------------------------------------------------------------------------------
-# Notes: You can also define -D__EXPERIMENTAL_VERSION flag, if you want to
-# build experimental version with fastcall technology.
-# *****************************************************************************
-# You can also define:
-# -DHAVE_MMX     mostly common for all cpu since Pentium-MMX and compatible
-# -DHAVE_MMX2    exists on K7+ and P3+
-# -DHAVE_SSE     exists only on P3+
-# -DHAVE_SSE2    exists only on P4+
-# -DHAVE_3DNOW   exists only on AMD's K6-2+
-# -DHAVE_3DNOWEX exists only on AMD's K7+
-# These flags are implicitly defined when you select pgcc mmx optimization
-# for corresponded CPUs. But you may want to disable mmx optimization for pgcc
-# (for example if you don't trust pgcc or if you don't have pgcc), but
-# explicitly enable it for inline assembler. Also for K6 CPU (not for K6-2)
-# it would be better to disable pgcc mmx optimization and enable it for
-# inline assembler (if you are interested in speed but not size).
-# *****************************************************************************
-# -D__DISABLE_ASM disables all inline assembly code.
-# Try it if you have problems with compilation due to assembler errors.
-# Note that it is not the same as specifying TARGET_PLATFORM=generic.
-#------------------------------------------------------------------------------
 HOST_CFLAGS=
-
-# Please add any host specific linker flags here
-#------------------------------------------------------------------------------
 HOST_LDFLAGS=
 
-###########################################################################
-# Here comes Unix-specific configuration, see unix.txt for details.
-# Please select screen library, valid values are:
-# vt100, slang, curses (default)
-#--------------------------------------------------------------------------
-TARGET_SCREEN_LIB=curses
+include ./config.mak
 
-# Please select if you want to use mouse. Valid values are:
-# n(default), y
-#----------------------------------------------------------
-USE_MOUSE=n
+CFLAGS = $(CDEFOS) $(CDEFSYS) $(HOST_CFLAGS)
+LDFLAGS = $(OSLDEF) $(HOST_LDFLAGS)
 
-# You can set compilation level:
-# max_debug  - To enable debugging, profiling, checking memory usage and more
-# debug      - To enable debugging and profiling only
-# normal     - Default for most platforms and gcc versions.
-# advance    - Use it only with the latest gcc version.
-#----------------------------------------------------------------------
-compilation=normal
-
-# Happy hacking :)
-##########################################################################
-
-ifeq ($(findstring qnx,$(TARGET_OS)),qnx)
+ifeq ($(findstring qnx,$(HOST)),qnx)
 include ./make_qnx.inc
-else
-include ./makefile.inc
 endif
 
 ###########################################################################
@@ -203,6 +135,9 @@ clean:
 	$(RM) biew.map
 	$(RM) *.err
 
+distclean: clean
+	$(RM) config.log config.mak
+
 cleansys:
 	$(RM) biewlib/sysdep/$(MACHINE)/{*.o,$(HOST)/*.o}
 cleanlib:
@@ -216,14 +151,6 @@ $(BIEWLIB): $(BIEWLIB_OBJS)
 $(TARGET): $(OBJS) $(BIEWLIB)
 	$(LD) $(LDFLAGS) -o $@ $(OBJS) $(LIBS)
 %.o : %.c
-ifeq ($(bad_os),yes)
-	@echo Please select valid TARGET_OS
-	@exit
-endif
-ifeq ($(bad_machine),yes)
-	@echo Please select valid TARGET_MACHINE
-	@exit
-endif
 	$(CC) $(CFLAGS) $(INCS) -c $< -o $@
 
 addendum.o:                   addendum.c
@@ -309,5 +236,32 @@ biewlib/sysdep/ia32/qnx/3sto3r.o:             biewlib/sysdep/ia32/qnx/3sto3r.asm
 endif
 
 install:
-	@echo Sorry! This operation should be performed manually for now!
-	@exit
+ifeq ($(INSTALL),)
+	@echo "*** 'install' utility was not found and you can't run automatic"
+	@echo "*** installation. Please download 'fileutils' from ftp://ftp.gnu.org and"
+	@echo "*** install them to have possibility perform autiomatic installation"
+	@echo "*** of this project" 
+	@exit 1
+endif
+	$(INSTALL) -D -m 755 $(TARGET) $(PREFIX)/bin/$(TARGET)
+	$(INSTALL) -D -c -m 644 bin_rc/biew.hlp $(DATADIR)/biew.hlp
+	mkdir --parents $(DATADIR)/skn
+	$(INSTALL) -D -c -m 644 bin_rc/skn/* $(DATADIR)/skn
+	mkdir --parents $(DATADIR)/syntax
+	$(INSTALL) -D -c -m 644 bin_rc/syntax/* $(DATADIR)/syntax
+	mkdir --parents $(DATADIR)/xlt
+	mkdir --parents $(DATADIR)/xlt/russian
+	$(INSTALL) -D -c -m 644 bin_rc/xlt/* $(DATADIR)/xlt
+	$(INSTALL) -D -c -m 644 bin_rc/xlt/russian/* $(DATADIR)/xlt/russian
+uninstall:
+	$(RM) $(PREFIX)/bin/$(TARGET)
+	$(RM) $(DATADIR)/skn/*
+	rmdir -p --ignore-fail-on-non-empty $(DATADIR)/skn
+	$(RM) $(DATADIR)/syntax/*
+	rmdir -p --ignore-fail-on-non-empty $(DATADIR)/syntax
+	$(RM) $(DATADIR)/xlt/russian/*
+	rmdir -p --ignore-fail-on-non-empty $(DATADIR)/xlt/russian
+	$(RM) $(DATADIR)/xlt/*
+	rmdir -p --ignore-fail-on-non-empty $(DATADIR)/xlt
+	$(RM) $(DATADIR)/*
+	rmdir -p --ignore-fail-on-non-empty $(DATADIR)
