@@ -1,5 +1,6 @@
 %define name	biew
-%define version	5.3.1
+%define version	5.3.2
+%define versrc	532
 %define release	1
 
 %define prefix	/usr
@@ -17,7 +18,7 @@ Group:		Development/Other
 Packager:	Konstantin Boldyshev <konst@linuxassembly.org>
 URL:		http://biew.sourceforge.net
 
-Source:		%{name}-%{version}.tar.gz
+Source:		%{name}%{versrc}.tar.bz2
 
 %description
 BIEW (Binary vIEW) is a free, portable, advanced file viewer with
@@ -58,7 +59,9 @@ rm -rf $RPM_BUILD_ROOT
 %{mandir}/man?/%{name}.1*
 
 %changelog
-* Fri Jan 4 2002 konst <konst@linuxassembly.org> 5.3.2-1
-- explicitly define TARGET_CPU, TARGET_OS, USE_MOUSE
+* Sun Jan 6 2002 konst <konst@linuxassembly.org> 5.3.2-1
+- build from the original source archive
+* Fri Jan 4 2002 konst <konst@linuxassembly.org> 5.3.1-2
+- explicitly define TARGET_CPU, TARGET_OS, USE_MOUSE, PREFIX
 * Wed Aug 15 2001 konst <konst@linuxassembly.org> 5.3.0-1
 - moved skins to skn folder
