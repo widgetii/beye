@@ -52,7 +52,7 @@ static char * __NEAR__ __FASTCALL__ Get4D(unsigned long val) { return Get4Digit(
 static char * __NEAR__ __FASTCALL__ Get8D(unsigned long val) { return Get8Digit(BMReadDWordEx(val,BM_SEEK_SET)); }
 
 static unsigned char __NEAR__ __FASTCALL__ sizeBit( void )  { return (tvioWidth-10)/(8+1+1); }
-static unsigned char __NEAR__ __FASTCALL__ sizeByte( void ) { return (((tvioWidth-10)/(2+1+1)-(tvioWidth-10)%((2+1+1)-1))/4)*4; }
+static unsigned char __NEAR__ __FASTCALL__ sizeByte( void ) { return ((tvioWidth-10)/(12+1+4)*4); } /* always round on four-column boundary */
 static unsigned char __NEAR__ __FASTCALL__ sizeWord( void ) { return (tvioWidth-10)/(4+1+2); }
 static unsigned char __NEAR__ __FASTCALL__ sizeDWord( void ){ return (tvioWidth-10)/(8+1+4); }
 
