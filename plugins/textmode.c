@@ -31,6 +31,382 @@
 #include "biewlib/kbd_code.h"
 #include "biewlib/pmalloc.h"
 
+typedef struct tag_acontext_hl_s
+{
+    Color color;
+    long  start_off;
+    long  end_off;
+}acontext_hl_t;
+
+typedef struct tag_context_hl_s
+{
+    Color color;
+    char  *start_seq;
+    char  *end_seq;
+}context_hl_t;
+
+typedef struct tag_keyword_hl_s
+{
+    Color color;
+    char  *keyword;
+}keyword_hl_t;
+
+typedef struct tag_operator_hl_s
+{
+    Color color;
+    char  _operator;
+}operator_hl_t;
+
+static struct tag_syntax_hl_s
+{
+   char *name;
+   context_hl_t *context;
+   keyword_hl_t *keyword;
+   operator_hl_t*operators;
+   unsigned context_num,keyword_num,operator_num;
+}syntax_hl;
+
+acontext_hl_t __HUGE__ *acontext; /* means active context*/
+unsigned long  acontext_num;
+
+extern char biew_syntax_name[];
+extern char **  ArgVector;
+
+static int HiLight = 1;
+static char detected_syntax_name[FILENAME_MAX+1] = "";
+static unsigned char word_set[UCHAR_MAX+1];
+
+#define MAX_STRLEN 1000 /**< defines maximal length of string */
+#define is_legal_word_char(ch) ((int)word_set[(unsigned char)ch])
+
+static void __NEAR__ __FASTCALL__ txtMarkupCtx(void)
+{
+    long ii,fpos,flen;
+    unsigned i,len;
+    int found;
+    char tmps[MAX_STRLEN],etmps[MAX_STRLEN],ch;
+    TWindow *hwnd;
+    hwnd=PleaseWaitWnd();
+    flen=BMGetFLength();
+    fpos=BMGetCurrFilePos();
+    BMSeek(0,BM_SEEK_SET);
+    acontext_num=0;
+    for(ii=0;ii<flen;ii++)
+    {
+	ch=BMReadByte();
+	for(i=0;i<syntax_hl.context_num;i++)
+	{
+	    len=strlen(syntax_hl.context[i].start_seq);
+	    if(ch==syntax_hl.context[i].start_seq[0])
+	    {
+		long cpos;
+		cpos=BMGetCurrFilePos();
+		found=0;
+		if(len>1)
+		{
+		    BMReadBuffer(tmps,len-1);
+		    if(memcmp(tmps,&syntax_hl.context[i].start_seq[1],len-1)==0) found=1;
+		}
+		else found=1;
+		if(found)
+		{
+		    if(!acontext) acontext=PHMalloc(sizeof(acontext_hl_t));
+		    else	  acontext=PHRealloc(acontext,sizeof(acontext_hl_t)*(acontext_num+1));
+		    acontext[acontext_num].color=LOGFB_TO_PHYS(syntax_hl.context[i].color,BACK_COLOR(text_cset.normal));
+		    acontext[acontext_num].start_off=ii;
+		    acontext[acontext_num].end_off=flen;
+		    ii+=len;
+		    BMSeek(ii,BM_SEEK_SET);
+		    /* try find end */
+		    if(strcmp(syntax_hl.context[i].end_seq,"\\n") == 0) strcpy(etmps,"\n");
+		    else
+		    if(strcmp(syntax_hl.context[i].end_seq,"\\t") == 0) strcpy(etmps,"\t");
+		    else
+		    strcpy(etmps,syntax_hl.context[i].end_seq);
+		    len=strlen(etmps);
+		    for(;ii<flen;ii++)
+		    {
+			ch=BMReadByte();
+			if(ch==etmps[0])
+			{
+			    long ecpos;
+			    ecpos=BMGetCurrFilePos();
+			    found=0;
+			    if(len>1)
+			    {
+				BMReadBuffer(tmps,len-1);
+				if(memcmp(tmps,&etmps[1],len-1)==0) found=1;
+			    }
+			    else found=1;
+			    if(found)
+			    {
+				ii+=len;
+				BMSeek(ii,BM_SEEK_SET);
+				acontext[acontext_num].end_off=ii;
+				break;
+			    }
+			    else BMSeek(ecpos,BM_SEEK_SET);
+			}
+		    }
+		    acontext_num++;
+		    ii--;
+		}
+		else BMSeek(cpos,BM_SEEK_SET);
+	    }
+	}
+    }    
+    BMSeek(fpos,BM_SEEK_SET);
+    CloseWnd(hwnd);
+}
+
+static tBool __FASTCALL__ txtFiUserFunc1(IniInfo * info)
+{
+  char *p;
+  if(strcmp(info->section,"Extensions")==0)
+  {
+	p = strrchr(ArgVector[1],'.');
+	if(p)
+	{
+	    p++;
+	    if(strcmp(p,info->item)==0)
+	    {
+		strcpy(detected_syntax_name,info->value);
+		return True;
+	    }
+	}
+  }
+  if(strcmp(info->section,"Names")==0)
+  {
+	char *pp;
+	p = strrchr(ArgVector[1],'/');
+	pp = strrchr(ArgVector[1],'\\');
+	p=max(p,pp);
+	if(p) p++;
+	else  p=ArgVector[1];
+	if(memcmp(p,info->item,strlen(info->item))==0)
+	{
+	    strcpy(detected_syntax_name,info->value);
+	    return True;
+	}
+  }
+  if(strcmp(info->section,"Context")==0)
+  {
+	long off,fpos;
+	unsigned i,ilen;
+	int found,softmode;
+	off = atol(info->item);
+	p = strstr(info->value,"-->");
+	if(!p) { ErrMessageBox("Missed separator in main context definition",NULL); return True; }
+	*p=0;
+	softmode=0;
+	if(strcmp(info->subsection,"Soft")==0) softmode=1;
+	ilen=strlen(info->value);
+	fpos=BMGetCurrFilePos();
+	BMSeek(off,BM_SEEK_SET);
+	found=1;
+	for(i=0;i<ilen;i++)
+	{
+	    unsigned char ch;
+	    ch=BMReadByte();
+	    if(isspace(ch) && softmode) { i--; continue; }
+	    if(ch != info->value[i])
+	    {
+		found=0;
+		break;
+	    }
+	}
+	BMSeek(fpos,BM_SEEK_SET);
+	if(found)
+	{
+	    strcpy(detected_syntax_name,p+3);
+	    return True;
+	}
+  }
+  return False;
+}
+
+extern Color __FASTCALL__ getColorByName(const char *name,Color defval,tBool *has_err);
+extern char last_skin_error[];
+static char *last_syntax_err="";
+static tBool __FASTCALL__ txtFiUserFunc2(IniInfo * info)
+{
+  char *p;
+  tBool err;
+  Color cdef=FORE_COLOR(text_cset.normal);
+  err=False;
+  if(strcmp(info->section,"General")==0)
+  {
+     if(strcmp(info->item,"Name")==0)
+     {
+       syntax_hl.name=malloc(strlen(info->value)+1);
+       strcpy(syntax_hl.name,info->value);
+     }
+     if(strcmp(info->item,"WSet")==0)
+     {
+       unsigned i,len;
+       len=strlen(info->value);
+       for(i=0;i<len;i++) word_set[(unsigned char)info->value[i]]=1;
+     }     
+  }     
+  if(strcmp(info->section,"Context")==0)
+  {
+     Color col;
+     col = getColorByName(info->item,cdef,&err);
+     if(!err)
+     {
+       if(!syntax_hl.context) syntax_hl.context=malloc(sizeof(context_hl_t));
+       else syntax_hl.context=realloc(syntax_hl.context,sizeof(context_hl_t)*(syntax_hl.context_num+1));
+       syntax_hl.context[syntax_hl.context_num].color=col;
+       p=strstr(info->value,"...");
+       if(!p) { last_syntax_err="Missed separator in context definition"; return True; }
+       *p=0;
+       p+=3;
+       syntax_hl.context[syntax_hl.context_num].start_seq=malloc(strlen(info->value)+1);
+       strcpy(syntax_hl.context[syntax_hl.context_num].start_seq,info->value);
+       syntax_hl.context[syntax_hl.context_num].end_seq=malloc(strlen(p)+1);
+       strcpy(syntax_hl.context[syntax_hl.context_num].end_seq,p);
+       syntax_hl.context_num++;
+     }
+     else last_syntax_err=last_skin_error;
+  }
+  if(strcmp(info->section,"Keywords")==0)
+  {
+     Color col;
+     col = getColorByName(info->item,cdef,&err);
+     if(!err)
+     {
+       if(!syntax_hl.keyword) syntax_hl.keyword=malloc(sizeof(keyword_hl_t));
+       else syntax_hl.keyword=realloc(syntax_hl.keyword,sizeof(keyword_hl_t)*(syntax_hl.keyword_num+1));
+       syntax_hl.keyword[syntax_hl.keyword_num].color=col;
+       syntax_hl.keyword[syntax_hl.keyword_num].keyword=malloc(strlen(info->value)+1);
+       strcpy(syntax_hl.keyword[syntax_hl.keyword_num].keyword,info->value);
+       syntax_hl.keyword_num++;
+     }
+     else last_syntax_err=last_skin_error;
+  }
+  if(strcmp(info->section,"Operators")==0)
+  {
+     Color col;
+     col = getColorByName(info->item,cdef,&err);
+     if(!err)
+     {
+       if(!syntax_hl.operators) syntax_hl.operators=malloc(sizeof(operator_hl_t));
+       else syntax_hl.operators=realloc(syntax_hl.operators,sizeof(operator_hl_t)*(syntax_hl.operator_num+1));
+       syntax_hl.operators[syntax_hl.operator_num].color=col;
+       if(strlen(info->value)>2) { last_syntax_err="Too long operator has been found"; return True; }
+       syntax_hl.operators[syntax_hl.operator_num]._operator=info->value[0];
+       syntax_hl.operator_num++;
+     }
+     else last_syntax_err=last_skin_error;
+  }
+  return err?True:False;
+}
+
+static tCompare __FASTCALL__ cmp_ctx(const void __HUGE__ *e1,const void __HUGE__ *e2)
+{
+  int sl1,sl2;
+  sl1=strlen((*(const context_hl_t __HUGE__ *)e1).start_seq);
+  sl2=strlen((*(const context_hl_t __HUGE__ *)e2).start_seq);
+  return __CmpLong__(sl2,sl1);
+}
+
+static tCompare __FASTCALL__ cmp_kwd(const void __HUGE__ *e1,const void __HUGE__ *e2)
+{
+  int sl1,sl2;
+  sl1=strlen((*(const keyword_hl_t __HUGE__ *)e1).keyword);
+  sl2=strlen((*(const keyword_hl_t __HUGE__ *)e2).keyword);
+  return __CmpLong__(sl2,sl1);
+}
+
+static void txtReadSyntaxes(void)
+{
+  if(__IsFileExists(biew_syntax_name))
+  {
+    FiProgress(biew_syntax_name,txtFiUserFunc1);
+    if(detected_syntax_name[0])
+    {
+	char tmp[FILENAME_MAX+1];
+	char *p;
+	char *pp;
+	strcpy(tmp,biew_syntax_name);
+	p=strrchr(tmp,'/');
+	pp=strrchr(tmp,'\\');
+	p=max(p,pp);
+	if(p) { p++; strcpy(p,detected_syntax_name); }
+	strcpy(detected_syntax_name,tmp);
+	if(__IsFileExists(detected_syntax_name))
+	{
+	    memset(&syntax_hl,0,sizeof(syntax_hl));
+	    memset(word_set,0,sizeof(word_set));
+	    FiProgress(detected_syntax_name,txtFiUserFunc2);
+	    if(last_syntax_err[0]) ErrMessageBox(last_syntax_err,NULL);
+	    /* put longest strings on top */
+	    HQSort(syntax_hl.context,syntax_hl.context_num,sizeof(context_hl_t),cmp_ctx);
+	    HQSort(syntax_hl.keyword,syntax_hl.keyword_num,sizeof(keyword_hl_t),cmp_kwd);
+	    if(syntax_hl.context_num) txtMarkupCtx();
+	}
+    }
+  }
+}
+
+static ColorAttr __NEAR__ __FASTCALL__ hlFindOp(char ch,Color col)
+{
+  unsigned i;
+  ColorAttr defcol=LOGFB_TO_PHYS(col,BACK_COLOR(text_cset.normal));
+  for(i=0;i<syntax_hl.operator_num;i++)
+  {
+    if(syntax_hl.operators[i]._operator == ch)
+    {
+	defcol=LOGFB_TO_PHYS(syntax_hl.operators[i].color,BACK_COLOR(text_cset.normal));
+	break;
+    }
+  }
+  return defcol;
+}
+
+static ColorAttr __NEAR__ __FASTCALL__ hlFindKwd(const char *str,Color col,unsigned *st_len)
+{
+  int found;
+  unsigned i,len;
+  ColorAttr defcol=LOGFB_TO_PHYS(col,BACK_COLOR(text_cset.normal));
+  *st_len=0;
+  for(i=0;i<syntax_hl.keyword_num;i++)
+  {
+    len=strlen(syntax_hl.keyword[i].keyword);
+    if(str[0]==syntax_hl.keyword[i].keyword[0])
+    {
+	found=0;
+	if(len>1) { if(memcmp(&str[1],&syntax_hl.keyword[i].keyword[1],len-1)==0) found=1; }
+	else found=1;
+	if(found)
+	{
+		defcol=LOGFB_TO_PHYS(syntax_hl.keyword[i].color,BACK_COLOR(text_cset.normal));
+		*st_len=len;
+		break;
+	}
+    }
+  }
+  return defcol;
+}
+
+static ColorAttr __NEAR__ __FASTCALL__ hlGetCtx(long off,int *is_valid, long *end_ctx)
+{
+    long ii;
+    *is_valid=0;
+    *end_ctx=BMGetFLength();
+    for(ii=0;ii<acontext_num;ii++)
+    {
+	if(acontext[ii].start_off <= off && off < acontext[ii].end_off)
+	{
+	    *is_valid=1;
+	    *end_ctx=acontext[ii].end_off;
+	    return acontext[ii].color;
+	}
+	if(off < acontext[ii].start_off) { *end_ctx=acontext[ii].start_off; break; }
+    }
+    return 0;
+}
+
 extern REGISTRY_NLS RussianNLS;
 
 static REGISTRY_NLS *nls_set[] =
@@ -63,7 +439,6 @@ static const char * mod_names[] =
 static unsigned bin_mode = MOD_PLAIN; /**< points to currently selected mode text mode */
 static BGLOBAL txtHandle = &bNull; /**< Own handle of BBIO stream. (For speed). */
 
-#define MAX_STRLEN 1000 /**< defines maximal length of string */
 static TSTR *tlines,*ptlines;
 static unsigned int maxstrlen = MAX_STRLEN; /**< contains maximal length of string which can be displayed without wrapping */
 static tBool wmode; /**< Wrap mode flag */
@@ -268,16 +643,43 @@ static void __NEAR__ __FASTCALL__ PrepareLines(int keycode)
  PrevPageSize = ptlines[h].end - ptlines[0].st + cp_symb_len;
 }
 
-static unsigned __NEAR__ __FASTCALL__ Tab2Space(tvioBuff * dest,unsigned int alen,char * str,unsigned int len,unsigned int shift,unsigned *n_tabs)
+static unsigned __NEAR__ __FASTCALL__ Tab2Space(tvioBuff * dest,unsigned int alen,char * str,unsigned int len,unsigned int shift,unsigned *n_tabs,long lstart)
 {
+  long end_ctx;
   unsigned char ch,defcol;
   size_t i,size,j,k;
-  unsigned int freq;
+  unsigned int freq, end_kwd, st_len;
+  int in_ctx,in_kwd;
+  ColorAttr ctx_color=text_cset.normal;
   if(n_tabs) *n_tabs = 0;
+  in_ctx=0;
+  in_kwd=0;
+  end_kwd=0; end_ctx=0;
+  st_len=0;
   for(i = 0,freq = 0,k = 0;i < len;i++,freq++)
   {
     defcol = text_cset.normal;
     ch = str[i];
+    if(dest && HiLight)
+    {
+        if(end_ctx)
+	{
+		if((lstart+i)>=end_ctx) goto rescan;
+	}
+	else
+	{
+		rescan:
+		ctx_color=hlGetCtx(lstart+i,&in_ctx,&end_ctx);
+	}
+	if(!in_ctx && i>=end_kwd)
+	{
+	    ctx_color = hlFindKwd(&str[i],(Color)defcol,&st_len);
+	    in_kwd=st_len?1:0;
+	    if(is_legal_word_char(str[i+st_len])||is_legal_word_char(str[i-1])) in_kwd=0;
+	    if(in_kwd) end_kwd=i+st_len;
+	}
+	if(in_kwd || in_ctx) defcol=ctx_color;
+    }
     if(ch < 32)
     {
       switch(ch)
@@ -360,6 +762,7 @@ static unsigned __NEAR__ __FASTCALL__ Tab2Space(tvioBuff * dest,unsigned int ale
       {
         if(dest)
         {
+	  if(!(in_ctx||in_kwd) && HiLight) defcol=hlFindOp(ch,defcol);
           dest->chars[k] = ch;
           dest->oem_pg[k] = 0;
           dest->attrs[k] = defcol;
@@ -389,8 +792,8 @@ static void __NEAR__ __FASTCALL__ txtPaintSearch(HLInfo * cptr,unsigned int shif
     }
     else
     {
-      sh = Tab2Space(NULL,UINT_MAX,buff,loc_st/cp_symb_len,shift,NULL)*cp_symb_len;
-      she= Tab2Space(NULL,UINT_MAX,buff,loc_end/cp_symb_len,shift,NULL)*cp_symb_len;
+      sh = Tab2Space(NULL,UINT_MAX,buff,loc_st/cp_symb_len,shift,NULL,0L)*cp_symb_len;
+      she= Tab2Space(NULL,UINT_MAX,buff,loc_end/cp_symb_len,shift,NULL,0L)*cp_symb_len;
     }
     save = FoundTextSt;
     savee= FoundTextEnd;
@@ -469,11 +872,11 @@ static unsigned __FASTCALL__ drawText( unsigned keycode , unsigned shift )
           len = txtConvertBuffer(buff,len,False);
           for(b_lim=len,b_ptr = 0;b_ptr < len;b_ptr+=2,b_lim-=2)
           {
-            shift = Tab2Space(NULL,UINT_MAX,&buff[b_ptr],b_lim,0,&n_tabs);
+            shift = Tab2Space(NULL,UINT_MAX,&buff[b_ptr],b_lim,0,&n_tabs,0L);
             if(shift) shift-=cp_symb_len;
             if(shift < (unsigned)(tvioWidth/2)) break;
           }
-          shift = Tab2Space(NULL,UINT_MAX,buff,b_ptr,0,NULL);
+          shift = Tab2Space(NULL,UINT_MAX,buff,b_ptr,0,NULL,0L);
         }
         else
         {
@@ -502,7 +905,7 @@ static unsigned __FASTCALL__ drawText( unsigned keycode , unsigned shift )
         rsize = size = txtConvertBuffer(buff,size,False);
         if(bin_mode != MOD_BINARY)
         {
-             rsize = size = Tab2Space(&it,__TVIO_MAXSCREENWIDTH,buff,size,shift,NULL);
+             rsize = size = Tab2Space(&it,__TVIO_MAXSCREENWIDTH,buff,size,shift,NULL,tlines[i].st);
              tmp = size + shift;
              if(strmaxlen < tmp) strmaxlen = tmp;
              if(textmaxlen < tmp) textmaxlen = tmp;
@@ -578,6 +981,26 @@ static tBool __FASTCALL__ txtSelectMode( void )
   return False;
 }
 
+static const char *hilight_names[] =
+{
+   "~Mono",
+   "~Highlight"
+};
+static tBool __FASTCALL__ txtSelectHiLight( void )
+{
+  unsigned nModes;
+  int i;
+  nModes = sizeof(hilight_names)/sizeof(char *);
+  i = SelBoxA(hilight_names,nModes," Select highlight mode: ",HiLight);
+  if(i != -1)
+  {
+    HiLight = i;
+    return True;
+  }
+  return False;
+}
+
+
 static tBool __FASTCALL__ txtSelectNLS( void )
 {
   const char *modeName[sizeof(nls_set)/sizeof(REGISTRY_NLS *)];
@@ -640,7 +1063,11 @@ static void __FASTCALL__ txtReadIni( hIniProfile *ini )
     biewReadProfileString(ini,"Biew","Browser","MiscMode","0",tmps,sizeof(tmps));
     w_m = (int)strtoul(tmps,NULL,10);
     wmode = w_m ? True : False;
+    biewReadProfileString(ini,"Biew","Browser","SubSubMode9","0",tmps,sizeof(tmps));
+    HiLight = (int)strtoul(tmps,NULL,10);
+    if(HiLight > 1) HiLight = 1;
  }
+ if(HiLight) txtReadSyntaxes();
 }
 
 static void __FASTCALL__ txtSaveIni( hIniProfile *ini )
@@ -651,6 +1078,8 @@ static void __FASTCALL__ txtSaveIni( hIniProfile *ini )
   biewWriteProfileString(ini,"Biew","Browser","MiscMode",wmode ? "1" : "0");
   sprintf(tmps,"%i",defNLSSet);
   biewWriteProfileString(ini,"Biew","Browser","SubSubMode4",tmps);
+  sprintf(tmps,"%i",HiLight);
+  biewWriteProfileString(ini,"Biew","Browser","SubSubMode9",tmps);
   activeNLS->save_ini(ini);
 }
 
@@ -669,10 +1098,26 @@ static void __FASTCALL__ txtInit( void )
 
 static void __FASTCALL__ txtTerm( void )
 {
+   unsigned i;
    PFREE(buff);
    PFREE(tlines);
    PFREE(ptlines);
    if(txtHandle != BMbioHandle()) { bioClose(txtHandle); txtHandle = &bNull; }
+   if(syntax_hl.name) free(syntax_hl.name);
+   if(syntax_hl.context)
+   {
+     for(i=0;i<syntax_hl.context_num;i++) { free(syntax_hl.context[i].start_seq); free(syntax_hl.context[i].end_seq); }
+     free(syntax_hl.context);
+   }
+   if(syntax_hl.keyword)
+   {
+     for(i=0;i<syntax_hl.keyword_num;i++) { free(syntax_hl.keyword[i].keyword); }
+     free(syntax_hl.keyword);
+   }
+   if(syntax_hl.operators) free(syntax_hl.operators);
+   PHFree(acontext);
+   acontext_num=0;
+   memset(&syntax_hl,0,sizeof(syntax_hl));
 }
 
 static unsigned __FASTCALL__ txtCharSize( void ) { return activeNLS->get_symbol_size(); }
@@ -680,8 +1125,8 @@ static unsigned __FASTCALL__ txtCharSize( void ) { return activeNLS->get_symbol_
 REGISTRY_MODE textMode =
 {
   "~Text mode",
-  { NULL, "CodPag", "TxMode", "NLSSet", NULL, NULL, NULL, NULL, NULL, NULL },
-  { NULL, txtSelectCP, txtSelectMode, txtSelectNLS, NULL, NULL, NULL, NULL, NULL, NULL },
+  { NULL, "CodPag", "TxMode", "NLSSet", NULL, NULL, NULL, NULL, "HiLght", NULL },
+  { NULL, txtSelectCP, txtSelectMode, txtSelectNLS, NULL, NULL, NULL, NULL, txtSelectHiLight, NULL },
   txtDetect,
   __MF_TEXT,
   drawText,

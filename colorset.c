@@ -47,7 +47,7 @@ namedColorDef named_color_def[16] =
    { "White",        White        }
 };
 
-static Color __NEAR__ __FASTCALL__ getColorByName(const char *name,Color defval,tBool *has_err)
+Color __FASTCALL__ getColorByName(const char *name,Color defval,tBool *has_err)
 {
   unsigned i;
   for(i = 0;i < sizeof(named_color_def)/sizeof(namedColorDef);i++)

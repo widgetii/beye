@@ -1,0 +1,25 @@
+;
+; Syntax highlight registration
+;
+
+[Context]
+; Offset = bytes-->syntax handler
+0=<HTML-->html.stx
+0=<html-->html.stx
+<Soft>
+0=#!/bin/sh-->sh.stx
+0=#!/bin/bash-->sh.stx
+
+
+[Extensions]
+htm=html.stx
+html=html.stx
+c=c.stx
+h=c.stx
+cpp=c.htx
+hpp=c.htx
+
+[Names]
+makefile=makefile.stx
+Makefile=makefile.stx
+

@@ -30,6 +30,7 @@
 static const char copyright[] = "$Id$";
 #endif
 
+#include <stddef.h>
 #include "biewlib/biewlib.h"
 
 int do_nls = 0;

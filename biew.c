@@ -51,6 +51,7 @@ unsigned long LastOffset;
 static tBool UseIniFile=True;
 char biew_help_name[FILENAME_MAX+1] = "";
 char biew_skin_name[FILENAME_MAX+1] = "";
+char biew_syntax_name[FILENAME_MAX+1] = "";
 extern char last_skin_error[];
 char biew_scheme_name[256] = "Built-in";
 static char biew_ini_ver[32];
@@ -398,6 +399,7 @@ static hIniProfile * __NEAR__ __FASTCALL__ load_ini_info( void )
   ini = UseIniFile ? iniOpenFile(ini_name,NULL) : NULL;
   biewReadProfileString(ini,"Biew","Setup","HelpName","",biew_help_name,sizeof(biew_help_name));
   biewReadProfileString(ini,"Biew","Setup","SkinName","",biew_skin_name,sizeof(biew_skin_name));
+  biewReadProfileString(ini,"Biew","Setup","SyntaxName","",biew_syntax_name,sizeof(biew_syntax_name));
   biewReadProfileString(ini,"Biew","Search","String","",(char *)search_buff,sizeof(search_buff));
   search_len = strlen((char *)search_buff);
   biewReadProfileString(ini,"Biew","Search","Case","off",tmp,sizeof(tmp));
@@ -445,6 +447,7 @@ static void __NEAR__ __FASTCALL__ save_ini_info( void )
   ini = iniOpenFile(ini_name,NULL);
   biewWriteProfileString(ini,"Biew","Setup","HelpName",biew_help_name);
   biewWriteProfileString(ini,"Biew","Setup","SkinName",biew_skin_name);
+  biewWriteProfileString(ini,"Biew","Setup","SyntaxName",biew_syntax_name);
   biewWriteProfileString(ini,"Biew","Setup","Version",BIEW_VERSION);
   biewWriteProfileString(ini,"Biew","Search","String",(char *)search_buff);
   biewWriteProfileString(ini,"Biew","Search","Case",biewSearchFlg & SF_CASESENS ? "on" : "off");

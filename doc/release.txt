@@ -67,7 +67,6 @@ What's todo:
 + Dissasemblers for other platform.               (IF THEIR USERS WILL CODED IT)
 + OS/2 mouse-related bug fix.                               (AS FAR AS POSSIBLE)
 + Any base for hex-mode (probably it will digit mode viewer)      (NOT URGENTLY)
-+ C (.c .cpp .h .hpp) syntax hilighting                           (NOT URGENTLY)
 + Bookmarks (screen-shot functionality)                           (NOT URGENTLY)
 + Search and replace (non-interactive)                            (NOT URGENTLY)
 + capable showing the stack of calls.                       (IN THE NEAR FUTURE)

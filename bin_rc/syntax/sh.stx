@@ -1,0 +1,34 @@
+;
+; Bash syntax definition for biew project
+;
+#nosmart
+[General]
+Name=Bash's syntax
+WSet=ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_.-0123456789
+
+[Context]
+LightGray=#...\n
+LightGreen="..."
+LightBlue='...'
+LightMagenta=`...`
+Green=EOF...EOF
+
+[Keywords]
+Yellow=for
+Yellow=in
+Yellow=do
+Yellow=done
+Yellow=select
+Yellow=case
+Yellow=esac
+Yellow=if
+Yellow=then
+Yellow=elif
+Yellow=else
+Yellow=fi
+Yellow=while
+Yellow=until
+
+[Operators]
+White=$
+

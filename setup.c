@@ -27,6 +27,7 @@
 
 extern char biew_help_name[];
 extern char biew_skin_name[];
+extern char biew_syntax_name[];
 
 extern unsigned long biew_vioIniFlags;
 extern unsigned long biew_twinIniFlags;
@@ -58,22 +59,32 @@ static char * __NEAR__ __FASTCALL__ biewGetColorSetName( void )
   return biew_skin_name;
 }
 
+static char * __NEAR__ __FASTCALL__ biewGetSyntaxName( void )
+{
+  if(!biew_syntax_name[0])
+  {
+    strcpy(biew_syntax_name,__get_rc_dir("biew"));
+    strcat(biew_syntax_name,"syntax.stx");
+  }
+  return biew_syntax_name;
+}
+
 static void __NEAR__ __FASTCALL__ setup_paint( TWindow *twin )
 {
   TWindow *usd;
   usd = twUsedWin();
   twUseWin(twin);
   twSetColorAttr(dialog_cset.group.active);
-  twGotoXY(2,6);
+  twGotoXY(2,8);
   twPrintF(" [%c] - Direct console access "
            ,GetBool((biew_vioIniFlags & __TVIO_FLG_DIRECT_CONSOLE_ACCESS) == __TVIO_FLG_DIRECT_CONSOLE_ACCESS));
-  twGotoXY(2,7);
+  twGotoXY(2,9);
   twPrintF(" [%c] - Mouse sensitivity     "
            ,GetBool((biew_kbdFlags & KBD_NONSTOP_ON_MOUSE_PRESS) == KBD_NONSTOP_ON_MOUSE_PRESS));
-  twGotoXY(2,8);
+  twGotoXY(2,10);
   twPrintF(" [%c] - Force mono            "
            ,GetBool((biew_twinIniFlags & TWIF_FORCEMONO) == TWIF_FORCEMONO));
-  twGotoXY(2,9);
+  twGotoXY(2,11);
 #ifdef __QNX4__
   if(photon)
   {
@@ -86,15 +97,15 @@ static void __NEAR__ __FASTCALL__ setup_paint( TWindow *twin )
 #endif
   twPrintF(" [%c] - Force 7-bit output    "
            ,GetBool((biew_vioIniFlags & __TVIO_FLG_USE_7BIT) == __TVIO_FLG_USE_7BIT));
-  twGotoXY(32,6);
+  twGotoXY(32,8);
   twPrintF(" [%c] - Apply plugin settings to all files     "
            ,GetBool(iniSettingsAnywhere));
-  twGotoXY(32,7);
+  twGotoXY(32,9);
   if(!__mmfIsWorkable()) twSetColorAttr(dialog_cset.group.disabled);
   twPrintF(" [%c] - Use MMF                                "
            ,GetBool(fioUseMMF));
   twSetColorAttr(dialog_cset.group.active);
-  twGotoXY(32,8);
+  twGotoXY(32,10);
   twPrintF(" [%c] - Preserve timestamp                     "
            ,GetBool(iniPreserveTime));
   twSetColorAttr(dialog_cset.main);
@@ -125,19 +136,20 @@ void Setup(void)
   tAbsCoord x1,y1,x2,y2;
   tRelCoord X1,Y1,X2,Y2;
   int ret;
-  TWindow * wdlg,*ewnd[2];
-  char estr[2][FILENAME_MAX+1];
+  TWindow * wdlg,*ewnd[3];
+  char estr[3][FILENAME_MAX+1];
   int active = 0;
   strcpy(estr[0],biewGetHelpName());
   strcpy(estr[1],biewGetColorSetName());
-  wdlg = CrtDlgWndnls(" Setup ",78,10);
+  strcpy(estr[2],biewGetSyntaxName());
+  wdlg = CrtDlgWndnls(" Setup ",78,12);
   twGetWinPos(wdlg,&x1,&y1,&x2,&y2);
   X1 = x1;
   Y1 = y1;
   X2 = x2;
   Y2 = y2;
   twSetFooterAttr(wdlg," [Enter] - Accept changes ",TW_TMODE_CENTER,dialog_cset.footer);
-  twinDrawFrameAttr(1,5,78,10,TW_UP3D_FRAME,dialog_cset.main);
+  twinDrawFrameAttr(1,7,78,12,TW_UP3D_FRAME,dialog_cset.main);
   X1 += 2;
   X2 -= 2;
   Y1 += 2;
@@ -155,6 +167,15 @@ void Setup(void)
   twUseWin(ewnd[1]);
   PostEvent(KE_ENTER);
   xeditstring(estr[1],NULL,sizeof(estr[1]), NULL);
+  Y1 += 2;
+  Y2 = Y1;
+  ewnd[2] = CreateEditor(X1,Y1,X2,Y2,TWS_CURSORABLE | TWS_NLSOEM);
+  twUseWin(wdlg);
+  twGotoXY(2,5); twPutS("Enter syntax name (including full path):");
+  twShowWin(ewnd[2]);
+  twUseWin(ewnd[2]);
+  PostEvent(KE_ENTER);
+  xeditstring(estr[2],NULL,sizeof(estr[2]), NULL);
   active = 0;
   twUseWin(ewnd[active]);
   setup_paint(wdlg);
@@ -167,7 +188,8 @@ void Setup(void)
      case KE_ESCAPE: ret = 0; goto exit;
      case KE_ENTER: ret = 1; goto exit;
      case KE_SHIFT_TAB:
-     case KE_TAB:   active = active ? 0 : 1;
+     case KE_TAB:   active = active++;
+		    if(active>2) active=0;
                     twUseWin(ewnd[active]);
                     continue;
      case KE_F(1):  hlpDisplay(5);
@@ -195,8 +217,10 @@ void Setup(void)
   {
     strcpy(biew_help_name,estr[0]);
     strcpy(biew_skin_name,estr[1]);
+    strcpy(biew_syntax_name,estr[2]);
   }
   CloseWnd(ewnd[0]);
   CloseWnd(ewnd[1]);
+  CloseWnd(ewnd[2]);
   CloseWnd(wdlg);
 }
