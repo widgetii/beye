@@ -36,9 +36,9 @@ void __FASTCALL__ __init_vio( unsigned long flg )
   reg.x.bx = 0;
   /* Background intensity enabled */
   int86(0x10,&reg,&reg);
-  reg.x.ax = 0x1000;
   for(i = 0;i < 16;i++)
   {
+    reg.x.ax = 0x1000;
     reg.h.bl = i;
     reg.h.bh = palettes[i];
     /* Set all palette registers to default values */

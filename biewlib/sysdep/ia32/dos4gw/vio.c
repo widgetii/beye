@@ -32,9 +32,9 @@ void __FASTCALL__ __init_vio( unsigned long flg )
   reg.x.ebx = 0;
   /* Background intensity enabled */
   int386(0x10,&reg,&reg);
-  reg.x.eax = 0x1000;
   for(i = 0;i < 16;i++)
   {
+    reg.x.eax = 0x1000;
     reg.h.bl = i;
     reg.h.bh = palettes[i];
     /* Set all palette registers to default values */
