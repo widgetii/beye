@@ -81,8 +81,6 @@ __inline static tUInt64 __FASTCALL__ __CONSTFUNC__ ByteSwapLL(tUInt64 x)
 }
 #define ByteSwapLL ByteSwapLL
 
-
-#ifndef __BEOS__
                 /** Translates byte via table lookup
                   * @return         byte readed from table \e t at offset \e i
                   * @param t        pointer to 256-byte memory block from which will be readed byte
@@ -98,9 +96,6 @@ __inline static tUInt8 __FASTCALL__ __CONSTFUNC__ __Xlat__(const tUInt8 *_table,
   return _idx;
 }
 #define __Xlat__ __Xlat__
-#else
-#define __Xlat__(t,i) (t[i])
-#endif
 
                 /** Compares two 4-byte numbers.
                   * @return         -1 if v1 < v2; +1 if v1 > v2 and 0 if v1 == v2
@@ -367,4 +362,3 @@ __inline static void __FASTCALL__ mmxShortsToChars(tUInt32 limit,
 #endif
 #undef ___INLINES_H
 #include "biewlib/sysdep/generic/_inlines.h"
-
