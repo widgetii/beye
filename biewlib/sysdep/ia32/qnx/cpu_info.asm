@@ -13,6 +13,7 @@
 ; * @author      Andrew Golovnia
 ; * @since       2001
 ; * @note        Development, fixes and improvements
+; * @note        Code for QNX 4.xx + Watcom C 10.6 (depricated)
 ;**
 
 .386p

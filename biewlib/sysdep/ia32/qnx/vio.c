@@ -14,15 +14,16 @@
  * @since       2001
  * @note        Development, fixes and improvements
 **/
-#ifdef __QNX4__
 
 #include <stdlib.h>
 #include <string.h>
 #include <fcntl.h>
 #include <errno.h>
+#include <ioctl.h>
 #include <sys/qnxterm.h>
 #include <sys/term.h>
 #include <sys/dev.h>
+#include <Ph.h>
 
 #include "biewlib/biewlib.h"
 
@@ -31,12 +32,13 @@
 
 #define	_addr(x,y) (viomem+((x)+(y)*tvioWidth))
 
-int bit7=0;
+int bit7=0,wrapped=0;
 tAbsCoord tvioWidth=80,tvioHeight=25;
 unsigned tvioNumColors=16;
 
 static int initialized=0,cursor_status=__TVIO_CUR_NORM;
 int photon,console;
+int ph_ig;
 tAbsCoord saveX,saveY;
 static tAbsCoord firstX=0,firstY=0;
 
@@ -45,6 +47,14 @@ unsigned char frames_dumb[0x30]=
 
 unsigned violen;
 unsigned char *viomem;
+
+int terminal;
+char *terms[]={
+/*0*/	"qnx",
+/*1*/	"qansi",
+/*2*/	"ansi",
+/*-1*/	NULL
+};
 
 int __FASTCALL__ __vioGetCursorType(void)
 {
@@ -100,12 +110,13 @@ void __FASTCALL__ __vioWriteBuff(tAbsCoord x,tAbsCoord y,const tvioBuff *buff,un
 	for(i=0;i<len;i++)
 	{
 		c=buff->chars[i];
-		if(bit7)
+		if(bit7||wrapped)
 		{
-			if(c>=_PSMIN&&c<=_PSMAX)
-				c=frames_dumb[c-_PSMIN];
-			if(c>=0&&c<=0x1f)
-				c=0x20;
+			if(c>=_PSMIN&&c<=_PSMAX) c=frames_dumb[c-_PSMIN];
+			else
+				if(c<=0x1f) c=0x20;
+				else
+					if(bit7&&c>=0x80) c='.';
 		}
 		ca=buff->attrs[i];
 		ch=((ca&0x77)<<8)|((ca&0x08)>>2)|((ca&0x80)>>7)|TERM_BLACK;
@@ -124,6 +135,9 @@ void __FASTCALL__ __vioWriteBuff(tAbsCoord x,tAbsCoord y,const tvioBuff *buff,un
 void __FASTCALL__ __init_vio(unsigned long flags)
 {
 	struct _dev_info_entry di;
+	char *term_name;
+	int i;
+
 	term_video_on();
 	if(term_state.is_mono) tvioNumColors=2;
 	tvioWidth=term_state.num_cols;
@@ -140,9 +154,41 @@ void __FASTCALL__ __init_vio(unsigned long flags)
 	dev_info(fileno(stdin),&di);
 	if(strcmp(di.driver_type,"console")==0) console=1;
 	else console=0;
-	if(getenv("PHOTON")!=NULL) photon=1;
+
+	if(PhAttach(0,0)) photon=1;
 	else photon=0;
-	bit7=(flags&__TVIO_FLG_USE_7BIT)|photon;	/*	7-bit output	*/
+
+	terminal=-1;
+	if((term_name=getenv("TERM"))!=NULL)
+		for(i=0;terms[i]!=NULL;i++)
+			if(strcmp(term_name,terms[i])==0)
+			{
+				terminal=i;
+				break;
+			}
+
+	/* 7-bit output */
+	bit7=
+		(flags&__TVIO_FLG_USE_7BIT)| /* 7-bit flag set */
+		(terminal==-1)|	/* unknown terminal */
+		(terminal==2)|	/* terminal=ansi */
+		(photon&&terminal==1);	/* Photon MicroGUI & terminal=qansi */
+
+	/* wrapped output */
+	wrapped=
+		bit7|			/* 7-bit output flag set */
+		photon;			/* run in Photon MicroGUI */
+
+	if(photon)
+	{
+		char *var;
+		ph_ig=0;
+		var=getenv("PHIG");
+		if(var==NULL) ph_ig=1;
+		else
+			if(sscanf(var,"%d",&ph_ig)!=1||ph_ig==0) ph_ig=1;
+	}
+
 	initialized=1;
 }
 
@@ -160,6 +206,3 @@ void __FASTCALL__ __vioSetTransparentColor(unsigned char value)
 {
 }
 
-#else
-#include "biewlib/sysdep/generic/unix/vio.c"
-#endif

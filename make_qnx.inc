@@ -23,7 +23,7 @@
 # Select QNX4 compiler. Valid values are:
 # watcomc, gcc(developing in progress)
 #-----------------------------------------------------------------------------
-COMPILER=watcomc
+COMPILER=gcc
 
 # Select Watcom C 10.6 patch. Valid values are:
 # none, a, b
@@ -47,7 +47,7 @@ ifeq ($(TARGET_OS),qnx4)
   CDEFOS+=-D__WATCOMC_B__
  endif
  OSLDEF=
- OS_LIBS= -ltermlib -lunix
+ OS_LIBS= -ltermlib -lunix -lphoton3r.lib
  ifeq ($(USE_MOUSE),n)
  else
   CDEFOS += -DHAVE_MOUSE
@@ -55,8 +55,8 @@ ifeq ($(TARGET_OS),qnx4)
  endif
 endif
 ifeq ($(TARGET_OS),qnx6)
- HOST=qnx
- CDEFOS=-D__QNX6__ -D_CURSES_ -D__OS_NAME__='"QNX6"' -D__OS__="qnx"\
+ HOST=qnxnto
+ CDEFOS=-D__QNX6__ -D_CURSES_ -D__OS_NAME__='"QNX6"' -D__OS__="qnxnto"\
   -U__NTO__ -U__QNX__
  OSLDEF=
  OS_LIBS= -lncurses
@@ -120,78 +120,78 @@ ifeq ($(TARGET_OS),qnx4)
   ifeq ($(TARGET_PLATFORM),i386)
    MACHINE=ia32
    CDEFSYS=-D__MACHINE__=ia32 -D__CPU_NAME__='"i386"' -D__CPU__=386\
-           -D__DEFAULT_DISASM=0 -m386 -fno-builtin
+           -D__DEFAULT_DISASM=0 -DCAN_COMPILE_X86_GAS=1 -m386 -fno-builtin
   endif
   ifeq ($(TARGET_PLATFORM),i486)
    MACHINE=ia32
    CDEFSYS=-D__MACHINE__=ia32  -D__CPU_NAME__='"i486"' -D__CPU__=486\
-           -D__DEFAULT_DISASM=0 -m486
+           -D__DEFAULT_DISASM=0 -DCAN_COMPILE_X86_GAS=1 -m486
   endif
   ifeq ($(TARGET_PLATFORM),i586)
    MACHINE=ia32
    CDEFSYS=-D__MACHINE__=ia32  -D__CPU_NAME__='"i586"' -D__CPU__=586\
-           -D__DEFAULT_DISASM=0 -march=pentium -mcpu=pentium -fschedule-insns2
+           -D__DEFAULT_DISASM=0 -DCAN_COMPILE_X86_GAS=1 -march=pentium -mcpu=pentium -fschedule-insns2
   endif
   ifeq ($(TARGET_PLATFORM),i586mmx)
    MACHINE=ia32
    CDEFSYS=-D__MACHINE__=ia32  -D__CPU_NAME__='"i586mmx"' -D__CPU__=586\
-           -D__DEFAULT_DISASM=0 -march=pentium -mcpu=pentium -mmmx\
+           -D__DEFAULT_DISASM=0 -DCAN_COMPILE_X86_GAS=1 -march=pentium -mcpu=pentium -mmmx\
            -fschedule-insns2
   endif
   ifeq ($(TARGET_PLATFORM),i686)
    MACHINE=ia32
    CDEFSYS=-D__MACHINE__=ia32  -D__CPU_NAME__='"i686"' -D__CPU__=686\
-           -D__DEFAULT_DISASM=0 -march=pentiumpro -mcpu=pentiumpro\
+           -D__DEFAULT_DISASM=0 -DCAN_COMPILE_X86_GAS=1 -march=pentiumpro -mcpu=pentiumpro\
            -fschedule-insns2
   endif
   ifeq ($(TARGET_PLATFORM),i686mmx)
    MACHINE=ia32
    CDEFSYS=-D__MACHINE__=ia32  -D__CPU_NAME__='"i686mmx"' -D__CPU__=686\
-           -D__DEFAULT_DISASM=0 -march=pentiumpro -mcpu=pentiumpro -mmmx\
+           -D__DEFAULT_DISASM=0 -DCAN_COMPILE_X86_GAS=1 -march=pentiumpro -mcpu=pentiumpro -mmmx\
            -fschedule-insns2
   endif
   ifeq ($(TARGET_PLATFORM),k5)
    MACHINE=ia32
    CDEFSYS=-D__MACHINE__=ia32  -D__CPU_NAME__='"amdk5"' -D__CPU__=586\
-           -D__DEFAULT_DISASM=0 -march=k5 -mcpu=k5 -fschedule-insns2
+           -D__DEFAULT_DISASM=0 -DCAN_COMPILE_X86_GAS=1 -march=k5 -mcpu=k5 -fschedule-insns2
   endif
   ifeq ($(TARGET_PLATFORM),k6)
    MACHINE=ia32
    CDEFSYS=-D__MACHINE__=ia32  -D__CPU_NAME__='"amdk6"' -D__CPU__=586\
-           -D__DEFAULT_DISASM=0 -march=k6 -mcpu=k6 -fschedule-insns2
+           -D__DEFAULT_DISASM=0 -DCAN_COMPILE_X86_GAS=1 -march=k6 -mcpu=k6 -fschedule-insns2
   endif
   ifeq ($(TARGET_PLATFORM),athlon)
    MACHINE=ia32
    CDEFSYS=-D__MACHINE__=ia32  -D__CPU_NAME__='"athlon"' -D__CPU__=686\
-           -D__DEFAULT_DISASM=0 -march=athlon -mcpu=athlon\
+           -D__DEFAULT_DISASM=0 -DCAN_COMPILE_X86_GAS=1 -march=athlon -mcpu=athlon\
            -fschedule-insns2
   endif
   ifeq ($(TARGET_PLATFORM),athlon_mmx)
    MACHINE=ia32
    CDEFSYS=-D__MACHINE__=ia32  -D__CPU_NAME__='"athlon"' -D__CPU__=686\
-           -D__DEFAULT_DISASM=0 -march=athlon -mcpu=athlon -mmmx\
+           -D__DEFAULT_DISASM=0 -DCAN_COMPILE_X86_GAS=1 -march=athlon -mcpu=athlon -mmmx\
            -fschedule-insns2
   endif
   ifeq ($(TARGET_PLATFORM),k6mmx)
    MACHINE=ia32
    CDEFSYS=-D__MACHINE__=ia32  -D__CPU_NAME__='"k6mmx"' -D__CPU__=586\
-           -D__DEFAULT_DISASM=0 -march=k6 -mcpu=k6 -mmmx -fschedule-insns2
+           -D__DEFAULT_DISASM=0 -DCAN_COMPILE_X86_GAS=1 -march=k6 -mcpu=k6 -mmmx -fschedule-insns2
   endif
   ifeq ($(TARGET_PLATFORM),6x86)
    MACHINE=ia32
    CDEFSYS=-D__MACHINE__=ia32  -D__CPU_NAME__='"cyrix6x86"' -D_CPU__=586\
-           -D__DEFAULT_DISASM=0 -march=6x86 -mcpu=6x86 -mmmx -fschedule-insns2
+           -D__DEFAULT_DISASM=0 -DCAN_COMPILE_X86_GAS=1 -march=6x86 -mcpu=6x86 -mmmx -fschedule-insns2
   endif
   ifeq ($(TARGET_PLATFORM),6x86mx)
    MACHINE=ia32
    CDEFSYS=-D__MACHINE__=ia32  -D__CPU_NAME__='"cyrix6x86mx"' -D__CPU__=586\
-           -D__DEFAULT_DISASM=0 -march=6x86mx -mcpu=6x86mx -mmmx\
+           -D__DEFAULT_DISASM=0 -DCAN_COMPILE_X86_GAS=1 -march=6x86mx -mcpu=6x86mx -mmmx\
            -fschedule-insns2
   endif
   ifeq ($(TARGET_PLATFORM),i86)
    MACHINE=ia16
    CDEFSYS=-D__MACHINE__=ia16  -D__CPU_NAME__='"i86"' -D__CPU__=86\
-           -D__DEFAULT_DISASM=0
+           -D__DEFAULT_DISASM=0 -DCAN_COMPILE_X86_GAS=1
   endif
   ifeq ($(TARGET_PLATFORM),generic)
    MACHINE=generic
@@ -222,67 +222,67 @@ ifeq ($(TARGET_OS),qnx6)
  ifeq ($(TARGET_PLATFORM),i386)
   MACHINE=ia32
   CDEFSYS=-D__MACHINE__=ia32 -D__CPU_NAME__='"i386"' -D__CPU__=386\
-          -D__DEFAULT_DISASM=0 -Wc,-m386,-fno-builtin
+          -D__DEFAULT_DISASM=0 -DCAN_COMPILE_X86_GAS=1 -Wc,-m386,-fno-builtin
  endif
  ifeq ($(TARGET_PLATFORM),i486)
   MACHINE=ia32
   CDEFSYS=-D__MACHINE__=ia32  -D__CPU_NAME__='"i486"' -D__CPU__=486\
-          -D__DEFAULT_DISASM=0 -Wc,-m486
+          -D__DEFAULT_DISASM=0 -DCAN_COMPILE_X86_GAS=1 -Wc,-m486
  endif
  ifeq ($(TARGET_PLATFORM),i586)
   MACHINE=ia32
   CDEFSYS=-D__MACHINE__=ia32  -D__CPU_NAME__='"i586"' -D__CPU__=586\
-          -D__DEFAULT_DISASM=0 -Wc,-march=pentium,-mcpu=pentium,-fschedule-insns2
+          -D__DEFAULT_DISASM=0 -DCAN_COMPILE_X86_GAS=1 -Wc,-march=pentium,-mcpu=pentium,-fschedule-insns2
  endif
  ifeq ($(TARGET_PLATFORM),i586mmx)
   MACHINE=ia32
   CDEFSYS=-D__MACHINE__=ia32  -D__CPU_NAME__='"i586mmx"' -D__CPU__=586\
-          -D__DEFAULT_DISASM=0 -Wc,-march=pentium,-mcpu=pentium,-mmmx,-fschedule-insns2
+          -D__DEFAULT_DISASM=0 -DCAN_COMPILE_X86_GAS=1 -Wc,-march=pentium,-mcpu=pentium,-mmmx,-fschedule-insns2
  endif
  ifeq ($(TARGET_PLATFORM),i686)
   MACHINE=ia32
   CDEFSYS=-D__MACHINE__=ia32  -D__CPU_NAME__='"i686"' -D__CPU__=686\
-          -D__DEFAULT_DISASM=0 -Wc,-march=pentiumpro,-mcpu=pentiumpro,-fschedule-insns2
+          -D__DEFAULT_DISASM=0 -DCAN_COMPILE_X86_GAS=1 -Wc,-march=pentiumpro,-mcpu=pentiumpro,-fschedule-insns2
  endif
  ifeq ($(TARGET_PLATFORM),i686mmx)
   MACHINE=ia32
   CDEFSYS=-D__MACHINE__=ia32  -D__CPU_NAME__='"i686mmx"' -D__CPU__=686\
-          -D__DEFAULT_DISASM=0 -Wc,-march=pentiumpro,-mcpu=pentiumpro,-mmmx,-fschedule-insns2
+          -D__DEFAULT_DISASM=0 -DCAN_COMPILE_X86_GAS=1 -Wc,-march=pentiumpro,-mcpu=pentiumpro,-mmmx,-fschedule-insns2
  endif
  ifeq ($(TARGET_PLATFORM),k5)
   MACHINE=ia32
   CDEFSYS=-D__MACHINE__=ia32  -D__CPU_NAME__='"amdk5"' -D__CPU__=586\
-          -D__DEFAULT_DISASM=0 -Wc,-march=k5,-mcpu=k5,-fschedule-insns2
+          -D__DEFAULT_DISASM=0 -DCAN_COMPILE_X86_GAS=1 -Wc,-march=k5,-mcpu=k5,-fschedule-insns2
  endif
  ifeq ($(TARGET_PLATFORM),k6)
   MACHINE=ia32
   CDEFSYS=-D__MACHINE__=ia32  -D__CPU_NAME__='"amdk6"' -D__CPU__=586\
-          -D__DEFAULT_DISASM=0 -Wc,-march=k6,-mcpu=k6,-fschedule-insns2
+          -D__DEFAULT_DISASM=0 -DCAN_COMPILE_X86_GAS=1 -Wc,-march=k6,-mcpu=k6,-fschedule-insns2
  endif
  ifeq ($(TARGET_PLATFORM),athlon)
   MACHINE=ia32
   CDEFSYS=-D__MACHINE__=ia32  -D__CPU_NAME__='"athlon"' -D__CPU__=686\
-          -D__DEFAULT_DISASM=0 -Wc,-march=athlon,-mcpu=athlon,-fschedule-insns2
+          -D__DEFAULT_DISASM=0 -DCAN_COMPILE_X86_GAS=1 -Wc,-march=athlon,-mcpu=athlon,-fschedule-insns2
  endif
  ifeq ($(TARGET_PLATFORM),athlon_mmx)
   MACHINE=ia32
   CDEFSYS=-D__MACHINE__=ia32  -D__CPU_NAME__='"athlon"' -D__CPU__=686\
-          -D__DEFAULT_DISASM=0 -Wc,-march=athlon,-mcpu=athlon,-mmmx,-fschedule-insns2
+          -D__DEFAULT_DISASM=0 -DCAN_COMPILE_X86_GAS=1 -Wc,-march=athlon,-mcpu=athlon,-mmmx,-fschedule-insns2
  endif
  ifeq ($(TARGET_PLATFORM),k6mmx)
   MACHINE=ia32
   CDEFSYS=-D__MACHINE__=ia32  -D__CPU_NAME__='"k6mmx"' -D__CPU__=586\
-          -D__DEFAULT_DISASM=0 -Wc,-march=k6,-mcpu=k6,-mmmx,-fschedule-insns2
+          -D__DEFAULT_DISASM=0 -DCAN_COMPILE_X86_GAS=1 -Wc,-march=k6,-mcpu=k6,-mmmx,-fschedule-insns2
  endif
  ifeq ($(TARGET_PLATFORM),6x86)
   MACHINE=ia32
   CDEFSYS=-D__MACHINE__=ia32  -D__CPU_NAME__='"cyrix6x86"' -D_CPU__=586\
-          -D__DEFAULT_DISASM=0 -Wc,-march=6x86,-mcpu=6x86,-mmmx,-fschedule-insns2
+          -D__DEFAULT_DISASM=0 -DCAN_COMPILE_X86_GAS=1 -Wc,-march=6x86,-mcpu=6x86,-mmmx,-fschedule-insns2
  endif
  ifeq ($(TARGET_PLATFORM),6x86mx)
   MACHINE=ia32
   CDEFSYS=-D__MACHINE__=ia32  -D__CPU_NAME__='"cyrix6x86mx"' -D__CPU__=586\
-          -D__DEFAULT_DISASM=0 -Wc,-march=6x86mx,-mcpu=6x86mx,-mmmx,-fschedule-insns2
+          -D__DEFAULT_DISASM=0 -DCAN_COMPILE_X86_GAS=1 -Wc,-march=6x86mx,-mcpu=6x86mx,-mmmx,-fschedule-insns2
  endif
  ifeq ($(TARGET_PLATFORM),i86)
   MACHINE=ia16

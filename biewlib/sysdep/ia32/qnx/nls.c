@@ -14,7 +14,6 @@
  * @since       2001
  * @note        Development, fixes and improvements
 **/
-#ifdef __QNX4__
 
 #include "biewlib/biewlib.h"
 
@@ -30,6 +29,3 @@ void __FASTCALL__ __nls_CmdlineToOem(unsigned char *buff,unsigned len)
 {
 }
 
-#else
-#include "biewlib/sysdep/generic/unix/nls.c"
-#endif

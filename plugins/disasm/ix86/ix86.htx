@@ -962,17 +962,17 @@
 ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
 ³ %IThe new set of registers:%i                                               ³
 ³ %IGPR 64-bit registers:%i                                                   ³
-³ %BByte regiters:%b                                                          ³
+³ %BByte registers:%b                                                         ³
 ³ ah, dh, ch, dh %Ican be accessed without REX only%i                         ³
 ³ al, dl, cl, dl, sil, dil, bpl, spl,                                     ³
 ³ r8b, r9b, r10b, r11b, r12b, r13b, r14b, r15b                            ³
-³ %BWord regiters:%b                                                          ³
+³ %BWord registers:%b                                                         ³
 ³ ax, dx, cx, dx, si, di, bp, sp,                                         ³
 ³ r8w, r9w, r10w, r11w, r12w, r13w, r14w, r15w                            ³
-³ %BDword regiters:%b                                                         ³
+³ %BDword registers:%b                                                        ³
 ³ eax, edx, ecx, edx, esi, edi, ebp, esp,                                 ³
 ³ r8d, r9d, r10d, r11d, r12d, r13d, r14d, r15d                            ³
-³ %BQword regiters:%b                                                         ³
+³ %BQword registers:%b                                                        ³
 ³ rax, rdx, rcx, rdx, rsi, rdi, rbp, rsp,                                 ³
 ³ r8, r9, r10, r11, r12, r13, r14, r15                                    ³
 ³ %IFPU registers%i                                                           ³

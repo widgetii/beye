@@ -31,7 +31,7 @@
 TARGET_PLATFORM=i386
 
 # Please select target operation system. Valid values are:
-# dos, os2, win32, linux, unix, beos
+# dos, os2, win32, linux, unix, beos, qnx4, qnx6
 #---------------------------------------------------------
 TARGET_OS=unix
 
@@ -179,7 +179,13 @@ biewlib/sysdep/$(MACHINE)/$(HOST)/vio.o
 
 ifeq ($(TARGET_OS),qnx4)
  ifeq ($(COMPILER),watcomc)
-OBJS += biewlib/sysdep/$(MACHINE)/$(HOST)/cpu_info.o 
+OBJS += \
+biewlib/sysdep/$(MACHINE)/$(HOST)/cpu_info.o
+ endif
+ ifeq ($(COMPILER),gcc)
+OBJS += \
+biewlib/sysdep/$(MACHINE)/$(HOST)/3rto3s.o\
+biewlib/sysdep/$(MACHINE)/$(HOST)/3sto3r.o
  endif
 endif
 
@@ -286,9 +292,14 @@ biewlib/sysdep/$(MACHINE)/$(HOST)/nls.o:      biewlib/sysdep/$(MACHINE)/$(HOST)/
 biewlib/sysdep/$(MACHINE)/$(HOST)/os_dep.o:   biewlib/sysdep/$(MACHINE)/$(HOST)/os_dep.c
 biewlib/sysdep/$(MACHINE)/$(HOST)/timer.o:    biewlib/sysdep/$(MACHINE)/$(HOST)/timer.c
 biewlib/sysdep/$(MACHINE)/$(HOST)/vio.o:      biewlib/sysdep/$(MACHINE)/$(HOST)/vio.c
+
 ifeq ($(findstring qnx,$(TARGET_OS)),qnx)
 biewlib/sysdep/ia32/qnx/cpu_info.o:           biewlib/sysdep/ia32/qnx/cpu_info.asm
-	$(CC) $(CFLAGS) -c $< -o $@
+	cc -c $< -o $@
+biewlib/sysdep/ia32/qnx/3rto3s.o:             biewlib/sysdep/ia32/qnx/3rto3s.asm
+	cc -c $< -o $@
+biewlib/sysdep/ia32/qnx/3sto3r.o:             biewlib/sysdep/ia32/qnx/3sto3r.asm
+	cc -c $< -o $@
 endif
 
 install:

@@ -14,7 +14,6 @@
  * @since       2001
  * @note        Development, fixes and improvements
 **/
-#ifdef __QNX4__
 
 #include <limits.h>
 #include <sys/qnxterm.h>
@@ -45,6 +44,9 @@ extern unsigned long biew_kbdFlags;
 #define	_addr(x,y) (viomem+((x)+(y)*tvioWidth))
 
 int _mouse_handler(unsigned*,struct mouse_event*);
+void _mouse_hide(void);
+void _mouse_show(void);
+char str[100];
 
 int __FASTCALL__ __init_mouse(void)
 {
@@ -70,8 +72,16 @@ void __FASTCALL__ __term_mouse(void)
 void _mouse_hide(void)
 {
 	int c,ca,ch;
-	char *addr=_addr(term_state.mouse_col,term_state.mouse_row);
-	c=*(addr+violen);
+	char s[2];
+	tAbsCoord x,y;
+	char *addr;
+	x=term_state.mouse_col;
+	y=term_state.mouse_row;
+	addr=_addr(x,y);
+/*	sprintf(str,"Hide addr=0x%08x,violen=0x%08x,viomem=0x%08x,x=%d,y=%d",addr,violen,viomem,x,y);
+	term_type(10,0,str,0,0);term_flush();
+	term_type(20,0,str,0,0);term_flush();*/
+	c=addr[violen];
 	if(bit7)
 	{
 		if(c>=_PSMIN&&c<=_PSMAX)
@@ -79,17 +89,27 @@ void _mouse_hide(void)
 		if(c>=0&&c<=0x1f)
 			c=0x20;
 	}
-	ca=*addr;
+	ca=addr[0];
 	ch=((ca&0x77)<<8)|((ca&0x08)>>2)|((ca&0x80)>>7)|TERM_BLACK;
-	term_type(term_state.mouse_row,term_state.mouse_col,&c,1,ch);
+	s[0]=c;
+	s[1]=0;
+	term_type(term_state.mouse_row,term_state.mouse_col,s,1,ch);
 	term_cur(saveY,saveX);
 }
 	
 void _mouse_show(void)
 {
 	int c,ca,ch;
-	char *addr=_addr(term_state.mouse_col,term_state.mouse_row);
-	c=*(addr+violen);
+	char s[2];
+	tAbsCoord x,y;
+	char *addr;
+	x=term_state.mouse_col;
+	y=term_state.mouse_row;
+	addr=_addr(x,y);
+/*	sprintf(str,"Hide addr=0x%08x,violen=0x%08x,viomem=0x%08x,x=%d,y=%d",addr,violen,viomem,x,y);
+	term_type(10,0,str,0,0);term_flush();
+	term_type(20,0,str,0,0);term_flush();*/
+	c=addr[violen];
 	if(bit7)
 	{
 		if(c>=_PSMIN&&c<=_PSMAX)
@@ -97,9 +117,11 @@ void _mouse_show(void)
 		if(c>=0&&c<=0x1f)
 			c=0x20;
 	}
-	ca=*addr;
+	ca=addr[0];
 	ch=((0x77-(ca&0x77))<<8)|((ca&0x08)>>2)|((ca&0x80)>>7)|TERM_BLACK;
-	term_type(term_state.mouse_row,term_state.mouse_col,&c,1,ch);
+	s[0]=c;
+	s[1]=0;
+	term_type(term_state.mouse_row,term_state.mouse_col,s,1,ch);
 	term_cur(saveY,saveX);
 }
 
@@ -160,6 +182,3 @@ int __FASTCALL__ __MsGetBtns(void)
 	return _mouse_buttons;
 }
 
-#else
-#include "biewlib/sysdep/generic/unix/mouse.c"
-#endif

@@ -19,7 +19,8 @@
  *
  * @author      Andrew Golovnia
  * @date        09.04.2001
- * @note        Development, fixes and improvements for QNX4 & Watcom C
+ * @note        Development, fixes and improvements
+ * @note        Code for QNX 4.xx + Watcom C 10.6 (depricated)
 **/
 
 unsigned __cpu_type(void);

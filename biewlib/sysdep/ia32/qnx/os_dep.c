@@ -14,7 +14,6 @@
  * @since       2001
  * @note        Development, fixes and improvements
 **/
-#ifdef __QNX4__
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -136,6 +135,3 @@ void __FASTCALL__ __term_sys(void)
 	qnx_proxy_detach(proxy);
 }
 
-#else
-#include "biewlib/sysdep/generic/unix/os_dep.c"
-#endif

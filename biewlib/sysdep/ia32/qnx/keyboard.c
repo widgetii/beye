@@ -14,28 +14,37 @@
  * @since       2001
  * @note        Development, fixes and improvements
 **/
-#ifdef __QNX4__
 
 #include <limits.h>
 #include <conio.h>
+#include <ioctl.h>
 #include <sys/qnxterm.h>
 #include <sys/dev.h>
 #include <sys/qioctl.h>
+#include <Ph.h>
 
 #include "biewlib/biewlib.h"
 #include "biewlib/kbd_code.h"
 
-#define DEV_SCRLOCK 0x00000001
-#define DEV_NUMLOCK 0x00000002
-#define DEV_CAPSLOCK 0x00000004
-#define DEV_SHIFT 0x00010000
-#define DEV_CTRL 0x00020000
-#define DEV_ALT 0x00040000
+#define DEV_SCRLOCK     0x00000001
+#define DEV_NUMLOCK     0x00000002
+#define DEV_CAPSLOCK    0x00000004
+#define DEV_SHIFT       0x00010000
+#define DEV_CTRL        0x00020000
+#define DEV_ALT         0x00040000
+
+#define PHK_SHIFT       Pk_KM_Shift
+#define PHK_CTRL        Pk_KM_Ctrl
+#define PHK_ALT         Pk_KM_Alt
+#define PHK_CAPSLOCK    Pk_KM_Caps_Lock
+#define PHK_NUMLOCK     Pk_KM_Num_Lock
+#define PHK_SCRLOCK     Pk_KM_Scroll_Lock
 
 int _shift_state=0;
 int _old_dev_state;
 extern int _mouse_buttons;
 extern int photon,console;
+extern int ph_ig;
 
 void __FASTCALL__ __init_keyboard( void )
 {
@@ -54,22 +63,37 @@ void __FASTCALL__ __term_keyboard( void )
 	__keypad(0,0);
 	return;
 }
-
 int __FASTCALL__ __kbdGetShiftsKey( void )
 {
 	long sbuf[2]={0,0};
 	long rbuf;
 	int ss=0;
-	if(!console) return _shift_state;
-	if(qnx_ioctl(0,QCTL_DEV_CTL,sbuf,8,&rbuf,4)==-1)
-		return _shift_state;
-	if(rbuf&DEV_ALT) ss|=KS_ALT;
-	if(rbuf&DEV_CTRL) ss|=KS_CTRL;
-	if(rbuf&DEV_SHIFT) ss|=KS_SHIFT;
-	if(rbuf&DEV_SCRLOCK) ss|=KS_SCRLOCK;
-	if(rbuf&DEV_CAPSLOCK) ss|=KS_CAPSLOCK;
-	if(rbuf&DEV_NUMLOCK) ss|=KS_NUMLOCK;
-	return ss;
+	if(console)
+	{
+		if(qnx_ioctl(0,QCTL_DEV_CTL,sbuf,8,&rbuf,4)==-1)
+			return _shift_state;
+		if(rbuf&DEV_ALT) ss|=KS_ALT;
+		if(rbuf&DEV_CTRL) ss|=KS_CTRL;
+		if(rbuf&DEV_SHIFT) ss|=KS_SHIFT;
+		if(rbuf&DEV_SCRLOCK) ss|=KS_SCRLOCK;
+		if(rbuf&DEV_CAPSLOCK) ss|=KS_CAPSLOCK;
+		if(rbuf&DEV_NUMLOCK) ss|=KS_NUMLOCK;
+		return ss;
+	}
+	else if(photon&&ph_ig!=0)
+		{
+			static PhCursorInfo_t buf;
+
+			PhQueryCursor(ph_ig,&buf);
+			if(buf.key_mods&PHK_ALT) ss|=KS_ALT;
+			if(buf.key_mods&PHK_CTRL) ss|=KS_CTRL;
+			if(buf.key_mods&PHK_SHIFT) ss|=KS_SHIFT;
+			if(buf.key_mods&PHK_SCRLOCK) ss|=KS_SCRLOCK;
+			if(buf.key_mods&PHK_CAPSLOCK) ss|=KS_CAPSLOCK;
+			if(buf.key_mods&PHK_NUMLOCK) ss|=KS_NUMLOCK;
+			return ss;
+		}
+	return _shift_state;
 }
 
 static int __NEAR__ __FASTCALL__ isShiftKeysChange( int flush_queue )
@@ -145,6 +169,3 @@ int __FASTCALL__ __kbdGetKey ( unsigned long flg )
 	return c;
 }
 
-#else
-#include "biewlib/sysdep/generic/unix/keyboard.c"
-#endif

@@ -14,7 +14,6 @@
  * @since       2001
  * @note        Development, fixes and improvements
 **/
-#ifdef __QNX4__
 
 #ifndef __KBD_CODES_H
 #define __KBD_CODES_H
@@ -152,8 +151,4 @@
 #define KE_ALT_(x) (((__SCAN_(x) << 8) & 0xFF00)
 
 #endif/*__KBD_CODES_H*/
-
-#else __QNX6__
-#include "biewlib/sysdep/generic/unix/kbd_code.h"
-#endif
 
