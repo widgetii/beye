@@ -173,7 +173,9 @@ sorts of weirdness can happen.
 
 ChangeLog (UNIX)
 ----------------
-
+5.5.0
+- fixed bug of non repainting of bottom part of window under some
+  vt100 terminals (NK).	
 5.3.2
 
 - use /struct termdesc/ instead of /int/ for terminal type

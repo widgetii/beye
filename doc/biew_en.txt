@@ -10,8 +10,8 @@
 €≤±∞                 ‹‹  ‹‹  ‹‹   ‹‹  ‹   ‹ ‹ ‹ ‹                     ∞±≤€
 €≤±∞                ‹‹‹‹‹‹  ‹‹‹‹ ‹‹‹‹‹‹    ‹   ‹                      ∞±≤€
 €≤±∞                                                                  ∞±≤€
-€≤±∞                           Ver 5.3.2                              ∞±≤€
-€≤±∞                          21 apr 2002.                            ∞±≤€
+€≤±∞                           Ver 5.5.0                              ∞±≤€
+€≤±∞                          04 jun 2003.                            ∞±≤€
 €≤±∞                                                                  ∞±≤€
 €≤±∞    Made in Kazan.Tatarstan.Russia. Written By Nick Kurshev.      ∞±≤€
 €≤±∞                                                                  ∞±≤€
@@ -710,8 +710,8 @@ v5.0.2        ! Changes:
                   Most functions were modified. Executable is reduced on ~17Kb
                   and gained some speedup.
                   Remarks: using this technology possible only if C-library
-		  of host system is fully compliant with accepted standards
-		  (saving of registers: esi, edi, ebx and etc.).
+                  of host system is fully compliant with accepted standards
+                  (saving of registers: esi, edi, ebx and etc.).
                   So cdecl and fastcall versions under os2-emx, linux and unix
                   have same results of work, but under winnt-crtdll.dll -
                   different. Therefore, this technology is possible to use only
@@ -849,12 +849,12 @@ v5.0.2        ! Changes:
 5.3.0-pre.1   ! Changes:
 26 nov 2000     + NEW: MMF (Memory-mapped files) technology for work with files.
                   Available for all OS exclude DOSxx.
-		  (Optimization for native CPU now is significant. Comparision
-		   of k6 versus i386 optimization for this project ~10%)
+                  (Optimization for native CPU now is significant. Comparision
+                   of k6 versus i386 optimization for this project ~10%)
                   OS/2 part is based on code http://www.edm2.com/0610/memorymap.zip
                   written by Sergey I. Yevtushenko <evsi@naverex.kiev.ua>
                 = Effect of speedup MMF versus traditional I/O = from 2.5 to 5
-		  times (depends from OS and testing algorithm).
+                  times (depends from OS and testing algorithm).
                 * Fixed bug when text mode plugin did not correctly show the
                   found string in plain submode with expanded tabs characters,
                   when the found sequence is located out of 255
@@ -914,7 +914,7 @@ v5.0.2        ! Changes:
                 * Fixed bug in computing symbolic table entry point of elf386
                   (I hope it final fix)
                 * Fixed minor errors in coff386 formats.
-		* Fixed bug in twPutS (has effect under *nix only)
+                * Fixed bug in twPutS (has effect under *nix only)
                 + Added new skins: insight.skn by me
                   golded.skn by Konstantin Boldyshev <konst@linuxassembly.org>
                   and slightly changed assembly.skn
@@ -1067,6 +1067,36 @@ v5.0.2        ! Changes:
                   Robert Riebisch <riebisch@bercom-berlin.de>
                 * Fixed computing of indirect address for SSE(2)
                   insns in SIB mode
+5.5.0         ! Changes (This release starts 64-bit support in biew)
+04 jun 2003     * Fixed bug #566760 (segfault on file format detection)
+                * Fixed SSE test
+                + Implemented BkSpace behaviour for Delete key in hex dialog editor
+                + Disable some non obvious features of 'Search dialog' in hex mode
+                + Athlon64 disassembler
+                  (highlights different execution units for Athlon64)
+                + fully featured support of ELF-64 LSBF
+                * some misc improvements in dialogs and other windows by X-Fixer <x-fixer@narod.ru>
+                * PE related fixes by X-Fixer <x-fixer@narod.ru>:
+                  * moved RVAs out of PEHEADER to make proper support of pe.peDirSize
+                  * moved RVAs display out of Header display and made a special list
+                    box for them (Alt-F9)
+                  * fix in RVA2Phys()
+                  * support of forwarding in PE exports (e.g. win2k's kernel32.dll)
+                  * fixed displaying of 8-chars-long sections names
+                  * more sections flags
+                  * more subsystems
+                * use runtime mmx detection and mmx-optimized functions even for
+                  i386 optimized project
+                * highlighs system opcodes
+                * configurable virtual width of browser in hex and bin modes
+                  (idea was borrowed from pview project)
+                * PNI support (Prescott new instructions aka SSE3)
+                * fixed bug of non repainting of bottom part of window under
+                  some vt100 terminals.
+                * reworked console's reader to enable clipboard pasting
+                  through SysMenu->Edit->Paste facility of window
+                  (by Sergey Oblomov <Sergey.Oblomov@intel.com>)
+                * Fixed 'CPU performance' tool under DJGPP
 []======================================================================[]
 []  Thank you for your interest.                                        []
 []  Nick Kurshev.                                                       []
