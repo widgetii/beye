@@ -105,6 +105,7 @@
 #compile plugins\bin\coff386.c
 #compile plugins\bin\dos_sys.c
 #compile plugins\bin\elf386.c
+#compile plugins\bin\jvmclass.c
 #compile plugins\bin\mz.c
 #compile plugins\bin\ne.c
 #compile plugins\bin\le.c
@@ -121,6 +122,7 @@
 
 #compile plugins\disasm\null_da.c
 #compile plugins\disasm\avr\avr.c
+#compile plugins\disasm\java\java.c
 #compile plugins\disasm\ix86\ix86.c
 #compile plugins\disasm\ix86\ix86_fun.c
 #compile plugins\disasm\ix86\ix86_fpu.c

@@ -43,12 +43,14 @@
 extern REGISTRY_DISASM ix86_Disasm;
 extern REGISTRY_DISASM Null_Disasm;
 extern REGISTRY_DISASM AVR_Disasm;
+extern REGISTRY_DISASM Java_Disasm;
 
 static REGISTRY_DISASM *mainDisasmTable[] =
 {
   &ix86_Disasm,
   &Null_Disasm,
-  &AVR_Disasm
+  &AVR_Disasm,
+  &Java_Disasm
 };
 
 static unsigned DefDisasmSel = __DEFAULT_DISASM;

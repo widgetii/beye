@@ -34,6 +34,7 @@
 #define DISASM_CPU_IX86          0  /**< indicates Intel-x86 disassembler */
 #define DISASM_DATA              1  /**< indicates data disassembler */
 #define DISASM_CPU_AVR           2  /**< indicates Atmel-AVR disassembler */
+#define DISASM_JAVA		 3  /**< indicates Java disassembler */
                                     /* ... here may placed other constants!!! ... */
 #define DISASM_DEFAULT          -1  /**< indicates unspecified disassembler: format default */
 

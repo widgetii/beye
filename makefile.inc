@@ -324,9 +324,9 @@ endif
 ifeq ($(findstring debug,$(compilation)),debug)
 CFLAGS += -g3 -p
 # Was detected problem with pgcc so temporary disable those keys
-ifeq ($(findstring unix,$(TARGET_OS)),unix)
-CFLAGS += -p -ax
-endif
+#ifeq ($(findstring unix,$(TARGET_OS)),unix)
+#CFLAGS += -p -ax
+#endif
 ifeq ($(compilation),max_debug)
 CFLAGS += -fcheck-memory-usage -fstack-check
 CDEFOS += -D__DISABLE_ASM -DDEBUG -UNDEBUG

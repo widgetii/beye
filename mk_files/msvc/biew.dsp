@@ -187,6 +187,10 @@ SOURCE=.\plugins\bin\elf386.c
 # End Source File
 # Begin Source File
 
+SOURCE=.\plugins\bin\jvmclass.c
+# End Source File
+# Begin Source File
+
 SOURCE=.\addons\tools\eval.c
 # End Source File
 # Begin Source File
@@ -218,7 +222,11 @@ SOURCE=.\info_win.c
 SOURCE=.\plugins\disasm\avr\avr.c
 # End Source File
 # Begin Source File
-
+
+SOURCE=.\plugins\disasm\java\java.c
+# End Source File
+# Begin Source File
+
 SOURCE=.\plugins\disasm\ix86\ix86.c
 # End Source File
 # Begin Source File

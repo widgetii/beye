@@ -138,6 +138,7 @@ plugins/bin/bin.o\
 plugins/bin/coff386.o\
 plugins/bin/dos_sys.o\
 plugins/bin/elf386.o\
+plugins/bin/jvmclass.o\
 plugins/bin/le.o\
 plugins/bin/lmf.o\
 plugins/bin/lx.o\
@@ -156,6 +157,7 @@ plugins/textmode.o\
 plugins/nls/russian.o\
 plugins/disasm/null_da.o\
 plugins/disasm/avr/avr.o\
+plugins/disasm/java/java.o\
 plugins/disasm/ix86/ix86.o\
 plugins/disasm/ix86/ix86_fpu.o\
 plugins/disasm/ix86/ix86_fun.o
@@ -256,6 +258,7 @@ plugins/bin/bin.o:            plugins/bin/bin.c
 plugins/bin/coff386.o:        plugins/bin/coff386.c
 plugins/bin/dos_sys.o:        plugins/bin/dos_sys.c
 plugins/bin/elf386.o:         plugins/bin/elf386.c
+plugins/bin/jvmclass.o:       plugins/bin/jvmclass.c
 plugins/bin/le.o:             plugins/bin/le.c
 plugins/bin/lmf.o:            plugins/bin/lmf.c
 plugins/bin/lx.o:             plugins/bin/lx.c
@@ -273,6 +276,7 @@ plugins/hexmode.o:            plugins/hexmode.c
 plugins/textmode.o:           plugins/textmode.c
 plugins/nls/russian.o:        plugins/nls/russian.c
 plugins/disasm/null_da.o:     plugins/disasm/null_da.c
+plugins/disasm/java/java.o:   plugins/disasm/java/java.c
 plugins/disasm/avr/avr.o:     plugins/disasm/avr/avr.c
 plugins/disasm/ix86/ix86.o:   plugins/disasm/ix86/ix86.c
 plugins/disasm/ix86/ix86_fpu.o: plugins/disasm/ix86/ix86_fpu.c

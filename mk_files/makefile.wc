@@ -155,6 +155,9 @@ hexmode.obj &
 textmode.obj &
 russian.obj &
 null_da.obj &
+avr.obj &
+java.obj &
+jvmclass.obj &
 ix86.obj &
 ix86_fpu.obj &
 ix86_fun.obj &
@@ -236,6 +239,7 @@ plugins\bin;&
 plugins\nls;&
 plugins\disasm;&
 plugins\disasm\avr;&
+plugins\disasm\java;&
 plugins\disasm\ix86;&
 biewlib;&
 biewlib\sysdep;&

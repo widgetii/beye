@@ -77,6 +77,7 @@ extern REGISTRY_BIN leTable;
 extern REGISTRY_BIN lxTable;
 extern REGISTRY_BIN nlm386Table;
 extern REGISTRY_BIN elf386Table;
+extern REGISTRY_BIN jvmTable;
 extern REGISTRY_BIN coff386Table;
 extern REGISTRY_BIN archTable;
 extern REGISTRY_BIN aoutTable;
@@ -96,6 +97,7 @@ static REGISTRY_BIN *mainBinTable[] =
   &lxTable,
   &nlm386Table,
   &elf386Table,
+  &jvmTable,
   &coff386Table,
   &archTable,
   &aoutTable,
