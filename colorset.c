@@ -47,7 +47,7 @@ namedColorDef named_color_def[16] =
    { "White",        White        }
 };
 
-Color __FASTCALL__ getColorByName(const char *name,Color defval,tBool *has_err)
+static Color __FASTCALL__ getColorByName(const char *name,Color defval,tBool *has_err)
 {
   unsigned i;
   for(i = 0;i < sizeof(named_color_def)/sizeof(namedColorDef);i++)
@@ -185,13 +185,27 @@ tBool csetReadIniFile(const char *ini_name)
       has_err |= readColorPair(cset,"Disasm",csec,cval,&disasm_cset.cpu_cset[j].clone[i]);
     }
   }
-  has_err |= readColorPair(cset,"Programming","","Regular",&prog_cset.regular);
-  has_err |= readColorPair(cset,"Programming","","Keyword",&prog_cset.keyword);
-  has_err |= readColorPair(cset,"Programming","","Const",&prog_cset.consts);
-  has_err |= readColorPair(cset,"Programming","","Preprocessor",&prog_cset.preproc);
   has_err |= readColorPair(cset,"Programming","","BadExpr",&prog_cset.bads);
-  has_err |= readColorPair(cset,"Programming","","Punctuation",&prog_cset.puncts);
-  has_err |= readColorPair(cset,"Programming","","Comments",&prog_cset.comments);
+  has_err |= readColorPair(cset,"Programming","Comments","base",&prog_cset.comments.base);
+  has_err |= readColorPair(cset,"Programming","Comments","extended",&prog_cset.comments.extended);
+  has_err |= readColorPair(cset,"Programming","Comments","reserved",&prog_cset.comments.reserved);
+  has_err |= readColorPair(cset,"Programming","Comments","alt",&prog_cset.comments.alt);
+  has_err |= readColorPair(cset,"Programming","Keyword","base",&prog_cset.keywords.base);
+  has_err |= readColorPair(cset,"Programming","Keyword","extended",&prog_cset.keywords.extended);
+  has_err |= readColorPair(cset,"Programming","Keyword","reserved",&prog_cset.keywords.reserved);
+  has_err |= readColorPair(cset,"Programming","Keyword","alt",&prog_cset.keywords.alt);
+  has_err |= readColorPair(cset,"Programming","Constant","base",&prog_cset.constants.base);
+  has_err |= readColorPair(cset,"Programming","Constant","extended",&prog_cset.constants.extended);
+  has_err |= readColorPair(cset,"Programming","Constant","reserved",&prog_cset.constants.reserved);
+  has_err |= readColorPair(cset,"Programming","Constant","alt",&prog_cset.constants.alt);
+  has_err |= readColorPair(cset,"Programming","Operator","base",&prog_cset.operators.base);
+  has_err |= readColorPair(cset,"Programming","Operator","extended",&prog_cset.operators.extended);
+  has_err |= readColorPair(cset,"Programming","Operator","reserved",&prog_cset.operators.reserved);
+  has_err |= readColorPair(cset,"Programming","Operator","alt",&prog_cset.operators.alt);
+  has_err |= readColorPair(cset,"Programming","Preproc","base",&prog_cset.preproc.base);
+  has_err |= readColorPair(cset,"Programming","Preproc","extended",&prog_cset.preproc.extended);
+  has_err |= readColorPair(cset,"Programming","Preproc","reserved",&prog_cset.preproc.reserved);
+  has_err |= readColorPair(cset,"Programming","Preproc","alt",&prog_cset.preproc.alt);  
   has_err |= readColorPair(cset,"Error","","Main",&error_cset.main);
   has_err |= readColorPair(cset,"Error","","Border",&error_cset.border);
   has_err |= readButton(cset,"Error","Button",&error_cset.button);
@@ -399,13 +413,27 @@ DisasmCSet disasm_cset =
 
 ProgCSet prog_cset =
 {
-  LOGFB_TO_PHYS(Yellow, Blue),
-  LOGFB_TO_PHYS(White, Blue),
-  LOGFB_TO_PHYS(LightCyan, Blue),
-  LOGFB_TO_PHYS(LightGreen, Blue),
   LOGFB_TO_PHYS(Black, Red),
-  LOGFB_TO_PHYS(LightBlue, Blue),
-  LOGFB_TO_PHYS(LightGray, Blue)
+  { LOGFB_TO_PHYS(LightGray, Blue),
+    LOGFB_TO_PHYS(Gray, Blue),
+    LOGFB_TO_PHYS(Brown, Blue),
+    LOGFB_TO_PHYS(Black, Blue) },
+  { LOGFB_TO_PHYS(Yellow, Blue),
+    LOGFB_TO_PHYS(LightRed, Blue),
+    LOGFB_TO_PHYS(Red, Blue),
+    LOGFB_TO_PHYS(White, Blue) },
+  { LOGFB_TO_PHYS(LightGreen, Blue),
+    LOGFB_TO_PHYS(LightBlue, Blue),
+    LOGFB_TO_PHYS(Green, Blue),
+    LOGFB_TO_PHYS(LightMagenta, Blue) },
+  { LOGFB_TO_PHYS(White, Blue),
+    LOGFB_TO_PHYS(LightBlue, Blue),
+    LOGFB_TO_PHYS(LightGreen, Blue),
+    LOGFB_TO_PHYS(LightRed, Blue) },
+  { LOGFB_TO_PHYS(LightRed, Blue),
+    LOGFB_TO_PHYS(LightMagenta, Blue),
+    LOGFB_TO_PHYS(Black, Blue),
+    LOGFB_TO_PHYS(Brown, Blue) }
 };
 
 DialogCSet dialog_cset =

@@ -129,15 +129,23 @@ typedef struct tag_DisasmCSet
 extern DisasmCSet disasm_cset;
 
 /** Programming highlight */
+
+typedef struct tag_PrgWordCSet
+{
+    ColorAttr base;
+    ColorAttr extended;
+    ColorAttr reserved;
+    ColorAttr alt;
+}PrgWordCSet;
+
 typedef struct tag_ProgCSet
 {
-  ColorAttr regular;
-  ColorAttr keyword;
-  ColorAttr consts;
-  ColorAttr preproc;
   ColorAttr bads;
-  ColorAttr puncts;
-  ColorAttr comments;
+  PrgWordCSet comments;
+  PrgWordCSet keywords;
+  PrgWordCSet constants;
+  PrgWordCSet operators;
+  PrgWordCSet preproc;
 }ProgCSet;
 
 extern ProgCSet prog_cset;
