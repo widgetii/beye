@@ -31,6 +31,12 @@
 #include "biewlib/kbd_code.h"
 #include "biewlib/pmalloc.h"
 
+typedef struct tag_shash_s
+{
+    unsigned start;
+    unsigned total;
+}shash_t;
+
 typedef struct tag_acontext_hl_s
 {
     Color color;
@@ -52,19 +58,14 @@ typedef struct tag_keyword_hl_s
     unsigned len; /* for accelerating */
 }keyword_hl_t;
 
-typedef struct tag_operator_hl_s
-{
-    Color color;
-    char  _operator;
-}operator_hl_t;
-
 static struct tag_syntax_hl_s
 {
    char *name;
    context_hl_t *context;
    keyword_hl_t *keyword;
-   operator_hl_t*operators;
-   unsigned context_num,keyword_num,operator_num;
+   shash_t       kwd_hash[256];
+   ColorAttr     op_hash[256];
+   unsigned context_num,keyword_num;
    unsigned maxkwd_len;
 }syntax_hl;
 
@@ -76,24 +77,30 @@ extern char **  ArgVector;
 
 static int HiLight = 1;
 static char detected_syntax_name[FILENAME_MAX+1] = "";
-static unsigned char word_set[UCHAR_MAX+1];
+static unsigned char word_set[UCHAR_MAX+1],wset[UCHAR_MAX+1];
 
 #define MAX_STRLEN 1000 /**< defines maximal length of string */
 #define is_legal_word_char(ch) ((int)word_set[(unsigned char)ch])
 
 static ColorAttr __NEAR__ __FASTCALL__ hlFindKwd(const char *str,Color col,unsigned *st_len)
 {
-  int found;
-  unsigned i,len;
+  int found,res;
+  unsigned i,len,st,end;
   ColorAttr defcol=LOGFB_TO_PHYS(col,BACK_COLOR(text_cset.normal));
   *st_len=0;
-  for(i=0;i<syntax_hl.keyword_num;i++)
+  if(syntax_hl.kwd_hash[(unsigned char)str[0]].start!=UINT_MAX)
   {
-    if(str[0]==syntax_hl.keyword[i].keyword[0])
+    st=syntax_hl.kwd_hash[(unsigned char)str[0]].start;
+    end=st+syntax_hl.kwd_hash[(unsigned char)str[0]].total;
+    for(i=st;i<end;i++)
     {
 	len=syntax_hl.keyword[i].len;
 	found=0;
-	if(len>1) { if(memcmp(&str[1],&syntax_hl.keyword[i].keyword[1],len-1)==0) found=1; }
+	if(len>1)
+	{
+	    res=memcmp(&str[1],&syntax_hl.keyword[i].keyword[1],len-1);
+	    if(res==0) found=1;
+	}
 	else found=1;
 	if(found)
 	{
@@ -378,9 +385,12 @@ static tBool __FASTCALL__ txtFiUserFunc2(IniInfo * info)
      }
      if(strcmp(info->item,"WSet")==0)
      {
-       unsigned i,len;
+       unsigned i,len,rlen;
        len=strlen(info->value);
        for(i=0;i<len;i++) word_set[(unsigned char)info->value[i]]=1;
+       rlen=min(UCHAR_MAX,len);
+       memcpy(wset,info->value,rlen);
+       wset[rlen]=0;
      }     
   }     
   if(strcmp(info->section,"Context")==0)
@@ -431,13 +441,9 @@ static tBool __FASTCALL__ txtFiUserFunc2(IniInfo * info)
      col = getOpColorByName(info->item,cdef,&err);
      if(!err)
      {
-       if(!syntax_hl.operators) syntax_hl.operators=malloc(sizeof(operator_hl_t));
-       else syntax_hl.operators=realloc(syntax_hl.operators,sizeof(operator_hl_t)*(syntax_hl.operator_num+1));
-       syntax_hl.operators[syntax_hl.operator_num].color=col;
        unfmt_str(info->value);
        if(strlen(info->value)>1) { last_syntax_err="Too long operator has been found"; return True; }
-       syntax_hl.operators[syntax_hl.operator_num]._operator=info->value[0];
-       syntax_hl.operator_num++;
+       syntax_hl.op_hash[(unsigned char)info->value[0]]=LOGFB_TO_PHYS(col,BACK_COLOR(text_cset.normal));
      }
      else last_syntax_err=last_skin_error;
   }
@@ -446,18 +452,26 @@ static tBool __FASTCALL__ txtFiUserFunc2(IniInfo * info)
 
 static tCompare __FASTCALL__ cmp_ctx(const void __HUGE__ *e1,const void __HUGE__ *e2)
 {
-  int sl1,sl2;
+  const char *k1,*k2;
+  int sl1,sl2,res;
+  k1=(*(const context_hl_t __HUGE__ *)e1).start_seq;
+  k2=(*(const context_hl_t __HUGE__ *)e2).start_seq;
   sl1=strlen((*(const context_hl_t __HUGE__ *)e1).start_seq);
   sl2=strlen((*(const context_hl_t __HUGE__ *)e2).start_seq);
-  return __CmpLong__(sl2,sl1);
+  res=memcmp(k1,k2,min(sl1,sl2));
+  return res==0?__CmpLong__(sl2,sl1):res;
 }
 
 static tCompare __FASTCALL__ cmp_kwd(const void __HUGE__ *e1,const void __HUGE__ *e2)
 {
-  int sl1,sl2;
+  const char *k1,*k2;
+  int sl1,sl2,res;
+  k1=(*(const keyword_hl_t __HUGE__ *)e1).keyword;
+  k2=(*(const keyword_hl_t __HUGE__ *)e2).keyword;
   sl1=strlen((*(const keyword_hl_t __HUGE__ *)e1).keyword);
   sl2=strlen((*(const keyword_hl_t __HUGE__ *)e2).keyword);
-  return __CmpLong__(sl2,sl1);
+  res=memcmp(k1,k2,min(sl1,sl2));
+  return res==0?__CmpLong__(sl2,sl1):res;
 }
 
 static void txtReadSyntaxes(void)
@@ -478,32 +492,35 @@ static void txtReadSyntaxes(void)
 	strcpy(detected_syntax_name,tmp);
 	if(__IsFileExists(detected_syntax_name))
 	{
-	    memset(&syntax_hl,0,sizeof(syntax_hl));
+	    unsigned i,total;
+	    int phash;
 	    memset(word_set,0,sizeof(word_set));
 	    FiProgress(detected_syntax_name,txtFiUserFunc2);
 	    if(last_syntax_err[0]) ErrMessageBox(last_syntax_err,NULL);
 	    /* put longest strings on top */
 	    HQSort(syntax_hl.context,syntax_hl.context_num,sizeof(context_hl_t),cmp_ctx);
 	    HQSort(syntax_hl.keyword,syntax_hl.keyword_num,sizeof(keyword_hl_t),cmp_kwd);
+	    /* Fill keyword's hash */
+	    phash=-1;
+	    total=0;
+	    for(i=0;i<sizeof(syntax_hl.kwd_hash)/sizeof(syntax_hl.kwd_hash[0]);i++)
+		    syntax_hl.kwd_hash[i].start=syntax_hl.kwd_hash[i].total=UINT_MAX;
+	    for(i=0;i<syntax_hl.keyword_num;i++)
+	    {
+		if(syntax_hl.keyword[i].keyword[0]!=phash)
+		{
+		    if(phash!=-1) syntax_hl.kwd_hash[phash].total=total;
+		    phash=(unsigned char)(syntax_hl.keyword[i].keyword[0]);
+		    syntax_hl.kwd_hash[phash].start=i;
+		    total=0;
+		}
+		total++;
+	    }
+	    if(phash!=-1) syntax_hl.kwd_hash[phash].total=total;
 	    if(syntax_hl.context_num) txtMarkupCtx();
 	}
     }
   }
-}
-
-static ColorAttr __NEAR__ __FASTCALL__ hlFindOp(char ch,Color col)
-{
-  unsigned i;
-  ColorAttr defcol=LOGFB_TO_PHYS(col,BACK_COLOR(text_cset.normal));
-  for(i=0;i<syntax_hl.operator_num;i++)
-  {
-    if(syntax_hl.operators[i]._operator == ch)
-    {
-	defcol=LOGFB_TO_PHYS(syntax_hl.operators[i].color,BACK_COLOR(text_cset.normal));
-	break;
-    }
-  }
-  return defcol;
 }
 
 static ColorAttr __NEAR__ __FASTCALL__ hlGetCtx(long off,int *is_valid, long *end_ctx)
@@ -794,6 +811,7 @@ static unsigned __NEAR__ __FASTCALL__ Tab2Space(tvioBuff * dest,unsigned int ale
 	    in_kwd=st_len?1:0;
 	    if(is_legal_word_char(str[i+st_len])||is_legal_word_char(str[i-1])) in_kwd=0;
 	    if(in_kwd) end_kwd=i+st_len;
+	    else       end_kwd=strspn(&str[i],wset);
 	}
 	if(in_kwd || in_ctx) defcol=ctx_color;
     }
@@ -879,7 +897,7 @@ static unsigned __NEAR__ __FASTCALL__ Tab2Space(tvioBuff * dest,unsigned int ale
       {
         if(dest)
         {
-	  if(!(in_ctx||in_kwd) && HiLight) defcol=hlFindOp(ch,defcol);
+	  if(!(in_ctx||in_kwd) && HiLight) defcol=syntax_hl.op_hash[ch];
           dest->chars[k] = ch;
           dest->oem_pg[k] = 0;
           dest->attrs[k] = defcol;
@@ -1183,8 +1201,11 @@ static void __FASTCALL__ txtReadIni( hIniProfile *ini )
     biewReadProfileString(ini,"Biew","Browser","SubSubMode9","0",tmps,sizeof(tmps));
     HiLight = (int)strtoul(tmps,NULL,10);
     if(HiLight > 1) HiLight = 1;
- }
- if(HiLight && txtDetect()) txtReadSyntaxes();
+  }
+  memset(&syntax_hl,0,sizeof(syntax_hl));
+  /* Fill operator's hash */
+  memset(syntax_hl.op_hash,text_cset.normal,sizeof(syntax_hl.op_hash));
+  if(HiLight && txtDetect()) txtReadSyntaxes();
 }
 
 static void __FASTCALL__ txtSaveIni( hIniProfile *ini )
@@ -1210,7 +1231,6 @@ static void __FASTCALL__ txtSaveIni( hIniProfile *ini )
      for(i=0;i<syntax_hl.keyword_num;i++) { free(syntax_hl.keyword[i].keyword); }
      free(syntax_hl.keyword);
   }
-  if(syntax_hl.operators) free(syntax_hl.operators);
   PHFree(acontext);
   acontext_num=0;
   memset(&syntax_hl,0,sizeof(syntax_hl));
@@ -1227,6 +1247,18 @@ static void __FASTCALL__ txtInit( void )
      exit(EXIT_FAILURE);
    }
    if((txtHandle = bioDup(BMbioHandle())) == &bNull) txtHandle = BMbioHandle();
+   memset(&syntax_hl,0,sizeof(syntax_hl));
+   /* Fill operator's hash */
+   memset(syntax_hl.op_hash,text_cset.normal,sizeof(syntax_hl.op_hash));
+}
+
+static tBool __FASTCALL__ txtShowType( void )
+{
+    char *type;
+    if(syntax_hl.name) type=syntax_hl.name;
+    else type="Unknown";
+    TMessageBox(type," Detected text type: ");
+    return False;
 }
 
 static void __FASTCALL__ txtTerm( void )
@@ -1242,8 +1274,8 @@ static unsigned __FASTCALL__ txtCharSize( void ) { return activeNLS->get_symbol_
 REGISTRY_MODE textMode =
 {
   "~Text mode",
-  { NULL, "CodPag", "TxMode", "NLSSet", NULL, NULL, NULL, NULL, "HiLght", NULL },
-  { NULL, txtSelectCP, txtSelectMode, txtSelectNLS, NULL, NULL, NULL, NULL, txtSelectHiLight, NULL },
+  { NULL, "CodPag", "TxMode", "NLSSet", NULL, NULL, NULL, NULL, "HiLght", "TxType" },
+  { NULL, txtSelectCP, txtSelectMode, txtSelectNLS, NULL, NULL, NULL, NULL, txtSelectHiLight, txtShowType },
   txtDetect,
   __MF_TEXT,
   drawText,
