@@ -34,25 +34,29 @@ are gladly accepted, as well as suggestions, feedback, bugreports and fixes.
 UNIX specific features of BIEW
 ------------------------------
 
-1)  Key modifiers are re-mapped as:
+1)  In terminal mode key modifiers are re-mapped as:
 
 	CTRL+A - ALT
 	CTRL+C - CTRL
 	CTRL+S - SHIFT
 
-    i.e. pressing CTRL+A in acts as holding down ALT, and so on.
+    i.e. pressing CTRL+A acts as holding down ALT, and so on.
     CTRL+Z resets modifiers to defaults. Modifiers are also reseted
     after any function key is pressed.
 
     Important: several terminals can handle SHIFT+Fx and CTRL+Fx keys,
     and BIEW/VT100 and BIEW/LINUX supports them when they are available.
     (e.g. Linux console supports SHIFT+Fx, Eterm supports both SHIFT+Fx
-    and CTRL+Fx). Note that status line is not updated when you'll
-    use such keys directly (except BIEW/LINUX in console mode).
+    and CTRL+Fx). Note that status line is not updated when you'll use
+    such keys directly.
 
-2)  There are some limitations on output, i.e. you can't see all characters
-    as they are: output is filtered to avoid unexpected behavior
-    (except BIEW/LINUX in console mode).
+    [except for BIEW/LINUX in console mode]
+
+2)  There are several limitations on output in terminal mode, i.e.
+    you can't  see all characters as they are: output is filtered
+    to avoid unexpected behavior.
+
+    [except for BIEW/LINUX in console mode]
 
 3)  It is possible to use 7bit output.
 
