@@ -10,6 +10,7 @@ WSet=
 [Context]
   <Comments>
     base=<!...>
-  <Constants>
+  <Keywords>
     base=<...>
-    alt=&...\x3B
+  <Constants>
+    base=&...\x3B

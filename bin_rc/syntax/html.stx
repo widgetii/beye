@@ -8,7 +8,7 @@ Name=HTML syntax
 WSet=
 
 [Context]
-  <Comments>
+  <Keywords>
     base=<A...>
     base=<ADDRESS...>
     base=<APPLET...>
@@ -54,8 +54,9 @@ WSet=
     base=<TD...>
     base=<TITLE...>
     base=<TR...>
-    extended=<!...>
-    reserved=<...>
+    alt=<...>
+  <Comments>
+    base=<!...>
   <Constants>
     base=&...\x3B
 

@@ -20,6 +20,9 @@ h=c.stx
 cpp=c.htx
 hpp=c.htx
 xml=xml.stx
+diff=diff.stx
+patch=diff.stx
+rej=diff.stx
 
 [Names]
 makefile=makefile.stx

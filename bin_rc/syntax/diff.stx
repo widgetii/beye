@@ -1,0 +1,33 @@
+;
+; Diffs syntax definition for biew project
+;
+#nosmart
+[General]
+Name=Diffs syntax
+WSet=
+
+[Context]
+  <Comments>
+    base=\ndiff...\n
+    base=\nIndex:...\n
+    reserved=\n?...\n
+    alt=\nRCS...\n
+    alt=\nretrieving...\n
+    alt=\nOnly...\n
+    alt=\nCommon...\n
+    alt=\nCommon...\n
+    alt=\nFile...\n
+    alt=\nBinary...\n
+  <Constants>
+    base=\n***...\n
+    base=\n+++...\n
+    base=\n+...\n
+    base=\n>...\n
+    alt=\n---...\n
+    alt=\n-...\n
+    alt=\n<...\n
+    extended=\n!...\n
+  <Operators>
+    base=\n@@...\n
+    base=\n****...\n
+    alt=\n\\...\n
