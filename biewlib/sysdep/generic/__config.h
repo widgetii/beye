@@ -21,8 +21,14 @@
 #ifndef ____CONFIG_H
 #define ____CONFIG_H
 
+#include <sys/types.h>
+
+#ifdef	__GLIBC__
+
 #include <endian.h>
 #include <stdint.h>
+
+#endif
 
 #define tInt8		int8_t
 #define tInt16		int16_t
@@ -32,6 +38,8 @@
 #define tUInt16		uint16_t
 #define tUInt32		uint32_t
 #define tUInt64		uint64_t
+
+#ifdef	__GLIBC__
 
 #define tIntLeast8	int_least8_t
 #define tIntLeast16	int_least16_t
@@ -51,10 +59,52 @@
 #define tUIntFast32	uint_fast32_t
 #define tUIntFast64	uint_fast64_t
 
+#else	/* !__GLIBC__ */
+
+#define tIntLeast8	int8_t
+#define tIntLeast16	int16_t
+#define	tIntLeast32	int32_t
+#define tIntLeast64	int64_t
+#define tUIntLeast8	uint8_t
+#define tUIntLeast16	uint16_t
+#define tUIntLeast32	uint32_t
+#define tUIntLeast64	uint64_t
+
+#define tIntFast8	int8_t
+#define tIntFast16	int16_t
+#define tIntFast32	int32_t
+#define tIntFast64	int64_t
+#define tUIntFast8	uint8_t
+#define tUIntFast16	uint16_t
+#define tUIntFast32	uint32_t
+#define tUIntFast64	uint64_t
+
+/*
+    These are usually defined in sys/types.h (machine/endian.h)
+
+    Note that __WORDSIZE is not defined,
+    which fortunately should be fine for non-16bit platforms.
+*/
+
+#ifndef	__LITTLE_ENDIAN
+#define	__LITTLE_ENDIAN LITTLE_ENDIAN
+#endif
+#ifndef	__BIG_ENDIAN
+#define	__BIG_ENDIAN BIG_ENDIAN
+#endif
+#ifndef	__PDP_ENDIAN
+#define	__PDP_ENDIAN PDP_ENDIAN
+#endif
+#ifndef	__BYTE_ORDER
+#define	__BYTE_ORDER BYTE_ORDER
+#endif
+
+#endif	/* __GLIBC__ */
+
 #define tUntPtr		int_ptr_t
 #define tUIntPtr	uint_ptr_t
 
 #define tIntMax		int_max_t
 #define tUIntMax	uint_max_t
 
-#endif
+#endif	/* ____CONFIG_H */
