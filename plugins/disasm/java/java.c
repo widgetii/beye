@@ -44,6 +44,7 @@ typedef struct java_codes_s
 #define JVM_CONST2	0x00000800UL /* insns hass const as idx,2-byte const */
 #define JVM_CONST4	0x00000C00UL /* insns hass const as idx,4-byte const */
 #define JVM_CONSTMASK	0x00000C00UL
+#define JVM_ATYPE	0x00001000UL
 #define JVM_CODEREF	0x20000000UL /* insns refers relative jump */
 #define JVM_LOOKUPSWITCH 0x01000000UL /* special case : lookupswitch insn */
 #define JVM_TABLESWITCH	0x02000000UL /* special case : tableswitch insn */
@@ -239,9 +240,9 @@ java_codes_t java_codes[256]=
   /*0xB7*/ { "invokespecial", 0x02 | JVM_OBJREF2 },
   /*0xB8*/ { "invokestatic", 0x02 | JVM_OBJREF2 },
   /*0xB9*/ { "invokeinterface", 0x04 | JVM_OBJREF2 | JVM_CONST1 },
-  /*0xBA*/ { "???", 0 },
+  /*0xBA*/ { "???", 0 }, /* is not used by historical reasons */
   /*0xBB*/ { "new", 0x02 | JVM_OBJREF2 },
-  /*0xBC*/ { "newarray", 0x01 /* decode data type !!! */},
+  /*0xBC*/ { "newarray", 0x01 | JVM_ATYPE /* decode data type !!! */},
   /*0xBD*/ { "anewarray", 0x02 },
   /*0xBE*/ { "arraylength", 0 },
   /*0xBF*/ { "athrow", 0 },
@@ -488,9 +489,29 @@ static DisasmRet __FASTCALL__ javaDisassembler(unsigned long ulShift,
 	    switch(tail)
 	    {
 		case 1:
+		{
+		    char *p;
 		    if(jflags & JVM_OBJREFMASK) strcat(outstr,"#");
-		    strcat(outstr,Get2Digit(buffer[idx]));
+		    p=NULL;
+		    if(jflags & JVM_ATYPE) 
+		    {
+			switch(buffer[idx])
+			{
+			    case 4: p="T_BOOLEAN"; break;
+			    case 5: p="T_CHAR"; break;
+			    case 6: p="T_FLOAT"; break;
+			    case 7: p="T_DOUBLE"; break;
+			    case 8: p="T_BYTE"; break;
+			    case 9: p="T_SHORT"; break;
+			    case 10: p="T_INT"; break;
+			    case 11: p="T_LONG"; break;
+			}
+		    }
+		    if(p) strcat(outstr,p);
+		    else
+			strcat(outstr,Get2Digit(buffer[idx]));
 		    break;
+		}
 		case 2: 
 		{
 		    unsigned short sval;
