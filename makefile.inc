@@ -28,7 +28,7 @@ NUL=/dev/null
 RM=rm -f
 CC=gcc
 LD=gcc
-AR=ar -rcou
+AR=ar -rcu
 RANLIB=ranlib
 LIBEXT=a
 LIBPREFIX=lib
@@ -74,8 +74,8 @@ ifeq ($(TARGET_OS),win32)
 endif
 ifeq ($(TARGET_OS),beos)
  HOST=beos
- CDEFOS=-D__BEOS__ -D__UNIX__ -D__OS_NAME__='"BeOS"' -D_VT100_ -D__OS__="beos" -Ubeos -D__DISABLE_MMF
- CDEFOS+=-DHAVE_TERMINAL_OUT=1 -DDATADIR='"/boot/home/config/lib"'
+ CDEFOS=-D__BEOS__ -D__UNIX__ -D__OS_NAME__='"BeOS"' -D_VT100_ -D__OS__="beos" -Ubeos
+ CDEFOS+=-DHAVE_TERMINAL_OUT=1 -DDATADIR='"/boot/home/config/lib"' -D__DISABLE_MMF -D__DISABLE_ASM
  OSLDEF=
  OS_LIBS=
 endif
@@ -109,7 +109,7 @@ ifeq ($(TARGET_OS),unix)
      OSNAME=Unix/Slang
    else
      CDEFOS += -D_CURSES_
-     OS_LIBS += -lncurses
+     OS_LIBS += -lncurses	#-lcurses
      OSNAME=Unix/Curses
    endif
  endif
@@ -281,7 +281,7 @@ endif
 ifeq ($(TARGET_PLATFORM),generic)
  MACHINE=generic
  CDEFSYS=-D__MACHINE__=generic  -D__CPU_NAME__='"generic"'\
-         -D__DEFAULT_DISASM=1 -fno-builtin
+         -D__DEFAULT_DISASM=1 -fno-builtin -D__DISABLE_ASM
 endif
 ifndef MACHINE
 bad_machine = yes
@@ -318,6 +318,7 @@ CFLAGS += -g3
 #endif
 ifeq ($(compilation),max_debug)
 CFLAGS += -fcheck-memory-usage -fstack-check
+CDEFOS += -D__DISABLE_ASM -DDEBUG -UNDEBUG
 endif
 else
 CFLAGS += -O2 -fomit-frame-pointer -DNDEBUG=1

@@ -54,6 +54,11 @@ TARGET_OS=unix
 # explicitly enable it for inline assembler. Also for K6 CPU (not for K6-2)
 # it would be better to disable pgcc mmx optimization and enable it for
 # inline assembler (if you interest with speed but not size).
+# *****************************************************************************
+# -D__DISABLE_ASM disables all inline assembly code.
+# Try it if you have problems with compilation due to assembler errors.
+# Note that it is not the same as specifying TARGET_PLATFORM=generic.
+#------------------------------------------------------------------------------
 HOST_CFLAGS=
 
 # Please add any host specific linker flags here, if it need
@@ -65,7 +70,7 @@ HOST_LDFLAGS=
 # Please select screen library, that you want to use. Valid values are:
 # vt100, slang, curses (default)
 #--------------------------------------------------------------------------
-TARGET_SCREEN_LIB = slang
+TARGET_SCREEN_LIB=curses
 
 # Please select if you want to use mouse. Valid values are:
 # n(default), y
@@ -188,7 +193,7 @@ clean:
 	$(RM) *.err
 
 cleansys:
-	$(RM) biewlib/sysdep/$(MACHINE)/$(HOST)/*.o
+	$(RM) biewlib/sysdep/$(MACHINE)/{*.o,$(HOST)/*.o}
 cleanlib:
 	$(RM) $(BIEWLIB_OBJS)
 	$(RM) $(BIEWLIB)
