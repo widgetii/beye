@@ -136,7 +136,7 @@ int __FASTCALL__ fmtShowList( GetNumItems gni,ReadItems ri,const char * title,in
  TWindow* w;
  ret = -1;
  if((handle = ReopenSeek(0)) == &bNull) return ret;
- nnames = gni ? (*gni)(handle) : -1;
+ nnames = gni ? (*gni)(handle) : (unsigned)-1;
  if(!(obj = ma_Build(nnames,True))) goto exit;
  w = PleaseWaitWnd();
  bool = (*ri)(handle,obj,nnames);

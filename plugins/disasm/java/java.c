@@ -407,7 +407,7 @@ static DisasmRet __FASTCALL__ javaDisassembler(__filesize_t ulShift,
         next_pa = detectedFormat->GetPubSym(prev_func,sizeof(prev_func),
                                             &func_class,ulShift,False);
     }
-    else prev_pa=0;
+    else next_pa=prev_pa=0;
     if(!next_pa) next_pa=bmGetFLength();
     if(!(prev_pa%4)) npadds = (ulShift+1-prev_pa)%4; /* align only if method is aligned */
     else npadds=0;

@@ -703,15 +703,16 @@ static tBool __FASTCALL__ PEReadRVAs(BGLOBAL handle, memArray * obj, unsigned nn
       "~COM+                ",
       "Reser~ved            "
   };
-
+  UNUSED(handle);
+  UNUSED(nnames);
   for (i=0; i<pe.peDirSize; i++)
   {
     char foo[80];
 
     sprintf(foo, "%s  %08lX  %8lu",
         i<ARRAY_SIZE(rvaNames) ? rvaNames[i] : "Unknown             ",
-        peDir[i].rva,
-        peDir[i].size);
+        (unsigned long)peDir[i].rva,
+        (unsigned long)peDir[i].size);
     if (!ma_AddString(obj, foo, True))
         return False;
   }
@@ -721,6 +722,7 @@ static tBool __FASTCALL__ PEReadRVAs(BGLOBAL handle, memArray * obj, unsigned nn
 
 static unsigned __FASTCALL__ PENumRVAs(BGLOBAL handle)
 {
+  UNUSED(handle);
   return pe.peDirSize;
 }
 

@@ -208,7 +208,11 @@ static void __NEAR__ __FASTCALL__ printObject(FILE *fout,unsigned obj_num,char *
                             oclass == OC_CODE ? "DUMP_TEXT" :
                             "Unknown";
   if(!oname[0]) { sprintf(onumname,"%s%u",name,obj_num); name = onumname; }
+#if __WORDSIZE >=32
+  fprintf(fout,"\nSEGMENT %s BYTE PUBLIC %s '%s'\n; size: %llu bytes\n\n"
+#else
   fprintf(fout,"\nSEGMENT %s BYTE PUBLIC %s '%s'\n; size: %lu bytes\n\n"
+#endif
               ,name
               ,btn
               ,oclass == OC_DATA ? "DATA" : oclass == OC_CODE ? "CODE" : "NoObject"
@@ -222,7 +226,11 @@ static void __NEAR__ __FASTCALL__ printHdr(FILE * fout,REGISTRY_BIN *fmt)
   cptr = cptr1 = ";"; cptr2 = "";
   time(&tim);
   fprintf(fout,"%s\n%sDissasembler dump of \'%s\'\n"
+#if __WORDSIZE >= 32
+               "%sRange : %16llXH-%16llXH\n"
+#else
                "%sRange : %08lXH-%08lXH\n"
+#endif
                "%sWritten by "BIEW_VER_MSG"\n"
                "%sDumped : %s\n"
                "%sFormat : %s\n"
@@ -478,8 +486,13 @@ static tBool FStore( void )
              while(func_pa && func_pa >= obj_start && func_pa < obj_end && func_pa > ff_startpos)
              {
                   diff = func_pa - ff_startpos;
+#if __WORDSIZE >= 32
+                  if(diff) fprintf(fout,"resb %16llXH\n",diff);
+                  fprintf(fout,"%s %s: ;at offset - %16llXH\n"
+#else
                   if(diff) fprintf(fout,"resb %08lXH\n",diff);
                   fprintf(fout,"%s %s: ;at offset - %08lXH\n"
+#endif
                               ,GET_FUNC_CLASS(func_class)
                               ,func_name
                               ,func_pa);
@@ -494,7 +507,11 @@ static tBool FStore( void )
                   }
               }
               diff = obj_end - ff_startpos;
+#if __WORDSIZE>=32
+              if(diff) fprintf(fout,"resb %16llXH\n",diff);
+#else
               if(diff) fprintf(fout,"resb %08lXH\n",diff);
+#endif
               ff_startpos = obj_end;
               goto next_obj;
           }
@@ -719,7 +736,7 @@ static tBool FRestore( void )
        while(wsize)
        {
          remaind = (unsigned)min(wsize,4096);
-         if(__OsRead(handle,tmp_buff,remaind) != remaind)
+         if((unsigned)__OsRead(handle,tmp_buff,remaind) != remaind)
          {
            errnoMessageBox(READ_FAIL,NULL,errno);
            __OsClose(handle);

@@ -166,7 +166,7 @@ static const char *  __FASTCALL__ hexMiscKeyName( void ) { return hmode == 1 ? "
 
 static void __FASTCALL__ __NEAR__ __checkWidthCorr(void)
 {
-  if(virtWidthCorr>hexViewer[hmode].width()-1) virtWidthCorr=hexViewer[hmode].width()-1;
+  if(virtWidthCorr>(unsigned)hexViewer[hmode].width()-1) virtWidthCorr=hexViewer[hmode].width()-1;
 }
 
 static tBool __FASTCALL__ hexSelectMode( void )
@@ -388,7 +388,7 @@ static tBool __FASTCALL__ hexIncVirtWidth( void )
 
 static tBool __FASTCALL__ hexDecVirtWidth( void )
 {
-  if(virtWidthCorr < hexViewer[hmode].width()-1) { virtWidthCorr++; return True; }
+  if(virtWidthCorr < (unsigned)hexViewer[hmode].width()-1) { virtWidthCorr++; return True; }
   return False;
 }
 

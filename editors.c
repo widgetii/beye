@@ -52,7 +52,7 @@ void __FASTCALL__ PaintETitle( int shift,tBool use_shift )
   twGotoXY(1,1);
   twClrEOL();
   twPrintF("%08lX: ",edit_cp + shift);
-  eidx = use_shift ? shift : edit_y*EditorMem.width+edit_x;
+  eidx = use_shift ? (unsigned)shift : edit_y*EditorMem.width+edit_x;
   byte  = EditorMem.buff[eidx];
   obyte = EditorMem.save[eidx];
   if(byte != obyte) twSetColorAttr(title_cset.change);

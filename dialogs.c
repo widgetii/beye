@@ -116,7 +116,7 @@ tBool __FASTCALL__ Get8DigitDlg(const char *title,const char *text,char attr,uns
  }
  CloseWnd(ewnd);
  CloseWnd(hwnd);
- if(ret) *xx = attr & SIGN ? strtol(str,NULL,base) : strtoul(str,NULL,base);
+ if(ret) *xx = attr & SIGN ? (unsigned long)strtol(str,NULL,base) : strtoul(str,NULL,base);
  twUseWin(using);
  return ret;
 }
@@ -169,7 +169,7 @@ tBool        __FASTCALL__ Get16DigitDlg(const char *title,const char *text,char 
  }
  CloseWnd(ewnd);
  CloseWnd(hwnd);
- if(ret) *xx = attr & SIGN ? strtoll(str,NULL,base) : strtoull(str,NULL,base);
+ if(ret) *xx = attr & SIGN ? (unsigned long long int)strtoll(str,NULL,base) : strtoull(str,NULL,base);
  twUseWin(using);
  return ret;
 }
@@ -274,10 +274,10 @@ tBool __FASTCALL__ GetJumpDlg( __filesize_t * addr,unsigned long *flags)
  {
 #if __WORDSIZE >= 32
  if(BMFileFlags&BMFF_USE64)
-    *addr = (*flags) == GJDLG_RELATIVE ? strtoll(str,NULL,16) : strtoull(str,NULL,16);
+    *addr = (*flags) == GJDLG_RELATIVE ? (unsigned long long int)strtoll(str,NULL,16) : strtoull(str,NULL,16);
  else
 #endif
-    *addr = (*flags) == GJDLG_RELATIVE ? strtol(str,NULL,16) : strtoul(str,NULL,16);
+    *addr = (*flags) == GJDLG_RELATIVE ? (unsigned long)strtol(str,NULL,16) : strtoul(str,NULL,16);
  }
  twUseWin(using);
  return ret;

@@ -216,7 +216,7 @@ static int __NEAR__ __FASTCALL__ __hlpListBox(char * * names,unsigned nlist,cons
                   tBool found;
                   int endsearch,startsearch,cache[UCHAR_MAX];
                   searchtxt[searchlen] = 0;
-                  endsearch = sflg & SF_REVERSE ? -1 : nlist;
+                  endsearch = sflg & SF_REVERSE ? -1 : (int)nlist;
                   direct = sflg & SF_REVERSE ? -1 : 1;
                   startsearch =    scursor != -1 ?
                                    scursor :

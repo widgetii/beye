@@ -525,7 +525,7 @@ static void txtReadSyntaxes(void)
 
 static ColorAttr __NEAR__ __FASTCALL__ hlGetCtx(long off,int *is_valid, long *end_ctx)
 {
-    long ii;
+    unsigned long ii;
     *is_valid=0;
     *end_ctx=BMGetFLength();
     for(ii=0;ii<acontext_num;ii++)
@@ -798,7 +798,7 @@ static unsigned __NEAR__ __FASTCALL__ Tab2Space(tvioBuff * dest,unsigned int ale
     {
         if(end_ctx)
 	{
-		if((lstart+i)>=end_ctx) goto rescan;
+		if((lstart+(long)i)>=end_ctx) goto rescan;
 	}
 	else
 	{

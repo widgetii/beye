@@ -98,7 +98,7 @@ static unsigned __FASTCALL__ drawBinary( unsigned keycode,unsigned tshift )
    {
      count=BWidth*_b_width;
      _index = cfp + j*count;
-     len = _index < limit ? count : _index < flen ? (int)(flen - _index) : 0;
+     len = _index < limit ? (int)count : _index < flen ? (int)(flen - _index) : 0;
      if(len) { lastbyte = _index + len; BMReadBufferEx((void *)buffer,len,_index,BM_SEEK_SET); }
      if(bin_mode!=MOD_PLAIN)
      {

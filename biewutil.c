@@ -238,9 +238,9 @@ static char __NEAR__ __FASTCALL__ GetHexAnalog(char val)
   return val >= '0' && val <= '9' ? val-'0' : ((toupper(val)-'A'+10)) & 0x0F;
 }
 
-void __FASTCALL__ CompressHex(unsigned char * dest,const char * src,int sizedest,tBool usespace)
+void __FASTCALL__ CompressHex(unsigned char * dest,const char * src,unsigned sizedest,tBool usespace)
 {
-  int i,j;
+  unsigned i,j;
   for(i = j = 0;j < sizedest;j++)
   {
       dest[j] = (GetHexAnalog(src[i++]) << 4) | GetHexAnalog(src[i++]);

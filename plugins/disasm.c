@@ -541,7 +541,7 @@ static int __NEAR__ __FASTCALL__ FullAsmEdit(TWindow * ewnd)
  edit_cp = BMGetCurrFilePos();
  start = 0;
 
- rlen = edit_cp + max_buff_size < flen ? max_buff_size : (int)(flen - edit_cp);
+ rlen = (__filesize_t)edit_cp + max_buff_size < flen ? max_buff_size : (unsigned)(flen - edit_cp);
  BMReadBufferEx((void *)EditorMem.buff,rlen,edit_cp,BM_SEEK_SET);
  memcpy(EditorMem.save,EditorMem.buff,max_buff_size);
  memset(EditorMem.alen,TWC_DEF_FILLER,height);
@@ -1130,7 +1130,7 @@ int __FASTCALL__ disAppendFAddr(char * str,__fileoff_t ulShift,__fileoff_t disti
    dret = Disassembler(r_sh,(MBuffer)disCodeBufPredict,__DISF_GETTYPE);
  }
 #ifndef NDEBUG
-  if(ulShift >= BMGetFLength()-codelen)
+  if(ulShift >= (__fileoff_t)BMGetFLength()-codelen)
   {
      char sout[75];
      static tBool displayed = False;
@@ -1190,7 +1190,7 @@ int __FASTCALL__ disAppendFAddr(char * str,__fileoff_t ulShift,__fileoff_t disti
  {
    if(hexAddressResolv && detectedFormat->AddressResolving)
    {
-     r_sh = r_sh ? r_sh : ulShift;
+     r_sh = r_sh ? r_sh : (__filesize_t)ulShift;
      appended = detectedFormat->AddressResolving(&str[strlen(str)],r_sh) ? RAPREF_DONE : RAPREF_NONE;
    }
    if(!appended)
@@ -1208,7 +1208,7 @@ int __FASTCALL__ disAppendFAddr(char * str,__fileoff_t ulShift,__fileoff_t disti
 	    sprintf(lbuf,"%016llX",r_sh);
 	else
 #endif
-       sprintf(lbuf,"%08lX",r_sh);
+       sprintf(lbuf,"%08lX",(unsigned long)r_sh);
        strcat(str,lbuf);
        appended = RAPREF_DONE;
      }

@@ -76,7 +76,7 @@ extern char * __FASTCALL__ Get16SignDig(tInt32 low,tInt32 high);
 extern char * __FASTCALL__ GetBinary(char val);
 
 extern int      __FASTCALL__ ExpandHex(char * dest,const unsigned char * src,int size,char hard);
-extern void     __FASTCALL__ CompressHex(unsigned char * dest,const char * src,int sizedest,tBool usespace);
+extern void     __FASTCALL__ CompressHex(unsigned char * dest,const char * src,unsigned sizedest,tBool usespace);
 extern unsigned __FASTCALL__ Summ(unsigned char *array,unsigned size);
 
 extern void   ExtHelp(void);

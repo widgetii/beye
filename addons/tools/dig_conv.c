@@ -110,9 +110,9 @@ static tUIntMax __NEAR__ __FASTCALL__ Str2Dig(char * buff,int action)
 
 static void __NEAR__ __FASTCALL__ DCStaticPaint(TWindow * wdlg,char * wbuff,tIntMax digit,unsigned *mlen)
 {
- int rlen,i;
+ int rlen;
  tAbsCoord x1,y1,x2,y2;
- unsigned w;
+ unsigned i,w;
  TWindow * using = twUsedWin();
     twUseWin(wdlg);
     twGetWinPos(wdlg,&x1,&y1,&x2,&y2);

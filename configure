@@ -301,6 +301,8 @@ else
     _cdefos="-DNBEBUG=1 $CFLAGS $_cdefos"
 fi
 
+cc_name=`$_cc -v 2>&1 | tail -1 | cut -d ' ' -f 1`
+cc_version=`$_cc -dumpversion`
 if test "$_target_system" = dos ; then
 # disable cc_check call for DJGPP due bugs in bash
 _cdefos="-D__HAVE_PRAGMA_PACK__=1 $_cdefos"
@@ -431,6 +433,11 @@ case "$host_arch" in
   ia32)
 # TODO: enable >386 optimizations here
   _cdefsys="-D__MACHINE__=ia32 -D__CPU_NAME__='\"ia32\"' -D__CPU__=386 -D__DEFAULT_DISASM=0 -DCAN_COMPILE_X86_GAS=1"
+  case $cc_version in
+    2.95.[3-9]|2.95.[3-9].[0-9]|3.[0-9]|3.[0-9].[0-9])
+      _cdefsys="-D__ENABLE_FASTCALL=1 $_cdefsys"
+      ;;
+  esac
     ;;
 
   *)

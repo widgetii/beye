@@ -447,7 +447,7 @@ tBool   __FASTCALL__ bioSeek(BGLOBAL bioFile,__fileoff_t pos,int orig)
 __filesize_t  __FASTCALL__ bioTell(BGLOBAL bioFile)
 {
   BFILE  *obj = MK_FPTR(bioFile);
-  return (IS_CACHE_VALID(obj) || obj->is_mmf) ? obj->FilePos : __OsTell(obj->b.vfb.handle);
+  return (IS_CACHE_VALID(obj) || obj->is_mmf) ? obj->FilePos : (__filesize_t)__OsTell(obj->b.vfb.handle);
 }
 
 tUInt8 __FASTCALL__ bioReadByte(BGLOBAL bioFile)

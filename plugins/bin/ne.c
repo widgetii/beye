@@ -1207,7 +1207,7 @@ static __filesize_t __NEAR__ __FASTCALL__ BuildReferStrNE(char *str,RELOC_NE *rn
          sprintf(&str[strlen(str)],"%s",buff);
        else
        {
-         if(need_virt) sprintf(&str[strlen(str)],".%08lX",nePA2VA(ep));
+         if(need_virt) sprintf(&str[strlen(str)],".%08lX",(unsigned long)nePA2VA(ep));
          else sprintf(&str[strlen(str)],"(*this).seg<#%hu>:%sH",rne->idx,Get4Digit(rne->ordinal));
          retrf = ep;
        }

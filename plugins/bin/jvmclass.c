@@ -154,7 +154,7 @@ static void __NEAR__ __FASTCALL__ get_name(BGLOBAL handle,char *str,unsigned sle
 static char * __NEAR__ __FASTCALL__ get_class_name(BGLOBAL handle,unsigned idx,char *str,unsigned slen)
 {
     *str='\0';
-    if(idx && idx<jvm_header.constant_pool_count-1)
+    if(idx && idx<(unsigned)jvm_header.constant_pool_count-1)
     {
 	unsigned char id;
 	bioSeek(handle,jvm_header.constants_offset,BM_SEEK_SET);
@@ -276,7 +276,7 @@ static __filesize_t __NEAR__ __FASTCALL__ __ShowAttributes(const char *title)
   {
     unsigned i;
     bmSeek(jvm_header.attributes_offset,BM_SEEK_SET);
-    for(i=0;i<ret+1;i++)
+    for(i=0;i<(unsigned)ret+1;i++)
     {
 	unsigned long len;
 	fpos=bmGetCurrFilePos();
@@ -340,7 +340,7 @@ static __filesize_t __FASTCALL__ ShowMethods(void)
     unsigned i;
     unsigned short acount;
     bmSeek(jvm_header.methods_offset,BM_SEEK_SET);
-    for(i=0;i<ret+1;i++)
+    for(i=0;i<(unsigned)ret+1;i++)
     {
 	fpos=bmGetCurrFilePos();
 	bmSeek(2,BM_SEEK_CUR);
@@ -414,7 +414,7 @@ static __filesize_t __FASTCALL__ ShowFields(void)
     unsigned i;
     unsigned short acount;
     bmSeek(jvm_header.fields_offset,BM_SEEK_SET);
-    for(i=0;i<ret+1;i++)
+    for(i=0;i<(unsigned)ret+1;i++)
     {
 	fpos=bmGetCurrFilePos();
 	bmSeek(2,BM_SEEK_CUR);
@@ -857,6 +857,7 @@ static unsigned long __FASTCALL__ jvm_AppendRef(char *str,__filesize_t ulShift,i
 {
  unsigned long  retrf = RAPREF_DONE;
  unsigned slen=1000; /* According on disasm/java/java.c */
+ UNUSED(r_sh);
     if((flags & APREF_TRY_LABEL)!=APREF_TRY_LABEL)
     {
 	__filesize_t fpos;

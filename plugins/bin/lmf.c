@@ -54,7 +54,7 @@ typedef struct		/* Extra definition */
 static lmf_headers_list *hl;
 static lmf_xdef xdef;
 static int xdef_len=0;
-static int seg_num=0;
+static unsigned seg_num=0;
 static tUInt32 reccnt;
 static tUInt32 recmax;
 static tUInt32 reclast;
@@ -122,7 +122,8 @@ static tBool __FASTCALL__ lmf_check_fmt(void)
 
 static void __FASTCALL__ lmf_init_fmt(void)
 {
-	tInt32 i,l,pos=0;
+	tUInt32 i,l;
+	tInt32 pos=0;
 	hl=PMalloc(MINREC*sizeof(lmf_headers_list));
 	if(hl==NULL) return;
 	recmax=MINREC;
@@ -131,7 +132,7 @@ static void __FASTCALL__ lmf_init_fmt(void)
 	for(i=0;i<seg_num;i++) segbase[i]=0;
 	for(i=0;;i++)
 	{
-		if(i==recmax)
+		if((unsigned)i==recmax)
 		{
 			hl=PRealloc(hl,(recmax+=MINREC)*sizeof(lmf_headers_list));
 			if(hl==NULL) return;
@@ -194,13 +195,14 @@ static int __FASTCALL__ lmf_platform(void)
 
 static int __FASTCALL__ lmf_bitness(__filesize_t pa)
 {
+	UNUSED(pa);
 	if(DEF.cflags&_PCF_32BIT) return DAB_USE32;
 	else return DAB_USE16;
 }
 
 static tBool __FASTCALL__ lmf_AddressResolv(char *addr,__filesize_t cfpos)
 {
-	int i;
+	unsigned i;
  /* Since this function is used in references resolving of disassembler
     it must be seriously optimized for speed. */
 	for(i=0;i<=reclast;i++)
@@ -266,7 +268,7 @@ static tBool __FASTCALL__ lmf_AddressResolv(char *addr,__filesize_t cfpos)
 
 static __filesize_t __FASTCALL__ lmf_va2pa(__filesize_t va)
 {
-	int i,j;
+	unsigned i,j;
 	int seclen;
 	__filesize_t addr=0;
 	__filesize_t newva=0;
@@ -302,7 +304,7 @@ static __filesize_t __FASTCALL__ lmf_va2pa(__filesize_t va)
 
 static __filesize_t __FASTCALL__ lmf_pa2va(__filesize_t pa)
 {
-	int i;
+	unsigned i;
 	int seclen;
 	__filesize_t addr=0;
 	for(i=1;i<reclast;i++)
@@ -325,9 +327,11 @@ static __filesize_t __FASTCALL__ lmf_pa2va(__filesize_t pa)
 
 static tBool __FASTCALL__ lmf_ReadSecHdr(BGLOBAL handle,memArray *obj,unsigned nnames)
 {
-	int i;
+	unsigned i;
 	char tmp[30];
 	char stmp[80];
+	UNUSED(handle);
+	UNUSED(nnames);
 	for(i=0;i<=reclast;i++)
 	{
 		switch(hl[i].header.rec_type)
@@ -399,7 +403,7 @@ static __filesize_t __FASTCALL__ lmf_ShowSecLst(void)
 
 static __filesize_t __FASTCALL__ lmf_ShowHeader( void )
 {
-	int i,j,k;
+	unsigned i,j,k;
 	__filesize_t fpos;
 	TWindow *w;
 	char hdr[81];

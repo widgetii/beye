@@ -863,7 +863,7 @@ static int __NEAR__ __FASTCALL__ __ListBox(const char ** names,unsigned nlist,un
                   tBool found;
                   int ii,endsearch,startsearch;
                   searchtxt[searchlen] = 0;
-                  endsearch = sflg & SF_REVERSE ? -1 : nlist;
+                  endsearch = sflg & SF_REVERSE ? -1 : (int)nlist;
                   direct = sflg & SF_REVERSE ? -1 : 1;
                   startsearch = (assel & LB_SELECTIVE) == LB_SELECTIVE ?
                                  cursor + start :

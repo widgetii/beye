@@ -303,9 +303,9 @@ static DisasmRet __FASTCALL__ AVRDisassembler( __filesize_t ulShift,
   comment2[0] = 0;
 
   /* extract 2nd instruction opcode */
+  insn2 = 0;
   if (opcode->name)
   {
-    insn2 = 0;
     ok = 1;
 
     if (opcode->insn_size > 1)
