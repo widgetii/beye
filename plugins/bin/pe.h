@@ -65,34 +65,37 @@ typedef struct tagPEHEADER
   tUInt32   peHeapReserveSize;
   tUInt32   peHeapCommitSize;
   tUInt32   peReserv10;
-  tUInt32   peInterestingVASize;
-  tUInt32   peExportTableRVA;
-  tUInt32   peTotalExportDataSize;
-  tUInt32   peImportTableRVA;
-  tUInt32   peTotalImportDataSize;
-  tUInt32   peResourceTableRVA;
-  tUInt32   peTotalResourceDataSize;
-  tUInt32   peExceptionTableRVA;
-  tUInt32   peTotalExceptionDataSize;
-  tUInt32   peSecurityTableRVA;
-  tUInt32   peTotalSecurityDataSize;
-  tUInt32   peFixupTableRVA;
-  tUInt32   peTotalFixupDataSize;
-  tUInt32   peDebugTableRVA;
-  tUInt32   peTotalDebugDirectories;
-  tUInt32   peImageDescriptionRVA;
-  tUInt32   peTotalDescriptionSize;
-  tUInt32   peMachineSpecificRVA;
-  tUInt32   peMachineSpecificSize;
-  tUInt32   peThreadLocalStorageRVA;
-  tUInt32   peTotalTLSSize;
+  tUInt32   peDirSize;
 }PEHEADER;
+
+typedef struct tagPERVA
+{
+  tUInt32 rva;
+  tUInt32 size;
+} PERVA;
+
+#define PE_EXPORT           0
+#define PE_IMPORT           1
+#define PE_RESOURCE         2
+#define PE_EXCEPT           3
+#define PE_SECURITY         4
+#define PE_FIXUP            5
+#define PE_DEBUG            6
+#define PE_IMAGE_DESC       7
+#define PE_MACHINE          8
+#define PE_TLS              9
+#define PE_LOAD_CONFIG      10
+#define PE_BOUND_IMPORT     11
+#define PE_IAT              12
+#define PE_DELAY_IMPORT     13
+#define PE_COM              14
+#define PE_RESERVED         15
 
 typedef struct tagPE_ADDR
 {
- tUInt32 rva;
- tUInt32 phys;
-}PE_ADDR;
+  tUInt32 rva;
+  tUInt32 phys;
+} PE_ADDR;
 
 typedef struct tagExportTablePE
 {

@@ -40,7 +40,8 @@
 #include "biewlib/pmalloc.h"
 
 static PE_ADDR * peVA = NULL;
-PEHEADER pe;
+static PEHEADER pe;
+static PERVA *peDir;
 
 static BGLOBAL pe_cache = &bNull;
 static BGLOBAL pe_cache1 = &bNull;
@@ -86,7 +87,7 @@ static unsigned long __NEAR__ __FASTCALL__ RVA2Phys(unsigned long rva)
    if(rva >= peVA[i].rva) break;
    if(IsKbdTerminate()) return 0;
  }
- if(i < 0) return 0;
+ if (i < 0) return rva;         // low RVAs fix -XF
  pphys = peVA[i].phys;
  obj_rva = peVA[i].rva;
  /* Added by Kostya Nosov <k-nosov@yandex.ru> */
@@ -124,30 +125,32 @@ static unsigned long __NEAR__ __FASTCALL__ fioReadDWord2Phys(BGLOBAL handle,unsi
  return RVA2Phys(dword);
 }
 
-const char * __pecputype[] =
-{
- "80386",
- "80486",
- "80586",
- "80686",
- "80787",
- "80887",
- "80987",
- "801087"
-};
-
 static const char * __NEAR__ __FASTCALL__ PECPUType(void)
 {
-  const char * cptr;
-  if(pe.peCPUType >= 0x014C && pe.peCPUType < 0x0150) cptr = __pecputype[(pe.peCPUType - 0x014C) & 0x0007];
-  else
-    if(pe.peCPUType == 0x0162) cptr = "__MIPS Mark I (R2000, R3000)";
-    else
-      if(pe.peCPUType == 0x0163) cptr = "__MIPS Mark II (R6000)";
-      else
-        if(pe.peCPUType == 0x0166) cptr = "__MIPS Mark III (R4000)";
-        else                            cptr = __pecputype[0];
-  return cptr;
+    static const char * __pecputype[] =
+    {
+     "80386",
+     "80486",
+     "80586",
+     "80686",
+     "80787",
+     "80887",
+     "80987",
+     "801087"
+    };
+    const char * cptr;
+
+    if (pe.peCPUType >= 0x014C && pe.peCPUType < 0x0150)
+        cptr = __pecputype[(pe.peCPUType - 0x014C) & 0x0007];
+    else if (pe.peCPUType == 0x0162)
+        cptr = "__MIPS Mark I (R2000, R3000)";
+    else if (pe.peCPUType == 0x0163)
+        cptr = "__MIPS Mark II (R6000)";
+    else if (pe.peCPUType == 0x0166)
+        cptr = "__MIPS Mark III (R4000)";
+    else cptr = __pecputype[0];
+
+    return cptr;
 }
 
 static unsigned long entryPE = 0L;
@@ -199,20 +202,20 @@ static void __NEAR__ PaintNewHeaderPE_1( void )
            ,pe.peObjectAlign);
 }
 
-const char * __pesubsyst[] =
-{
-  "Unknown",
-  "Native",
-  "Windows GUI",
-  "Windows Character",
-  "OS/2 GUI",
-  "OS/2 Character",
-  "Posix GUI",
-  "Posix Character"
-};
-
 static void __NEAR__ PaintNewHeaderPE_2( void )
 {
+  static const char * __pesubsyst[] =
+  {
+    "Unknown",
+    "Native",
+    "Windows GUI",
+    "Windows Character",
+    "OS/2 GUI",
+    "OS/2 Character",
+    "Posix GUI",
+    "Posix Character"
+  };
+
   twPrintF("File align                     = %08lXH\n"
            "OS version                     = %hu.%hu\n"
            "User version                   = %hu.%hu\n"
@@ -230,10 +233,7 @@ static void __NEAR__ PaintNewHeaderPE_2( void )
            "Stack commit size              = %lu bytes\n"
            "Heap reserve size              = %lu bytes\n"
            "Heap commit size               = %lu bytes\n"
-           "Number interesting VA/Sizes    = %lu bytes\n"
-           "Export Table RVA               = %08lXH\n"
-           "Total export data size         = %lu bytes\n"
-           "Import Table RVA               = %08lXH"
+           "Number of directory entries    = %lu bytes"
            ,pe.peFileAlign
            ,pe.peOSMajor,pe.peOSMinor
            ,pe.peUserMajor,pe.peUserMinor
@@ -251,55 +251,13 @@ static void __NEAR__ PaintNewHeaderPE_2( void )
            ,pe.peStackCommitSize
            ,pe.peHeapReserveSize
            ,pe.peHeapCommitSize
-           ,pe.peInterestingVASize
-           ,pe.peExportTableRVA
-           ,pe.peTotalExportDataSize
-           ,pe.peImportTableRVA);
+           ,pe.peDirSize);
 }
 
-static void __NEAR__ PaintNewHeaderPE_3( void )
+static const void (__NEAR__ * pephead[])(void) =
 {
-  twPrintF("Total import data size            = %lu bytes\n"
-           "Resource Table RVA                = %08lXH\n"
-           "Total resource data size          = %lu bytes\n"
-           "Exception Table RVA               = %08lXH\n"
-           "Total exception data size         = %lu bytes\n"
-           "Security Table RVA                = %08lXH\n"
-           "Total security data size          = %lu bytes\n"
-           "Fixup Table RVA                   = %08lXH\n"
-           "Total fixup data size             = %lu bytes\n"
-           "Debug Table RVA                   = %08lXH\n"
-           "Total number of debug directories = %lu bytes\n"
-           "Image Description string RVA      = %08lXH\n"
-           "Total description data size       = %lu bytes\n"
-           "Machine Specific value RVA        = %08lXH\n"
-           "Machine specific value size       = %lu bytes\n"
-           "Thread Local Storage RVA          = %08lXH\n"
-           "Total Thread Local Storage size   = %lu bytes"
-           ,pe.peTotalImportDataSize
-           ,pe.peResourceTableRVA
-           ,pe.peTotalResourceDataSize
-           ,pe.peExceptionTableRVA
-           ,pe.peTotalExceptionDataSize
-           ,pe.peSecurityTableRVA
-           ,pe.peTotalSecurityDataSize
-           ,pe.peFixupTableRVA
-           ,pe.peTotalFixupDataSize
-           ,pe.peDebugTableRVA
-           ,pe.peTotalDebugDirectories
-           ,pe.peImageDescriptionRVA
-           ,pe.peTotalDescriptionSize
-           ,pe.peMachineSpecificRVA
-           ,pe.peMachineSpecificSize
-           ,pe.peThreadLocalStorageRVA
-           ,pe.peTotalTLSSize);
-}
-
-static void (__NEAR__ * pephead[])( void ) =
-{
- PaintNewHeaderPE_1,
- PaintNewHeaderPE_2,
- PaintNewHeaderPE_3
+    PaintNewHeaderPE_1,
+    PaintNewHeaderPE_2
 };
 
 static void __FASTCALL__ PaintNewHeaderPE(TWindow * win,const void **ptr,unsigned npage,unsigned tpage)
@@ -312,7 +270,7 @@ static void __FASTCALL__ PaintNewHeaderPE(TWindow * win,const void **ptr,unsigne
   sprintf(text," Portable Executable Header [%d/%d] ",npage + 1,tpage);
   twSetTitleAttr(win,text,TW_TMODE_CENTER,dialog_cset.title);
   twSetFooterAttr(win,PAGEBOX_SUB,TW_TMODE_RIGHT,dialog_cset.selfooter);
-  if(npage < 3)
+  if(npage < 2)
   {
     twGotoXY(1,1);
     (*(pephead[npage]))();
@@ -325,7 +283,7 @@ static unsigned long __FASTCALL__ ShowNewHeaderPE( void )
  long fpos;
  fpos = BMGetCurrFilePos();
  entryPE = RVA2Phys(pe.peEntryPointRVA);
- if(PageBox(70,21,NULL,3,PaintNewHeaderPE) != -1 && entryPE && entryPE < bmGetFLength()) fpos = entryPE;
+ if(PageBox(70,21,NULL,2,PaintNewHeaderPE) != -1 && entryPE && entryPE < bmGetFLength()) fpos = entryPE;
  return fpos;
 }
 
@@ -438,7 +396,7 @@ static unsigned __NEAR__ __FASTCALL__ GetImportCountPE(BGLOBAL handle,unsigned l
 /* returns really readed number of characters */
 unsigned __NEAR__ __FASTCALL__ __peReadASCIIZName(BGLOBAL handle,unsigned long offset,char *buff, unsigned cb_buff)
 {
-  int j;
+  unsigned j;
   char ch;
   unsigned long fpos;
   fpos = bioTell(handle);
@@ -508,7 +466,7 @@ static tBool __FASTCALL__  __ReadImpContPE(BGLOBAL handle,memArray * obj,unsigne
   {
     char stmp[300];
     tBool is_eof;
-    sprintf(stmp,".%08X: ",VA);
+    sprintf(stmp,".%08X: ", VA);
     VA += 4; /* sizeof(unsigned) ?*/
     Hint = bioReadDWord(handle);
     if(!(Hint & 0x80000000UL))
@@ -546,10 +504,10 @@ static unsigned long __FASTCALL__ ShowModRefPE( void )
   unsigned nnames;
   unsigned long phys,fret;
   fret = BMGetCurrFilePos();
-  if(!pe.peImportTableRVA) { not_found: NotifyBox(NOT_ENTRY," Module References "); return fret; }
+  if(!peDir[PE_IMPORT].rva) { not_found: NotifyBox(NOT_ENTRY," Module References "); return fret; }
   handle = pe_cache;
   bioSeek(handle,0L,SEEK_SET);
-  phys = RVA2Phys(pe.peImportTableRVA);
+  phys = RVA2Phys(peDir[PE_IMPORT].rva);
   if(!(nnames = GetImportCountPE(handle,phys))) goto not_found;
   if(!(obj = ma_Build(nnames,True))) goto exit;
   if(__ReadImportPE(handle,phys,obj,nnames))
@@ -581,17 +539,28 @@ static unsigned long __FASTCALL__ ShowModRefPE( void )
 
 static ExportTablePE et;
 
+static void writeExportVA(unsigned long va, BGLOBAL handle, char *buf, unsigned long bufsize)
+{
+    // check for forwarded export
+    if (va>=peDir[PE_EXPORT].rva && va<peDir[PE_EXPORT].rva+peDir[PE_EXPORT].size)
+        __peReadASCIIZName(handle, RVA2Phys(va), buf, bufsize);
+    // normal export
+    else sprintf(buf, ".%08lX", va + pe.peImageBase);
+}
+
 static tBool __FASTCALL__ PEExportReadItems(BGLOBAL handle,memArray * obj,unsigned nnames)
 {
   unsigned long nameaddr;
   unsigned long expaddr,nameptr,*addr;
   unsigned i,ord;
-  char buff[40];
+  char buff[80];
+
   nameptr = RVA2Phys(et.etNamePtrTableRVA);
-  expaddr  = RVA2Phys(et.etOrdinalTableRVA);
+  expaddr = RVA2Phys(et.etOrdinalTableRVA);
   if(!(addr = PMalloc(sizeof(unsigned long)*nnames))) return True;
   bioSeek(handle,RVA2Phys(et.etAddressTableRVA),SEEKF_START);
   bioReadBuffer(handle,addr,sizeof(unsigned long)*nnames);
+
   for(i = 0;i < et.etNumNamePtrs;i++)
   {
     char stmp[300];
@@ -601,21 +570,25 @@ static tBool __FASTCALL__ PEExportReadItems(BGLOBAL handle,memArray * obj,unsign
     if(IsKbdTerminate()) break;
     ord = fioReadWord(handle,expaddr + i*2,SEEKF_START);
     is_eof = bioEOF(handle);
-    sprintf(buff,"%c%-9lu .%08lX",LB_ORD_DELIMITER, ord+(unsigned long)et.etOrdinalBase,addr[ord]+pe.peImageBase);
+    sprintf(buff,"%c%-9lu ", LB_ORD_DELIMITER, ord+(unsigned long)et.etOrdinalBase);
+    writeExportVA(addr[ord], handle, buff+11, sizeof(buff)-11);
     addr[ord] = 0;
     strcat(stmp,buff);
-    if(!ma_AddString(obj,is_eof ? CORRUPT_BIN_MSG : stmp,True)) { PFree(stmp); break; }
+    if(!ma_AddString(obj,is_eof ? CORRUPT_BIN_MSG : stmp,True)) break;  // -XF removed PFree(stmp)
     if(is_eof) break;
   }
+
   for(i = 0;i < nnames;i++)
   {
     if(addr[i])
     {
       ord = i+et.etOrdinalBase;
-      sprintf(buff," < by ordinal > %c%-5lu .%08lX",LB_ORD_DELIMITER, (unsigned long)ord,addr[i]+pe.peImageBase);
+      sprintf(buff," < by ordinal > %c%-9lu ",LB_ORD_DELIMITER, (unsigned long)ord);
+      writeExportVA(addr[i], handle, buff+27, sizeof(buff)-27);
       if(!ma_AddString(obj,buff,True)) break;
     }
   }
+
   PFree(addr);
   return True;
 }
@@ -623,8 +596,8 @@ static tBool __FASTCALL__ PEExportReadItems(BGLOBAL handle,memArray * obj,unsign
 static unsigned __FASTCALL__ PEExportNumItems(BGLOBAL handle)
 {
   unsigned long addr;
-  if(!pe.peExportTableRVA) return 0;
-  addr = RVA2Phys(pe.peExportTableRVA);
+  if(!peDir[PE_EXPORT].rva) return 0;
+  addr = RVA2Phys(peDir[PE_EXPORT].rva);
   bioSeek(handle,addr,SEEKF_START);
   bioReadBuffer(handle,(void *)&et,sizeof(et));
   return (unsigned)(et.etNumEATEntries);
@@ -657,9 +630,9 @@ static unsigned long __FASTCALL__ ShowExpNamPE( void )
   char exp_nam[256], exp_buf[300];
   fpos = BMGetCurrFilePos();
   strcpy(exp_nam,EXP_TABLE);
-  if(pe.peExportTableRVA)
+  if(peDir[PE_EXPORT].rva)
   {
-    addr = RVA2Phys(pe.peExportTableRVA);
+    addr = RVA2Phys(peDir[PE_EXPORT].rva);
     bmSeek(addr,SEEKF_START);
     bmReadBuffer((void *)&et,sizeof(et));
     if(et.etNameRVA)
@@ -683,6 +656,61 @@ static unsigned long __FASTCALL__ ShowExpNamPE( void )
   {
     fpos = CalcEntryPE(ordinal,True);
   }
+  return fpos;
+}
+
+
+static tBool __FASTCALL__ PEReadRVAs(BGLOBAL handle, memArray * obj, unsigned nnames)
+{
+  unsigned i;
+  static const char *rvaNames[] =
+  {
+      "~Export Table        ",
+      "~Import Table        ",
+      "~Resource Table      ",
+      "E~xception Table     ",
+      "Sec~urity Table      ",
+      "Re~location Table    ",
+      "~Debug Information   ",
+      "Image De~scription   ",
+      "~Machine Specific    ",
+      "~Thread Local Storage",
+      "Load Confi~guration  ",
+      "~Bound Import Table  ",
+      "Import ~Adress Table ",
+      "Dela~y Import Table  ",
+      "~COM                 ",
+      "Reser~ved            "
+  };
+
+  for (i=0; i<pe.peDirSize; i++)
+  {
+    char foo[80];
+
+    sprintf(foo, "%s  %08lX  %8lu",
+        i<sizeof(rvaNames)/sizeof(rvaNames[0]) ? rvaNames[i] : "Unknown             ",
+        peDir[i].rva,
+        peDir[i].size);
+    if (!ma_AddString(obj, foo, True))
+        return False;
+  }
+
+  return True;
+}
+
+static unsigned __FASTCALL__ PENumRVAs(BGLOBAL handle)
+{
+  return pe.peDirSize;
+}
+
+static unsigned long __FASTCALL__ ShowPERVAs( void )
+{
+  unsigned long fpos = BMGetCurrFilePos();
+  int ret;
+  ret = fmtShowList(PENumRVAs, PEReadRVAs, " Directory Entry       RVA           size ", LB_SELECTIVE|LB_USEACC, NULL);
+  if (ret!=-1 && peDir[ret].rva)
+    fpos = RVA2Phys(peDir[ret].rva);
+
   return fpos;
 }
 
@@ -733,9 +761,9 @@ static void __NEAR__ __FASTCALL__ BuildPERefChain( void )
   /**
      building references chain for external
   */
-  if(pe.peImportTableRVA)
+  if(peDir[PE_IMPORT].rva)
   {
-    phys = RVA2Phys(pe.peImportTableRVA);
+    phys = RVA2Phys(peDir[PE_IMPORT].rva);
     nnames = GetImportCountPE(handle,phys);
   }
   else
@@ -776,12 +804,12 @@ static void __NEAR__ __FASTCALL__ BuildPERefChain( void )
   /**
      building references chain for internal
   */
-  if(pe.peTotalFixupDataSize)
+  if(peDir[PE_FIXUP].size)
   {
-    phys = RVA2Phys(pe.peFixupTableRVA);
+    phys = RVA2Phys(peDir[PE_FIXUP].rva);
     bioSeek(handle,phys,SEEKF_START);
     cpos = bioTell(handle);
-    while(bioTell(handle) < cpos + pe.peTotalFixupDataSize)
+    while(bioTell(handle) < cpos + peDir[PE_FIXUP].size)
     {
       tUInt16 typeoff;
       unsigned long page,physoff,size,ccpos;
@@ -827,7 +855,7 @@ static unsigned long __NEAR__ __FASTCALL__ BuildReferStrPE(char *str,RELOC_PE __
    handle = pe_cache;
    handle2 = pe_cache4;
    handle3 = pe_cache3;
-   phys = RVA2Phys(pe.peImportTableRVA);
+   phys = RVA2Phys(peDir[PE_IMPORT].rva);
    bioSeek(handle,phys + 20L*rpe->modidx,SEEKF_START);
    rva = fioReadDWord(handle,12L,SEEKF_CUR);
    retrf = RAPREF_DONE;
@@ -940,7 +968,7 @@ static unsigned long __FASTCALL__ AppendPERef(char *str,unsigned long ulShift,in
   b_cache = pe_cache3;
   retrf = RAPREF_NONE;
   if(flags & APREF_TRY_PIC) return RAPREF_NONE;
-  if(pe.peImportTableRVA || pe.peFixupTableRVA)
+  if(peDir[PE_IMPORT].rva || peDir[PE_FIXUP].rva)
   {
     bioSeek(b_cache,
             RVA2Phys(bmReadDWordEx(ulShift,SEEK_SET) - pe.peImageBase),
@@ -979,20 +1007,30 @@ static void __FASTCALL__ initPE( void )
    int i;
    BGLOBAL main_handle;
    PMRegLowMemCallBack(peLowMemFunc);
+
    bmReadBufferEx(&pe,sizeof(PEHEADER),headshift,SEEKF_START);
+
+   if(!(peDir = PMalloc(sizeof(PERVA)*pe.peDirSize)))
+   {
+     MemOutBox("PE initialization");
+     exit(EXIT_FAILURE);
+   }
+   bmReadBuffer(peDir, sizeof(PERVA)*pe.peDirSize);
+
    if(!(peVA = PMalloc(sizeof(PE_ADDR)*pe.peObjects)))
    {
      MemOutBox("PE initialization");
      exit(EXIT_FAILURE);
    }
-   main_handle = bmbioHandle();
-   bioSeek(main_handle,0x18 + pe.peNTHdrSize + headshift,SEEKF_START);
+   bmSeek(0x18 + pe.peNTHdrSize + headshift,SEEKF_START);
    for(i = 0;i < pe.peObjects;i++)
    {
-     peVA[i].rva = fioReadDWord(main_handle,12L,SEEKF_CUR);
-     peVA[i].phys = fioReadDWord(main_handle,4L,SEEKF_CUR);
-     bioSeek(main_handle,16L,SEEKF_CUR);
+     peVA[i].rva = bmReadDWordEx(12L,SEEKF_CUR);
+     peVA[i].phys = bmReadDWordEx(4L,SEEKF_CUR);
+     bmSeek(16L,SEEKF_CUR);
    }
+
+   main_handle = bmbioHandle();
    if((pe_cache = bioDupEx(main_handle,BBIO_SMALL_CACHE_SIZE)) == &bNull) pe_cache = main_handle;
    if((pe_cache1 = bioDupEx(main_handle,BBIO_SMALL_CACHE_SIZE)) == &bNull) pe_cache1 = main_handle;
    if((pe_cache2 = bioDupEx(main_handle,BBIO_SMALL_CACHE_SIZE)) == &bNull) pe_cache2 = main_handle;
@@ -1003,7 +1041,8 @@ static void __FASTCALL__ initPE( void )
 static void __FASTCALL__ destroyPE( void )
 {
   BGLOBAL main_handle;
-  if(peVA) PFree(peVA);
+  if(peVA) PFREE(peVA);
+  if(peDir) PFREE(peDir);
   if(PubNames) { la_Destroy(PubNames); PubNames = 0; }
   if(CurrPEChain) { la_Destroy(CurrPEChain); CurrPEChain = 0; } /* Fixed by "Kostya Nosov" <k-nosov@yandex.ru> */
   main_handle = bmbioHandle();
@@ -1036,7 +1075,7 @@ static tBool __FASTCALL__ peAddressResolv(char *addr,unsigned long cfpos)
     it must be seriously optimized for speed. */
  tBool bret = True;
  tUInt32 res;
- if(cfpos >= headshift && cfpos < headshift + sizeof(PEHEADER))
+ if(cfpos >= headshift && cfpos < headshift + sizeof(PEHEADER) + pe.peDirSize*sizeof(PERVA))
  {
     strcpy(addr,"PEH :");
     strcpy(&addr[5],Get4Digit(cfpos - headshift));
@@ -1176,8 +1215,8 @@ static int __FASTCALL__ pePlatform( void ) { return DISASM_CPU_IX86; }
 REGISTRY_BIN peTable =
 {
   "PE (Portable Executable)",
-  { "PEHelp", "Import", "Export", NULL, NULL, NULL, NULL, "PEHead", NULL, "Object" },
-  { PEHelp, ShowModRefPE, ShowExpNamPE, NULL, NULL, NULL, NULL, ShowNewHeaderPE, NULL, ShowObjectsPE },
+  { "PEHelp", "Import", "Export", NULL, NULL, NULL, NULL, "PEHead", "Dir   ", "Object" },
+  { PEHelp, ShowModRefPE, ShowExpNamPE, NULL, NULL, NULL, NULL, ShowNewHeaderPE, ShowPERVAs, ShowObjectsPE },
   IsPE, initPE, destroyPE,
   NULL,
   AppendPERef,
