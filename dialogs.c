@@ -168,7 +168,7 @@ tBool __FASTCALL__ GetJumpDlg( unsigned long * addr,unsigned long *flags)
  hwnd = CrtDlgWndnls(" Jump within file ",26,4);
  twUseWin(hwnd);
  twGetWinPos(hwnd,&x1,&y1,&x2,&y2);
- twGotoXY(1,1); twPutS("Type new shift:");
+ twGotoXY(2,1); twPutS("Enter offset :");
  twSetColorAttr(dialog_cset.group.active);
  twGotoXY(2,2); twPutS(" ( ) - Absolute ");
  twGotoXY(2,3); twPutS(" ( ) - Relative ");

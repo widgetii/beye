@@ -144,13 +144,13 @@ void Setup(void)
   Y2 = Y1;
   ewnd[0] = CreateEditor(X1,Y1,X2,Y2,TWS_CURSORABLE | TWS_NLSOEM);
   twUseWin(wdlg);
-  twGotoXY(2,1); twPutS("Input fully qualified help name:");
+  twGotoXY(2,1); twPutS("Enter help file name (including full path):");
   twShowWin(ewnd[0]);
   Y1 += 2;
   Y2 = Y1;
   ewnd[1] = CreateEditor(X1,Y1,X2,Y2,TWS_CURSORABLE | TWS_NLSOEM);
   twUseWin(wdlg);
-  twGotoXY(2,3); twPutS("Input fully qualified color set name:");
+  twGotoXY(2,3); twPutS("Enter color skin name (including full path):");
   twShowWin(ewnd[1]);
   twUseWin(ewnd[1]);
   PostEvent(KE_ENTER);

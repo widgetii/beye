@@ -131,7 +131,7 @@ const char * msgFindOpt[] =
 const char * msgFindOpt2[] =
 {
  " [ ] - Search for hex             ",
- " [ ] - Use wildcard ( *? )        ",
+ " [ ] - Use wildcards ( *? )       ",
  " [ ] - Use plugin's output        "
 };
 
@@ -139,37 +139,37 @@ const char UNDEFINE[]=         "Undefined";
 const char FATAL_ERROR[]=      " *** FATAL ERROR *** : ";
 
 const char ISR_JUMP[]=         " Jump to ISR ";
-const char INT_NUMBER[]=       " Number of interrupt : ";
-const char GO_ABS_SHIFT[]=     " Go to absolute shift ";
-const char GO_REL_SHIFT[]=     " Go to relative shift ";
-const char TYPE_SHIFT[]=       "Type new shifts : ";
+const char INT_NUMBER[]=       " Interrupt number : ";
+const char GO_ABS_SHIFT[]=     " Go to absolute offset ";
+const char GO_REL_SHIFT[]=     " Go to relative offset ";
+const char TYPE_SHIFT[]=       "Enter new offsets : ";
 const char DIG_EVALUTOR[]=     " Digital evaluator (hexadecimal) ";
 const char DIG_OPERATORS[]=    " Known Operators - ()+-*/% ~|&^ ";
 const char EXPRESSION[]=       "Expression:";
 const char RESULT[]=           "Result:";
-const char TYPE_HEX_FORM[]=    "Type desired parameters in hexadecimal form:";
+const char TYPE_HEX_FORM[]=    "Enter parameters in hexadecimal form:";
 const char FILE_PRMT[]=        "File :";
 const char XLAT_PRMT[]=        "Xlat (eXtend Looking At Table) file:";
 const char START_PRMT[]=       "Start:";
 const char LENGTH_PRMT[]=      "Length :";
 const char INIT_MASK[]=        " Initialize mask ";
-const char INPUT_MASK[]=       "Input new value of XX:";
+const char INPUT_MASK[]=       "Enter new value of XX:";
 const char ERROR_MSG[]=        " Error ";
 const char WARN_MSG[]=         " Warning ";
 const char NOTE_MSG[]=         " Note ";
 
-const char HOW_SEE[]=          " How to see ";
+const char HOW_SEE[]=          " How to look ";
 
 const char NOT_ENTRY[]=        "Entry not found";
 const char BAD_ENTRY[]=        " Bad entry ";
-const char NO_ENTRY[]=         "Entry do not refers to physical page of this file";
+const char NO_ENTRY[]=         "Entry does not refer to physical page of this file";
 const char UNK_SIGNATURE[]=    "Unknown type of signature : ";
 const char UNK_HEADER[]=       " Unknown header ";
 const char MOD_REFER[]=        " Detected Module References : ";
-const char EXT_REFER[]=        " External Refernces : ";
+const char EXT_REFER[]=        " External References : ";
 const char EXP_TABLE[]=        " Export Table : ";
 const char RES_NAMES[]=        " Resident Names : ";
-const char NORES_NAMES[]=      " Non Resident Names : ";
+const char NORES_NAMES[]=      " Non-Resident Names : ";
 const char IMPPROC_TABLE[]=    " Import Procedures Table : ";
 const char CORRUPT_BIN_MSG[]=  "??? *** Binary format is corrupt or internal error *** ???";
 const char BUILD_REFS[]=       "Building reference chains";
@@ -178,7 +178,7 @@ const char SYSTEM_BUSY[]=      " System is busy ";
 const char BACKWARD[]=         "Backward";
 const char FORWARD[]=          "Forward ";
 const char FIND_STR[]=         " Find string ";
-const char TYPE_STR[]=         "Type string to search (for control letters hold ALT down + NumPads):";
+const char TYPE_STR[]=         "Enter string to search (for control letters hold ALT down + NumPads):";
 const char PLEASE_WAIT[]=      "Please wait ... ";
 const char SEARCHING[]=        " Searching ";
 const char STR_NOT_FOUND[]=    "String not found";
@@ -193,11 +193,11 @@ const char NAME_OF_EXP_FILE[]= " Name of export file ";
 const char NAME_MSG[]=         " Name : ";
 const char ACCESS_DENIED[]=    " Access denied ";
 
-const char READ_FAIL[]=        " Can not read from file ";
-const char WRITE_FAIL[]=       " Can not write into file ";
-const char OPEN_FAIL[]=        " Can not open file ";
-const char DUP_FAIL[]=         " Can not dup file ";
-const char RESIZE_FAIL[]=      " Can not change size of file ";
-const char EXPAND_FAIL[]=      " Can not expand of file ";
-const char TRUNC_FAIL[]=       " Can not truncate file ";
-const char NOTHING_EDIT[]=     " Can not edit zero file ";
+const char READ_FAIL[]=        " Can't read from file ";
+const char WRITE_FAIL[]=       " Can't write into file ";
+const char OPEN_FAIL[]=        " Can't open file ";
+const char DUP_FAIL[]=         " Can't dup file ";
+const char RESIZE_FAIL[]=      " Can't change size of file ";
+const char EXPAND_FAIL[]=      " Can't expand of file ";
+const char TRUNC_FAIL[]=       " Can't truncate file ";
+const char NOTHING_EDIT[]=     " Can't edit zero file ";

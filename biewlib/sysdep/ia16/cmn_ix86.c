@@ -612,7 +612,7 @@ void __FillCPUInfo(char *buff,unsigned cbBuff,void (*percent_callback)(int))
     }
     else strcat(buff,"not present\n");
   }
-  else strcat(buff,"\n\n\n\n        This processor have no cpuid instruction\n\n\n\n\n");
+  else strcat(buff,"\n\n\n\n        This CPU has no cpuid instruction\n\n\n\n\n");
   percent_callback(50);
   fpu_class = __fpu_type();
   strcat(buff,"FPU info : ");

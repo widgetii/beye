@@ -26,7 +26,7 @@
 #        gcc-2.9x : i586 i686 p3 p4 k6 k6_2 athlon
 #        pgcc     : i586mmx i686mmx p3mmx p4mmx k5 k6mmx k6_2mmx 6x86 6x86mmx
 #                   athlon_mmx
-#     unknown     : generic
+# Other platform  : generic
 #-----------------------------------------------------------------------------
 TARGET_PLATFORM=i386
 
@@ -35,7 +35,7 @@ TARGET_PLATFORM=i386
 #---------------------------------------------------------
 TARGET_OS=unix
 
-# Please add any host specific flags here, if it need
+# Please add any host specific flags here
 # (like -fcall-used-R -fcall-saved-R -mrtd -mregparm=3 -mreg-alloc=  e.t.c ;-):
 #------------------------------------------------------------------------------
 # Notes: You can also define -D__EXPERIMENTAL_VERSION flag, if you want to
@@ -48,12 +48,12 @@ TARGET_OS=unix
 # -DHAVE_SSE2    exists only on P4+
 # -DHAVE_3DNOW   exists only on AMD's K6-2+
 # -DHAVE_3DNOWEX exists only on AMD's K7+
-# These flags explicitly defined when you select pgcc mmx optimization for
-# corresponded cpus. But you may want to disable mmx optimization for pgcc
-# (for example if you don't trust to pgcc or if you don't have pgcc), but
+# These flags are implicitly defined when you select pgcc mmx optimization
+# for corresponded CPUs. But you may want to disable mmx optimization for pgcc
+# (for example if you don't trust pgcc or if you don't have pgcc), but
 # explicitly enable it for inline assembler. Also for K6 CPU (not for K6-2)
 # it would be better to disable pgcc mmx optimization and enable it for
-# inline assembler (if you interest with speed but not size).
+# inline assembler (if you are interested in speed but not size).
 # *****************************************************************************
 # -D__DISABLE_ASM disables all inline assembly code.
 # Try it if you have problems with compilation due to assembler errors.
@@ -61,13 +61,13 @@ TARGET_OS=unix
 #------------------------------------------------------------------------------
 HOST_CFLAGS=
 
-# Please add any host specific linker flags here, if it need
+# Please add any host specific linker flags here
 #------------------------------------------------------------------------------
 HOST_LDFLAGS=
 
 ###########################################################################
-# You can fine tune the project for Unix platforms. For detail see unix.txt
-# Please select screen library, that you want to use. Valid values are:
+# Here comes Unix-specific configuration, see unix.txt for details.
+# Please select screen library, valid values are:
 # vt100, slang, curses (default)
 #--------------------------------------------------------------------------
 TARGET_SCREEN_LIB=curses
@@ -77,11 +77,11 @@ TARGET_SCREEN_LIB=curses
 #----------------------------------------------------------
 USE_MOUSE=n
 
-# You can select compilation level:
+# You can set compilation level:
 # max_debug  - To enable debugging, profiling, checking memory usage and more
 # debug      - To enable debugging and profiling only
 # normal     - Default for most platforms and gcc versions.
-# advance    - Use it only for latest version of gcc
+# advance    - Use it only with the latest gcc version.
 #----------------------------------------------------------------------
 compilation=normal
 
@@ -288,5 +288,5 @@ biewlib/sysdep/ia32/qnx/cpu_info.o:           biewlib/sysdep/ia32/qnx/cpu_info.a
 endif
 
 install:
-	@echo Sorry! This operation should be performed by hand for now!
+	@echo Sorry! This operation should be performed manually for now!
 	@exit
