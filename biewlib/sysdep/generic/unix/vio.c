@@ -335,12 +335,14 @@ void __FASTCALL__ __vioWriteBuff(tAbsCoord x, tAbsCoord y, const tvioBuff *buff,
 #define	LEN(x) (x << 4)
     unsigned char mode = 0, old_mode = -1;
     unsigned char cache_pb[LEN(VMAX_X)];
-    unsigned char *pb = len > VMAX_X ? malloc(LEN(len)) : cache_pb;
+    unsigned char *dpb,*pb = len > VMAX_X ? malloc(LEN(len)) : cache_pb;
+    unsigned slen;
 
     if (pb == NULL) {
 	printm("Memory allocation failed: %s\nExiting..", strerror(errno));
 	exit(errno);
     }
+    dpb=pb;
 
     memset(pb, 0, LEN(len));
 #endif
@@ -390,7 +392,11 @@ void __FASTCALL__ __vioWriteBuff(tAbsCoord x, tAbsCoord y, const tvioBuff *buff,
 #ifdef	_VT100_
 	else {
 	    char *map = mode ? "\016" : "\017";
-	    if (old_mode != mode) strcat(pb, map);
+	    if (old_mode != mode)
+	    {
+		strcpy(dpb,map);
+		dpb += strlen(map);
+	    }
 	    old_mode = mode;
 	}
 #endif	    
@@ -413,8 +419,13 @@ void __FASTCALL__ __vioWriteBuff(tAbsCoord x, tAbsCoord y, const tvioBuff *buff,
 #endif
 #ifdef	_VT100_
 	if ((ca != buff->attrs[i - 1] && i) || i == len || !i)
-	    strcat(pb, _2ansi(ca));
-	strncat(pb, &c, 1);
+	{
+	    unsigned char *d;
+	    d = _2ansi(ca);
+	    strcpy(dpb, d);
+	    dpb += strlen(d);
+	}
+	*dpb=c; dpb++;
 #endif	    
     }
 #ifdef	_SLANG_
@@ -426,7 +437,15 @@ void __FASTCALL__ __vioWriteBuff(tAbsCoord x, tAbsCoord y, const tvioBuff *buff,
     gotoxy(xx, yy);
 #endif
 #ifdef	_VT100_
-    twrite(pb);
+    *dpb=0;
+    dpb=pb;
+    slen=strlen(dpb);
+    while(slen)
+    {
+	unsigned stored=twrite(dpb);
+	dpb+=stored;
+	slen-= stored;
+    }
     gotoxy(xx, yy);
     if (pb != cache_pb) free(pb);
 #undef	LEN
