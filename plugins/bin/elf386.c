@@ -301,7 +301,7 @@ static __filesize_t __NEAR__ __FASTCALL__
    {
      tableptr = ELF_WORD(ELF_SHDR(shdr,sh_offset));
      *nitems = ELF_WORD(ELF_SHDR(shdr,sh_size))/ELF_WORD(ELF_SHDR(shdr,sh_entsize));
-     *link = ELF_HALF(ELF_SHDR(shdr,sh_link));
+     *link = ELF_WORD(ELF_SHDR(shdr,sh_link));
      *ent_size = ELF_WORD(ELF_SHDR(shdr,sh_entsize));
      break;
    }
