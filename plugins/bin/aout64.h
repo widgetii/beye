@@ -37,7 +37,9 @@
 /** This is the layout on disk of the 32-bit or 64-bit exec header. */
 
 #define BYTES_IN_WORD 4
-#define N_MAGIC(x) (x)
+#define N_MAGIC(x) ((x) & 0xFFFF)
+#define N_MACHTYPE(x) (((x) >> 16) & 0xff)
+#define N_FLAGS(x) (((x) >> 24) & 0xff)
 
 #ifndef external_exec
 struct external_exec
@@ -56,26 +58,27 @@ struct external_exec
 
 /** Magic numbers for a.out files */
 
-#if ARCH_SIZE==64
-#define OMAGIC 0x1001		/**< Code indicating object file  */
-#define ZMAGIC 0x1002		/**< Code indicating demand-paged executable.  */
-#define NMAGIC 0x1003		/**< Code indicating pure executable.  */
+#define OMAGIC64 0x1001		/**< Code indicating object file  */
+#define ZMAGIC64 0x1002		/**< Code indicating demand-paged executable.  */
+#define NMAGIC64 0x1003		/**< Code indicating pure executable.  */
 
 /* There is no 64-bit QMAGIC as far as I know.  */
 
-#define N_BADMAG(x)	  (N_MAGIC(x) != OMAGIC		\
-			&& N_MAGIC(x) != NMAGIC		\
-  			&& N_MAGIC(x) != ZMAGIC)
-#else
-#define OMAGIC 0407		/**< ...object file or impure executable.  */
-#define NMAGIC 0410		/**< Code indicating pure executable.  */
-#define ZMAGIC 0413		/**< Code indicating demand-paged executable.  */
-#define BMAGIC 0415		/**< Used by a b.out object.  */
+#define N_BADMAG64(x)	  (N_MAGIC(x) != OMAGIC64	\
+			&& N_MAGIC(x) != NMAGIC64	\
+  			&& N_MAGIC(x) != ZMAGIC64)
+
+#define OMAGIC 0x0107		/**< ...object file or impure executable.  */
+#define NMAGIC 0x0108		/**< Code indicating pure executable.  */
+#define ZMAGIC 0x010B		/**< Code indicating demand-paged executable.  */
+#define BMAGIC 0x010D		/**< Used by a b.out object.  */
+
+#define CMAGIC 0x0111		/**< Code indicating core file.  */
 
 /** This indicates a demand-paged executable with the header in the text.
     It is used by 386BSD (and variants) and Linux, at least.  */
 #ifndef QMAGIC
-#define QMAGIC 0314
+#define QMAGIC 0x00CC
 #endif
 # ifndef N_BADMAG
 #  define N_BADMAG(x)	  (N_MAGIC(x) != OMAGIC	\
@@ -83,7 +86,6 @@ struct external_exec
   			&& N_MAGIC(x) != ZMAGIC \
 		        && N_MAGIC(x) != QMAGIC)
 # endif /* N_BADMAG */
-#endif
 
 #endif
 
