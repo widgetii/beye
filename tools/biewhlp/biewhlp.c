@@ -210,6 +210,7 @@ tBool __FASTCALL__ MyCallOut(IniInfo *ini)
 }
 
 static void my_atexit( void ) { __term_sys(); }
+char **ArgVector;
 
 int main( int argc, char *argv[] )
 {
@@ -223,6 +224,7 @@ int main( int argc, char *argv[] )
              Usage: biewhlp project.file\n");
      return -1;
   }
+  ArgVector=argv;
   atexit(my_atexit);
   __init_sys();
   printf("Using %s as project\n", argv[1]);

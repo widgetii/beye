@@ -37,6 +37,8 @@
 #define INTERACTIVE
 #include "lzssutil.c"
 
+char **ArgVector;
+
 int main(int argc, char *argv[])
 {
 	char  *s;
@@ -48,6 +50,7 @@ int main(int argc, char *argv[])
 		   "'lzss d file2 file1' decodes file2 into file1.\n");
 	    return EXIT_FAILURE;
 	}
+        ArgVector=argv;
 	if ((s = argv[1], s[1] || strpbrk(s, "DEde") == NULL)
   	    || (s = argv[2], (infile  = bioOpen(s,O_RDONLY,0xFFFF,BIO_OPT_DB)) == NULL))
         {

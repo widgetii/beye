@@ -125,7 +125,11 @@ static void GetCpuCaps( void ) {}
 #undef HAVE_3DNOW
 #undef HAVE_SSE
 #define RENAME(a) a ## _C
+#ifdef __MSDOS__
+#include "biewlib/sysdep/ia32/aclib_~1.c"
+#else
 #include "biewlib/sysdep/ia32/aclib_template.c"
+#endif
 
 //MMX versions
 #undef RENAME
@@ -133,7 +137,11 @@ static void GetCpuCaps( void ) {}
 #undef HAVE_MMX2
 #undef HAVE_3DNOW
 #define RENAME(a) a ## _MMX
+#ifdef __MSDOS__
+#include "biewlib/sysdep/ia32/aclib_~1.c"
+#else
 #include "biewlib/sysdep/ia32/aclib_template.c"
+#endif
 
 #if 0 /* TODO: better detection of gas possibilities */
 //MMX2 versions
@@ -142,7 +150,11 @@ static void GetCpuCaps( void ) {}
 #define HAVE_MMX2
 #undef HAVE_3DNOW
 #define RENAME(a) a ## _MMX2
+#ifdef __MSDOS__
+#include "biewlib/sysdep/ia32/aclib_~1.c"
+#else
 #include "biewlib/sysdep/ia32/aclib_template.c"
+#endif
 
 //3DNOW versions
 #undef RENAME
@@ -150,7 +162,11 @@ static void GetCpuCaps( void ) {}
 #undef HAVE_MMX2
 #define HAVE_3DNOW
 #define RENAME(a) a ## _3DNow
+#ifdef __MSDOS__
+#include "biewlib/sysdep/ia32/aclib_~1.c"
+#else
 #include "biewlib/sysdep/ia32/aclib_template.c"
+#endif
 #endif
 
 #endif // CAN_COMPILE_X86_ASM
@@ -166,7 +182,7 @@ static void * init_fast_memcpy(void * to, const void * from, size_t len)
 	else
 #endif
 	fast_memcpy_ptr = memcpy;
-	return (*fast_memcpy_ptr)(to,from,len);	
+	return (*fast_memcpy_ptr)(to,from,len);
 }
 void *(*fast_memcpy_ptr)(void * to, const void * from, size_t len) = init_fast_memcpy;
 
@@ -181,7 +197,7 @@ static void * init_fast_memset(void * to, int filler, size_t len)
 	else
 #endif
 	fast_memset_ptr = memset;
-	return (*fast_memset_ptr)(to,filler,len);	
+	return (*fast_memset_ptr)(to,filler,len);
 }
 void *(*fast_memset_ptr)(void * to, int filler, size_t len) = init_fast_memset;
 
@@ -199,7 +215,7 @@ static void __FASTCALL__ init_InterleaveBuffers(tUInt32 limit,
 	else
 #endif
 	InterleaveBuffers_ptr = InterleaveBuffers_C;
-	(*InterleaveBuffers_ptr)(limit,destbuffer,evenbuffer,oddbuffer);	
+	(*InterleaveBuffers_ptr)(limit,destbuffer,evenbuffer,oddbuffer);
 }
 
 void __FASTCALL__ (*InterleaveBuffers_ptr)(tUInt32 limit,
@@ -220,7 +236,7 @@ static void __FASTCALL__ init_CharsToShorts(tUInt32 limit,
 	else
 #endif
 	CharsToShorts_ptr = CharsToShorts_C;
-	(*CharsToShorts_ptr)(limit,destbuffer,evenbuffer);	
+	(*CharsToShorts_ptr)(limit,destbuffer,evenbuffer);
 }
 
 void __FASTCALL__ (*CharsToShorts_ptr)(tUInt32 limit,
@@ -240,7 +256,7 @@ static void __FASTCALL__ init_ShortsToChars(tUInt32 limit,
 	else
 #endif
 	ShortsToChars_ptr = ShortsToChars_C;
-	(*ShortsToChars_ptr)(limit,destbuffer,evenbuffer);	
+	(*ShortsToChars_ptr)(limit,destbuffer,evenbuffer);
 }
 
 void __FASTCALL__ (*ShortsToChars_ptr)(tUInt32 limit,
