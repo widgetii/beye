@@ -344,7 +344,7 @@ DisasmCSet disasm_cset =
    },
    {
     {
-     LOGFB_TO_PHYS(Black, Blue),
+     LOGFB_TO_PHYS(LightBlue, Blue),
      LOGFB_TO_PHYS(Black, Blue),
      LOGFB_TO_PHYS(Black, Blue),
      LOGFB_TO_PHYS(Black, Blue),

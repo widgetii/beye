@@ -95,7 +95,7 @@
     Clone15      = Black:Black
     Clone16      = Black:Black
  < Processor2 > ; Third Processor (for x86 it MMX)
-    Clone1       = Black:Blue
+    Clone1       = Black:LightBlue
     Clone2       = Black:Blue
     Clone3       = Black:Blue
     Clone4       = Black:Blue
@@ -111,7 +111,7 @@
     Clone14      = Black:Blue
     Clone15      = Black:Blue
     Clone16      = Black:Blue
- < Processor3 > ; for x86 it not used
+ < Processor3 > ; for x86 it's not used
     Clone1       = Black:Black
     Clone2       = Black:Black
     Clone3       = Black:Black

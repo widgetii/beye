@@ -304,14 +304,14 @@ ix86_Opcodes ix86_table[256] =
   /*0xD5*/ DECLARE_BASE_INSN("aad on","aad on","???",ix86_ArgByte,ix86_ArgByte,IX86_CPU086,K64_ATHLON),
   /*0xD6*/ DECLARE_BASE_INSN("salc","salc","salc",NULL,NULL,IX86_CPU086,K64_ATHLON),
   /*0xD7*/ DECLARE_BASE_INSN("xlat","xlat","xlat",NULL,NULL,IX86_CPU086,K64_ATHLON),
-  /*0xD8*/ DECLARE_BASE_INSN("esc","esc","esc",ix86_FPUCmd,ix86_FPUCmd,IX86_CPU086,K64_ATHLON),
-  /*0xD9*/ DECLARE_BASE_INSN("esc","esc","esc",ix86_FPUCmd,ix86_FPUCmd,IX86_CPU086,K64_ATHLON),
-  /*0xDA*/ DECLARE_BASE_INSN("esc","esc","esc",ix86_FPUCmd,ix86_FPUCmd,IX86_CPU086,K64_ATHLON),
-  /*0xDB*/ DECLARE_BASE_INSN("esc","esc","esc",ix86_FPUCmd,ix86_FPUCmd,IX86_CPU086,K64_ATHLON),
-  /*0xDC*/ DECLARE_BASE_INSN("esc","esc","esc",ix86_FPUCmd,ix86_FPUCmd,IX86_CPU086,K64_ATHLON),
-  /*0xDD*/ DECLARE_BASE_INSN("esc","esc","esc",ix86_FPUCmd,ix86_FPUCmd,IX86_CPU086,K64_ATHLON),
-  /*0xDE*/ DECLARE_BASE_INSN("esc","esc","esc",ix86_FPUCmd,ix86_FPUCmd,IX86_CPU086,K64_ATHLON),
-  /*0xDF*/ DECLARE_BASE_INSN("esc","esc","esc",ix86_FPUCmd,ix86_FPUCmd,IX86_CPU086,K64_ATHLON),
+  /*0xD8*/ DECLARE_BASE_INSN("esc","esc","esc",ix86_FPUCmd,ix86_FPUCmd,IX86_CPU086,K64_ATHLON|K64_FPU),
+  /*0xD9*/ DECLARE_BASE_INSN("esc","esc","esc",ix86_FPUCmd,ix86_FPUCmd,IX86_CPU086,K64_ATHLON|K64_FPU),
+  /*0xDA*/ DECLARE_BASE_INSN("esc","esc","esc",ix86_FPUCmd,ix86_FPUCmd,IX86_CPU086,K64_ATHLON|K64_FPU),
+  /*0xDB*/ DECLARE_BASE_INSN("esc","esc","esc",ix86_FPUCmd,ix86_FPUCmd,IX86_CPU086,K64_ATHLON|K64_FPU),
+  /*0xDC*/ DECLARE_BASE_INSN("esc","esc","esc",ix86_FPUCmd,ix86_FPUCmd,IX86_CPU086,K64_ATHLON|K64_FPU),
+  /*0xDD*/ DECLARE_BASE_INSN("esc","esc","esc",ix86_FPUCmd,ix86_FPUCmd,IX86_CPU086,K64_ATHLON|K64_FPU),
+  /*0xDE*/ DECLARE_BASE_INSN("esc","esc","esc",ix86_FPUCmd,ix86_FPUCmd,IX86_CPU086,K64_ATHLON|K64_FPU),
+  /*0xDF*/ DECLARE_BASE_INSN("esc","esc","esc",ix86_FPUCmd,ix86_FPUCmd,IX86_CPU086,K64_ATHLON|K64_FPU),
   /*0xE0*/ DECLARE_BASE_INSN("loopnz","loopnz","loopnz",ix86_ArgShort,ix86_ArgShort,IX86_CPU086,K64_ATHLON),
   /*0xE1*/ DECLARE_BASE_INSN("loopz","loopz","loopz",ix86_ArgShort,ix86_ArgShort,IX86_CPU086,K64_ATHLON),
   /*0xE2*/ DECLARE_BASE_INSN("loop","loop","loop",ix86_ArgShort,ix86_ArgShort,IX86_CPU086,K64_ATHLON),
@@ -368,18 +368,18 @@ ix86_ExOpcodes ix86_extable[256] = /* for 0FH leading */
   /*0x0A*/ DECLARE_EX_INSN("???","???",NULL,NULL,IX86_UNKCPU,K64_ATHLON),
   /*0x0B*/ DECLARE_EX_INSN("ud","ud",NULL,NULL,IX86_CPU686,K64_ATHLON),
   /*0x0C*/ DECLARE_EX_INSN("???","???",NULL,NULL,IX86_UNKCPU,K64_ATHLON),
-  /*0x0D*/ DECLARE_EX_INSN("!!!","!!!",ix86_3dNowPrefetchGrp,ix86_3dNowPrefetchGrp,IX86_3DNOW,K64_ATHLON),
+  /*0x0D*/ DECLARE_EX_INSN("!!!","!!!",ix86_3dNowPrefetchGrp,ix86_3dNowPrefetchGrp,IX86_3DNOW,K64_ATHLON|K64_MMX),
   /*0x0E*/ DECLARE_EX_INSN("femms","femms",NULL,NULL,IX86_3DNOW,K64_ATHLON),
-  /*0x0F*/ DECLARE_EX_INSN("!!!","!!!",ix86_3dNowOpCodes,ix86_3dNowOpCodes,IX86_3DNOW,K64_ATHLON),
-  /*0x10*/ DECLARE_EX_INSN("movups","movups",ix86_ArgXMMXnD,ix86_ArgXMMXnD,IX86_P3MMX,K64_ATHLON),
-  /*0x11*/ DECLARE_EX_INSN("movups","movups",ix86_ArgXMMXD,ix86_ArgXMMXD,IX86_P3MMX,K64_ATHLON),
-  /*0x12*/ DECLARE_EX_INSN("movlps","movlps",ix86_ArgXMMXnD,ix86_ArgXMMXnD,IX86_P3MMX,K64_ATHLON),
-  /*0x13*/ DECLARE_EX_INSN("movlps","movlps",ix86_ArgXMMXD,ix86_ArgXMMXD,IX86_P3MMX,K64_ATHLON),
-  /*0x14*/ DECLARE_EX_INSN("unpcklps","unpcklps",ix86_ArgXMMXnD,ix86_ArgXMMXnD,IX86_P3MMX,K64_ATHLON),
-  /*0x15*/ DECLARE_EX_INSN("unpckhps","unpckhps",ix86_ArgXMMXnD,ix86_ArgXMMXnD,IX86_P3MMX,K64_ATHLON),
-  /*0x16*/ DECLARE_EX_INSN("movhps","movhps",ix86_ArgXMMXnD,ix86_ArgXMMXnD,IX86_P3MMX,K64_ATHLON),
-  /*0x17*/ DECLARE_EX_INSN("movhps","movhps",ix86_ArgXMMXD,ix86_ArgXMMXD,IX86_P3MMX,K64_ATHLON),
-  /*0x18*/ DECLARE_EX_INSN("!!!","!!!",ix86_ArgKatmaiGrp2,ix86_ArgKatmaiGrp2,IX86_P3,K64_ATHLON),
+  /*0x0F*/ DECLARE_EX_INSN("!!!","!!!",ix86_3dNowOpCodes,ix86_3dNowOpCodes,IX86_3DNOW,K64_ATHLON|K64_MMX),
+  /*0x10*/ DECLARE_EX_INSN("movups","movups",ix86_ArgXMMXnD,ix86_ArgXMMXnD,IX86_P3MMX,K64_ATHLON|K64_SSE),
+  /*0x11*/ DECLARE_EX_INSN("movups","movups",ix86_ArgXMMXD,ix86_ArgXMMXD,IX86_P3MMX,K64_ATHLON|K64_SSE),
+  /*0x12*/ DECLARE_EX_INSN("movlps","movlps",ix86_ArgXMMXnD,ix86_ArgXMMXnD,IX86_P3MMX,K64_ATHLON|K64_SSE),
+  /*0x13*/ DECLARE_EX_INSN("movlps","movlps",ix86_ArgXMMXD,ix86_ArgXMMXD,IX86_P3MMX,K64_ATHLON|K64_SSE),
+  /*0x14*/ DECLARE_EX_INSN("unpcklps","unpcklps",ix86_ArgXMMXnD,ix86_ArgXMMXnD,IX86_P3MMX,K64_ATHLON|K64_SSE),
+  /*0x15*/ DECLARE_EX_INSN("unpckhps","unpckhps",ix86_ArgXMMXnD,ix86_ArgXMMXnD,IX86_P3MMX,K64_ATHLON|K64_SSE),
+  /*0x16*/ DECLARE_EX_INSN("movhps","movhps",ix86_ArgXMMXnD,ix86_ArgXMMXnD,IX86_P3MMX,K64_ATHLON|K64_SSE),
+  /*0x17*/ DECLARE_EX_INSN("movhps","movhps",ix86_ArgXMMXD,ix86_ArgXMMXD,IX86_P3MMX,K64_ATHLON|K64_SSE),
+  /*0x18*/ DECLARE_EX_INSN("!!!","!!!",ix86_ArgKatmaiGrp2,ix86_ArgKatmaiGrp2,IX86_P3,K64_ATHLON|K64_SSE),
   /*0x19*/ DECLARE_EX_INSN("???","???",NULL,NULL,IX86_UNKCPU,K64_ATHLON),
   /*0x1A*/ DECLARE_EX_INSN("???","???",NULL,NULL,IX86_UNKCPU,K64_ATHLON),
   /*0x1B*/ DECLARE_EX_INSN("???","???",NULL,NULL,IX86_UNKCPU,K64_ATHLON),
@@ -395,14 +395,14 @@ ix86_ExOpcodes ix86_extable[256] = /* for 0FH leading */
   /*0x25*/ DECLARE_EX_INSN("mov","mov",ix86_ArgMovXRY,ix86_ArgMovXRY,IX86_CPU386,K64_ATHLON),
   /*0x26*/ DECLARE_EX_INSN("mov","mov",ix86_ArgMovXRY,ix86_ArgMovXRY,IX86_CPU386,K64_ATHLON),
   /*0x27*/ DECLARE_EX_INSN("mov","mov",ix86_ArgMovXRY,ix86_ArgMovXRY,IX86_CPU386,K64_ATHLON),
-  /*0x28*/ DECLARE_EX_INSN("movaps","movaps",ix86_ArgXMMXnD,ix86_ArgXMMXnD,IX86_P3MMX,K64_ATHLON),
-  /*0x29*/ DECLARE_EX_INSN("movaps","movaps",ix86_ArgXMMXD,ix86_ArgXMMXD,IX86_P3MMX,K64_ATHLON),
-  /*0x2A*/ DECLARE_EX_INSN("cvtpi2ps","cvtpi2ps",ix86_ArgXMMXMMnD,ix86_ArgXMMXMMnD,IX86_P3MMX,K64_ATHLON),
-  /*0x2B*/ DECLARE_EX_INSN("movntps","movntps",ix86_ArgXMMXD,ix86_ArgXMMXD,IX86_P3MMX,K64_ATHLON),
-  /*0x2C*/ DECLARE_EX_INSN("cvttps2pi","cvttps2pi",ix86_ArgMMXMMXnD,ix86_ArgMMXMMXnD,IX86_P3MMX,K64_ATHLON),
-  /*0x2D*/ DECLARE_EX_INSN("cvtps2pi","cvtps2pi",ix86_ArgMMXMMXnD,ix86_ArgMMXMMXnD,IX86_P3MMX,K64_ATHLON),
-  /*0x2E*/ DECLARE_EX_INSN("ucomiss","ucomiss",ix86_ArgXMMXnD,ix86_ArgXMMXnD,IX86_P3MMX,K64_ATHLON),
-  /*0x2F*/ DECLARE_EX_INSN("comiss","comiss",ix86_ArgXMMXnD,ix86_ArgXMMXnD,IX86_P3MMX,K64_ATHLON),
+  /*0x28*/ DECLARE_EX_INSN("movaps","movaps",ix86_ArgXMMXnD,ix86_ArgXMMXnD,IX86_P3MMX,K64_ATHLON|K64_SSE),
+  /*0x29*/ DECLARE_EX_INSN("movaps","movaps",ix86_ArgXMMXD,ix86_ArgXMMXD,IX86_P3MMX,K64_ATHLON|K64_SSE),
+  /*0x2A*/ DECLARE_EX_INSN("cvtpi2ps","cvtpi2ps",ix86_ArgXMMXMMnD,ix86_ArgXMMXMMnD,IX86_P3MMX,K64_ATHLON|K64_SSE),
+  /*0x2B*/ DECLARE_EX_INSN("movntps","movntps",ix86_ArgXMMXD,ix86_ArgXMMXD,IX86_P3MMX,K64_ATHLON|K64_SSE),
+  /*0x2C*/ DECLARE_EX_INSN("cvttps2pi","cvttps2pi",ix86_ArgMMXMMXnD,ix86_ArgMMXMMXnD,IX86_P3MMX,K64_ATHLON|K64_SSE),
+  /*0x2D*/ DECLARE_EX_INSN("cvtps2pi","cvtps2pi",ix86_ArgMMXMMXnD,ix86_ArgMMXMMXnD,IX86_P3MMX,K64_ATHLON|K64_SSE),
+  /*0x2E*/ DECLARE_EX_INSN("ucomiss","ucomiss",ix86_ArgXMMXnD,ix86_ArgXMMXnD,IX86_P3MMX,K64_ATHLON|K64_SSE),
+  /*0x2F*/ DECLARE_EX_INSN("comiss","comiss",ix86_ArgXMMXnD,ix86_ArgXMMXnD,IX86_P3MMX,K64_ATHLON|K64_SSE),
   /*0x30*/ DECLARE_EX_INSN("wrmsr","wrmsr",NULL,NULL,IX86_CPU586,K64_ATHLON),
   /*0x31*/ DECLARE_EX_INSN("rdtsc","rdtsc",NULL,NULL,IX86_CPU586,K64_ATHLON),
   /*0x32*/ DECLARE_EX_INSN("rdmsr","rdmsr",NULL,NULL,IX86_CPU586,K64_ATHLON),
@@ -435,54 +435,54 @@ ix86_ExOpcodes ix86_extable[256] = /* for 0FH leading */
   /*0x4D*/ DECLARE_EX_INSN("cmovnl","cmovnl",ix86_ArgModRMDW,ix86_ArgModRMDW,IX86_CPU686,K64_ATHLON),
   /*0x4E*/ DECLARE_EX_INSN("cmovle","cmovle",ix86_ArgModRMDW,ix86_ArgModRMDW,IX86_CPU686,K64_ATHLON),
   /*0x4F*/ DECLARE_EX_INSN("cmovg","cmovg",ix86_ArgModRMDW,ix86_ArgModRMDW,IX86_CPU686,K64_ATHLON),
-  /*0x50*/ DECLARE_EX_INSN("movmskps","movmskps",ix86_ArgXMMXRD,ix86_ArgXMMXRD,IX86_P3MMX,K64_ATHLON),
-  /*0x51*/ DECLARE_EX_INSN("sqrtps","sqrtps",ix86_ArgXMMXnD,ix86_ArgXMMXnD,IX86_P3MMX,K64_ATHLON),
-  /*0x52*/ DECLARE_EX_INSN("rsqrtps","rsqrtps",ix86_ArgXMMXnD,ix86_ArgXMMXnD,IX86_P3MMX,K64_ATHLON),
-  /*0x53*/ DECLARE_EX_INSN("rcpps","rcpps",ix86_ArgXMMXnD,ix86_ArgXMMXnD,IX86_P3MMX,K64_ATHLON),
-  /*0x54*/ DECLARE_EX_INSN("andps","andps",ix86_ArgXMMXnD,ix86_ArgXMMXnD,IX86_P3MMX,K64_ATHLON),
-  /*0x55*/ DECLARE_EX_INSN("andnps","andnps",ix86_ArgXMMXnD,ix86_ArgXMMXnD,IX86_P3MMX,K64_ATHLON),
-  /*0x56*/ DECLARE_EX_INSN("orps","orps",ix86_ArgXMMXnD,ix86_ArgXMMXnD,IX86_P3MMX,K64_ATHLON),
-  /*0x57*/ DECLARE_EX_INSN("xorps","xorps",ix86_ArgXMMXnD,ix86_ArgXMMXnD,IX86_P3MMX,K64_ATHLON),
-  /*0x58*/ DECLARE_EX_INSN("addps","addps",ix86_ArgXMMXnD,ix86_ArgXMMXnD,IX86_P3MMX,K64_ATHLON),
-  /*0x59*/ DECLARE_EX_INSN("mulps","mulps",ix86_ArgXMMXnD,ix86_ArgXMMXnD,IX86_P3MMX,K64_ATHLON),
-  /*0x5A*/ DECLARE_EX_INSN("cvtps2pd","cvtps2pd",ix86_ArgXMMXnD,ix86_ArgXMMXnD,IX86_P4MMX,K64_ATHLON),
-  /*0x5B*/ DECLARE_EX_INSN("cvtdq2ps","cvtdq2ps",ix86_ArgXMMXnD,ix86_ArgXMMXnD,IX86_P4MMX,K64_ATHLON),
-  /*0x5C*/ DECLARE_EX_INSN("subps","subps",ix86_ArgXMMXnD,ix86_ArgXMMXnD,IX86_P3MMX,K64_ATHLON),
-  /*0x5D*/ DECLARE_EX_INSN("minps","minps",ix86_ArgXMMXnD,ix86_ArgXMMXnD,IX86_P3MMX,K64_ATHLON),
-  /*0x5E*/ DECLARE_EX_INSN("divps","divps",ix86_ArgXMMXnD,ix86_ArgXMMXnD,IX86_P3MMX,K64_ATHLON),
-  /*0x5F*/ DECLARE_EX_INSN("maxps","maxps",ix86_ArgXMMXnD,ix86_ArgXMMXnD,IX86_P3MMX,K64_ATHLON),
-  /*0x60*/ DECLARE_EX_INSN("punpcklbw","punpcklbw",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_MMX586,K64_ATHLON),
-  /*0x61*/ DECLARE_EX_INSN("punpcklwd","punpcklwd",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_MMX586,K64_ATHLON),
-  /*0x62*/ DECLARE_EX_INSN("punpckldq","punpckldq",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_MMX586,K64_ATHLON),
-  /*0x63*/ DECLARE_EX_INSN("packsswb","packsswb",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_MMX586,K64_ATHLON),
-  /*0x64*/ DECLARE_EX_INSN("pcmpgtb","pcmpgtb",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_MMX586,K64_ATHLON),
-  /*0x65*/ DECLARE_EX_INSN("pcmpgtw","pcmpgtw",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_MMX586,K64_ATHLON),
-  /*0x66*/ DECLARE_EX_INSN("pcmpgtd","pcmpgtd",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_MMX586,K64_ATHLON),
-  /*0x67*/ DECLARE_EX_INSN("packuswb","packuswb",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_MMX586,K64_ATHLON),
-  /*0x68*/ DECLARE_EX_INSN("punpckhbw","punpckhbw",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_MMX586,K64_ATHLON),
-  /*0x69*/ DECLARE_EX_INSN("punpckhwd","punpckhwd",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_MMX586,K64_ATHLON),
-  /*0x6A*/ DECLARE_EX_INSN("punpckhdq","punpckhdq",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_MMX586,K64_ATHLON),
-  /*0x6B*/ DECLARE_EX_INSN("packssdw","packssdw",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_MMX586,K64_ATHLON),
+  /*0x50*/ DECLARE_EX_INSN("movmskps","movmskps",ix86_ArgXMMXRD,ix86_ArgXMMXRD,IX86_P3MMX,K64_ATHLON|K64_SSE),
+  /*0x51*/ DECLARE_EX_INSN("sqrtps","sqrtps",ix86_ArgXMMXnD,ix86_ArgXMMXnD,IX86_P3MMX,K64_ATHLON|K64_SSE),
+  /*0x52*/ DECLARE_EX_INSN("rsqrtps","rsqrtps",ix86_ArgXMMXnD,ix86_ArgXMMXnD,IX86_P3MMX,K64_ATHLON|K64_SSE),
+  /*0x53*/ DECLARE_EX_INSN("rcpps","rcpps",ix86_ArgXMMXnD,ix86_ArgXMMXnD,IX86_P3MMX,K64_ATHLON|K64_SSE),
+  /*0x54*/ DECLARE_EX_INSN("andps","andps",ix86_ArgXMMXnD,ix86_ArgXMMXnD,IX86_P3MMX,K64_ATHLON|K64_SSE),
+  /*0x55*/ DECLARE_EX_INSN("andnps","andnps",ix86_ArgXMMXnD,ix86_ArgXMMXnD,IX86_P3MMX,K64_ATHLON|K64_SSE),
+  /*0x56*/ DECLARE_EX_INSN("orps","orps",ix86_ArgXMMXnD,ix86_ArgXMMXnD,IX86_P3MMX,K64_ATHLON|K64_SSE),
+  /*0x57*/ DECLARE_EX_INSN("xorps","xorps",ix86_ArgXMMXnD,ix86_ArgXMMXnD,IX86_P3MMX,K64_ATHLON|K64_SSE),
+  /*0x58*/ DECLARE_EX_INSN("addps","addps",ix86_ArgXMMXnD,ix86_ArgXMMXnD,IX86_P3MMX,K64_ATHLON|K64_SSE),
+  /*0x59*/ DECLARE_EX_INSN("mulps","mulps",ix86_ArgXMMXnD,ix86_ArgXMMXnD,IX86_P3MMX,K64_ATHLON|K64_SSE),
+  /*0x5A*/ DECLARE_EX_INSN("cvtps2pd","cvtps2pd",ix86_ArgXMMXnD,ix86_ArgXMMXnD,IX86_P4MMX,K64_ATHLON|K64_SSE),
+  /*0x5B*/ DECLARE_EX_INSN("cvtdq2ps","cvtdq2ps",ix86_ArgXMMXnD,ix86_ArgXMMXnD,IX86_P4MMX,K64_ATHLON|K64_SSE),
+  /*0x5C*/ DECLARE_EX_INSN("subps","subps",ix86_ArgXMMXnD,ix86_ArgXMMXnD,IX86_P3MMX,K64_ATHLON|K64_SSE),
+  /*0x5D*/ DECLARE_EX_INSN("minps","minps",ix86_ArgXMMXnD,ix86_ArgXMMXnD,IX86_P3MMX,K64_ATHLON|K64_SSE),
+  /*0x5E*/ DECLARE_EX_INSN("divps","divps",ix86_ArgXMMXnD,ix86_ArgXMMXnD,IX86_P3MMX,K64_ATHLON|K64_SSE),
+  /*0x5F*/ DECLARE_EX_INSN("maxps","maxps",ix86_ArgXMMXnD,ix86_ArgXMMXnD,IX86_P3MMX,K64_ATHLON|K64_SSE),
+  /*0x60*/ DECLARE_EX_INSN("punpcklbw","punpcklbw",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_MMX586,K64_ATHLON|K64_MMX),
+  /*0x61*/ DECLARE_EX_INSN("punpcklwd","punpcklwd",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_MMX586,K64_ATHLON|K64_MMX),
+  /*0x62*/ DECLARE_EX_INSN("punpckldq","punpckldq",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_MMX586,K64_ATHLON|K64_MMX),
+  /*0x63*/ DECLARE_EX_INSN("packsswb","packsswb",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_MMX586,K64_ATHLON|K64_MMX),
+  /*0x64*/ DECLARE_EX_INSN("pcmpgtb","pcmpgtb",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_MMX586,K64_ATHLON|K64_MMX),
+  /*0x65*/ DECLARE_EX_INSN("pcmpgtw","pcmpgtw",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_MMX586,K64_ATHLON|K64_MMX),
+  /*0x66*/ DECLARE_EX_INSN("pcmpgtd","pcmpgtd",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_MMX586,K64_ATHLON|K64_MMX),
+  /*0x67*/ DECLARE_EX_INSN("packuswb","packuswb",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_MMX586,K64_ATHLON|K64_MMX),
+  /*0x68*/ DECLARE_EX_INSN("punpckhbw","punpckhbw",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_MMX586,K64_ATHLON|K64_MMX),
+  /*0x69*/ DECLARE_EX_INSN("punpckhwd","punpckhwd",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_MMX586,K64_ATHLON|K64_MMX),
+  /*0x6A*/ DECLARE_EX_INSN("punpckhdq","punpckhdq",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_MMX586,K64_ATHLON|K64_MMX),
+  /*0x6B*/ DECLARE_EX_INSN("packssdw","packssdw",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_MMX586,K64_ATHLON|K64_MMX),
   /*0x6C*/ DECLARE_EX_INSN("???","???",NULL,NULL,IX86_UNKMMX,K64_ATHLON),
   /*0x6D*/ DECLARE_EX_INSN("???","???",NULL,NULL,IX86_UNKMMX,K64_ATHLON),
-  /*0x6E*/ DECLARE_EX_INSN("movd","movd",ix86_ArgMMXRnD,ix86_ArgMMXRnD,IX86_MMX586,K64_ATHLON),
-  /*0x6F*/ DECLARE_EX_INSN("movq","movq",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_MMX586,K64_ATHLON),
-  /*0x70*/ DECLARE_EX_INSN("pshufw","pshufw",ix86_ArgMMRMDigit,ix86_ArgMMRMDigit,IX86_P3MMX,K64_ATHLON),
-  /*0x71*/ DECLARE_EX_INSN("!!!","!!!",ix86_ArgMMXGr1,ix86_ArgMMXGr1,IX86_MMX586,K64_ATHLON),
-  /*0x72*/ DECLARE_EX_INSN("!!!","!!!",ix86_ArgMMXGr2,ix86_ArgMMXGr2,IX86_MMX586,K64_ATHLON),
-  /*0x73*/ DECLARE_EX_INSN("!!!","!!!",ix86_ArgMMXGr3,ix86_ArgMMXGr3,IX86_MMX586,K64_ATHLON),
+  /*0x6E*/ DECLARE_EX_INSN("movd","movd",ix86_ArgMMXRnD,ix86_ArgMMXRnD,IX86_MMX586,K64_ATHLON|K64_MMX),
+  /*0x6F*/ DECLARE_EX_INSN("movq","movq",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_MMX586,K64_ATHLON|K64_MMX),
+  /*0x70*/ DECLARE_EX_INSN("pshufw","pshufw",ix86_ArgMMRMDigit,ix86_ArgMMRMDigit,IX86_P3MMX,K64_ATHLON|K64_MMX),
+  /*0x71*/ DECLARE_EX_INSN("!!!","!!!",ix86_ArgMMXGr1,ix86_ArgMMXGr1,IX86_MMX586,K64_ATHLON|K64_MMX),
+  /*0x72*/ DECLARE_EX_INSN("!!!","!!!",ix86_ArgMMXGr2,ix86_ArgMMXGr2,IX86_MMX586,K64_ATHLON|K64_MMX),
+  /*0x73*/ DECLARE_EX_INSN("!!!","!!!",ix86_ArgMMXGr3,ix86_ArgMMXGr3,IX86_MMX586,K64_ATHLON|K64_MMX),
   /*0x74*/ DECLARE_EX_INSN("pcmpeqb","pcmpeqb",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_MMX586,K64_ATHLON),
   /*0x75*/ DECLARE_EX_INSN("pcmpeqw","pcmpeqw",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_MMX586,K64_ATHLON),
   /*0x76*/ DECLARE_EX_INSN("pcmpeqd","pcmpeqd",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_MMX586,K64_ATHLON),
-  /*0x77*/ DECLARE_EX_INSN("emms","emms",NULL,NULL,IX86_MMX586,K64_ATHLON),
+  /*0x77*/ DECLARE_EX_INSN("emms","emms",NULL,NULL,IX86_MMX586,K64_ATHLON|K64_MMX),
   /*0x78*/ DECLARE_EX_INSN("svdc","???",ix86_ArgSegRM,ix86_ArgSegRM,IX86_CYRIX486,K64_ATHLON),
   /*0x79*/ DECLARE_EX_INSN("rsdc","???",ix86_ArgSegRM,ix86_ArgSegRM,IX86_CYRIX486,K64_ATHLON),
   /*0x7A*/ DECLARE_EX_INSN("svldt","???",ix86_ArgMod,ix86_ArgMod,IX86_CYRIX486,K64_ATHLON),
   /*0x7B*/ DECLARE_EX_INSN("rsldt","???",ix86_ArgMod,ix86_ArgMod,IX86_CYRIX486,K64_ATHLON),
   /*0x7C*/ DECLARE_EX_INSN("svts","???",ix86_ArgMod,ix86_ArgMod,IX86_CYRIX486,K64_ATHLON),
   /*0x7D*/ DECLARE_EX_INSN("rsts","???",ix86_ArgMod,ix86_ArgMod,IX86_CYRIX486,K64_ATHLON),
-  /*0x7E*/ DECLARE_EX_INSN("movd","movd",ix86_ArgMMXRD,ix86_ArgMMXRD,IX86_MMX586,K64_ATHLON),
-  /*0x7F*/ DECLARE_EX_INSN("movq","movq",ix86_ArgMMXD,ix86_ArgMMXD,IX86_MMX586,K64_ATHLON),
+  /*0x7E*/ DECLARE_EX_INSN("movd","movd",ix86_ArgMMXRD,ix86_ArgMMXRD,IX86_MMX586,K64_ATHLON|K64_MMX),
+  /*0x7F*/ DECLARE_EX_INSN("movq","movq",ix86_ArgMMXD,ix86_ArgMMXD,IX86_MMX586,K64_ATHLON|K64_MMX),
   /*0x80*/ DECLARE_EX_INSN("jo","jo",ix86_ArgNear,ix86_ArgNear,IX86_CPU386,K64_ATHLON),
   /*0x81*/ DECLARE_EX_INSN("jno","jno",ix86_ArgNear,ix86_ArgNear,IX86_CPU386,K64_ATHLON),
   /*0x82*/ DECLARE_EX_INSN("jc","jc",ix86_ArgNear,ix86_ArgNear,IX86_CPU386,K64_ATHLON),
@@ -529,7 +529,7 @@ ix86_ExOpcodes ix86_extable[256] = /* for 0FH leading */
   /*0xAB*/ DECLARE_EX_INSN("bts","bts",ix86_ArgModRMnDW,ix86_ArgModRMnDW,IX86_CPU386,K64_ATHLON),
   /*0xAC*/ DECLARE_EX_INSN("shrd","shrd",ix86_DblShift,ix86_DblShift,IX86_CPU386,K64_ATHLON),
   /*0xAD*/ DECLARE_EX_INSN("shrd","shrd",ix86_DblShift,ix86_DblShift,IX86_CPU386,K64_ATHLON),
-  /*0xAE*/ DECLARE_EX_INSN("!!!","!!!",ix86_ArgKatmaiGrp1,ix86_ArgKatmaiGrp1,IX86_P3FPU,K64_ATHLON),
+  /*0xAE*/ DECLARE_EX_INSN("!!!","!!!",ix86_ArgKatmaiGrp1,ix86_ArgKatmaiGrp1,IX86_P3FPU,K64_ATHLON|K64_FPU),
   /*0xAF*/ DECLARE_EX_INSN("imul","imul",ix86_ArgModRMDW,ix86_ArgModRMDW,IX86_CPU386,K64_ATHLON),
   /*0xB0*/ DECLARE_EX_INSN("cmpxchg","cmpxchg",ix86_ArgModRMnDnW,ix86_ArgModRMnDnW,IX86_CPU486,K64_ATHLON),
   /*0xB1*/ DECLARE_EX_INSN("cmpxchg","cmpxchg",ix86_ArgModRMnDW,ix86_ArgModRMnDW,IX86_CPU486,K64_ATHLON),
@@ -549,11 +549,11 @@ ix86_ExOpcodes ix86_extable[256] = /* for 0FH leading */
   /*0xBF*/ DECLARE_EX_INSN("movsx","movsx",ix86_ArgMovYX,ix86_ArgMovYX,IX86_CPU386,K64_ATHLON),
   /*0xC0*/ DECLARE_EX_INSN("xadd","xadd",ix86_ArgModRMnDnW,ix86_ArgModRMnDnW,IX86_CPU486,K64_ATHLON),
   /*0xC1*/ DECLARE_EX_INSN("xadd","xadd",ix86_ArgModRMnDW,ix86_ArgModRMnDW,IX86_CPU486,K64_ATHLON),
-  /*0xC2*/ DECLARE_EX_INSN("cmpps","cmpps",ix86_ArgXMMCmp,ix86_ArgXMMCmp,IX86_P3MMX,K64_ATHLON),
+  /*0xC2*/ DECLARE_EX_INSN("cmpps","cmpps",ix86_ArgXMMCmp,ix86_ArgXMMCmp,IX86_P3MMX,K64_ATHLON|K64_SSE),
   /*0xC3*/ DECLARE_EX_INSN("movnti","movnti",ix86_ArgModRMnDW,ix86_ArgModRMnDW,IX86_P4,K64_ATHLON),
-  /*0xC4*/ DECLARE_EX_INSN("pinsrw","pinsrw",ix86_ArgXMMRegDigit,ix86_ArgXMMRegDigit,IX86_P3MMX,K64_ATHLON),
-  /*0xC5*/ DECLARE_EX_INSN("pextrw","pextrw",ix86_ArgRegXMMDigit,ix86_ArgRegXMMDigit,IX86_P3MMX,K64_ATHLON),
-  /*0xC6*/ DECLARE_EX_INSN("shufps","shufps",ix86_ArgXMMRMDigit,ix86_ArgXMMRMDigit,IX86_P3MMX,K64_ATHLON),
+  /*0xC4*/ DECLARE_EX_INSN("pinsrw","pinsrw",ix86_ArgXMMRegDigit,ix86_ArgXMMRegDigit,IX86_P3MMX,K64_ATHLON|K64_SSE),
+  /*0xC5*/ DECLARE_EX_INSN("pextrw","pextrw",ix86_ArgRegXMMDigit,ix86_ArgRegXMMDigit,IX86_P3MMX,K64_ATHLON|K64_SSE),
+  /*0xC6*/ DECLARE_EX_INSN("shufps","shufps",ix86_ArgXMMRMDigit,ix86_ArgXMMRMDigit,IX86_P3MMX,K64_ATHLON|K64_SSE),
   /*0xC7*/ DECLARE_EX_INSN("cmpxchg8b","cmpxchg8b",ix86_ArgMod,ix86_ArgMod,IX86_CPU586,K64_ATHLON),
   /*0xC8*/ DECLARE_EX_INSN("bswap","bswap",ix86_ArgIReg,ix86_ArgIReg,IX86_CPU486,K64_ATHLON),
   /*0xC9*/ DECLARE_EX_INSN("bswap","bswap",ix86_ArgIReg,ix86_ArgIReg,IX86_CPU486,K64_ATHLON),
@@ -564,52 +564,52 @@ ix86_ExOpcodes ix86_extable[256] = /* for 0FH leading */
   /*0xCE*/ DECLARE_EX_INSN("bswap","bswap",ix86_ArgIReg,ix86_ArgIReg,IX86_CPU486,K64_ATHLON),
   /*0xCF*/ DECLARE_EX_INSN("bswap","bswap",ix86_ArgIReg,ix86_ArgIReg,IX86_CPU486,K64_ATHLON),
   /*0xD0*/ DECLARE_EX_INSN("???","???",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_UNKMMX,K64_ATHLON),
-  /*0xD1*/ DECLARE_EX_INSN("psrlw","psrlw",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_MMX586,K64_ATHLON),
-  /*0xD2*/ DECLARE_EX_INSN("psrld","psrld",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_MMX586,K64_ATHLON),
-  /*0xD3*/ DECLARE_EX_INSN("psrlq","psrlq",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_MMX586,K64_ATHLON),
-  /*0xD4*/ DECLARE_EX_INSN("paddq","paddq",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_P4MMX,K64_ATHLON),
-  /*0xD5*/ DECLARE_EX_INSN("pmullw","pmullw",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_MMX586,K64_ATHLON),
+  /*0xD1*/ DECLARE_EX_INSN("psrlw","psrlw",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_MMX586,K64_ATHLON|K64_MMX),
+  /*0xD2*/ DECLARE_EX_INSN("psrld","psrld",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_MMX586,K64_ATHLON|K64_MMX),
+  /*0xD3*/ DECLARE_EX_INSN("psrlq","psrlq",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_MMX586,K64_ATHLON|K64_MMX),
+  /*0xD4*/ DECLARE_EX_INSN("paddq","paddq",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_P4MMX,K64_ATHLON|K64_MMX),
+  /*0xD5*/ DECLARE_EX_INSN("pmullw","pmullw",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_MMX586,K64_ATHLON|K64_MMX),
   /*0xD6*/ DECLARE_EX_INSN("???","???",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_UNKMMX,K64_ATHLON),
-  /*0xD7*/ DECLARE_EX_INSN("pmovmskb","pmovmskb",ix86_ArgRMMXRevnD,ix86_ArgRMMXRevnD,IX86_P3MMX,K64_ATHLON),
-  /*0xD8*/ DECLARE_EX_INSN("psubusb","psubusb",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_MMX586,K64_ATHLON),
-  /*0xD9*/ DECLARE_EX_INSN("psubusw","psubusw",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_MMX586,K64_ATHLON),
-  /*0xDA*/ DECLARE_EX_INSN("pminub","pminub",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_P3MMX,K64_ATHLON),
-  /*0xDB*/ DECLARE_EX_INSN("pand","pand",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_MMX586,K64_ATHLON),
-  /*0xDC*/ DECLARE_EX_INSN("paddusb","paddusb",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_MMX586,K64_ATHLON),
-  /*0xDD*/ DECLARE_EX_INSN("paddusw","paddusw",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_MMX586,K64_ATHLON),
-  /*0xDE*/ DECLARE_EX_INSN("pmaxub","pmaxub",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_P3MMX,K64_ATHLON),
-  /*0xDF*/ DECLARE_EX_INSN("pandn","pandn",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_MMX586,K64_ATHLON),
-  /*0xE0*/ DECLARE_EX_INSN("pavgb","pavgb",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_P3MMX,K64_ATHLON),
-  /*0xE1*/ DECLARE_EX_INSN("psraw","psraw",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_MMX586,K64_ATHLON),
-  /*0xE2*/ DECLARE_EX_INSN("psrad","psrad",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_MMX586,K64_ATHLON),
-  /*0xE3*/ DECLARE_EX_INSN("pavgw","pavgw",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_P3MMX,K64_ATHLON),
-  /*0xE4*/ DECLARE_EX_INSN("pmulhuw","pmulhuw",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_P3MMX,K64_ATHLON),
-  /*0xE5*/ DECLARE_EX_INSN("pmulhw","pmulhw",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_MMX586,K64_ATHLON),
+  /*0xD7*/ DECLARE_EX_INSN("pmovmskb","pmovmskb",ix86_ArgRMMXRevnD,ix86_ArgRMMXRevnD,IX86_P3MMX,K64_ATHLON|K64_MMX),
+  /*0xD8*/ DECLARE_EX_INSN("psubusb","psubusb",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_MMX586,K64_ATHLON|K64_MMX),
+  /*0xD9*/ DECLARE_EX_INSN("psubusw","psubusw",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_MMX586,K64_ATHLON|K64_MMX),
+  /*0xDA*/ DECLARE_EX_INSN("pminub","pminub",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_P3MMX,K64_ATHLON|K64_MMX),
+  /*0xDB*/ DECLARE_EX_INSN("pand","pand",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_MMX586,K64_ATHLON|K64_MMX),
+  /*0xDC*/ DECLARE_EX_INSN("paddusb","paddusb",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_MMX586,K64_ATHLON|K64_MMX),
+  /*0xDD*/ DECLARE_EX_INSN("paddusw","paddusw",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_MMX586,K64_ATHLON|K64_MMX),
+  /*0xDE*/ DECLARE_EX_INSN("pmaxub","pmaxub",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_P3MMX,K64_ATHLON|K64_MMX),
+  /*0xDF*/ DECLARE_EX_INSN("pandn","pandn",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_MMX586,K64_ATHLON|K64_MMX),
+  /*0xE0*/ DECLARE_EX_INSN("pavgb","pavgb",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_P3MMX,K64_ATHLON|K64_MMX),
+  /*0xE1*/ DECLARE_EX_INSN("psraw","psraw",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_MMX586,K64_ATHLON|K64_MMX),
+  /*0xE2*/ DECLARE_EX_INSN("psrad","psrad",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_MMX586,K64_ATHLON|K64_MMX),
+  /*0xE3*/ DECLARE_EX_INSN("pavgw","pavgw",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_P3MMX,K64_ATHLON|K64_MMX),
+  /*0xE4*/ DECLARE_EX_INSN("pmulhuw","pmulhuw",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_P3MMX,K64_ATHLON|K64_MMX),
+  /*0xE5*/ DECLARE_EX_INSN("pmulhw","pmulhw",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_MMX586,K64_ATHLON|K64_MMX),
   /*0xE6*/ DECLARE_EX_INSN("???","???",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_UNKMMX,K64_ATHLON),
-  /*0xE7*/ DECLARE_EX_INSN("movntq","movntq",ix86_ArgMMXD,ix86_ArgMMXD,IX86_P3MMX,K64_ATHLON),
-  /*0xE8*/ DECLARE_EX_INSN("psubsb","psubsb",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_MMX586,K64_ATHLON),
-  /*0xE9*/ DECLARE_EX_INSN("psubsw","psubsw",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_MMX586,K64_ATHLON),
-  /*0xEA*/ DECLARE_EX_INSN("pminsw","pminsw",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_P3MMX,K64_ATHLON),
-  /*0xEB*/ DECLARE_EX_INSN("por","por",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_MMX586,K64_ATHLON),
-  /*0xEC*/ DECLARE_EX_INSN("paddsb","paddsb",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_MMX586,K64_ATHLON),
-  /*0xED*/ DECLARE_EX_INSN("paddsw","paddsw",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_MMX586,K64_ATHLON),
-  /*0xEE*/ DECLARE_EX_INSN("pmaxsw","pmaxsw",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_P3MMX,K64_ATHLON),
-  /*0xEF*/ DECLARE_EX_INSN("pxor","pxor",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_MMX586,K64_ATHLON),
+  /*0xE7*/ DECLARE_EX_INSN("movntq","movntq",ix86_ArgMMXD,ix86_ArgMMXD,IX86_P3MMX,K64_ATHLON|K64_MMX),
+  /*0xE8*/ DECLARE_EX_INSN("psubsb","psubsb",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_MMX586,K64_ATHLON|K64_MMX),
+  /*0xE9*/ DECLARE_EX_INSN("psubsw","psubsw",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_MMX586,K64_ATHLON|K64_MMX),
+  /*0xEA*/ DECLARE_EX_INSN("pminsw","pminsw",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_P3MMX,K64_ATHLON|K64_MMX),
+  /*0xEB*/ DECLARE_EX_INSN("por","por",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_MMX586,K64_ATHLON|K64_MMX),
+  /*0xEC*/ DECLARE_EX_INSN("paddsb","paddsb",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_MMX586,K64_ATHLON|K64_MMX),
+  /*0xED*/ DECLARE_EX_INSN("paddsw","paddsw",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_MMX586,K64_ATHLON|K64_MMX),
+  /*0xEE*/ DECLARE_EX_INSN("pmaxsw","pmaxsw",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_P3MMX,K64_ATHLON|K64_MMX),
+  /*0xEF*/ DECLARE_EX_INSN("pxor","pxor",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_MMX586,K64_ATHLON|K64_MMX),
   /*0xF0*/ DECLARE_EX_INSN("???","???",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_UNKMMX,K64_ATHLON),
-  /*0xF1*/ DECLARE_EX_INSN("psllw","psllw",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_MMX586,K64_ATHLON),
-  /*0xF2*/ DECLARE_EX_INSN("pslld","pslld",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_MMX586,K64_ATHLON),
-  /*0xF3*/ DECLARE_EX_INSN("psllq","psllq",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_MMX586,K64_ATHLON),
-  /*0xF4*/ DECLARE_EX_INSN("pmuludq","pmuludq",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_P4MMX,K64_ATHLON),
-  /*0xF5*/ DECLARE_EX_INSN("pmaddwd","pmaddwd",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_MMX586,K64_ATHLON),
-  /*0xF6*/ DECLARE_EX_INSN("psadbw","psadbw",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_P3MMX,K64_ATHLON),
-  /*0xF7*/ DECLARE_EX_INSN("maskmovq","maskmovq",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_P3MMX,K64_ATHLON),
-  /*0xF8*/ DECLARE_EX_INSN("psubb","psubb",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_MMX586,K64_ATHLON),
-  /*0xF9*/ DECLARE_EX_INSN("psubw","psubw",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_MMX586,K64_ATHLON),
-  /*0xFA*/ DECLARE_EX_INSN("psubd","psubd",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_MMX586,K64_ATHLON),
-  /*0xFB*/ DECLARE_EX_INSN("psubq","psubq",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_P4MMX,K64_ATHLON),
-  /*0xFC*/ DECLARE_EX_INSN("paddb","paddb",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_MMX586,K64_ATHLON),
-  /*0xFD*/ DECLARE_EX_INSN("paddw","paddw",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_MMX586,K64_ATHLON),
-  /*0xFE*/ DECLARE_EX_INSN("paddd","paddd",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_MMX586,K64_ATHLON),
+  /*0xF1*/ DECLARE_EX_INSN("psllw","psllw",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_MMX586,K64_ATHLON|K64_MMX),
+  /*0xF2*/ DECLARE_EX_INSN("pslld","pslld",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_MMX586,K64_ATHLON|K64_MMX),
+  /*0xF3*/ DECLARE_EX_INSN("psllq","psllq",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_MMX586,K64_ATHLON|K64_MMX),
+  /*0xF4*/ DECLARE_EX_INSN("pmuludq","pmuludq",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_P4MMX,K64_ATHLON|K64_MMX),
+  /*0xF5*/ DECLARE_EX_INSN("pmaddwd","pmaddwd",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_MMX586,K64_ATHLON|K64_MMX),
+  /*0xF6*/ DECLARE_EX_INSN("psadbw","psadbw",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_P3MMX,K64_ATHLON|K64_MMX),
+  /*0xF7*/ DECLARE_EX_INSN("maskmovq","maskmovq",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_P3MMX,K64_ATHLON|K64_MMX),
+  /*0xF8*/ DECLARE_EX_INSN("psubb","psubb",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_MMX586,K64_ATHLON|K64_MMX),
+  /*0xF9*/ DECLARE_EX_INSN("psubw","psubw",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_MMX586,K64_ATHLON|K64_MMX),
+  /*0xFA*/ DECLARE_EX_INSN("psubd","psubd",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_MMX586,K64_ATHLON|K64_MMX),
+  /*0xFB*/ DECLARE_EX_INSN("psubq","psubq",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_P4MMX,K64_ATHLON|K64_MMX),
+  /*0xFC*/ DECLARE_EX_INSN("paddb","paddb",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_MMX586,K64_ATHLON|K64_MMX),
+  /*0xFD*/ DECLARE_EX_INSN("paddw","paddw",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_MMX586,K64_ATHLON|K64_MMX),
+  /*0xFE*/ DECLARE_EX_INSN("paddd","paddd",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_MMX586,K64_ATHLON|K64_MMX),
   /*0xFF*/ DECLARE_EX_INSN("???","???",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_UNKMMX,K64_ATHLON)
 };
 
@@ -2146,6 +2146,10 @@ static DisasmRet __FASTCALL__ ix86Disassembler(unsigned long ulShift,
  ix86Param DisP;
  char ua,ud,up,has_lock,has_rep,has_seg;
 
+#ifdef INT64_C
+ if(x86_Bitness == DAB_USE64) DisP.pro_clone=K64_ATHLON;
+ else
+#endif
  DisP.pro_clone = IX86_CPU086;
  DisP.codelen = 1;
  DisP.DisasmPrefAddr = ulShift;
@@ -2289,6 +2293,10 @@ static DisasmRet __FASTCALL__ ix86Disassembler(unsigned long ulShift,
                 DisP.RealCmd = &DisP.RealCmd[2];
                 code = DisP.RealCmd[0];
                 DisP.codelen++;
+#ifdef INT64_C
+		if(x86_Bitness == DAB_USE64) DisP.pro_clone = K64_ATHLON|K64_SSE;
+		else
+#endif
                 DisP.pro_clone = ix86_660F_PentiumTable[code].pro_clone;
                 strcpy(Ret.str,ix86_660F_PentiumTable[code].name);
                 if(ix86_660F_PentiumTable[code].method)
@@ -2321,6 +2329,10 @@ static DisasmRet __FASTCALL__ ix86Disassembler(unsigned long ulShift,
                 DisP.RealCmd = &DisP.RealCmd[2];
                 code = DisP.RealCmd[0];
                 DisP.codelen++;
+#ifdef INT64_C
+		if(x86_Bitness == DAB_USE64) DisP.pro_clone = K64_ATHLON|K64_SSE;
+		else
+#endif
                 DisP.pro_clone = ix86_F20F_PentiumTable[code].pro_clone;
                 strcpy(Ret.str,ix86_F20F_PentiumTable[code].name);
                 if(ix86_F20F_PentiumTable[code].method)
@@ -2343,6 +2355,10 @@ static DisasmRet __FASTCALL__ ix86Disassembler(unsigned long ulShift,
                 DisP.RealCmd = &DisP.RealCmd[2];
                 code = DisP.RealCmd[0];
                 DisP.codelen++;
+#ifdef INT64_C
+		if(x86_Bitness == DAB_USE64) DisP.pro_clone = K64_ATHLON|K64_SSE;
+		else
+#endif
                 DisP.pro_clone = ix86_F30F_PentiumTable[code].pro_clone;
                 strcpy(Ret.str,ix86_F30F_PentiumTable[code].name);
                 if(ix86_F30F_PentiumTable[code].method)
@@ -2357,9 +2373,9 @@ static DisasmRet __FASTCALL__ ix86Disassembler(unsigned long ulShift,
                 if(DisP.RealCmd[1] == 0x90)
                 {
                   /* this is pause insns */
-                  strcpy(Ret.str,"pause");
+                  strcpy(Ret.str,x86_Bitness == DAB_USE64?"???":"pause");
                   DisP.codelen++;
-                  DisP.pro_clone = IX86_P4;
+                  DisP.pro_clone = DAB_USE64?K64_ATHLON:IX86_P4;
                   goto ExitDisAsm;
                 }
               if(has_rep + has_lock) break;
@@ -2374,6 +2390,12 @@ static DisasmRet __FASTCALL__ ix86Disassembler(unsigned long ulShift,
               up++;
               goto RepeateByPrefix;
  }
+#ifdef INT64_C
+ /* Let it be overwritten later */
+ if(x86_Bitness == DAB_USE64) DisP.pro_clone = ix86_table[code].flags64;
+ else
+#endif
+ DisP.pro_clone = ix86_table[code].pro_clone;
 #ifdef INT64_C
  if(x86_Bitness == DAB_USE64)
  {
@@ -2440,19 +2462,8 @@ static DisasmRet __FASTCALL__ ix86Disassembler(unsigned long ulShift,
                 break;
      default:   break;
  }
-#ifdef INT64_C
- if(x86_Bitness == DAB_USE64) DisP.pro_clone = ix86_table[code].flags64 & K64_CLONEMASK;
- else
-#endif
- {
-   if((DisP.pro_clone & IX86_CPUMASK) < ix86_table[code].pro_clone) DisP.pro_clone = ix86_table[code].pro_clone;
-   if((DisP.pro_clone & IX86_FPUMASK) < (ix86_table[code].pro_clone & IX86_FPUMASK) &&
-      (DisP.pro_clone & IX86_CPUMASK) == IX86_CPUMASK) DisP.pro_clone = ix86_table[code].pro_clone;
-   if((DisP.pro_clone & IX86_MMXMASK) < (ix86_table[code].pro_clone & IX86_MMXMASK) &&
-      (DisP.pro_clone & IX86_CPUMASK) == IX86_CPUMASK &&
-      (DisP.pro_clone & IX86_FPUMASK) == IX86_FPUMASK ) DisP.pro_clone = ix86_table[code].pro_clone;
- }
  ExitDisAsm:
+ /* control jumps here after SSE2 opcodes */
  if(up) DisP.codelen+=up;
  if(ix86_segpref[0])
  {
@@ -2541,7 +2552,14 @@ static const char * CPU64Names[] =
 static ColorAttr  __FASTCALL__ ix86GetAsmColor(unsigned long clone)
 {
 #ifdef INT64_C
-     if(x86_Bitness == DAB_USE64) return disasm_cset.cpu_cset[0].clone[clone];
+     if(x86_Bitness == DAB_USE64)
+     {
+	if((clone & K64_SSE) == K64_SSE) return disasm_cset.cpu_cset[2].clone[clone & K64_CLONEMASK];
+	else
+	if(clone & K64_SSE) return disasm_cset.cpu_cset[1].clone[clone & K64_CLONEMASK];
+	else
+	return disasm_cset.cpu_cset[0].clone[clone & K64_CLONEMASK];
+     }
      else
 #endif
      if(clone & IX86_MMXMASK) return disasm_cset.cpu_cset[2].clone[(clone >> 16) & 0xFF];
@@ -2564,7 +2582,11 @@ static void __FASTCALL__ ix86HelpAsm( void )
  unsigned long nstrs;
  TWindow * hwnd;
  if(!hlpOpen(True)) return;
+#ifdef INT64_C
+ size = (unsigned)hlpGetItemSize(x86_Bitness == DAB_USE64 ? 20002:20001);
+#else
  size = (unsigned)hlpGetItemSize(20001);
+#endif
  if(!size) goto ix86hlp_bye;
  msgAsmText = PMalloc(size+1);
  if(!msgAsmText)
@@ -2573,7 +2595,11 @@ static void __FASTCALL__ ix86HelpAsm( void )
    MemOutBox(" Help Display ");
    goto ix86hlp_bye;
  }
+#ifdef INT64_C
+ if(!hlpLoadItem(x86_Bitness == DAB_USE64 ? 20002:20001,msgAsmText))
+#else
  if(!hlpLoadItem(20001,msgAsmText))
+#endif
  {
    PFree(msgAsmText);
    goto ix86hlp_bye;
@@ -2602,15 +2628,24 @@ static void __FASTCALL__ ix86HelpAsm( void )
 #ifdef INT64_C
  if(x86_Bitness == DAB_USE64)
  {
+   twGotoXY(5,4);
    for(i = 0;i < 10;i++)
    {
      twSetColorAttr(disasm_cset.cpu_cset[0].clone[i]);
      twPutS(CPU64Names[i]);
    }
-   twGotoXY(5,4);
-   twClrEOL();
    twGotoXY(5,5);
-   twClrEOL();
+   for(i = 0;i < 10;i++)
+   {
+     twSetColorAttr(disasm_cset.cpu_cset[1].clone[i]);
+     twPutS(CPU64Names[i]);
+   }
+   twGotoXY(5,6);
+   for(i = 0;i < 10;i++)
+   {
+     twSetColorAttr(disasm_cset.cpu_cset[2].clone[i]);
+     twPutS(CPU64Names[i]);
+   }
  }
  else
 #endif

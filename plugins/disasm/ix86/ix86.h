@@ -119,8 +119,13 @@ typedef void (__FASTCALL__*ix86_method)(char *encode_str,ix86Param *);
 
 #define K64_ATHLON	0x00000000UL
 #define K64_CLONEMASK	0x00FFFFFFUL
-#define K64_NOCOMPAT	0x01000000UL /* means insns has no 16 or 32 bit forms */
-#define K64_DEF32	0x02000000UL /* means insns size depends on default data size but not address size */
+#define K64_REGGROUP    0x03000000UL
+#define K64_GPR         0x00000000UL /* insn works with general purpose registers */
+#define K64_FPU         0x01000000UL /* insn works with fpu registers */
+#define K64_MMX         0x02000000UL /* insn works with mmx registers */
+#define K64_SSE         0x03000000UL /* insn works with sse registers */
+#define K64_NOCOMPAT	0x04000000UL /* means insns has no 16 or 32 bit forms */
+#define K64_DEF32	0x08000000UL /* means insns size depends on default data size but not address size */
 
 typedef struct tag_ix86opcodes
 {

@@ -630,7 +630,12 @@ void __FASTCALL__ ix86_SMov(char * str,ix86Param *DisP)
   sregptr = getSREG(sreg);
   DisP->codelen = 2;
   tileptr = ix86_getModRM(True,mod,reg,DisP);
-  if(sreg > 3) if((DisP->pro_clone & IX86_CPUMASK) < 3) DisP->pro_clone = IX86_CPU386;
+  if(sreg > 3)
+    if((DisP->pro_clone & IX86_CPUMASK) < 3)
+#ifdef INT64_C
+	if(x86_Bitness != DAB_USE64)
+#endif
+      DisP->pro_clone = IX86_CPU386;
   Use32Data = use32data;
   strcat(str,direct ? sregptr : tileptr);
   ix86_CStile(str,direct ? tileptr : sregptr);
@@ -648,7 +653,12 @@ void __FASTCALL__ ix86_ArgSegRM(char * str,ix86Param *DisP)
   strcat(str,sregptr);
   DisP->codelen++;
   tileptr = ix86_getModRM(True,mod,reg,DisP);
-  if(sreg > 3) if((DisP->pro_clone & IX86_CPUMASK) < 3) DisP->pro_clone = IX86_CPU386;
+  if(sreg > 3)
+    if((DisP->pro_clone & IX86_CPUMASK) < 3)
+#ifdef INT64_C
+	if(x86_Bitness != DAB_USE64)
+#endif
+      DisP->pro_clone = IX86_CPU386;
   Use32Data = use32data;
   ix86_CStile(str,tileptr);
 }
@@ -991,7 +1001,7 @@ void  __FASTCALL__ ix86_ExOpCodes(char *str,ix86Param *DisP)
    ix86_extable[code].method(str,DisP);
  }
 #ifdef INT64_C
- if(x86_Bitness == DAB_USE64) DisP->pro_clone = ix86_extable[code].flags64 & K64_CLONEMASK;
+ if(x86_Bitness == DAB_USE64) DisP->pro_clone = ix86_extable[code].flags64;
  else
 #endif
  if(DisP->pro_clone < ix86_extable[code].pro_clone) DisP->pro_clone = ix86_extable[code].pro_clone;
@@ -1034,6 +1044,9 @@ void  __FASTCALL__ ix86_ArgExGr1(char *str,ix86Param *DisP)
     if(rm == 7)
     {
       word = False;
+#ifdef INT64_C
+      if(x86_Bitness != DAB_USE64)
+#endif
       DisP->pro_clone = IX86_CPU486;
       buf = 1;
       ptr = DUMMY_PTR;
@@ -1475,7 +1488,11 @@ void __FASTCALL__ ix86_ArgKatmaiGrp1(char *str,ix86Param *DisP)
      ix86_ArgMod(str,DisP);
    }
    else DisP->codelen++;
-   if(code2 == 5 || code2 == 6) DisP->pro_clone = IX86_P4MMX;
+   if(code2 == 5 || code2 == 6)
+#ifdef INT64_C
+	if(x86_Bitness != DAB_USE64)
+#endif
+      DisP->pro_clone = IX86_P4MMX;
 }
 
 void __FASTCALL__ ix86_ArgKatmaiGrp2(char *str,ix86Param *DisP)
@@ -1581,7 +1598,11 @@ void __FASTCALL__ ix86_3dNowOpCodes( char *str,ix86Param *DisP)
  strcpy(str,ix86_3dNowtable[code].name);
  TabSpace(str,TAB_POS);
  strcat(str,ix86_Katmai_buff);
- DisP->pro_clone = ix86_3dNowtable[code].pro_clone;
+#ifdef INT64_C
+   if(x86_Bitness == DAB_USE64) DisP->pro_clone = K64_ATHLON|K64_MMX;
+   else
+#endif
+   DisP->pro_clone = ix86_3dNowtable[code].pro_clone;
 }
 
 void __FASTCALL__ ix86_3dNowPrefetchGrp(char *str,ix86Param *DisP)

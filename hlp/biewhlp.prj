@@ -43,4 +43,5 @@ id = BIEW_HLP v5.3.0
 10015 = ../plugins/bin/lmf.htx
 20000 = ../plugins/disasm/ix86/ix86.htx
 20001 = ../plugins/disasm/ix86/ix86size.htx
+20002 = ../plugins/disasm/ix86/k86size.htx
 20010 = ../plugins/disasm/null_da.htx
