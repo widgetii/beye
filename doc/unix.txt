@@ -160,6 +160,10 @@ sorts of weirdness can happen.
 ChangeLog (Linux/UNIX)
 ----------------------
 
+5.3.1
+
+- Minor fixes
+
 5.3.0
 
 - BIEW/LINUX: reduce use of system calls, use pwrite if possible,

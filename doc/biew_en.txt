@@ -10,8 +10,8 @@
 €≤±∞                 ‹‹  ‹‹  ‹‹   ‹‹  ‹   ‹ ‹ ‹ ‹                     ∞±≤€
 €≤±∞                ‹‹‹‹‹‹  ‹‹‹‹ ‹‹‹‹‹‹    ‹   ‹                      ∞±≤€
 €≤±∞                                                                  ∞±≤€
-€≤±∞                           Ver 5.3.0                              ∞±≤€
-€≤±∞                          07 nov 2001.                            ∞±≤€
+€≤±∞                           Ver 5.3.1                              ∞±≤€
+€≤±∞                          23 dec 2001.                            ∞±≤€
 €≤±∞                                                                  ∞±≤€
 €≤±∞    Made in Kazan.Tatarstan.Russia. Written By Nick Kurshev.      ∞±≤€
 €≤±∞                                                                  ∞±≤€
@@ -1040,6 +1040,21 @@ v5.0.2        ! Changes:
                 + Expanded CPUID stuff.
                 * Virtual addresses as operands of call and jmp insns in NE
                   plugin.
+5.3.1         ! Changes:
+23 dec 2001     * Fixed wrong jump-address computing for insns which start
+                  from 0F
+                * Fixed -DDATADIR for beos
+                * Fixed bug which might cause program crash in disasm.c
+                * Fixed many wildcard related bugs
+                * Some fixes which are maden by Olivier Mengue <dolmen@bigfoot.com>
+                  in win32 related stuff:
+                  + Fixed bswap64 compilation under MSVC 
+                  + Solved warning
+                  + Added save/restore of console state.
+                  + Improvment of the non-DirectMode : in this mode, display
+                    is relative to the visible window.
+                  + Fixed MSVC debug compilation
+                * Few cosmetic changes in unix related stuff by K. Boldyshev
 []======================================================================[]
 []  Thank you for your interest.                                        []
 []  Nick Kurshev.                                                       []
