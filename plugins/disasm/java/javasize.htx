@@ -1,0 +1,6 @@
+ How to see 
+ %UDisassembler presentation:%u
+ %IDDDDDDD: CCCCCC                      instruction%i
+   ³        ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ     instruction bytes
+   ³     
+   ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ     file position offset.

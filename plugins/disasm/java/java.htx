@@ -1,2 +1,330 @@
  Java assembly reference 
- Not implemented yet :(
+ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+³ %BJava Summary%b                                                            ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
+³                                                                         ³
+³ %IDescription%i                                                             ³
+³                                                                         ³
+³ The Java virtual machine is an %Uabstract%u machine. The Java virtual       ³
+³ machine specified here will support the Java programming language       ³
+³ specified in The JavaTM Language Specification (Addison-Wesley, 1996).  ³
+³ It is compatible with the Java platform implemented by Sun's JDK        ³
+³ releases %U1.0.2%u and %U1.1%u and the %UJavaTM 2%u platform implemented by Sun's   ³
+³ JavaTM 2 SDK, Standard Edition, v1.2 (formerly known as JDK release 1.2)³
+³                                                                         ³
+³ A Java virtual machine instruction consists of an opcode specifying the ³
+³ operation to be performed, followed by zero or more operands embodying  ³
+³ values to be operated upon.                                             ³
+³                                                                         ³
+³ The Java virtual machine is an abstract computing machine. Like a real  ³
+³ computing machine, it has an instruction set and manipulates various    ³
+³ memory areas at run time. It is reasonably common to implement a        ³
+³ programming language using a virtual machine; the best-known virtual    ³
+³ machine may be the %UP-Code%u machine of %UUCSD Pascal%u.                       ³
+³                                                                         ³
+³ The Java virtual machine defines various runtime data areas that are    ³
+³ used during execution of a program.                                     ³
+³                                                                         ³
+³ The Java virtual machine can support many %Uthreads%u of execution at once. ³
+³ Each Java virtual machine thread has its own %Upc (program counter)%u       ³
+³ register. At any point, each Java virtual machine thread is executing   ³
+³ the code of a single method, the current method for that thread.        ³
+³                                                                         ³
+³ Each Java virtual machine thread has a private Java %Uvirtual machine%u     ³
+³ %Ustack%u, created at the same time as the thread. A Java virtual machine   ³
+³ stack stores frames. A Java virtual machine stack is analogous to the   ³
+³ stack of a conventional language such as C: it holds local variables    ³
+³ and partial results, and plays a part in method invocation and return.  ³
+³ Because the Java virtual machine stack is never manipulated directly    ³
+³ except to push and pop frames, frames may be heap allocated. The memory ³
+³ for a Java virtual machine stack does not need to be contiguous.        ³
+³                                                                         ³
+³ The Java virtual machine specification permits Java virtual machine     ³
+³ stacks either to be of a %Ufixed size%u or to %Udynamically expand%u and        ³
+³ contract as required by the computation. If the Java virtual machine    ³
+³ stacks are of a fixed size, the size of each Java virtual machine       ³
+³ stack may be chosen independently when that stack is created. A Java    ³
+³ virtual machine implementation may provide the programmer or the user   ³
+³ control over the initial size of Java virtual machine stacks, as well   ³
+³ as, in the case of dynamically expanding or contracting Java virtual    ³
+³ machine stacks, control over the maximum and minimum sizes.             ³
+³                                                                         ³
+³ The Java virtual machine has a %Uheap%u that is shared among all Java       ³
+³ virtual machine threads. The heap is the runtime data area from which   ³
+³ memory for all class instances and arrays is allocated.                 ³
+³                                                                         ³
+³ The Java virtual machine has a %Umethod area%u that is shared among all     ³
+³ Java virtual machine threads. The method area is analogous to the       ³
+³ storage area for compiled code of a conventional language or analogous  ³
+³ to the "%Utext%u" segment in a UNIX process.                                ³
+³                                                                         ³
+³ A runtime %Uconstant pool%u is a per-class or per-interface runtime         ³
+³ representation of the constant_pool table in a class file. It contains  ³
+³ several kinds of constants, ranging from numeric literals known at      ³
+³ compile time to method and field references that must be resolved at    ³
+³ run time. The runtime constant pool serves a function similar to that   ³
+³ of a symbol table for a conventional programming language, although     ³
+³ it contains a wider range of data than a typical symbol table.          ³
+³                                                                         ³
+³ An implementation of the Java virtual machine may use conventional      ³
+³ stacks, colloquially called "%UC stacks%u" to support native methods,       ³
+³ methods written in a language other than the Java programming language. ³
+³ Native method stacks may also be used by the implementation of an       ³
+³ interpreter for the Java virtual machine's instruction set in a language³
+³ such as %UC%u.                                                              ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
+³ aaload           [32]       Load reference from array                   ³
+³ aastore          [53]       Store into reference array                  ³
+³ aconst_null      [01]       Push %Unull%u                                   ³
+³ aload            [19,i1]    Load reference from local variable          ³
+³ aload_0          [2A]       Load reference from local variable #0       ³
+³ aload_1          [2B]       Load reference from local variable #1       ³
+³ aload_2          [2C]       Load reference from local variable #2       ³
+³ aload_3          [2D]       Load reference from local variable #3       ³
+³ anewarray        [BD,i2]    Create new array of reference               ³
+³ areturn          [B0]       Return reference from method                ³
+³ arraylength      [BE]       Get length of array                         ³
+³ astore           [3A,i1]    Store reference into local variable         ³
+³ astore_0         [4B]       Store reference into local variable #0      ³
+³ astore_1         [4C]       Store reference into local variable #1      ³
+³ astore_2         [4D]       Store reference into local variable #2      ³
+³ astore_3         [4E]       Store reference into local variable #3      ³
+³ athrow           [BF]       Throw exception or error                    ³
+³ baload           [33]       Load byte or boolean from array             ³
+³ bastore          [54]       Store into byte or boolean array            ³
+³ bipush           [10,b1]    Push byte                                   ³
+³ breakpoint       [CA]       Breakpoint                                  ³
+³ caload           [34]       Load char from array                        ³
+³ castore          [55]       Store char into array                       ³
+³ checkcast        [C0,i2]    Check whether object is of given type       ³
+³ d2f              [90]       Convert double to float                     ³
+³ d2i              [8E]       Convert double to int                       ³
+³ d2l              [8F]       Convert double to long                      ³
+³ dadd             [63]       Add double                                  ³
+³ daload           [31]       Load double from array                      ³
+³ dastore          [52]       Store into double array                     ³
+³ dcmpg            [98]       Compare double; %Ust0>st1?1:st0==st1?0:-1%u     ³
+³ dcmpl            [97]       Compare double. Differs only by NaN treating³
+³ dconst_0         [0E]       Push 0.0                                    ³
+³ dconst_1         [0F]       Push 1.0                                    ³
+³ ddiv             [6F]       Divide double                               ³
+³ dload            [18,i1]    Load double from local variable             ³
+³ dload_0          [26]       Load double from local variable #0          ³
+³ dload_1          [27]       Load double from local variable #1          ³
+³ dload_2          [28]       Load double from local variable #2          ³
+³ dload_3          [29]       Load double from local variable #3          ³
+³ dmul             [6B]       Multiply double                             ³
+³ dneg             [77]       Negate double                               ³
+³ drem             [73]       Remainder double                            ³
+³ dreturn          [AF]       Return double from method                   ³
+³ dstore           [39,i1]    Store double into local variable            ³
+³ dstore_0         [47]       Store double into local variable #0         ³
+³ dstore_1         [48]       Store double into local variable #1         ³
+³ dstore_2         [49]       Store double into local variable #2         ³
+³ dstore_3         [4A]       Store double into local variable #3         ³
+³ dsub             [67]       Substract double                            ³
+³ dup              [59]       Duplicate the top operand stack value       ³
+³ dup_x1           [5A]       Dup the top opstack value & insert 2 val dn ³
+³ dup_x2           [5B]       Dup the top opstack value & insert 3 val dn ³
+³ dup2             [5C]       Duplicate the top upto 2 operand stack value³
+³ dup2_x1          [5D]       Dup the top upto 2 opstack value&insert 3 dn³
+³ dup2_x2          [5E]       Dup the top upto 2 opstack value&insert 4 dn³
+³ f2d              [8D]       Convert float to double                     ³
+³ f2i              [8B]       Convert float to int                        ³
+³ f2l              [8C]       Convert float to long                       ³
+³ fadd             [62]       Add float                                   ³
+³ faload           [30]       Load float from array                       ³
+³ fastore          [51]       Store into float array                      ³
+³ fcmpg            [96]       Compare float; %Ust0>st1?1:st0==st1?0:-1%u      ³
+³ fcmpl            [95]       Compare float. Differs only by NaN treating ³
+³ fconst_0         [0B]       Push 0.0                                    ³
+³ fconst_1         [0C]       Push 1.0                                    ³
+³ fconst_2         [0D]       Push 2.0                                    ³
+³ fdiv             [6E]       Divide float                                ³
+³ fload            [17,i1]    Load float from local variable              ³
+³ fload_0          [22]       Load float from local variable #0           ³
+³ fload_1          [23]       Load float from local variable #1           ³
+³ fload_2          [24]       Load float from local variable #2           ³
+³ fload_3          [25]       Load float from local variable #3           ³
+³ fmul             [6A]       Multiply float                              ³
+³ fneg             [76]       Negate float                                ³
+³ frem             [72]       Remainder float                             ³
+³ freturn          [AE]       Return float from method                    ³
+³ fstore           [38,i1]    Store float into local variable             ³
+³ fstore_0         [43]       Store float into local variable #0          ³
+³ fstore_1         [44]       Store float into local variable #1          ³
+³ fstore_2         [45]       Store float into local variable #2          ³
+³ fstore_3         [46]       Store float into local variable #3          ³
+³ fsub             [66]       Substract float                             ³
+³ getfield         [B4,i2]    Fetch field from object                     ³
+³ getstatic        [B2,i2]    Get static field from class                 ³
+³ goto             [A7,c2]    Branch always                               ³
+³ goto_w           [C8,c4]    Branch always (wide index)                  ³
+³ i2b              [91]       Convert int to byte                         ³
+³ i2c              [92]       Convert int to char                         ³
+³ i2d              [87]       Convert int to double                       ³
+³ i2f              [86]       Convert int to float                        ³
+³ i2l              [85]       Convert int to long                         ³
+³ i2s              [93]       Convert int to short                        ³
+³ iadd             [60]       Add int                                     ³
+³ iaload           [2E]       Load int from array                         ³
+³ iand             [7E]       Boolean AND int                             ³
+³ iastore          [4F]       Store into int array                        ³
+³ iconst_m1        [02]       Push -1                                     ³
+³ iconst_0         [03]       Push 0                                      ³
+³ iconst_1         [04]       Push 1                                      ³
+³ iconst_2         [05]       Push 2                                      ³
+³ iconst_3         [06]       Push 3                                      ³
+³ iconst_4         [07]       Push 4                                      ³
+³ iconst_5         [08]       Push 5                                      ³
+³ idiv             [6C]       Divide int                                  ³
+³ if_acmpeq        [A5,c2]    Branch if st0==st1                          ³
+³ if_acmpne        [A6,c2]    Branch if st0!=st1                          ³
+³ if_icmpeq        [9F,c2]    Branch if (int)st0==(int)st1                ³
+³ if_icmpne        [A0,c2]    Branch if (int)st0!=(int)st1                ³
+³ if_icmplt        [A1,c2]    Branch if (int)st0<(int)st1                 ³
+³ if_icmpge        [A2,c2]    Branch if (int)st0>=(int)st1                ³
+³ if_icmpgt        [A3,c2]    Branch if (int)st0>(int)st1                 ³
+³ if_icmple        [A4,c2]    Branch if (int)st0<=(int)st1                ³
+³ ifeq             [99,c2]    Branch if (int)st0==0                       ³
+³ ifne             [9A,c2]    Branch if (int)st0!=0                       ³
+³ iflt             [9B,c2]    Branch if (int)st0<0                        ³
+³ ifge             [9C,c2]    Branch if (int)st0>=0                       ³
+³ ifgt             [9D,c2]    Branch if (int)st0>0                        ³
+³ ifle             [9E,c2]    Branch if (int)st0<=0                       ³
+³ ifnonnull        [C7,c2]    Branch if reference not null                ³
+³ ifnull           [C6,c2]    Branch if reference null                    ³
+³ iinc             [84,i1,v1] Increment local variable by constant        ³
+³ iload            [15,i1]    Load int from local variable                ³
+³ iload_0          [1A]       Load int from local variable #0             ³
+³ iload_1          [1B]       Load int from local variable #1             ³
+³ iload_2          [1C]       Load int from local variable #2             ³
+³ iload_3          [1D]       Load int from local variable #3             ³
+³ imul             [68]       Multiply int                                ³
+³ impdep1          [FE]       RESERVED                                    ³
+³ impdep2          [FF]       RESERVED                                    ³
+³ ineg             [74]       Negate int                                  ³
+³ instanceof       [C1,i2]    Determine if object is of given type        ³
+³ invokeinterface  [B9,i2,v1] Invoke interface method                     ³
+³ invokespecial    [B7,i2]    Invoke instance method                      ³
+³ invokestatic     [B8,i2]    Invoke static method                        ³
+³ invokevirtual    [B6,i2]    Invoke virtual method                       ³
+³ ior              [80]       Boolean OR int                              ³
+³ irem             [70]       Remainder int                               ³
+³ ireturn          [AC]       Return int from method                      ³
+³ ishl             [78]       Shift left int                              ³
+³ ishr             [7A]       Arithmentic shift right int                 ³
+³ istore           [36,i1]    Store int into local variable               ³
+³ istore_0         [3B]       Store int into local variable #0            ³
+³ istore_1         [3C]       Store int into local variable #1            ³
+³ istore_2         [3D]       Store int into local variable #2            ³
+³ istore_3         [3E]       Store int into local variable #3            ³
+³ isub             [64]       Substract int                               ³
+³ iushr            [7C]       Logical shift right int                     ³
+³ ixor             [82]       Boolean XOR int                             ³
+³ jsr              [A8,c2]    Jump subroutine                             ³
+³ jsr_w            [C9,c4]    Jump subroutine (wide index)                ³
+³ l2d              [8A]       Convert long to double                      ³
+³ l2f              [89]       Convert long to float                       ³
+³ l2i              [88]       Convert long to int                         ³
+³ ladd             [61]       Add long                                    ³
+³ laload           [2F]       Load long from array                        ³
+³ land             [7F]       Boolean AND long                            ³
+³ lastore          [50]       Store into long array                       ³
+³ lcmp             [94]       Compare long                                ³
+³ lconst_0         [09]       Push 0                                      ³
+³ lconst_1         [0A]       Push 1                                      ³
+³ ldc              [12,i1]    Push item from runtime constant pool        ³
+³ ldc_w            [13,i2]    Push item from runtime constant pool (wide) ³
+³ ldc2_w           [14,i2]    Push l or d from runtime constant pool(wide)³
+³ ldiv             [6D]       Divide long                                 ³
+³ lload            [16,i1]    Load long from local variable               ³
+³ lload_0          [1E]       Load long from local variable #0            ³
+³ lload_1          [1F]       Load long from local variable #1            ³
+³ lload_2          [20]       Load long from local variable #2            ³
+³ lload_3          [21]       Load long from local variable #3            ³
+³ lmul             [69]       Multiply long                               ³
+³ lneg             [75]       Negate long                                 ³
+³ lookupswitch     [AB,...]   Access jump table by key match and jump     ³
+³ lor              [81]       Boolean OR long                             ³
+³ lrem             [71]       Remainder long                              ³
+³ lreturn          [AD]       Return long from method                     ³
+³ lshl             [79]       Shift left                                  ³
+³ lshr             [7B]       Arithmetic shift right long                 ³
+³ lstore           [37,i1]    Store long into local variable              ³
+³ lstore_0         [3F]       Store long into local variable #0           ³
+³ lstore_1         [40]       Store long into local variable #1           ³
+³ lstore_2         [41]       Store long into local variable #2           ³
+³ lstore_3         [42]       Store long into local variable #3           ³
+³ lsub             [65]       Substract long                              ³
+³ lushr            [7D]       Logical shift right long                    ³
+³ lxor             [83]       Logical XOR long                            ³
+³ monitorenter     [C2]       Enter monitor for object                    ³
+³ monitorexit      [C3]       Exit monitor for object                     ³
+³ multinewarray    [C5,i2,v1] Create new multidimensional array           ³
+³ new              [BB,i2]    Create new object                           ³
+³ newarray         [BB,v1]    Create new array                            ³
+³ nop              [00]       Do nothing                                  ³
+³ pop              [57]       Pop the top operand stack value             ³
+³ pop2             [58]       Pop the top one or two operand stack values ³
+³ putfield         [B5,i2]    Set field in object                         ³
+³ putstatic        [B3,i2]    Set static field in class                   ³
+³ ret              [A9,i1]    Return from subroutine                      ³
+³ return           [B1]       Return void from method                     ³
+³ saload           [35]       Load short from array                       ³
+³ sastore          [56]       Store into short array                      ³
+³ sipush           [11,v2]    Push short                                  ³
+³ swap             [5F]       Swap the top two operand stack values       ³
+³ tableswitch      [AA,...]   Access jump table by index and jump         ³
+³ wide             [C4,opc]   Extend local var index by additional bytes  ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
+³                                                                         ³
+³ %ILimitations%i                                                             ³
+³                                                                         ³
+³  The per-class or per-interface constant pool is limited to 65535       ³
+³  entries by the 16-bit constant_pool_count field                        ³
+³                                                                         ³
+³  The amount of code per non-native, non-abstract method is limited to   ³
+³  65536 bytes by the sizes of the indices in the exception_table of the  ³
+³  Code attribute.                                                        ³
+³                                                                         ³
+³  The greatest number of local variables in the local variables array of ³
+³  a frame created upon invocation of a method is limited to 65535 by the ³
+³  size of the max_locals item of the Code attribute.                     ³
+³                                                                         ³
+³  The number of fields that may be declared by a class or interface is   ³
+³  limited to 65535 by the size of the fields_count item of the ClassFile ³
+³  structure                                                              ³
+³                                                                         ³
+³  The number of methods that may be declared by a class or interface is  ³
+³  limited to 65535 by the size of the   methods_count item of the        ³
+³  ClassFile structure.                                                   ³
+³                                                                         ³
+³  The number of direct superinterfaces of a class or interface is limited³
+³  to 65535 by the size of the interfaces_count item of the ClassFile     ³
+³  structure.                                                             ³
+³                                                                         ³
+³  The size of an operand stack in a frame is limited to 65535 values     ³
+³  by the max_stack field of the Code_attribute structure.                ³
+³                                                                         ³
+³  The number of local variables in a frame is limited to 65535 by the    ³
+³  max_locals field of the Code_attribute structure and the 16-bit local  ³
+³  variable indexing of the Java virtual machine instruction set.         ³
+³                                                                         ³
+³  The number of dimensions in an array is limited to 255 by the size of  ³
+³  the dimensions opcode of the multianewarray instruction and by the     ³
+³  constraints imposed on the multianewarray, anewarray, and newarray     ³
+³  instructions.                                                          ³
+³                                                                         ³
+³  The number of method parameters is limited to 255 by the definition    ³
+³  of a method descriptor, where the limit includes one unit for this     ³
+³  in the case of instance or interface method invocations. Note that     ³
+³  a method descriptor is defined in terms of a notion of method          ³
+³  parameter length in which a parameter of type long or double           ³
+³  contributes two units to the length, so parameters of these types      ³
+³  further reduce the limit.                                              ³
+³                                                                         ³
+³  The length of field and method names, field and method descriptors,    ³
+³  and other constant string values is limited to 65535 characters by     ³
+³  the 16-bit unsigned length item of the CONSTANT_Utf8_info structure.   ³
+ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ

@@ -47,3 +47,5 @@ id = BIEW_HLP v5.3.0
 20010 = ../plugins/disasm/null_da.htx
 20020 = ../plugins/disasm/avr/avr.htx
 20021 = ../plugins/disasm/avr/avrsize.htx
+20030 = ../plugins/disasm/java/java.htx
+20031 = ../plugins/disasm/java/javasize.htx

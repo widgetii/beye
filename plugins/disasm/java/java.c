@@ -52,7 +52,7 @@ java_codes_t java_codes[256]=
 {
   /*0x00*/ { "nop", NULL, 0 },
   /*0x01*/ { "aconst_null", NULL, 0 },
-  /*0x02*/ { "iconst_ml", NULL, 0 },
+  /*0x02*/ { "iconst_m1", NULL, 0 },
   /*0x03*/ { "iconst_0", NULL, 0 },
   /*0x04*/ { "iconst_1", NULL, 0 },
   /*0x05*/ { "iconst_2", NULL, 0 },
@@ -446,7 +446,13 @@ static DisasmRet __FASTCALL__ javaDisassembler(unsigned long ulShift,
 
 static void  __FASTCALL__ javaHelpAsm( void )
 {
-  hlpDisplay(20010);
+  hlpDisplay(20030);
+}
+
+static tBool  __FASTCALL__ javaAsmHelp( void )
+{
+  hlpDisplay(20031);
+  return False;
 }
 
 static int    __FASTCALL__ javaMaxInsnLen( void ) { return 15; }
@@ -489,8 +495,8 @@ static void __FASTCALL__ javaWriteIni( hIniProfile *ini )
 REGISTRY_DISASM Java_Disasm =
 {
   "~Java",
-  { NULL, "NULL", NULL, NULL, NULL },
-  { NULL, NULL, NULL, NULL, NULL },
+  { "JvmAsm", NULL, NULL, NULL, NULL },
+  { javaAsmHelp, NULL, NULL, NULL, NULL },
   javaDisassembler,
   NULL,
   javaHelpAsm,
