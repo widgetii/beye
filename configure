@@ -229,7 +229,7 @@ if test "$_target_arch" = auto ; then
   if test -z "$host_arch" ; then
   host_arch=`( uname -p ) 2>&1`
   case "$host_arch" in
-   i386|sparc|ppc|alpha|arm|mips)
+   i*86|sparc|ppc|alpha|arm|mips)
      ;;
 
    *) # uname -p on Linux returns 'unknown' for the processor type,
@@ -239,7 +239,7 @@ if test "$_target_arch" = auto ; then
       # recognize.
 
       case "`( uname -m ) 2>&1`" in
-      i[3-9]86|x86*) host_arch=ia32 ;;
+      i*86|x86*) host_arch=ia32 ;;
       ppc) host_arch=ppc ;;
       alpha) host_arch=alpha ;;
       sparc*) host_arch=sparc ;;
