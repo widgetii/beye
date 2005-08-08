@@ -22,8 +22,8 @@
  * @author      GNU FSF
  * @since       1997
 **/
-#ifndef _STDINT_H
-#define _STDINT_H	1
+#ifndef __STDINT_H
+#define __STDINT_H	1
 
 /** It is possible to compile containing GCC extensions even if GCC is
     run in pedantic mode if the uses are carefully marked using the
