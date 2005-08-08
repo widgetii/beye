@@ -11,6 +11,9 @@
  * @date        02/03/2001
  * @bug         Program can be destroyed if operates with 0 size of file.
 **/
+/* for cygwin - remove unnecessary includes */
+#define _OLE_H
+#define _OLE2_H
 #ifdef __DISABLE_MMF
 #include "biewlib/sysdep/ia16/dos/mmfio.c"
 #else

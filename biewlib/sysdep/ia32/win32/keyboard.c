@@ -34,6 +34,9 @@
  * @author      Andrew Golovnia
  * @date        19.12.2003
 **/
+/* for cygwin - remove unnecessary includes */
+#define _OLE_H
+#define _OLE2_H
 #include <windows.h>
 #include <limits.h>
 #include <string.h>

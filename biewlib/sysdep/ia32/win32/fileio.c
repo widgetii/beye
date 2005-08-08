@@ -15,6 +15,9 @@
  * @note        Development, fixes and improvements
  * @warning     WinNT may "die", when performs long file query in network.
 **/
+/* for cygwin - remove unnecessary includes */
+#define _OLE_H
+#define _OLE2_H
 #include <windows.h>
 #include <string.h>
 #include <stdlib.h>

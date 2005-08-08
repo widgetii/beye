@@ -14,6 +14,9 @@
  * @since       1999
  * @note        Development, fixes and improvements
 **/
+/* for cygwin - remove unnecessary includes */
+#define _OLE_H
+#define _OLE2_H
 #include <windows.h>
 #include <stddef.h>
 #include <stdlib.h>

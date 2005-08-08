@@ -16,6 +16,9 @@
  * @bug         __MsGetPos does not return precision coordinates of mouse
  * @todo        Attempt to precise mouse coordinates
 **/
+/* for cygwin - remove unnecessary includes */
+#define _OLE_H
+#define _OLE2_H
 #include <windows.h>
 #include <limits.h>
 #include <string.h>

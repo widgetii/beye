@@ -6,6 +6,9 @@
  * @author      Nick Kurshev
  * @date        2003
 **/
+/* for cygwin - remove unnecessary includes */
+#define _OLE_H
+#define _OLE2_H
 #include <windows.h>
 #include <stdlib.h>
 #include <stdio.h>
