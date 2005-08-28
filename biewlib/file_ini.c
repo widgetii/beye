@@ -127,7 +127,7 @@ static const char * list[] = {
  "Bad variable in 'set' or 'delete' statement.",
  "Bad value of variable in 'set' statement.",
  "Unrecognized name of variable in 'delete' statement.",
- "Undefined variable detected (case sensivity?).",
+ "Undefined variable detected (case sensitivity?).",
  "Missing 'if' for 'elif' statement.",
  "Open variable on line (use even number of '%' characters).",
  "Lost or mismatch character '=' in assigned expression.",

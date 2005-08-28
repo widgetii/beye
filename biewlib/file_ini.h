@@ -41,7 +41,7 @@
 #define __FI_BADVAR       -11 /**< Bad variable in 'set' or 'delete' statement */
 #define __FI_BADVAL       -12 /**< Bad value of variable in 'set' statement */
 #define __FI_NOVAR        -13 /**< Unrecognized name of variable in 'delete' statement */
-#define __FI_NODEFVAR     -14 /**< Detected undefined variable (case sensivity?) */
+#define __FI_NODEFVAR     -14 /**< Detected undefined variable (case sensitivity?) */
 #define __FI_ELIFSTAT     -15 /**< Missing 'if' for 'elif' statement */
 #define __FI_OPENVAR      -16 /**< Opened variable on line (use even number of '%' characters) */
 #define __FI_NOTEQU       -17 /**< Lost or mismatch character '=' in assigned expression */
