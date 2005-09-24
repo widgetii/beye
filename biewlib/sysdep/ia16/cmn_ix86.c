@@ -318,6 +318,16 @@ void __FillCPUInfo(char *buff,unsigned cbBuff,void (*percent_callback)(int))
                  }
                  break;
           case 7:
+                 __eax = 1;
+                 __edx = __cpuid_edx(&__eax);
+                 __ecx = 1;
+                 __ebx = __cpuid_ebxecx(&__ecx);
+                 if(__edx & BIT_NO(30)) // Itanium
+                 {
+                    strcpy(cpu_name,"Itanium");
+                    cpu_suffix = "";
+                    break;
+                 }
                  switch(model)
                  {
                     default:
@@ -334,7 +344,6 @@ void __FillCPUInfo(char *buff,unsigned cbBuff,void (*percent_callback)(int))
                  divisor = 3; /* 3 instructions per CPU clock */
                  break;
           case 0xF:
-//          case 0x10:
             {
               int msb;
               family += extfamily;
@@ -345,6 +354,12 @@ void __FillCPUInfo(char *buff,unsigned cbBuff,void (*percent_callback)(int))
               __ebx = __cpuid_ebxecx(&__ecx);
               brand_id = __ebx & 0x000000FFUL;
               msb = brand_id >> 3;
+              if(__edx & BIT_NO(30)) // Itanium
+              {
+                 strcpy(cpu_name,"Itanium");
+                 cpu_suffix = "";
+                 break;
+              }
               if(__edx & BIT_NO(28)) // HTT
               {
                  __ecx = 0x80000001;
@@ -371,7 +386,7 @@ void __FillCPUInfo(char *buff,unsigned cbBuff,void (*percent_callback)(int))
               }
               switch(brand_id)
               { 
-                 case 0:  cpu_suffix = "(Engineering sample)"; break;
+                 case 0:  "(Engineering sample)"; break;
                  case 4:
                    switch(model)
                    {
@@ -677,7 +692,7 @@ void __FillCPUInfo(char *buff,unsigned cbBuff,void (*percent_callback)(int))
 "           [%c] - Debug Trace    [%c] - ACPI           [%c] - Intel MMX\n"
 "           [%c] - FXSAVE/FXRSTOR [%c] - SSE            [%c] - SSE2\n"
 "           [%c] - Self Snoop     [%c] - Hyper-Thread   [%c] - Therm.Monitor\n"
-"           [%c] - reserved       [%c] - Pend. Brk. En\n"
+"           [%c] - IA-64 Itanium  [%c] - Pend. Brk. En\n"
 "           [%c] - SSE3           [%c] - MONITOR/MWAIT  [%c] - DS-CPL\n"
 "           [%c] - EST            [%c] - Therm.Monitor2 [%c] - CNXT-ID\n"
 "           [%c] - CMPXCHG16B     [%c] - xTPR\n"
@@ -716,7 +731,7 @@ void __FillCPUInfo(char *buff,unsigned cbBuff,void (*percent_callback)(int))
             ,__edx & BIT_NO(27) ? 'x' : ' '
             ,__edx & BIT_NO(28) ? 'x' : ' '
             ,__edx & BIT_NO(29) ? 'x' : ' '
-            ,__edx & BIT_NO(30) ? 'x' : ' '
+            ,__edx & BIT_NO(30) ? 'x' : ' ' // see Intel document No:245319-004 p.3:430
             ,__edx & BIT_NO(31) ? 'x' : ' '
             ,__ecx & BIT_NO( 0) ? 'x' : ' '
             ,__ecx & BIT_NO( 3) ? 'x' : ' '
