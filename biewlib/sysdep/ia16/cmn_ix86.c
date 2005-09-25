@@ -164,6 +164,20 @@ void __FillCPUInfo(char *buff,unsigned cbBuff,void (*percent_callback)(int))
      */
     if(is_intel)
     {
+       if(family > 5)
+       {
+          __eax = 1;
+          __edx = __cpuid_edx(&__eax);
+          __ecx = 1;
+          __ebx = __cpuid_ebxecx(&__ecx);
+          if(__edx & BIT_NO(30)) // Itanium
+          {
+             strcpy(cpu_name,"Itanium");
+             cpu_suffix = "";
+             break;
+          }
+       }
+
        switch(family)
        {
          case 4:
@@ -318,16 +332,6 @@ void __FillCPUInfo(char *buff,unsigned cbBuff,void (*percent_callback)(int))
                  }
                  break;
           case 7:
-                 __eax = 1;
-                 __edx = __cpuid_edx(&__eax);
-                 __ecx = 1;
-                 __ebx = __cpuid_ebxecx(&__ecx);
-                 if(__edx & BIT_NO(30)) // Itanium
-                 {
-                    strcpy(cpu_name,"Itanium");
-                    cpu_suffix = "";
-                    break;
-                 }
                  switch(model)
                  {
                     default:
@@ -354,12 +358,6 @@ void __FillCPUInfo(char *buff,unsigned cbBuff,void (*percent_callback)(int))
               __ebx = __cpuid_ebxecx(&__ecx);
               brand_id = __ebx & 0x000000FFUL;
               msb = brand_id >> 3;
-              if(__edx & BIT_NO(30)) // Itanium
-              {
-                 strcpy(cpu_name,"Itanium");
-                 cpu_suffix = "";
-                 break;
-              }
               if(__edx & BIT_NO(28)) // HTT
               {
                  __ecx = 0x80000001;
