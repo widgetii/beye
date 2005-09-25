@@ -164,20 +164,6 @@ void __FillCPUInfo(char *buff,unsigned cbBuff,void (*percent_callback)(int))
      */
     if(is_intel)
     {
-       if(family > 5)
-       {
-          __eax = 1;
-          __edx = __cpuid_edx(&__eax);
-          __ecx = 1;
-          __ebx = __cpuid_ebxecx(&__ecx);
-          if(__edx & BIT_NO(30)) // Itanium
-          {
-             strcpy(cpu_name,"Itanium");
-             cpu_suffix = "";
-             break;
-          }
-       }
-
        switch(family)
        {
          case 4:
@@ -291,6 +277,18 @@ void __FillCPUInfo(char *buff,unsigned cbBuff,void (*percent_callback)(int))
           divisor = 3; /** @todo Correct Pentium4 instructions per clock count */
         }
         default: break;
+       }
+       if(family > 5)
+       {
+          __eax = 1;
+          __edx = __cpuid_edx(&__eax);
+          __ecx = 1;
+          __ebx = __cpuid_ebxecx(&__ecx);
+          if(__edx & BIT_NO(30)) // Itanium
+          {
+             strcpy(cpu_name,"IA-64");
+             cpu_suffix = "(Itanium)";
+          }
        }
     }
     if(is_amd)
