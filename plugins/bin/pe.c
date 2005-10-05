@@ -128,30 +128,51 @@ static __filesize_t __NEAR__ __FASTCALL__ fioReadDWord2Phys(BGLOBAL handle,__fil
 
 static const char * __NEAR__ __FASTCALL__ PECPUType(void)
 {
-    static const char * __pecputype[] =
-    {
-     "80386",
-     "80486",
-     "80586",
-     "80686",
-     "80787",
-     "80887",
-     "80987",
-     "801087"
+    static const struct {
+       int code;
+       char *name;
+    } pe_cpu[] = {
+       {0x014C, "Intel 80386"},
+//       {0x014D, "Intel 80486"},
+//       {0x014E, "Intel 80586"},
+//       {0x014F, "Intel 80686"},
+//       {0x0150, "Intel 80786"},
+       {0x0162, "MIPS R3000"},
+       {0x0166, "MIPS R4000"},
+       {0x0168, "MIPS R10000"},
+       {0x0169, "MIPS WCE v2"},
+       {0x0184, "DEC Alpha"},
+       {0x01A2, "SH3"},
+       {0x01A3, "SH3DSP"},
+       {0x01A4, "SH3E"},
+       {0x01A6, "SH4"},
+       {0x01A8, "SH5"},
+       {0x01C0, "ARM"},
+       {0x01C2, "ARM Thumb"},
+       {0x01D3, "AM33"},
+       {0x01F0, "IBM PowerPC"},
+       {0x01F1, "IBM PowerPC FP"},
+       {0x0200, "Intel IA-64"},
+       {0x0266, "MIPS16"},
+       {0x0284, "DEC Alpha 64"},
+       {0x0366, "MIPSFPU"},
+       {0x0466, "MIPSFPU16"},
+       {0x0520, "Tricore"},
+       {0x0CEF, "CEF"},
+       {0x0EBC, "EFI Byte Code"},
+       {0x8664, "AMD64"},
+       {0x9041, "M32R"},
+       {0xC0EE, "CEE"},
+       {0x0000, "Unknown"},
     };
-    const char * cptr;
+    int i;
 
-    if (pe.peCPUType >= 0x014C && pe.peCPUType < 0x0150)
-        cptr = __pecputype[(pe.peCPUType - 0x014C) & 0x0007];
-    else if (pe.peCPUType == 0x0162)
-        cptr = "__MIPS Mark I (R2000, R3000)";
-    else if (pe.peCPUType == 0x0163)
-        cptr = "__MIPS Mark II (R6000)";
-    else if (pe.peCPUType == 0x0166)
-        cptr = "__MIPS Mark III (R4000)";
-    else cptr = __pecputype[0];
+    for(i=0; i<(sizeof(pe_cpu)/sizeof(pe_cpu[0])); i++) {
+       if(pe.peCPUType == pe_cpu[i].code)
+          return pe_cpu[i].name;
+    }
 
-    return cptr;
+    return "Unknown";
 }
 
 static __filesize_t entryPE = 0L;
