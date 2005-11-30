@@ -633,7 +633,7 @@ void __FillCPUInfo(char *buff,unsigned cbBuff,void (*percent_callback)(int))
           case 5:
              switch(model)
              {
-                case 0: cpu_suffix = "(55x)"; break;
+                case 0: cpu_suffix = "(SiS55x/Vortex86)"; break;
                 default: break;
              }
              break;
