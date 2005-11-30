@@ -234,61 +234,72 @@ void __FillCPUInfo(char *buff,unsigned cbBuff,void (*percent_callback)(int))
                          break;
             }
           }
+          break;
+        case 7:
+           strcpy(cpu_name,"IA-64");
+           cpu_suffix = "(Itanium Merced)";
+           divisor = 3; /** @todo Correct Itanium instructions per clock count */
+           break;
         case 0xF:
         {
-          static char p4_name[128];
-
-          cpu_suffix = p4_name;
-          family += extfamily;
-          model |= extmodel << 4;
-          __eax = 1;
-          __edx = __cpuid_edx(&__eax);
-          __ecx = 1;
-          __ebx = __cpuid_ebxecx(&__ecx);
-          brand_id = __ebx & 0x000000FFUL;
-          if(__edx & BIT_NO(28)) // HTT
+          // see http://www.sandpile.org/ia32/cpuid.htm
+          if(extfamily == 0x01)
           {
-             logical_cpus = ((__ebx & 0x00FF0000UL) >> 16) + 1;
+            strcpy(cpu_name,"IA-64");
+            switch(model)
+            {
+                case 0: cpu_suffix = "(Itanium2 McKinley)"; break;
+                case 1: cpu_suffix = "(Itanium2 Madison/Deerfield)"; break;
+                case 2: cpu_suffix = "(Itanium2 Madison 9M)"; break;
+                default: cpu_suffix = "(Itanium2)"; break;
+            }
+            divisor = 3; /** @todo Correct Itanium2 instructions per clock count */
           }
-          if(__highest_cpuid > 4)
+          else
           {
-             __eax = 4;
-             __cpuid_edx(&__eax);
-             physical_cpus = (__eax >> 26) + 1;
+            static char p4_name[128];
+           
+            cpu_suffix = p4_name;
+            family += extfamily;
+            model |= extmodel << 4;
+            __eax = 1;
+            __edx = __cpuid_edx(&__eax);
+            __ecx = 1;
+            __ebx = __cpuid_ebxecx(&__ecx);
+            brand_id = __ebx & 0x000000FFUL;
+            if(__edx & BIT_NO(28)) // HTT
+            {
+               logical_cpus = ((__ebx & 0x00FF0000UL) >> 16) + 1;
+            }
+            if(__highest_cpuid > 4)
+            {
+               __eax = 4;
+               __cpuid_edx(&__eax);
+               physical_cpus = (__eax >> 26) + 1;
+            }
+            switch(brand_id)
+            {
+                  case 9: strcpy(p4_name, "(P4 EE"); break;
+                  case 10: strcpy(p4_name, "(Cel"); break;
+                  case 12: strcpy(p4_name, "(Xeon MP"); break;
+                  case 14: strcpy(p4_name, model == 2? "(P4 M" : "(Xeon"); break;
+                  case 15: strcpy(p4_name, "(Cel M"); break;
+                  default: strcpy(p4_name, "(P4"); break;
+            }
+            switch(model)
+            {
+                  case 0:
+                  case 1: strcat(p4_name, " Foster/Willamette)"); break;
+                  case 2: strcat(p4_name, " Gallatin/Prestonia/Northwood)"); break;
+                  case 3: strcat(p4_name, " Prescott/Nocona)"); break;
+                  case 4: strcat(p4_name, " Prescott/Nocona/Potomac/SmithField)"); break;
+                  default: strcat(p4_name, ")"); break;
+            }
+            divisor = 3; /** @todo Correct Pentium4 instructions per clock count */
           }
-          switch(brand_id)
-          {
-                case 9: strcpy(p4_name, "(P4 EE"); break;
-                case 10: strcpy(p4_name, "(Cel"); break;
-                case 12: strcpy(p4_name, "(Xeon MP"); break;
-                case 14: strcpy(p4_name, model == 2? "(P4 M" : "(Xeon"); break;
-                case 15: strcpy(p4_name, "(Cel M"); break;
-                default: strcpy(p4_name, "(P4"); break;
-          }
-          switch(model)
-          {
-                case 0:
-                case 1: strcat(p4_name, " Foster/Willamette)"); break;
-                case 2: strcat(p4_name, " Gallatin/Prestonia/Northwood)"); break;
-                case 3: strcat(p4_name, " Prescott/Nocona)"); break;
-                case 4: strcat(p4_name, " Prescott/Nocona/Potomac/SmithField)"); break;
-                default: strcat(p4_name, ")"); break;
-          }
-          divisor = 3; /** @todo Correct Pentium4 instructions per clock count */
         }
+        break;
         default: break;
-       }
-       if(family > 5)
-       {
-          __eax = 1;
-          __edx = __cpuid_edx(&__eax);
-          __ecx = 1;
-          __ebx = __cpuid_ebxecx(&__ecx);
-          if(__edx & BIT_NO(30)) // Itanium
-          {
-             strcpy(cpu_name,"IA-64");
-             cpu_suffix = "(Itanium)";
-          }
        }
     }
     if(is_amd)
