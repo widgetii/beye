@@ -22,10 +22,6 @@ include ./config.mak
 CFLAGS = $(CDEFOS) $(CDEFSYS) $(HOST_CFLAGS)
 LDFLAGS = $(OSLDEF) $(HOST_LDFLAGS)
 
-ifeq ($(findstring qnx,$(HOST)),qnx)
-include ./make_qnx.inc
-endif
-
 ###########################################################################
 # TARGET: put name of executable image here                               #
 ###########################################################################
@@ -112,16 +108,10 @@ biewlib/sysdep/$(MACHINE)/$(HOST)/os_dep.o\
 biewlib/sysdep/$(MACHINE)/$(HOST)/timer.o\
 biewlib/sysdep/$(MACHINE)/$(HOST)/vio.o
 
-ifeq ($(TARGET_OS),qnx4)
- ifeq ($(COMPILER),watcomc)
-OBJS += \
-biewlib/sysdep/$(MACHINE)/$(HOST)/cpu_info.o
- endif
- ifeq ($(COMPILER),gcc)
+ifeq ($(HOST),qnx)
 OBJS += \
 biewlib/sysdep/$(MACHINE)/$(HOST)/3rto3s.o\
 biewlib/sysdep/$(MACHINE)/$(HOST)/3sto3r.o
- endif
 endif
 
 all: $(BIEWLIB) $(TARGET)
@@ -226,7 +216,7 @@ biewlib/sysdep/$(MACHINE)/$(HOST)/os_dep.o:   biewlib/sysdep/$(MACHINE)/$(HOST)/
 biewlib/sysdep/$(MACHINE)/$(HOST)/timer.o:    biewlib/sysdep/$(MACHINE)/$(HOST)/timer.c
 biewlib/sysdep/$(MACHINE)/$(HOST)/vio.o:      biewlib/sysdep/$(MACHINE)/$(HOST)/vio.c
 
-ifeq ($(findstring qnx,$(TARGET_OS)),qnx)
+ifeq ($(HOST),qnx)
 biewlib/sysdep/ia32/qnx/cpu_info.o:           biewlib/sysdep/ia32/qnx/cpu_info.asm
 	cc -c $< -o $@
 biewlib/sysdep/ia32/qnx/3rto3s.o:             biewlib/sysdep/ia32/qnx/3rto3s.asm

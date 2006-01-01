@@ -74,7 +74,7 @@ extern void __FASTCALL__ memlwr(void *buffer,unsigned cb_buffer);
                     **/
 extern char *        ltoa(long _value, char *_s, int _radix);
 #endif
-#if defined( DJGPP ) || (defined( __GNUC__ ) && defined(__WIN32__))
+#if defined( DJGPP ) || (defined( __GNUC__ ) && defined(__WIN32__)) || defined(__QNX4__)
 #ifdef atoll
 #undef atoll
 #endif

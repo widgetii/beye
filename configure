@@ -1,7 +1,7 @@
 #!/bin/sh
 # Configure script for biew project
 #
-
+#set -x
 # Declare useful functions
 
 # Prefer these macros to full length text !
@@ -177,11 +177,6 @@ for I in "$TMPDIR" "$TEMPDIR" "/tmp" ; do
   test "$I" && break
 done
 
-# Checking for INSTALL
-_install="install"
-$_install --version 1>/dev/null 2>/dev/null || _install=""
-
-
 TMPLOG="config.log"
 $_rm -f "$TMPLOG"
 TMPC="$I/biew-conf-$RANDOM-$$.c"
@@ -194,14 +189,52 @@ echocheck "target OS"
 if test "$_target_system" = auto ; then
   if test -z "$system_name" ; then
     # OS name
-    system_name=`/bin/sh --version 2>&1 | sed -n 's/^.*\([(]\)./\1/p'`
+    system_name=`uname -s`
     case "$system_name" in
 	*linux*)
 	    _target_system=linux
 	    ;;
-	*qnx*)
-	    _target_system=qnx
+	*QNX*)
+	    echo `uname -v` | grep ^42
+	    if test $? -eq 0
+	    then
+	        _target_system=qnx
+	        host_arch=ia32
+	        _install=cp
+	    else
+	        _target_system=qnxnto
+	        _install=cp
+	    fi
 	    ;;
+	*[cC][yY][gG][wW][iI][nN]*)
+	    _target_system=win32
+	    ;;
+	*[eE][mM][xX]*)
+	    _target_system=os2
+	    ;;
+	*msdosdjgpp*)
+	    _target_system=dos
+	    host_arch=ia32
+	    _tee=
+	    ;;
+#	|FreeBSD|NetBSD|BSD/OS|OpenBSD|SunOS|BeOS)
+#	*)
+#	    _target_system=unix
+#	    ;;
+    esac
+  else
+    _target_system=auto
+  fi
+fi
+
+if test "$_target_system" = auto ; then
+  if test -z "$system_name" ; then
+    # OS name
+    system_name=`/bin/sh --version 2>&1 | sed -n 's/^.*\([(]\)./\1/p'`
+    case "$system_name" in
+	*linux*)
+            _target_system=linux
+            ;;
 	*[cC][yY][gG][wW][iI][nN]*)
 	    _target_system=win32
 	    ;;
@@ -217,7 +250,7 @@ if test "$_target_system" = auto ; then
 	*)
 	    _target_system=unix
 	    ;;
-  esac
+    esac
   else
     _target_system=unix
   fi
@@ -357,6 +390,15 @@ case "$_target_system" in
     beos)
 	_cdefos="-D__BEOS__ -D__UNIX__ -D__OS_NAME__='\"BeOS\"' -D__OS__=\"beos\" -Ubeos -D_VT100_ -DHAVE_TERMINAL_OUT=1 -DDATADIR='\"/boot/home/config/lib\"' -D__DISABLE_MMF -D__DISABLE_ASM -D__DISABLE_SIGIO -DPREFIX=\"$_prefix\" $_cdefos"
 	;;
+    qnx)
+	_cdefos="-D__QNX4__ -D__UNIX__ -D__OS_NAME__='\"QNX4\"' -D__OS__=\"qnx\" -U__QNX__ -D_VT100_ -DHAVE_TERMINAL_OUT=1 -D__DISABLE_MMF -DPREFIX=\"$_prefix\" $_cdefos"
+	_oslibs="-ltermlib -lunix -lphoton3r.lib $_oslibs"
+
+	;;
+    qnxnto)
+	_cdefos="-D__QNX6__ -D__UNIX__ -D__OS_NAME__='\"QNX6\"' -D__OS__=\"qnxnto\" -U__QNX__ -U__NTO__ -D_VT100_ -DHAVE_TERMINAL_OUT=1 -D__DISABLE_MMF -DPREFIX=\"$_prefix\" $_cdefos"
+	_oslibs="-lncurses $_oslibs"
+	;;
     linux)
 	_cdefos="-D__LINUX__ -D__UNIX__ -D__OS_NAME__='\"Linux\"' -D__OS__=\"linux\" -Ulinux -D_VT100_ -DHAVE_TERMINAL_OUT=1 -DPREFIX=\"$_prefix\" $_cdefos"
 echocheck "gpm.h"
@@ -445,6 +487,13 @@ case "$host_arch" in
     echo "using $host_arch architecture"
     ;;
 esac
+
+# Checking for INSTALL
+if test -z $_install
+then 
+    _install="install"
+    $_install --version 1>/dev/null 2>/dev/null || _install=""
+fi
 
 #Force including of our .h files before standard
 _cdefos="-I. $_cdefos"
