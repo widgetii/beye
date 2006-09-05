@@ -574,8 +574,9 @@ static void __NEAR__ __FASTCALL__ PaintLine(unsigned i,const char *name,
                                             tBool useAcc,tBool is_hl)
 {
   size_t namelen;
-  char buffer[__TVIO_MAXSCREENWIDTH];
+  char buffer[__TVIO_MAXSCREENWIDTH + 1];
   memset(buffer,TWC_DEF_FILLER,sizeof(buffer));
+  buffer[__TVIO_MAXSCREENWIDTH] = 0; /* [dBorca] play it safe for strchr below */
   namelen = name?strlen(name):0;
   if(isOrdinal)
   {

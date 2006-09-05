@@ -809,7 +809,7 @@ static unsigned __NEAR__ __FASTCALL__ Tab2Space(tvioBuff * dest,unsigned int ale
 	{
 	    ctx_color = hlFindKwd(&str[i],(Color)defcol,&st_len);
 	    in_kwd=st_len?1:0;
-	    if(is_legal_word_char(str[i+st_len])||is_legal_word_char(str[i-1])) in_kwd=0;
+	    if(is_legal_word_char(str[i+st_len])||(i && is_legal_word_char(str[i-1]))) in_kwd=0;
 	    if(in_kwd) end_kwd=i+st_len;
 	    else       end_kwd=strspn(&str[i],wset);
 	}

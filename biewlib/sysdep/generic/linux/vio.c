@@ -242,7 +242,7 @@ void __FASTCALL__ __vioWriteBuff(tAbsCoord x, tAbsCoord y, const tvioBuff *buff,
 	    
 	    if (!c) c = ' '; else if (!printable(c)) c = '.';
 
-	    if ((ca != buff->attrs[i - 1] && i) || i == len || !i)
+	    if (!i || (ca != buff->attrs[i - 1])) /* [dBorca] short-circuit */
 	    {
 		unsigned char *ptr;
 		ptr = _2ansi(ca);

@@ -98,11 +98,11 @@ typedef tBool      (__FASTCALL__ *FiUserFunc)(IniInfo * info);
 *                                 FiStringProcessor    *
 \******************************************************/
 
-extern  int    __FASTCALL__ (*FiError)(int nError,int row); /**< Default error handler */
-extern  void   __FASTCALL__ (*FiFileProcessor)(const char *fname); /**< Default file processor */
-extern  tBool  __FASTCALL__ (*FiStringProcessor)(char * curr_str); /**< Default string processor */
-extern  tBool  __FASTCALL__ (*FiCommandProcessor)(const char * cmd); /**< Default command processor */
-extern  tBool  __FASTCALL__ (*FiGetCondition)(const char * cond);    /**< Default processor of conditions */
+extern  int    (__FASTCALL__ *FiError)(int nError,int row); /**< Default error handler */
+extern  void   (__FASTCALL__ *FiFileProcessor)(const char *fname); /**< Default file processor */
+extern  tBool  (__FASTCALL__ *FiStringProcessor)(char * curr_str); /**< Default string processor */
+extern  tBool  (__FASTCALL__ *FiCommandProcessor)(const char * cmd); /**< Default command processor */
+extern  tBool  (__FASTCALL__ *FiGetCondition)(const char * cond);    /**< Default processor of conditions */
 
 #define FI_MAXSTRLEN 255 /**< Specifies maximal length of string, that can be readed from ini file */
 

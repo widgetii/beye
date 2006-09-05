@@ -39,7 +39,7 @@
 #define DISASM_DEFAULT          -1  /**< indicates unspecified disassembler: format default */
 
 
-typedef tBool __FASTCALL__ (*DisasmAction)( void );
+typedef tBool (__FASTCALL__ *DisasmAction)( void );
 typedef unsigned char * MBuffer;
 
 /*
@@ -94,10 +94,10 @@ extern unsigned dis_severity; /**< severity of disassembler commentaries */
 #define __INSNT_JMPVVT  0x00000003L /**< Jump via virtual table */
 #define __INSNT_JMPPIC  0x00000004L /**< Jump via PIC. Like: .i386: jmp name@GOT(ebx) */
 
-typedef DisasmRet __FASTCALL__ (*DisasmFunc)(__filesize_t shift,
+typedef DisasmRet (__FASTCALL__ *DisasmFunc)(__filesize_t shift,
                                              MBuffer insn_buff,
                                              unsigned flags);
-typedef AsmRet    __FASTCALL__ (*AsmFunc)(const char *str);
+typedef AsmRet    (__FASTCALL__ *AsmFunc)(const char *str);
 
 typedef struct tag_REGISTRY_DISASM
 {
@@ -106,16 +106,16 @@ typedef struct tag_REGISTRY_DISASM
   DisasmAction action[5];    /**< actions on Ctrl-(F1,F3-F5,F10) */
   DisasmFunc   disasm;       /**< main function of disasm */
   AsmFunc      asm_f;        /**< assembler (vice versa of disasm) */
-  void         __FASTCALL__ (*ShowShortHelp)(void); /**< displays short help */
-  int          __FASTCALL__ (*max_insn_len)(void); /**< Max length of 1 disasm instruction */
-  ColorAttr    __FASTCALL__ (*GetInsnColor)(unsigned long clone); /**< returns color of instruction */
-  ColorAttr    __FASTCALL__ (*GetOpcodeColor)(unsigned long clone); /**< returns color of instruction */
-  int          __FASTCALL__ (*GetDefBitness)(void);               /**< returns currently ised bitness */
-  char         __FASTCALL__ (*CloneShortName)(unsigned long clone); /**< returns short clone name of instruction */
-  void         __FASTCALL__ (*init)(void);     /**< initializing of plugin */
-  void         __FASTCALL__ (*term)(void);     /**< terminating of plugin */
-  void         __FASTCALL__ (*read_ini)(hIniProfile *);  /**< reads settings of plugin from .ini file */
-  void         __FASTCALL__ (*save_ini)(hIniProfile *);  /**< stores settings of plugin into .ini file */
+  void         (__FASTCALL__ *ShowShortHelp)(void); /**< displays short help */
+  int          (__FASTCALL__ *max_insn_len)(void); /**< Max length of 1 disasm instruction */
+  ColorAttr    (__FASTCALL__ *GetInsnColor)(unsigned long clone); /**< returns color of instruction */
+  ColorAttr    (__FASTCALL__ *GetOpcodeColor)(unsigned long clone); /**< returns color of instruction */
+  int          (__FASTCALL__ *GetDefBitness)(void);               /**< returns currently ised bitness */
+  char         (__FASTCALL__ *CloneShortName)(unsigned long clone); /**< returns short clone name of instruction */
+  void         (__FASTCALL__ *init)(void);     /**< initializing of plugin */
+  void         (__FASTCALL__ *term)(void);     /**< terminating of plugin */
+  void         (__FASTCALL__ *read_ini)(hIniProfile *);  /**< reads settings of plugin from .ini file */
+  void         (__FASTCALL__ *save_ini)(hIniProfile *);  /**< stores settings of plugin into .ini file */
 }REGISTRY_DISASM;
 
 extern REGISTRY_DISASM *activeDisasm; /**< currently selected active disassembler */

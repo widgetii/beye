@@ -30,8 +30,8 @@
 #define extern "C" {
 #endif
 
-typedef __filesize_t  __FASTCALL__ (*BinFunc)( void );
-typedef tBool         __FASTCALL__ (*ModFunc)( void );
+typedef __filesize_t  (__FASTCALL__ *BinFunc)( void );
+typedef tBool         (__FASTCALL__ *ModFunc)( void );
 
 #define APREF_NORMAL      0x0000 /**< Append references in short form if it really present in binary */
 #define APREF_USE_TYPE    0x0001 /**< Append references in detail form if it really present in binary */
@@ -48,7 +48,7 @@ typedef tBool         __FASTCALL__ (*ModFunc)( void );
    * @param r_shift      used only if APPREF_TRY_LABEL mode is set, contains real value of field, that required binding
    * @return             one of RAPREF_* constants (see biewutil.h file for detail)
 */
-typedef unsigned long __FASTCALL__ (*AppRefs)(char *str,__filesize_t shift,int flags,int codelen,__filesize_t r_shift);
+typedef unsigned long (__FASTCALL__ *AppRefs)(char *str,__filesize_t shift,int flags,int codelen,__filesize_t r_shift);
 
 /***************************************************************\
 *  This form registry binary file formats                       *
@@ -96,9 +96,9 @@ typedef struct tag_REGISTRY_BIN
   const char * name;                            /**< name of binary format */
   const char * prompt[10];                      /**< on ALT-Fx selection */
   BinFunc   action[10];                         /**< action on ALT-Fx selection */
-  tBool   __FASTCALL__ (*check_format)( void ); /**< Checks format */
-  void    __FASTCALL__ (*init)( void );         /**< Inits plugin (if check o'k) (constructor) */
-  void    __FASTCALL__ (*destroy)( void );      /**< Destroys plugin (destructor) */
+  tBool   (__FASTCALL__ *check_format)( void ); /**< Checks format */
+  void    (__FASTCALL__ *init)( void );         /**< Inits plugin (if check o'k) (constructor) */
+  void    (__FASTCALL__ *destroy)( void );      /**< Destroys plugin (destructor) */
   BinFunc   showHdr;                            /**< if not an MZ style format */
   AppRefs   bind;                               /**< for show references */
 
@@ -107,7 +107,7 @@ typedef struct tag_REGISTRY_BIN
                            * @note             Plugin must support counter of
                            *                   states. (For multiple call purpose)
                           **/
-  void    __FASTCALL__ (*set_state)(int state);
+  void    (__FASTCALL__ *set_state)(int state);
 
                          /** Returns CPU platform, that required by format.
                            * @note           Full list of platform please see in
@@ -115,27 +115,27 @@ typedef struct tag_REGISTRY_BIN
                            *                 function return -1 then platform is
                            *                 undefined.
                           **/
-  int     __FASTCALL__ (*query_platform)( void );
+  int     (__FASTCALL__ *query_platform)( void );
 
                          /** Returns DAB_XXX. Quick version for disassembler */
-  int     __FASTCALL__ (*query_bitness)(__filesize_t);
+  int     (__FASTCALL__ *query_bitness)(__filesize_t);
 
                          /** For displaying offset within struct in left address column.
                            * @return         False if string is not modified.
                           **/
-  tBool   __FASTCALL__ (*AddressResolving)(char *,__filesize_t);
+  tBool   (__FASTCALL__ *AddressResolving)(char *,__filesize_t);
 
                          /** Converts virtual address to physical (means file offset).
                            * @param va       indicates virtual address to be converted
                            * @return         0 if operation meaningless
                           **/
- __filesize_t __FASTCALL__ (*va2pa)(__filesize_t va);
+ __filesize_t (__FASTCALL__ *va2pa)(__filesize_t va);
 
                          /** Converts physical address to virtual.
                            * @param pa       indicates physical address to be converted
                            * @note           seg pointer can be NULL
                           **/
-  __filesize_t __FASTCALL__ (*pa2va)(__filesize_t pa);
+  __filesize_t (__FASTCALL__ *pa2va)(__filesize_t pa);
 
 
 /*-- Below placed functions for 'put structures' method of save as dialog --*/
@@ -151,7 +151,7 @@ typedef struct tag_REGISTRY_BIN
                            *                  physical address of public symbol
                            *                  which is found in given direction
                           **/
-  __filesize_t __FASTCALL__ (*GetPubSym)(char *str,unsigned cb_str,unsigned *_class,
+  __filesize_t (__FASTCALL__ *GetPubSym)(char *str,unsigned cb_str,unsigned *_class,
                              __filesize_t pa,tBool as_prev);
 
                          /** Determines attributes of object at given physical file address.
@@ -172,7 +172,7 @@ typedef struct tag_REGISTRY_BIN
                            *                  = 0, end = begin of first data or
                            *                  code object).
                           **/
-  unsigned    __FASTCALL__ (*GetObjAttr)(__filesize_t pa,char *name,unsigned cb_name,
+  unsigned    (__FASTCALL__ *GetObjAttr)(__filesize_t pa,char *name,unsigned cb_name,
                               __filesize_t *start,__filesize_t *end,int *_class,int *bitness);
 
                          /** Prepares internal buffers for work file structures.
@@ -182,9 +182,9 @@ typedef struct tag_REGISTRY_BIN
                            *                  is occured (sample: out of memory)
                            * @note            It is called before GetPubSym and GetObjAttr
                           **/
-  tBool         __FASTCALL__ (*prepare_structs)(__filesize_t start,__filesize_t end);
+  tBool         (__FASTCALL__ *prepare_structs)(__filesize_t start,__filesize_t end);
                          /** Cleans internal buffers after stopping of structural disassembler */
-  void          __FASTCALL__ (*drop_structs)( void );
+  void          (__FASTCALL__ *drop_structs)( void );
 }REGISTRY_BIN;
 
 extern REGISTRY_BIN *detectedFormat;
@@ -205,7 +205,7 @@ typedef struct tag_REGISTRY_MODE
   const char *  name;
   const char *  prompt[10];                   /**< on Ctrl-Fx selection */
   ModFunc       action[10];                   /**< action on Ctrl-Fx selection */
-  tBool         __FASTCALL__ (*detect)(void); /**< detects possibility to assign this mode as default mode for openned file. */
+  tBool         (__FASTCALL__ *detect)(void); /**< detects possibility to assign this mode as default mode for openned file. */
   unsigned       flags;                       /**< see __MF_* constants */
 
                          /** Paints the file on the screen.
@@ -213,7 +213,7 @@ typedef struct tag_REGISTRY_MODE
                            * @param textshift indicates shift of text. Useful only for text mode.
                            * return           new shift of text
                           **/
-  unsigned      __FASTCALL__ (*paint)(unsigned keycode,unsigned textshift);
+  unsigned      (__FASTCALL__ *paint)(unsigned keycode,unsigned textshift);
 
                          /** Converts buffer with using selected NLS as xlat table.
                            * @param str       string to be converted
@@ -222,20 +222,20 @@ typedef struct tag_REGISTRY_MODE
                                               system but not screen.
                            * @return          new size of blocks after conversation
                           **/
-  unsigned      __FASTCALL__ (*convert_cp)(char *str,unsigned len, tBool use_fs_nls);
+  unsigned      (__FASTCALL__ *convert_cp)(char *str,unsigned len, tBool use_fs_nls);
 
-  unsigned      __FASTCALL__ (*get_symbol_size)( void ); /**< Returns symbol size in bytes for selected NLS codepage */
-  const char *  __FASTCALL__ (*misckey_name)( void );    /**< F4 key name */
-  void          __FASTCALL__ (*misc_action)( void );     /**< F4 action */
-  unsigned long __FASTCALL__ (*PrevPageSize)(void);      /**< Get previous page size */
-  unsigned long __FASTCALL__ (*CurPageSize)(void);       /**< Get current page size */
-  unsigned long __FASTCALL__ (*PrevLineWidth)( void );   /**< Get previous line width */
-  unsigned long __FASTCALL__ (*CurLineWidth)( void );    /**< Get current line width */
-  void          __FASTCALL__ (*help)( void );            /**< display help about mode */
-  void          __FASTCALL__ (*read_ini)( hIniProfile * );  /**< reads biew.ini file if need */
-  void          __FASTCALL__ (*save_ini)( hIniProfile * );  /**< writes to biew.ini if need */
-  void          __FASTCALL__ (*init)( void );            /**< initialize mode (constructor) */
-  void          __FASTCALL__ (*term)( void );            /**< destroy mode (destructor) */
+  unsigned      (__FASTCALL__ *get_symbol_size)( void ); /**< Returns symbol size in bytes for selected NLS codepage */
+  const char *  (__FASTCALL__ *misckey_name)( void );    /**< F4 key name */
+  void          (__FASTCALL__ *misc_action)( void );     /**< F4 action */
+  unsigned long (__FASTCALL__ *PrevPageSize)(void);      /**< Get previous page size */
+  unsigned long (__FASTCALL__ *CurPageSize)(void);       /**< Get current page size */
+  unsigned long (__FASTCALL__ *PrevLineWidth)( void );   /**< Get previous line width */
+  unsigned long (__FASTCALL__ *CurLineWidth)( void );    /**< Get current line width */
+  void          (__FASTCALL__ *help)( void );            /**< display help about mode */
+  void          (__FASTCALL__ *read_ini)( hIniProfile * );  /**< reads biew.ini file if need */
+  void          (__FASTCALL__ *save_ini)( hIniProfile * );  /**< writes to biew.ini if need */
+  void          (__FASTCALL__ *init)( void );            /**< initialize mode (constructor) */
+  void          (__FASTCALL__ *term)( void );            /**< destroy mode (destructor) */
                          /** Performs search in plugin's output
                            * @param pwnd      indicates handle of Percent window with progress indicator
                            * @param start     indicates start offset within file where search must be performed
@@ -246,7 +246,7 @@ typedef struct tag_REGISTRY_MODE
                            * @param is_found  on output must contain True if result is really found
                            * @return          offset of found sequence or ULONG(LONG)_MAX if not found
                           **/
-__filesize_t __FASTCALL__ (*search_engine)(TWindow *pwnd, __filesize_t start, __filesize_t *slen, unsigned flags, tBool is_continue, tBool *is_found);
+__filesize_t (__FASTCALL__ *search_engine)(TWindow *pwnd, __filesize_t start, __filesize_t *slen, unsigned flags, tBool is_continue, tBool *is_found);
 }REGISTRY_MODE;
 
 extern REGISTRY_MODE *activeMode;

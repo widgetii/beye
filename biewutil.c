@@ -243,7 +243,8 @@ void __FASTCALL__ CompressHex(unsigned char * dest,const char * src,unsigned siz
   unsigned i,j;
   for(i = j = 0;j < sizedest;j++)
   {
-      dest[j] = (GetHexAnalog(src[i++]) << 4) | GetHexAnalog(src[i++]);
+      dest[j] = (GetHexAnalog(src[i]) << 4) | GetHexAnalog(src[i + 1]);
+      i += 2;	/* [dBorca] avoid ambiguous side-effects */
       if(usespace) i++;
   }
 }

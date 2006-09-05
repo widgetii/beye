@@ -54,7 +54,7 @@ static char * __NEAR__ __FASTCALL__ biewGetColorSetName( void )
   if(!biew_skin_name[0])
   {
     strcpy(biew_skin_name,__get_rc_dir("biew"));
-    strcat(biew_skin_name,"standard.skn");
+    strcat(biew_skin_name,"skn/" "standard.skn"); /* [dBorca] in skn/ subdir */
   }
   return biew_skin_name;
 }
@@ -64,7 +64,7 @@ static char * __NEAR__ __FASTCALL__ biewGetSyntaxName( void )
   if(!biew_syntax_name[0])
   {
     strcpy(biew_syntax_name,__get_rc_dir("biew"));
-    strcat(biew_syntax_name,"syntax.stx");
+    strcat(biew_syntax_name,"syntax/" "syntax.stx"); /* [dBorca] in syntax/ subdir */
   }
   return biew_syntax_name;
 }

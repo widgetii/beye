@@ -73,9 +73,9 @@ extern __filesize_t __FASTCALL__ fmtGetPubSym(BGLOBAL fmt_cache,char *str,unsign
                                       ReadPubNameList fmtReadPubNameList,
                                       ReadPubName fmtReadPubName);
 
-typedef unsigned      __FASTCALL__ (* GetNumItems)(BGLOBAL handle);
-typedef tBool         __FASTCALL__ (* ReadItems)(BGLOBAL handle,memArray * names,unsigned nnames);
-typedef __filesize_t  __FASTCALL__ (* CalcEntry)(unsigned,int dispmsg);
+typedef unsigned      (__FASTCALL__ * GetNumItems)(BGLOBAL handle);
+typedef tBool         (__FASTCALL__ * ReadItems)(BGLOBAL handle,memArray * names,unsigned nnames);
+typedef __filesize_t  (__FASTCALL__ * CalcEntry)(unsigned,int dispmsg);
 extern  int           __FASTCALL__ fmtShowList( GetNumItems gni,ReadItems ri,const char * title,int flags,unsigned * ordinal);
 
 

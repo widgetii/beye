@@ -218,7 +218,7 @@ static void __FASTCALL__ init_InterleaveBuffers(tUInt32 limit,
 	(*InterleaveBuffers_ptr)(limit,destbuffer,evenbuffer,oddbuffer);
 }
 
-void __FASTCALL__ (*InterleaveBuffers_ptr)(tUInt32 limit,
+void (__FASTCALL__ *InterleaveBuffers_ptr)(tUInt32 limit,
 				    void *destbuffer,
 				    const void *evenbuffer, 
 				    const void *oddbuffer) = init_InterleaveBuffers;
@@ -239,7 +239,7 @@ static void __FASTCALL__ init_CharsToShorts(tUInt32 limit,
 	(*CharsToShorts_ptr)(limit,destbuffer,evenbuffer);
 }
 
-void __FASTCALL__ (*CharsToShorts_ptr)(tUInt32 limit,
+void (__FASTCALL__ *CharsToShorts_ptr)(tUInt32 limit,
 					     void *destbuffer,
 					     const void *evenbuffer) = init_CharsToShorts;
 
@@ -259,6 +259,6 @@ static void __FASTCALL__ init_ShortsToChars(tUInt32 limit,
 	(*ShortsToChars_ptr)(limit,destbuffer,evenbuffer);
 }
 
-void __FASTCALL__ (*ShortsToChars_ptr)(tUInt32 limit,
+void (__FASTCALL__ *ShortsToChars_ptr)(tUInt32 limit,
 					     void *destbuffer,
 					     const void *evenbuffer) = init_ShortsToChars;

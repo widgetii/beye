@@ -353,6 +353,7 @@ BGLOBAL  __FASTCALL__ bioOpen(const char * fname,unsigned openmode,unsigned bSiz
           bFile->FLength = __mmfSize(bFile->b.mmb->mmf);
           bFile->primary_mmf = True;
           bFile->is_mmf = True;
+	  bFile->b.vfb.MBuffer = NULL; /* [dBorca] be consistent with IS_CACHE_VALID */
         }
         else PFREE(bFile->b.mmb);
       }

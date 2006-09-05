@@ -283,7 +283,7 @@ static void __NEAR__ PaintNewHeaderPE_2( void )
            ,pe.peDirSize);
 }
 
-static const void (__NEAR__ * pephead[])(void) =
+static void (__NEAR__ * const pephead[])(void) = /* [dBorca] the table is const, not the void */
 {
     PaintNewHeaderPE_1,
     PaintNewHeaderPE_2

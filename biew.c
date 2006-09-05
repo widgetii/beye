@@ -403,7 +403,7 @@ tBool isValidIniArgs( void )
 
 static hIniProfile * __NEAR__ __FASTCALL__ load_ini_info( void )
 {
-  char tmp[20];
+  char tmp[20], buf[20];
   hIniProfile *ini;
   ini_name = getenv("BIEW_INI");
   if(!ini_name) ini_name = __get_ini_name("biew");
@@ -426,8 +426,8 @@ static hIniProfile * __NEAR__ __FASTCALL__ load_ini_info( void )
   biewReadProfileString(ini,"Biew","Search","AsHex","off",tmp,sizeof(tmp));
   if(stricmp(tmp,"on") == 0) biewSearchFlg |= SF_ASHEX;
   biewReadProfileString(ini,"Biew","Browser","LastOpen","",LastOpenFileName,4096);
-  sprintf(tmp,"%u",LastMode);
-  biewReadProfileString(ini,"Biew","Browser","LastMode",tmp,tmp,sizeof(tmp));
+  sprintf(buf,"%u",LastMode); /* [dBorca] so that src and dst won't overlap for strncpy */
+  biewReadProfileString(ini,"Biew","Browser","LastMode",buf,tmp,sizeof(tmp));
   LastMode = (size_t)strtoul(tmp,NULL,10);
   biewReadProfileString(ini,"Biew","Browser","Offset","0",tmp,sizeof(tmp));
 #if __WORDSIZE >= 32

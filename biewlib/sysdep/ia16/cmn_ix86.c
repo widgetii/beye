@@ -393,7 +393,7 @@ void __FillCPUInfo(char *buff,unsigned cbBuff,void (*percent_callback)(int))
               }
               switch(brand_id)
               { 
-                 case 0:  "(Engineering sample)"; break;
+                 case 0:  cpu_suffix = "(Engineering sample)"; break; /* [dBorca] */
                  case 4:
                    switch(model)
                    {

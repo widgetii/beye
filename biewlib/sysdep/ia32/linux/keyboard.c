@@ -353,7 +353,7 @@ void __FASTCALL__ ReadNextEvent(void)
 		struct vt_stat vt;
 		int newvt;
 
-		if (ioctl(in_fd, VT_GETSTATE, &vt) != 0) goto place_key;
+		if (ioctl(in_fd, VT_GETSTATE, &vt) != 0) goto c_end;
 		switch (key) {
 		    case KE_F(1): newvt = 1; break;
 		    case KE_F(2): newvt = 2; break;
@@ -362,15 +362,16 @@ void __FASTCALL__ ReadNextEvent(void)
 		    case KE_F(5): newvt = 5; break;
 		    case KE_F(6): newvt = 6; break;
 		    case KE_F(7): newvt = 7; break;
-		    default: goto place_key;
+		    default: goto c_end;
 		}
 
 		if (vt.v_active != newvt) {
-		    if (ioctl(in_fd, VT_ACTIVATE, newvt) != 0) goto place_key;
+		    if (ioctl(in_fd, VT_ACTIVATE, newvt) != 0) goto c_end;
 		    console_restart = 0;
 		    while (!console_restart) __OsYield();
 		}
 	    }
+c_end:;
         } else {
 /*
     VT100 emulation
