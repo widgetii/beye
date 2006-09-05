@@ -334,7 +334,7 @@ else
     _cdefos="-DNBEBUG=1 $CFLAGS $_cdefos"
 fi
 
-cc_name=`$_cc -v 2>&1 | tail -1 | cut -d ' ' -f 1`
+cc_name=`$_cc -v 2>&1 | tail -n 1 | cut -d ' ' -f 1`
 cc_version=`$_cc -dumpversion`
 if test "$_target_system" = dos ; then
 # disable cc_check call for DJGPP due bugs in bash
