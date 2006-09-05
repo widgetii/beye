@@ -86,7 +86,7 @@ static tBool  __FASTCALL__ jvm_check_fmt( void )
   unsigned char id[4];
   bmReadBufferEx(id,sizeof(id),0,BM_SEEK_SET);
   /* Cafe babe !!! */
-  return id[0]==0xCA && id[1]==0xFE && id[2]==0xBA && id[3]==0xBE;
+  return id[0]==0xCA && id[1]==0xFE && id[2]==0xBA && id[3]==0xBE && bmGetFLength()>=16;
 }
 
 static unsigned __NEAR__ __FASTCALL__ skip_constant(BGLOBAL handle,unsigned char id)
