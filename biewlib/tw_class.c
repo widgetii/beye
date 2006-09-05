@@ -71,6 +71,6 @@ void __FASTCALL__ twcDestroyClassSet(void)
 TwClass * __FASTCALL__ twcFindClass(const char *name)
 {
  TwClass key;
- (const char *)(key.name) = name;
+ key.name = name;
  return (TwClass *)la_Find(class_set,&key, comp_class);
 }

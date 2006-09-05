@@ -209,8 +209,8 @@ static void * RENAME(fast_memcpy)(void * to, const void * from, size_t len)
 		MOVNTQ" %%mm6, 48(%1)\n"
 		MOVNTQ" %%mm7, 56(%1)\n"
 		:: "r" (from), "r" (to) : "memory");
-		((const unsigned char *)from)+=64;
-		((unsigned char *)to)+=64;
+		from+=64;
+		to+=64;
 	}
 
 	// Pure Assembly cuz gcc is a bit unpredictable ;)
@@ -297,8 +297,8 @@ static void * RENAME(fast_memcpy)(void * to, const void * from, size_t len)
 		MOVNTQ" %%mm6, 48(%1)\n"
 		MOVNTQ" %%mm7, 56(%1)\n"
 		:: "r" (from), "r" (to) : "memory");
-		((const unsigned char *)from)+=64;
-		((unsigned char *)to)+=64;
+		from+=64;
+		to+=64;
 	}
 
 #endif /* Have SSE */
@@ -393,7 +393,7 @@ static void * RENAME(fast_memset)(void * to, int val, size_t len)
 		MOVNTQ" %%mm0, 112(%0)\n"
 		MOVNTQ" %%mm0, 120(%0)\n"
 		:: "r" (to) : "memory");
-		((unsigned char *)to)+=128;
+		to+=128;
 	}
 #endif /* Have SSE */
 #ifdef HAVE_MMX2

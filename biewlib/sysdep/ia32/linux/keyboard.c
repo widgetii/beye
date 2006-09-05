@@ -371,7 +371,6 @@ void __FASTCALL__ ReadNextEvent(void)
 		    while (!console_restart) __OsYield();
 		}
 	    }
-c_end:;
         } else {
 /*
     VT100 emulation
@@ -453,6 +452,7 @@ c_end:;
 	    }
 #undef S
 	}
+c_end:
 place_key:
 	if(!rawkb_mode) { ret(key); }
 	else { rawkb_escape=(key==KE_ESCAPE&&rawkb_len==1); rawkb_mode=0; }

@@ -1891,9 +1891,9 @@ int __FASTCALL__ twPutS(const char *str)
        strcpy(__nls,str);
        __nls_OemToOsdep((unsigned char *)__nls,len);
      }
-     else (const char *)__nls = str;
+     else __nls = str;
   }
-  else (const char *)__nls = str;
+  else __nls = str;
   __nls_ptr = __nls;
   __oem_ptr = str;
   vidx = active->cur_x + active->cur_y*active->wwidth;

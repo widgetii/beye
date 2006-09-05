@@ -1295,7 +1295,7 @@ static tBool __NEAR__ __FASTCALL__ __addCache(const char *section,const char *su
   void __HUGE__ *found;
   ini_cache __HUGE__ *it;
   ini_cache ic;
-  (const char *)ic.item = section;
+  ic.item = section;
   ic.flags = 0;
   if(!(found =la_Find((linearArray *)opening->cache,&ic,__full_compare_cache)))
   {
@@ -1325,7 +1325,7 @@ static tBool __NEAR__ __FASTCALL__ __addCache(const char *section,const char *su
   {
     do_subsect:
       it = (ini_cache __HUGE__ *)found;
-      (const char *)ic.item = subsection;
+      ic.item = subsection;
       if(!(found=la_Find(it->v.leaf,&ic,__full_compare_cache)))
       {
         ic.item = PMalloc(strlen(subsection)+1);
@@ -1354,7 +1354,7 @@ static tBool __NEAR__ __FASTCALL__ __addCache(const char *section,const char *su
       {
         do_item:
         it = (ini_cache __HUGE__ *)found;
-        (const char *)ic.item = item;
+        ic.item = item;
         ic.flags = IC_STRING;
         if(!(found=la_Find(it->v.leaf,&ic,__full_compare_cache)))
         {
@@ -1589,15 +1589,15 @@ unsigned __FASTCALL__ iniReadProfileString(hIniProfile *ini,const char *section,
           ini_cache ic;
           void __HUGE__ *found,__HUGE__ *foundi,__HUGE__ *foundv;
           ini_cache __HUGE__ *fi;
-          (const char *)ic.item = section;
+          ic.item = section;
           ic.flags = 0;
           if((found=la_Find(ini->cache,&ic,__full_compare_cache))!=NULL)
           {
-            (const char *)ic.item=subsection;
+            ic.item=subsection;
             fi = (ini_cache __HUGE__ *)found;
             if((foundi=la_Find(fi->v.leaf,&ic,__full_compare_cache))!=NULL)
             {
-               (const char *)ic.item = _item;
+               ic.item = _item;
                ic.flags = IC_STRING;
                fi = (ini_cache __HUGE__ *)foundi;
                if((foundv=la_Find(fi->v.leaf,&ic,__full_compare_cache))!=NULL)
