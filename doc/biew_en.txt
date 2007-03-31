@@ -1140,6 +1140,20 @@ v5.0.2        ! Changes:
                 * Other minor/major fixes.
 5.6.1         ! Changes:
 01 apr 2004     * Fixed focus positioning in dialog
+5.6.2         ! Changes:
+20 sep 2004     * os2 compilation fixes from Max Alekseyev <relf@os2.ru>
+		* Various amd64-related fixes
+		  (thanks to "Alexey Khoshenko" <alexey_khosh@rambler.ru>):
+                  * fixed encoding order of spl, bpl, sil and dil registers
+                  * in 'mov rax, [moff64]' address length affected only by rex.b
+                  * 'mov CR(DR)x, GPR' and 'push/pop GPR' always use GPR64
+                  * enabled access to CR8-CR15,DR8-DR15
+                  * fixed size prefix for sign-extended imm8->[mem64] (by rex.w)
+                  * allow to use r12 as index in rex-modrm-sib mode
+                  * opcodes A0-A3 default to 64-bit.
+                * Fixed computing of link-table for 32-bit big-endian elfs
+                * Fixed gcc-3.4.2 compilation
+                * Big-endian and 64-bit related a.out fixes
 []======================================================================[]
 []  Thank you for your interest.                                        []
 []  Nick Kurshev.                                                       []
