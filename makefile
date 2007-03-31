@@ -62,14 +62,21 @@ addons/tools/dig_conv.o\
 addons/tools/eval.o\
 plugins/bin/aout.o\
 plugins/bin/arch.o\
+plugins/bin/asf.o\
+plugins/bin/avi.o\
 plugins/bin/bin.o\
+plugins/bin/bmp.o\
 plugins/bin/coff386.o\
 plugins/bin/dos_sys.o\
 plugins/bin/elf386.o\
+plugins/bin/jpeg.o\
 plugins/bin/jvmclass.o\
 plugins/bin/le.o\
 plugins/bin/lmf.o\
 plugins/bin/lx.o\
+plugins/bin/mov.o\
+plugins/bin/mp3.o\
+plugins/bin/mpeg.o\
 plugins/bin/mz.o\
 plugins/bin/ne.o\
 plugins/bin/nlm386.o\
@@ -78,6 +85,7 @@ plugins/bin/pe.o\
 plugins/bin/pharlap.o\
 plugins/bin/rdoff.o\
 plugins/bin/rdoff2.o\
+plugins/bin/wav.o\
 plugins/binmode.o\
 plugins/disasm.o\
 plugins/hexmode.o\
@@ -171,14 +179,21 @@ addons/tools/dig_conv.o:      addons/tools/dig_conv.c
 addons/tools/eval.o:          addons/tools/eval.c
 plugins/bin/aout.o:           plugins/bin/aout.c
 plugins/bin/arch.o:           plugins/bin/arch.c
+plugins/bin/asf.o:            plugins/bin/asf.c
+plugins/bin/avi.o:            plugins/bin/avi.c
 plugins/bin/bin.o:            plugins/bin/bin.c
+plugins/bin/bmp.o:            plugins/bin/bmp.c
 plugins/bin/coff386.o:        plugins/bin/coff386.c
 plugins/bin/dos_sys.o:        plugins/bin/dos_sys.c
 plugins/bin/elf386.o:         plugins/bin/elf386.c
+plugins/bin/jpeg.o:           plugins/bin/jpeg.c
 plugins/bin/jvmclass.o:       plugins/bin/jvmclass.c
 plugins/bin/le.o:             plugins/bin/le.c
 plugins/bin/lmf.o:            plugins/bin/lmf.c
 plugins/bin/lx.o:             plugins/bin/lx.c
+plugins/bin/mov.o:            plugins/bin/mov.c
+plugins/bin/mp3.o:            plugins/bin/mp3.c
+plugins/bin/mpeg.o:           plugins/bin/mpeg.c
 plugins/bin/mz.o:             plugins/bin/mz.c
 plugins/bin/ne.o:             plugins/bin/ne.c
 plugins/bin/nlm386.o:         plugins/bin/nlm386.c
@@ -187,6 +202,7 @@ plugins/bin/pe.o:             plugins/bin/pe.c
 plugins/bin/pharlap.o:        plugins/bin/pharlap.c
 plugins/bin/rdoff.o:          plugins/bin/rdoff.c
 plugins/bin/rdoff2.o:         plugins/bin/rdoff2.c
+plugins/bin/wav.o:            plugins/bin/wav.c
 plugins/binmode.o:            plugins/binmode.c
 plugins/disasm.o:             plugins/disasm.c
 plugins/hexmode.o:            plugins/hexmode.c

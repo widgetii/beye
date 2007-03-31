@@ -71,6 +71,14 @@ TWindow * MainWnd = 0,*HelpWnd = 0,*TitleWnd = 0,*ErrorWnd = 0;
 char shortname[SHORT_PATH_LEN + 1];
 
 extern REGISTRY_BIN binTable;
+extern REGISTRY_BIN movTable;
+extern REGISTRY_BIN mp3Table;
+extern REGISTRY_BIN mpegTable;
+extern REGISTRY_BIN jpegTable;
+extern REGISTRY_BIN wavTable;
+extern REGISTRY_BIN aviTable;
+extern REGISTRY_BIN asfTable;
+extern REGISTRY_BIN bmpTable;
 extern REGISTRY_BIN neTable;
 extern REGISTRY_BIN peTable;
 extern REGISTRY_BIN leTable;
@@ -108,6 +116,14 @@ static REGISTRY_BIN *mainBinTable[] =
   &lmfTable,
   &mzTable,
   &dossysTable,
+  &aviTable,
+  &asfTable,
+  &bmpTable,
+  &mpegTable,
+  &jpegTable,
+  &wavTable,
+  &mp3Table,
+  &movTable,
   &binTable
 };
 

@@ -1154,6 +1154,8 @@ v5.0.2        ! Changes:
                 * Fixed computing of link-table for 32-bit big-endian elfs
                 * Fixed gcc-3.4.2 compilation
                 * Big-endian and 64-bit related a.out fixes
+5.6.3         ! Changes:
+XX yyy 2007     + Added initial support for multimedia file formats (AVI,WAV,BMP,MP3)
 []======================================================================[]
 []  Thank you for your interest.                                        []
 []  Nick Kurshev.                                                       []
