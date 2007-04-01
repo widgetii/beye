@@ -71,6 +71,7 @@ TWindow * MainWnd = 0,*HelpWnd = 0,*TitleWnd = 0,*ErrorWnd = 0;
 char shortname[SHORT_PATH_LEN + 1];
 
 extern REGISTRY_BIN binTable;
+extern REGISTRY_BIN rmTable;
 extern REGISTRY_BIN movTable;
 extern REGISTRY_BIN mp3Table;
 extern REGISTRY_BIN mpegTable;
@@ -122,8 +123,9 @@ static REGISTRY_BIN *mainBinTable[] =
   &mpegTable,
   &jpegTable,
   &wavTable,
-  &mp3Table,
   &movTable,
+  &rmTable,
+  &mp3Table,
   &binTable
 };
 

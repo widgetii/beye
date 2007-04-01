@@ -79,7 +79,7 @@ What's todo:
   (this will in 6.x series)
 + Filters for text-mode (like rtf-view)			    (IN THE NEAR FUTURE)
 + User defined structures (like dbf-view)			  (NOT URGENTLY)
-+ Support for ASF, MPEG, MOV, JPEG file formats			  (NOT URGENTLY)
++ Support for ASF, MPEG, MOV, RM, JPEG file formats		  (NOT URGENTLY)
 
 
 Sweet dreams:                                                   (DISTANT FUTURE)
