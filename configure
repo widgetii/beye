@@ -209,6 +209,9 @@ if test "$_target_system" = auto ; then
 	*[cC][yY][gG][wW][iI][nN]*)
 	    _target_system=win32
 	    ;;
+	*MINGW32*)
+	    _target_system=win32
+	    ;;
 	*[eE][mM][xX]*)
 	    _target_system=os2
 	    ;;
