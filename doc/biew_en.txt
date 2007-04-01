@@ -10,8 +10,8 @@
 €≤±∞                 ‹‹  ‹‹  ‹‹   ‹‹  ‹   ‹ ‹ ‹ ‹                     ∞±≤€
 €≤±∞                ‹‹‹‹‹‹  ‹‹‹‹ ‹‹‹‹‹‹    ‹   ‹                      ∞±≤€
 €≤±∞                                                                  ∞±≤€
-€≤±∞                           Ver 5.6.1                              ∞±≤€
-€≤±∞                          01 apr 2004.                            ∞±≤€
+€≤±∞                           Ver 5.6.3                              ∞±≤€
+€≤±∞                          01 apr 2007.                            ∞±≤€
 €≤±∞                                                                  ∞±≤€
 €≤±∞    Made in Kazan.Tatarstan.Russia. Written By Nick Kurshev.      ∞±≤€
 €≤±∞                                                                  ∞±≤€
@@ -1155,14 +1155,14 @@ v5.0.2        ! Changes:
                 * Fixed gcc-3.4.2 compilation
                 * Big-endian and 64-bit related a.out fixes
 5.6.3         ! Changes:
-                * Fixes by Andrew Golovnia <andrew_golovnia@users.sourceforge.net>
+01 apr 2007     * Fixes by Andrew Golovnia <andrew_golovnia@users.sourceforge.net>
 		  * Sis CPU's ID fix
                   + itanium1/2 detection (experimental)
 		  * detection of processor in PE format is fixed
 		  * fixes of cpu identification
 		  * CPUInfo display window changed to scrollable window
-XX yyy 2007     + Added initial support for multimedia file formats (AVI,WAV,BMP,MP3)
+                + Added initial support for multimedia file formats (AVI,WAV,BMP,MP3)
 []======================================================================[]
 []  Thank you for your interest.                                        []
-[]  Nick Kurshev.                                                       []
+[]  Nick Kurshev (http://my666.boom.ru/666_en.html).                    []
 []======================================================================[]

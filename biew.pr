@@ -117,7 +117,16 @@
 #compile plugins\bin\pharlap.c
 #compile plugins\bin\rdoff.c
 #compile plugins\bin\rdoff2.c
-
+#compile plugins/bin/asf.c
+#compile plugins/bin/avi.c
+#compile plugins/bin/bmp.c
+#compile plugins/bin/jpeg.c
+#compile plugins/bin/mov.c
+#compile plugins/bin/mp3.c
+#compile plugins/bin/mpeg.c
+#compile plugins/bin/realmedia.c
+#compile plugins/bin/wav.c
+                          
 #compile plugins\nls\russian.c
 
 #compile plugins\disasm\null_da.c
