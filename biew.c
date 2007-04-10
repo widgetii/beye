@@ -94,6 +94,8 @@ extern REGISTRY_BIN OldPharLapTable;
 extern REGISTRY_BIN PharLapTable;
 extern REGISTRY_BIN rdoffTable;
 extern REGISTRY_BIN rdoff2Table;
+extern REGISTRY_BIN sisTable;
+extern REGISTRY_BIN sisxTable;
 extern REGISTRY_BIN lmfTable;
 extern REGISTRY_BIN mzTable;
 extern REGISTRY_BIN dossysTable;
@@ -117,6 +119,8 @@ static REGISTRY_BIN *mainBinTable[] =
   &lmfTable,
   &mzTable,
   &dossysTable,
+  &sisTable,
+  &sisxTable,
   &aviTable,
   &asfTable,
   &bmpTable,

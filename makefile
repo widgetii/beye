@@ -86,6 +86,8 @@ plugins/bin/pharlap.o\
 plugins/bin/rdoff.o\
 plugins/bin/rdoff2.o\
 plugins/bin/realmedia.o\
+plugins/bin/sis.o\
+plugins/bin/sisx.o\
 plugins/bin/wav.o\
 plugins/binmode.o\
 plugins/disasm.o\
@@ -204,6 +206,8 @@ plugins/bin/pharlap.o:        plugins/bin/pharlap.c
 plugins/bin/rdoff.o:          plugins/bin/rdoff.c
 plugins/bin/rdoff2.o:         plugins/bin/rdoff2.c
 plugins/bin/realmedia.o:      plugins/bin/realmedia.c
+plugins/bin/sis.o:            plugins/bin/sis.c
+plugins/bin/sisx.o:           plugins/bin/sisx.c
 plugins/bin/wav.o:            plugins/bin/wav.c
 plugins/binmode.o:            plugins/binmode.c
 plugins/disasm.o:             plugins/disasm.c
