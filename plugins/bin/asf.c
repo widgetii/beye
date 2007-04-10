@@ -40,7 +40,7 @@ static tBool  __FASTCALL__ asf_check_fmt( void )
 
 static __filesize_t __FASTCALL__ Show_ASF_Header( void )
 {
-    ErrMessageBox("Not implemented yet!",NULL);
+    ErrMessageBox("Not implemented yet!","ASF format");
     return BMGetCurrFilePos();
 }
 

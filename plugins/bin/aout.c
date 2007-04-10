@@ -17,6 +17,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "bswap.h"
 #include "colorset.h"
 #include "bmfile.h"
 #include "biewutil.h"
@@ -123,7 +124,7 @@ static tBool __FASTCALL__ aout_check_fmt( void )
   tUInt32 id;
   id = bmReadDWordEx(0,SEEKF_START);
   if(__aout_check_fmt(id)) return 1;
-  id=ByteSwapL(id);
+  id=be2me_32(id);
   if(__aout_check_fmt(id)) { is_msbf=1; return 1; }
   return 0;
 }

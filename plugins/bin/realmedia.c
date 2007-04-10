@@ -35,6 +35,12 @@ static tBool  __FASTCALL__ rm_check_fmt( void )
     return False;
 }
 
+static __filesize_t __FASTCALL__ Show_RM_Header( void )
+{
+    ErrMessageBox("Not implemented yet!","RM format");
+    return BMGetCurrFilePos();
+}
+
 static void __FASTCALL__ rm_init_fmt( void ) {}
 static void __FASTCALL__ rm_destroy_fmt(void) {}
 static int  __FASTCALL__ rm_platform( void) { return DISASM_DEFAULT; }
@@ -47,7 +53,7 @@ REGISTRY_BIN rmTable =
   rm_check_fmt,
   rm_init_fmt,
   rm_destroy_fmt,
-  NULL,
+  Show_RM_Header,
   NULL,
   NULL,
   rm_platform,

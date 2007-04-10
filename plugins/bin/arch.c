@@ -19,6 +19,7 @@
 #include <stdio.h>
 #include <time.h>
 
+#include "bswap.h"
 #include "bmfile.h"
 #include "bin_util.h"
 #include "biewhelp.h"
@@ -88,7 +89,7 @@ static tBool __NEAR__ __FASTCALL__ archReadModList(memArray *obj,unsigned nnames
        Here is a horrible attempt to determine it.
     */
     foff = addr[i];
-    if(foff > flen)  foff = ByteSwapL(foff);
+    if(foff > flen)  foff = be2me_32(foff);
     if(IsKbdTerminate()) break;
     bmReadBufferEx(stmp,sizeof(ar_sub_hdr),foff,BM_SEEK_SET);
     is_eof = bmEOF();
@@ -109,7 +110,7 @@ static __filesize_t __FASTCALL__ archModLst( void )
    fpos = BMGetCurrFilePos();
    flen = bmGetFLength();
    rnames = bmReadDWordEx(sizeof(ar_hdr),BM_SEEK_SET);
-   bnames = ByteSwapL(rnames);
+   bnames = be2me_32(rnames);
    /**
       Some archives sometimes have big and sometimes little endian.
       Here is a horrible attempt to determine it.
@@ -134,7 +135,7 @@ static __filesize_t __FASTCALL__ archModLst( void )
           Here is a horrible attempt to determine it.
        */
        fpos = addr[ret];
-       if(fpos > flen) fpos = ByteSwapL(fpos);
+       if(fpos > flen) fpos = be2me_32(fpos);
        fpos += sizeof(ar_sub_hdr);
      }
    }

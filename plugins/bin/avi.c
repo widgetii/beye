@@ -225,7 +225,7 @@ static __filesize_t __FASTCALL__ Show_A_Header( void )
           "Quality              = %lu\n"
           "SampleSize           = %lu\n"
           "====== WAVE HEADER ====================\n"
-          "FormatTag            = 0x%04X\n"
+          "FormatTag            = 0x%04X (%s)\n"
           "ChannelsxSampleSecs  = %ux%u\n"
           "AvgBytesSecs         = %lu\n"
           "BlockAlign           = %u\n"
@@ -244,7 +244,7 @@ static __filesize_t __FASTCALL__ Show_A_Header( void )
 	 ,strh.dwSuggestedBufferSize
 	 ,strh.dwQuality
 	 ,strh.dwSampleSize
-	 ,wavf.wFormatTag
+	 ,wavf.wFormatTag,wtag_find_name(wavf.wFormatTag)
 	 ,wavf.nChannels,wavf.nSamplesPerSec
 	 ,wavf.nAvgBytesPerSec
 	 ,wavf.nBlockAlign

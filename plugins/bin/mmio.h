@@ -59,4 +59,12 @@ typedef struct __attribute__((__packed__))
 ,((char *)&i)[2]?((char *)&i)[2]:' '\
 ,((char *)&i)[3]?((char *)&i)[3]:' '
 
+typedef struct
+{
+    unsigned short wTag;
+    const char *name;
+}wTagNames;
+extern wTagNames wtagNames[];
+extern const char *wtag_find_name(unsigned short wtag);
+
 #endif
