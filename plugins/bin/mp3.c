@@ -17,6 +17,7 @@
 **/
 #include <stddef.h>
 
+#include "bswap.h"
 #include "bconsole.h"
 #include "biewhelp.h"
 #include "colorset.h"
@@ -55,6 +56,7 @@ int mp_mp3_get_lsf(unsigned char* hbuf){
 /*
  * return frame size or -1 (bad frame)
  */
+#define MAXFRAMESIZE 1280
 int mp_decode_mp3_header(unsigned char* hbuf,int *fmt,int *brate,int *samplerate,int *channels){
     int nch,ssize,crc,lsf,mpeg25,framesize,padding,bitrate_index,sampling_frequency,mp3_fmt;
     unsigned long newhead = 
@@ -110,6 +112,7 @@ int mp_decode_mp3_header(unsigned char* hbuf,int *fmt,int *brate,int *samplerate
 
     switch(mp3_fmt)
     {
+	case 0:		return -1;
 	case 1:		framesize = (long) tabsel_123[lsf][0][bitrate_index]*12000;
     			framesize /= freqs[sampling_frequency];
 			framesize = (framesize + padding)<<2;
@@ -122,6 +125,7 @@ int mp_decode_mp3_header(unsigned char* hbuf,int *fmt,int *brate,int *samplerate
 			break;
     }
 
+    if(framesize<=0 || framesize>MAXFRAMESIZE) return -1;
     if(brate) *brate=(tabsel_123[lsf][mp3_fmt-1][bitrate_index]*1000)/8;
     if(samplerate) *samplerate=freqs[sampling_frequency];
     return framesize;
@@ -362,6 +366,7 @@ static void find_next_mp3_hdr(unsigned char *hdr) {
   while(!bmEOF()) {
     spos=bmGetCurrFilePos();
     bmReadBuffer(hdr,4);
+    if(bmEOF()) break;
     len = mp_decode_mp3_header(hdr,NULL,NULL,NULL,NULL);
     if(len < 0) {
       bmSeek(-3,BM_SEEK_CUR);
@@ -402,11 +407,11 @@ static int Xing_test(char *hdr,int *scale,int *lsf,int *srate,long *nframes,long
 	*nbytes=*nframes=0;
 	*lsf=mpeg1?0:1;
 	*srate=sr_table[sr_index&0x3];
-	head_flags = ByteSwapL(bmReadDWord());
-	if(head_flags & FRAMES_FLAG)	*nframes=ByteSwapL(bmReadDWord());
-	if(head_flags & BYTES_FLAG)	*nbytes=ByteSwapL(bmReadDWord());
+	head_flags = be2me_32(bmReadDWord());
+	if(head_flags & FRAMES_FLAG)	*nframes=be2me_32(bmReadDWord());
+	if(head_flags & BYTES_FLAG)	*nbytes=be2me_32(bmReadDWord());
 	if(head_flags & TOC_FLAG)	bmSeek(100,BM_SEEK_CUR); /* skip indexes */
-	if(head_flags & VBR_SCALE_FLAG)	*scale = ByteSwapL(bmReadDWord());
+	if(head_flags & VBR_SCALE_FLAG)	*scale = be2me_32(bmReadDWord());
     }
     bmSeek(fpos,BM_SEEK_SET);
     return is_xing;
@@ -437,10 +442,13 @@ static tBool  __FASTCALL__ mp3_check_fmt( void )
     else
     {
 	find_next_mp3_hdr(hdr);
+	if(bmEOF()) return False;
 	for(i=0;i<5;i++)
 	{
 	    if((off=mp_decode_mp3_header(hdr,&fmt,&mp3_brate,&mp3_samplerate,&mp3_channels)) < 0) return False;
 	    bmSeek(off,BM_SEEK_CUR);
+	    if(bmEOF()) return False;
+
 	}
     }
     return True;
