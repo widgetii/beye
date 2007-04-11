@@ -29,12 +29,23 @@
 
 static tBool  __FASTCALL__ jpeg_check_fmt( void )
 {
+    unsigned long val;
+    unsigned char id[4];
+    val=bmReadDWordEx(0,BM_SEEK_SET);
+    bmReadBufferEx(id,4,6,BM_SEEK_SET);
+    if(val==0xE0FFD8FF && memcmp(id,"JFIF",4)==0) return True;
     return False;
 }
 
 static void __FASTCALL__ jpeg_init_fmt( void ) {}
 static void __FASTCALL__ jpeg_destroy_fmt(void) {}
 static int  __FASTCALL__ jpeg_platform( void) { return DISASM_DEFAULT; }
+
+static __filesize_t __FASTCALL__ Show_JPEG_Header( void )
+{
+    ErrMessageBox("Not implemented yet!","JPEG format");
+    return BMGetCurrFilePos();
+}
 
 REGISTRY_BIN jpegTable =
 {
@@ -44,7 +55,7 @@ REGISTRY_BIN jpegTable =
   jpeg_check_fmt,
   jpeg_init_fmt,
   jpeg_destroy_fmt,
-  NULL,
+  Show_JPEG_Header,
   NULL,
   NULL,
   jpeg_platform,

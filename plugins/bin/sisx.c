@@ -82,11 +82,17 @@ static __filesize_t __FASTCALL__ Show_SisX_Header( void )
 {
  unsigned keycode;
  TWindow * hwnd;
- char *cpuname;
+ char *cpuname,*exetype,head[80];
  struct E32ImageHeader img;
  __filesize_t newcpos,fpos,fpos2;
  fpos2=fpos = BMGetCurrFilePos();
  bmReadBufferEx(&img,sizeof(img),0,BM_SEEK_SET);
+ switch(img.iUid1)
+ {
+    case 0x10000079: exetype="DLL"; break;
+    case 0x1000007A: exetype="EXE"; break;
+    default: exetype="UNK"; break;
+ }
  switch(img.iCpuIdentifier)
  {
     case 0x1000: cpuname="x86"; break;
@@ -99,7 +105,8 @@ static __filesize_t __FASTCALL__ Show_SisX_Header( void )
     case 0x4000: cpuname="MCore"; break;
     default:     cpuname="unknown"; break;
  }
- hwnd = CrtDlgWndnls(" E32Image Header ",68,15);
+ sprintf(head," E32Image Header (%s) ",exetype);
+ hwnd = CrtDlgWndnls(head,68,15);
  twUseWin(hwnd);
  twGotoXY(1,1);
  twPrintF("Module/Tool Version  = 0x%08X/0x%08X\n"
