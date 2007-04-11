@@ -157,10 +157,10 @@ for ac_option do
     _target_arch=`echo $ac_option | cut -d '=' -f 2`
     ;;
   --with-extraincdir=*)
-    _extraincdir=-I`echo $ac_option | cut -d '=' -f 2`
+    _extraincdir="$_extraincdir -I`echo $ac_option | cut -d '=' -f 2`"
     ;;
   --with-extralibdir=*)
-    _extralibdir=-L`echo $ac_option | cut -d '=' -f 2`
+    _extralibdir="$_extralibdir -L`echo $ac_option | cut -d '=' -f 2`"
     ;;
   --with-x11incdir=*)
     _x11incdir=-I`echo $ac_option | cut -d '=' -f 2`
