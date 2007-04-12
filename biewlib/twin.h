@@ -257,6 +257,15 @@ typedef struct tagTWindow
 #define WM_SHOWBENEATH   0x0005 /**< It sent when window is being displayed beneath of other window, has handle of top window as event_data*/
 #define WM_HIDE          0x0006 /**< It sent when window is being hidded, has no parameters */
 
+                   /** Calls window function with given arguments
+                     * @return                function answer
+                     * @param event           one of WM_* commands
+                     * @param event_param     command related parameter
+                     * @param event_data      command related data
+                     * @see                   twcRegisterClass
+                    **/
+long __FASTCALL__ twinSendMessage(TWindow *win,unsigned event,unsigned long event_param, void *event_data);
+
                    /** Draws frame of given type in active window
                      * @return                none
                      * @param x1_,y1_,x2_,y2_ indicate coordinates inside window

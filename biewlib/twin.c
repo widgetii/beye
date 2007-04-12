@@ -1449,7 +1449,7 @@ TWindow *  __FASTCALL__ twCreateWinEx(tAbsCoord x1_, tAbsCoord y1_,
       ret->method = cls->method;
       ret->class_flags = cls->flags;
     }
-    if(ret->method) ((twClassFunc)(ret->method))(ret,WM_CREATE,0L,NULL);
+    twinSendMessage(ret,WM_CREATE,0L,NULL);
   }
   return ret;
 }
@@ -1457,7 +1457,7 @@ TWindow *  __FASTCALL__ twCreateWinEx(tAbsCoord x1_, tAbsCoord y1_,
 
 void __FASTCALL__ twShowWin(TWindow* w)
 {
-  if(w->method) ((twClassFunc)(w->method))(w,WM_SHOW,0L,NULL);
+  twinSendMessage(w,WM_SHOW,0L,NULL);
   if(!(w->iflags & IFLG_VISIBLE) == IFLG_VISIBLE)
   {
     w->iflags |= IFLG_VISIBLE;
@@ -1475,7 +1475,7 @@ void __FASTCALL__ twShowWin(TWindow* w)
 
 void __FASTCALL__ twShowWinOnTop(TWindow* w)
 {
-  if(w->method) ((twClassFunc)(w->method))(w,WM_TOPSHOW,0L,NULL);
+  twinSendMessage(w,WM_TOPSHOW,0L,NULL);
   if((w->iflags & IFLG_VISIBLE) == IFLG_VISIBLE) twHideWin(w);
   w->iflags |= IFLG_VISIBLE;
   __unlistwin(w);
@@ -1491,7 +1491,7 @@ void __FASTCALL__ twShowWinOnTop(TWindow* w)
 
 void __FASTCALL__ twShowWinBeneath(TWindow* w,TWindow *prev)
 {
-  if(w->method) ((twClassFunc)(w->method))(w,WM_SHOWBENEATH,0L,prev);
+  twinSendMessage(w,WM_SHOWBENEATH,0L,prev);
   if((w->iflags & IFLG_VISIBLE) == IFLG_VISIBLE) twHideWin(w);
   w->iflags |= IFLG_VISIBLE;
   __unlistwin(w);
@@ -1502,7 +1502,7 @@ void __FASTCALL__ twShowWinBeneath(TWindow* w,TWindow *prev)
 
 void __FASTCALL__ twHideWin(TWindow *w)
 {
-  if(w->method) ((twClassFunc)(w->method))(w,WM_HIDE,0L,NULL);
+  twinSendMessage(w,WM_HIDE,0L,NULL);
   if(cursorwin == w) twSetCursorType(TW_CUR_OFF);
   savedwin2screen(w);
   w->iflags &= ~IFLG_VISIBLE;
@@ -1510,7 +1510,7 @@ void __FASTCALL__ twHideWin(TWindow *w)
 
 void __FASTCALL__ twDestroyWin(TWindow *win)
 {
-  if(win->method) ((twClassFunc)(win->method))(win,WM_DESTROY,0L,NULL);
+  twinSendMessage(win,WM_DESTROY,0L,NULL);
   twHideWin(win);
   if(win->Title) PFREE(win->Title);
   if(win->Footer) PFREE(win->Footer);
@@ -2200,4 +2200,10 @@ void __FASTCALL__ twScrollWinRt(TWindow *win,tRelCoord xpos, unsigned npos)
       twWriteBuffer(win,i,j,&accel,1);
     }
   }
+}
+
+long __FASTCALL__ twinSendMessage(TWindow *win,unsigned event,unsigned long event_param, void *event_data)
+{
+    if(win->method) return ((twClassFunc)(win->method))(win,event,event_param,event_data);
+    return 0L;
 }
