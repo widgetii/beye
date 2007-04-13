@@ -1163,7 +1163,7 @@ v5.0.2        ! Changes:
 		  * CPUInfo display window changed to scrollable window
                 + Added initial support for multimedia file formats (AVI,WAV,BMP,MP3)
 5.6.4         ! Changes:
-XX yyy 2007     * Fixed bug #1695783 (biew 5.6.3 - Bug in file detection due mp3.c)
+14 apr 2007     * Fixed bug #1695783 (biew 5.6.3 - Bug in file detection due mp3.c)
                 * Improved multimedia format support
 		+ Added initial support for Sis and SisX formats of Symbian OS
 		* Fixed bug #1696442 (-extraincdir and -extralibdir can only handle one extra lib.)
