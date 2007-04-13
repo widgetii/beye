@@ -315,7 +315,7 @@ static void __NEAR__ __FASTCALL__ ParseCmdLine( void )
        case 3: biew_mode = 2; break;
        case 4: biew_mode = 0; break;
        case 5:
-#if __WORDSIZE >= 32
+#if (__WORDSIZE >= 32) && !defined(__QNX4__)
 		new_file_size = strtoull(ArgVector[++i],NULL,10);
 #else
 		new_file_size = strtoul(ArgVector[++i],NULL,10);
@@ -452,7 +452,7 @@ static hIniProfile * __NEAR__ __FASTCALL__ load_ini_info( void )
   biewReadProfileString(ini,"Biew","Browser","LastMode",buf,tmp,sizeof(tmp));
   LastMode = (size_t)strtoul(tmp,NULL,10);
   biewReadProfileString(ini,"Biew","Browser","Offset","0",tmp,sizeof(tmp));
-#if __WORDSIZE >= 32
+#if (__WORDSIZE >= 32) && !defined(__QNX4__)
   LastOffset = atoll(tmp);
 #else
   LastOffset = atol(tmp); /** by watcom */
@@ -496,7 +496,7 @@ static void __NEAR__ __FASTCALL__ save_ini_info( void )
   biewWriteProfileString(ini,"Biew","Browser","LastOpen",ArgVector[1]);
   sprintf(tmp,"%u",defMainModeSel);
   biewWriteProfileString(ini,"Biew","Browser","LastMode",tmp);
-#if __WORDSIZE >= 32
+#if (__WORDSIZE >= 32) && !defined(__QNX4__)
   sprintf(tmp,"%llu",LastOffset);
 #else
   sprintf(tmp,"%lu",LastOffset);

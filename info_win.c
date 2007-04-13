@@ -548,7 +548,7 @@ __filesize_t __FASTCALL__ WhereAMI(__filesize_t ctrl_pos)
            detectedFormat->prepare_structs(ctrl_pos,ctrl_pos);
   va = detectedFormat->pa2va ? detectedFormat->pa2va(ctrl_pos) : ctrl_pos;
   vaddr[0] = '\0';
-#if __WORDSIZE >= 32
+#if (__WORDSIZE >= 32) && !defined(__QNX4__)
   sprintf(&vaddr[strlen(vaddr)],"%016llXH",va);
 #else
   sprintf(&vaddr[strlen(vaddr)],"%08lXH",va);
@@ -590,7 +590,7 @@ __filesize_t __FASTCALL__ WhereAMI(__filesize_t ctrl_pos)
     default: btn = "";
   }
   twPrintF(
-#if __WORDSIZE >= 32
+#if (__WORDSIZE >= 32) && !defined(__QNX4__)
 	   "File  offset : %016llXH\n"
 #else
 	   "File  offset : %08lXH\n"
@@ -598,7 +598,7 @@ __filesize_t __FASTCALL__ WhereAMI(__filesize_t ctrl_pos)
            "Virt. address: %s\n"
            "%s entry  : %s\n"
            "Next  entry  : %s\n"
-#if __WORDSIZE >= 32
+#if (__WORDSIZE >= 32) && !defined(__QNX4__)
            "Curr. object : #%u %s %s %016llXH=%016llXH %s"
 #else
            "Curr. object : #%u %s %s %08lXH=%08lXH %s"

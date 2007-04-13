@@ -208,7 +208,7 @@ static void __NEAR__ __FASTCALL__ printObject(FILE *fout,unsigned obj_num,char *
                             oclass == OC_CODE ? "DUMP_TEXT" :
                             "Unknown";
   if(!oname[0]) { sprintf(onumname,"%s%u",name,obj_num); name = onumname; }
-#if __WORDSIZE >=32
+#if (__WORDSIZE >=32) && !defined(__QNX4__)
   fprintf(fout,"\nSEGMENT %s BYTE PUBLIC %s '%s'\n; size: %llu bytes\n\n"
 #else
   fprintf(fout,"\nSEGMENT %s BYTE PUBLIC %s '%s'\n; size: %lu bytes\n\n"
@@ -226,7 +226,7 @@ static void __NEAR__ __FASTCALL__ printHdr(FILE * fout,REGISTRY_BIN *fmt)
   cptr = cptr1 = ";"; cptr2 = "";
   time(&tim);
   fprintf(fout,"%s\n%sDissasembler dump of \'%s\'\n"
-#if __WORDSIZE >= 32
+#if (__WORDSIZE >= 32) && !defined(__QNX4__)
                "%sRange : %16llXH-%16llXH\n"
 #else
                "%sRange : %08lXH-%08lXH\n"
@@ -475,7 +475,7 @@ static tBool FStore( void )
           if(obj_class == OC_NOOBJECT)
           {
             __filesize_t diff;
-#if __WORDSIZE >= 32
+#if (__WORDSIZE >= 32) && !defined(__QNX4__)
             fprintf(fout,"; L%016llXH-L%016llXH - no object\n",obj_start,obj_end);
 #else
             fprintf(fout,"; L%08lXH-L%08lXH - no object\n",obj_start,obj_end);
@@ -486,7 +486,7 @@ static tBool FStore( void )
              while(func_pa && func_pa >= obj_start && func_pa < obj_end && func_pa > ff_startpos)
              {
                   diff = func_pa - ff_startpos;
-#if __WORDSIZE >= 32
+#if (__WORDSIZE >= 32) && !defined(__QNX4__)
                   if(diff) fprintf(fout,"resb %16llXH\n",diff);
                   fprintf(fout,"%s %s: ;at offset - %16llXH\n"
 #else
@@ -507,7 +507,7 @@ static tBool FStore( void )
                   }
               }
               diff = obj_end - ff_startpos;
-#if __WORDSIZE>=32
+#if (__WORDSIZE>=32) && !defined(__QNX4__)
               if(diff) fprintf(fout,"resb %16llXH\n",diff);
 #else
               if(diff) fprintf(fout,"resb %08lXH\n",diff);
@@ -1180,7 +1180,7 @@ static tBool FileInfo( void )
   strcpy(stimes[2],ctime(&statbuf.st_atime));
   twPrintF("Name                          = %s\n"
            "Type                          = %s\n"
-#if __WORDSIZE >= 32
+#if (__WORDSIZE >= 32) && !defined(__QNX4__)
            "Length                        = %llu bytes\n"
 #else
            "Length                        = %lu bytes\n"

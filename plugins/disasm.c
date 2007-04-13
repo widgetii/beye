@@ -1203,7 +1203,7 @@ int __FASTCALL__ disAppendFAddr(char * str,__fileoff_t ulShift,__fileoff_t disti
        char lbuf[20];
        cptr = DumpMode ? "L" : "file:";
        strcat(str,cptr);
-#if __WORDSIZE >= 32
+#if (__WORDSIZE >= 32) && !defined(__QNX4__)
 	if((BMFileFlags&BMFF_USE64))
 	    sprintf(lbuf,"%016llX",r_sh);
 	else
