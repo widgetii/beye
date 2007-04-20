@@ -1,46 +1,20 @@
                           How to compile
                           ==============
 
-Compiling the project is a very simple thing. All you need  to  do  is
-to modify makefile with preferred values of several variables.
+Compilation of the project is enough simple task. All waht you need to do
+for that is executing configure script and change config.mak with preferable
+values of some variables if you need that.
 
-GNU makefile
-------------
+To get list of arguments of configure script executte this command:
+./configure --help
 
-If you have any GNU  compatible  development  system  (DJGPP,  Cygwin,
-EMX) or genuine port of GNU system, follow the instruction below.
+after that you need to run make command:
+make all install
 
-Edit top makefile in the root folder. In general, you must change  two
-variables:
+Compilation of installing at one line:
 
-TARGET_PLATFORM=
-TARGET_OS=
+Run: './configure; make; make install'
 
-Valid values are described above each variable. You  may  also  modify
-(if you know what you're doing):
-
-HOST_CFLAGS=
-HOST_LDFLAGS=
-
-On UNIX systems you may also modify:
-
-TARGET_SCREEN_LIB=
-USE_MOUSE=
-
-On other systems these variables are meaningless.
-
-If you have  gcc-2.95.2  or  higher  it  would  be  better  to  change
-compilation level:
-
-compilation=advance
-
-Please use:
-
-compilation=normal
-
-in any other cases.
-
-That's all!
 
 Other makefiles
 ---------------
