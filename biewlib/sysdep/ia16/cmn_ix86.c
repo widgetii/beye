@@ -591,7 +591,9 @@ void __FillCPUInfo(char *buff,unsigned cbBuff,void (*percent_callback)(int))
                                      "(Samuel2)":
                                      "(Ezra)"; break;
                 case 8: cpu_suffix = "(Ezra-T)"; break;
-                case 9: cpu_suffix = "(Nehemiah)"; break;
+                case 9: cpu_suffix = (stepping <= 7)?
+                                     "(Nehemiah)":
+                                     "(C3-M)"; break;
                 default: break;
              }
              break;
@@ -1051,6 +1053,27 @@ void __FillCPUInfo(char *buff,unsigned cbBuff,void (*percent_callback)(int))
 "           [%c] - 3D-Now! technology\n"
             ,__edx & BIT_NO(31) ? 'x' : ' '
             );
+          __eax = 0xC0000000UL;
+          __edx = __cpuid_edx(&__eax);
+          if(__eax >= 0xC0000001UL)
+          {
+            __eax = 0xC0000001UL;
+            __edx = __cpuid_edx(&__eax);
+            sprintf(&buff[strlen(buff)],
+"           [%c] - Alternate Instruction Set  [%c] - AIS Enabled\n"
+"           [%c] - Random Number Generator    [%c] - RNG Enabled\n"
+"           [%c] - Longhaul MSR 0x110A        [%c] - FEMMS instruction\n"
+"           [%c] - Advanced Crypto. Engine    [%c] - ACE Enabled\n"
+            ,__edx & BIT_NO( 0) ? 'x' : ' '
+            ,__edx & BIT_NO( 1) ? 'x' : ' '
+            ,__edx & BIT_NO( 2) ? 'x' : ' '
+            ,__edx & BIT_NO( 3) ? 'x' : ' '
+            ,__edx & BIT_NO( 4) ? 'x' : ' '
+            ,__edx & BIT_NO( 5) ? 'x' : ' '
+            ,__edx & BIT_NO( 6) ? 'x' : ' '
+            ,__edx & BIT_NO( 7) ? 'x' : ' '
+            );
+          }
       }
       if(is_transmeta)
       {
