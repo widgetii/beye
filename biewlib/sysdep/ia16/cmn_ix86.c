@@ -694,17 +694,16 @@ void __FillCPUInfo(char *buff,unsigned cbBuff,void (*percent_callback)(int))
 "           [%c] - FPU on chip    [%c] - VM86 Ext       [%c] - Debug exts\n"
 "           [%c] - 4MB pages      [%c] - TSC present    [%c] - Intel MSRs\n"
 "           [%c] - Phys Addr Ext  [%c] - Mach.Chck Exc  [%c] - CMPXCHG8B\n"
-"           [%c] - Local APIC     [%c] - reserved       [%c] - Fast syscall\n"
-"           [%c] - MTRR           [%c] - Page Global    [%c] - Mach.Chck Arch\n"
-"           [%c] - (F)CMOVxx      [%c] - Page Attr Tab. [%c] - PSE-36\n"
-"           [%c] - Ser.Num        [%c] - CLFLUSH        [%c] - reserved\n"
-"           [%c] - Debug Trace    [%c] - ACPI           [%c] - Intel MMX\n"
-"           [%c] - FXSAVE/FXRSTOR [%c] - SSE            [%c] - SSE2\n"
-"           [%c] - Self Snoop     [%c] - Hyper-Thread   [%c] - Therm.Monitor\n"
-"           [%c] - IA-64 Itanium  [%c] - Pend. Brk. En\n"
+"           [%c] - Local APIC     [%c] - Fast syscall   [%c] - MTRR\n"
+"           [%c] - Page Global    [%c] - Mach.Chck Arch [%c] - (F)CMOVxx\n"
+"           [%c] - Page Attr Tab. [%c] - PSE-36         [%c] - Ser.Num\n"
+"           [%c] - CLFLUSH        [%c] - Debug Trace    [%c] - ACPI\n"
+"           [%c] - Intel MMX      [%c] - FXSAVE/FXRSTOR [%c] - SSE\n"
+"           [%c] - SSE2           [%c] - Self Snoop     [%c] - Hyper-Thread\n"
+"           [%c] - Therm.Monitor  [%c] - IA-64 Itanium  [%c] - Pend. Brk. En\n"
 "           [%c] - SSE3           [%c] - MONITOR/MWAIT  [%c] - DS-CPL\n"
-"           [%c] - EST            [%c] - Therm.Monitor2 [%c] - CNXT-ID\n"
-"           [%c] - CMPXCHG16B     [%c] - xTPR\n"
+"           [%c] - VMX            [%c] - EST            [%c] - Therm.Monitor2\n"
+"           [%c] - CNXT-ID        [%c] - CMPXCHG16B     [%c] - xTPR\n"
             ,stepping
             ,model
             ,family
@@ -720,7 +719,7 @@ void __FillCPUInfo(char *buff,unsigned cbBuff,void (*percent_callback)(int))
             ,__edx & BIT_NO( 7) ? 'x' : ' '
             ,__edx & BIT_NO( 8) ? 'x' : ' '
             ,__edx & BIT_NO( 9) ? 'x' : ' '
-            ,__edx & BIT_NO(10) ? 'x' : ' '
+//            ,__edx & BIT_NO(10) ? 'x' : ' ' //reserved
             ,__edx & BIT_NO(11) ? 'x' : ' '
             ,__edx & BIT_NO(12) ? 'x' : ' '
             ,__edx & BIT_NO(13) ? 'x' : ' '
@@ -730,7 +729,7 @@ void __FillCPUInfo(char *buff,unsigned cbBuff,void (*percent_callback)(int))
             ,__edx & BIT_NO(17) ? 'x' : ' '
             ,__edx & BIT_NO(18) ? 'x' : ' '
             ,__edx & BIT_NO(19) ? 'x' : ' '
-            ,__edx & BIT_NO(20) ? 'x' : ' '
+//            ,__edx & BIT_NO(20) ? 'x' : ' ' // reserved
             ,__edx & BIT_NO(21) ? 'x' : ' '
             ,__edx & BIT_NO(22) ? 'x' : ' '
             ,__edx & BIT_NO(23) ? 'x' : ' '
@@ -745,6 +744,7 @@ void __FillCPUInfo(char *buff,unsigned cbBuff,void (*percent_callback)(int))
             ,__ecx & BIT_NO( 0) ? 'x' : ' '
             ,__ecx & BIT_NO( 3) ? 'x' : ' '
             ,__ecx & BIT_NO( 4) ? 'x' : ' '
+            ,__ecx & BIT_NO( 5) ? 'x' : ' '
             ,__ecx & BIT_NO( 7) ? 'x' : ' '
             ,__ecx & BIT_NO( 8) ? 'x' : ' '
             ,__ecx & BIT_NO(10) ? 'x' : ' '
