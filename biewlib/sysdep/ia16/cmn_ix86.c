@@ -635,6 +635,15 @@ void __FillCPUInfo(char *buff,unsigned cbBuff,void (*percent_callback)(int))
                 default: break;
              }
              break;
+          case 0xF:
+             switch(model)
+             {
+                case 2:
+                case 3: cpu_suffix = "(Efficion TM8000)"; break;
+                default: cpu_suffix = "(Efficion)"; break;
+//                default: break;
+             }
+             break;
           default: break;
        }
     }
@@ -1083,6 +1092,23 @@ void __FillCPUInfo(char *buff,unsigned cbBuff,void (*percent_callback)(int))
 "           [%c] - FCMOVxx\n"
             ,__edx & BIT_NO(16) ? 'x' : ' '
             );
+          __eax = 0x80860000UL;
+          __edx = __cpuid_edx(&__eax);
+          if(__eax >= 0x80860001UL)
+          {
+            __eax = 0x80860001UL;
+            __edx = __cpuid_edx(&__eax);
+            sprintf(&buff[strlen(buff)],
+"           [%c] - Recovery active            [%c] - LongRun(tm)\n"
+"           [%c] - LongRun Table Interface    [%c] - Persistent Translation 1.x\n"
+"           [%c] - Persistent Translation 2.0\n"
+            ,__edx & BIT_NO( 0) ? 'x' : ' '
+            ,__edx & BIT_NO( 1) ? 'x' : ' '
+            ,__edx & BIT_NO( 3) ? 'x' : ' '
+            ,__edx & BIT_NO( 7) ? 'x' : ' '
+            ,__edx & BIT_NO( 8) ? 'x' : ' '
+            );
+          }
       }
     }
     else strcat(buff,"not present\n");
