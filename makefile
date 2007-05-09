@@ -256,15 +256,15 @@ ifeq ($(INSTALL),)
 	@exit 1
 endif
 	$(INSTALL) -D -m 755 $(TARGET) $(PREFIX)/bin/$(TARGET)
+	$(INSTALL) -D -c -m 644 doc/biew.1 $(PREFIX)/man/man1/biew.1
 	$(INSTALL) -D -c -m 644 bin_rc/biew.hlp $(DATADIR)/biew.hlp
 	mkdir --parents $(DATADIR)/skn
 	$(INSTALL) -D -c -m 644 bin_rc/skn/* $(DATADIR)/skn
 	mkdir --parents $(DATADIR)/syntax
 	$(INSTALL) -D -c -m 644 bin_rc/syntax/* $(DATADIR)/syntax
-	mkdir --parents $(DATADIR)/xlt
 	mkdir --parents $(DATADIR)/xlt/russian
-	$(INSTALL) -D -c -m 644 bin_rc/xlt/* $(DATADIR)/xlt
 	$(INSTALL) -D -c -m 644 bin_rc/xlt/russian/* $(DATADIR)/xlt/russian
+	$(INSTALL) -D -c -m 644 bin_rc/xlt/*.xlt bin_rc/xlt/readme $(DATADIR)/xlt
 uninstall:
 	$(RM) $(PREFIX)/bin/$(TARGET)
 	$(RM) $(DATADIR)/skn/*
