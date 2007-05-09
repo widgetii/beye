@@ -191,7 +191,7 @@ if test "$_target_system" = auto ; then
     # OS name
     system_name=`uname -s`
     case "$system_name" in
-	*linux*)
+	*[Ll]inux*)
 	    _target_system=linux
 	    ;;
 	*QNX*)
@@ -265,7 +265,9 @@ if test "$_target_arch" = auto ; then
   if test -z "$host_arch" ; then
   host_arch=`( uname -p ) 2>&1`
   case "$host_arch" in
-   i*86|sparc|ppc|alpha|arm|mips)
+   i*86) host_arch=ia32
+     ;;
+   sparc|ppc|alpha|arm|mips)
      ;;
 
    *) # uname -p on Linux returns 'unknown' for the processor type,
