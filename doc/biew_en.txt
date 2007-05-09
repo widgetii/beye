@@ -1168,6 +1168,20 @@ v5.0.2        ! Changes:
 		+ Added initial support for Sis and SisX formats of Symbian OS
 		* Fixed bug #1696442 (-extraincdir and -extralibdir can only handle one extra lib.)
 		* Added endian selection in hexmode viewer
+5.6.5         ! Changes:
+XX yyy 2007     * Fixes by Daniel Borca <dborca@yahoo.com>:
+		  * unix/vio.c use the correct alternate set for line drawing.
+		    see http://www.in-ulm.de/~mascheck/various/alternate_charset/
+		  * configure: accept linux and Linux from uname. i?86 is really ia32.
+		  * makefile: install xlt and man pages correctly.
+		  * unix/os_dep.c: DATADIR conforming to configure. Fix duplicate biew
+		     name in configuration file
+		  * ia32/_inlines.h: replace xlat with regular table indexing (to be able
+		    to test biew with valgrind).
+		  * linux/keyboard.c: fix 'I/O possible' error; it seems to be appearing
+		    spuriously between __init_vio and the end of __init_keyboard, where
+		    SIGIO is hooked as event handler. I think it's harmless to just or maybe
+		    block SIGIO events until we are finished setting up the keyboard.
 []======================================================================[]
 []  Thank you for your interest.                                        []
 []  Nick Kurshev (http://my666.boom.ru/666_en.html).                    []
