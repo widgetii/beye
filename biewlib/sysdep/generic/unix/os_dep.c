@@ -43,7 +43,7 @@ static const char rcs_id[] = "$Id$";
 #endif
 
 #ifndef	DATADIR
-#define DATADIR	PREFIX"/share"
+#define DATADIR	PREFIX"/share/biew"
 #endif
 
 tBool break_status = False;	/**< CTRL+BREAK flag */
@@ -88,8 +88,8 @@ char * __FASTCALL__ __get_ini_name(const char *progname)
 
 char * __FASTCALL__ __get_rc_dir(const char *progname)
 {
-    strcpy(_rc_dir_name, DATADIR"/");
-    strcat(_rc_dir_name, progname);
+    strcpy(_rc_dir_name, DATADIR);
+    /*strcat(_rc_dir_name, progname);*/
     return strcat(_rc_dir_name, "/");
 }
 
