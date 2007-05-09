@@ -229,8 +229,8 @@ void __FASTCALL__ __vioWriteBuff(tAbsCoord x, tAbsCoord y, const tvioBuff *buff,
 		c &= 0x7f;
 	    } else {
 		unsigned char *map = mode ?
-			    (output_G1 ? "\016" : "\033(U"):
-			    (output_G1 ? "\017" : "\033(K");
+			    (output_G1 ? "\033)0\016" : "\033(U"):
+			    (output_G1 ? "\033(B\017" : "\033(K");
 
 		if (output_G1 && old_mode != mode)
 		{
