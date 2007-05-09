@@ -92,11 +92,14 @@ __inline static tUInt64 __FASTCALL__ __CONSTFUNC__ ByteSwapLL(tUInt64 x)
                 **/
 __inline static tUInt8 __FASTCALL__ __CONSTFUNC__ __Xlat__(const tUInt8 *_table, tUInt8 _idx)
 {
+ /*
  __asm("xlatb"   :
       "=a" (_idx):
       "0"(_idx),
       "b"(_table));
   return _idx;
+ */
+ return _table[_idx];
 }
 #define __Xlat__ __Xlat__
 
