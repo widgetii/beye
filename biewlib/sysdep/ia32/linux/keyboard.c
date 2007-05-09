@@ -536,8 +536,15 @@ int __FASTCALL__ __MsGetBtns(void)
 
 */
 
+static void
+dummy_handler (int sig)
+{
+    /*fprintf(stderr, "warning: received early %d\n", sig);*/
+}
+
 void __FASTCALL__ __init_keyboard(void)
 {
+    signal(SIGIO, dummy_handler);
     in_fd = open(ttyname(STDIN_FILENO), O_RDONLY);
     if (in_fd < 0) in_fd = STDIN_FILENO;
 
