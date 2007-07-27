@@ -123,105 +123,132 @@ typedef unsigned long long int	tUIntMax;
 /** Limits of integral types.  */
 
 /** Minimum of signed integral types.  */
+#ifndef INT8_MIN
 # define INT8_MIN		(-128)
 # define INT16_MIN		(-32767-1)
 # define INT32_MIN		(-2147483647-1)
 #ifdef __GNUC__
 # define INT64_MIN		(-__INT64_C(9223372036854775807)-1)
 #endif
+#endif
+
 /** Maximum of signed integral types.  */
+#ifndef INT8_MAX
 # define INT8_MAX		(127)
 # define INT16_MAX		(32767)
 # define INT32_MAX		(2147483647)
 #ifdef __GNUC__
 # define INT64_MAX		(__INT64_C(9223372036854775807))
 #endif
+#endif
 
 /** Maximum of unsigned integral types.  */
+#ifndef UINT8_MAX
 # define UINT8_MAX		(255U)
 # define UINT16_MAX		(65535U)
 # define UINT32_MAX		(4294967295U)
 #ifdef __GNUC__
 # define UINT64_MAX		(__UINT64_C(18446744073709551615))
 #endif
-
+#endif
 
 /** Minimum of signed integral types having a minimum size.  */
+#ifndef INT_LEAST8_MIN
 # define INT_LEAST8_MIN		(-128)
 # define INT_LEAST16_MIN	(-32767-1)
 # define INT_LEAST32_MIN	(-2147483647-1)
 #ifdef __GNUC__
 # define INT_LEAST64_MIN	(-__INT64_C(9223372036854775807)-1)
 #endif
+#endif
+
 /** Maximum of signed integral types having a minimum size.  */
+#ifndef INT_LEAST8_MAX
 # define INT_LEAST8_MAX		(127)
 # define INT_LEAST16_MAX	(32767)
 # define INT_LEAST32_MAX	(2147483647)
 #ifdef __GNUC__
 # define INT_LEAST64_MAX	(__INT64_C(9223372036854775807))
 #endif
+#endif
 
 /** Maximum of unsigned integral types having a minimum size.  */
+#ifndef UINT_LEAST8_MAX
 # define UINT_LEAST8_MAX	(255U)
 # define UINT_LEAST16_MAX	(65535U)
 # define UINT_LEAST32_MAX	(4294967295U)
 #ifdef __GNUC__
 # define UINT_LEAST64_MAX	(__UINT64_C(18446744073709551615))
 #endif
-
+#endif
 
 /** Minimum of fast signed integral types having a minimum size.  */
+#ifndef INT_FAST8_MIN
 # define INT_FAST8_MIN		(-128)
 # define INT_FAST16_MIN		(-2147483647-1)
 # define INT_FAST32_MIN		(-2147483647-1)
 #ifdef __GNUC__
 # define INT_FAST64_MIN		(-__INT64_C(9223372036854775807)-1)
 #endif
+#endif
+
 /** Maximum of fast signed integral types having a minimum size.  */
+#ifndef INT_FAST8_MAX
 # define INT_FAST8_MAX		(127)
 # define INT_FAST16_MAX		(2147483647)
 # define INT_FAST32_MAX		(2147483647)
 #ifdef __GNUC__
 # define INT_FAST64_MAX		(__INT64_C(9223372036854775807))
 #endif
+#endif
 
 /** Maximum of fast unsigned integral types having a minimum size.  */
+#ifndef UINT_FAST8_MAX
 # define UINT_FAST8_MAX		(255U)
 # define UINT_FAST16_MAX	(4294967295U)
 # define UINT_FAST32_MAX	(4294967295U)
 #ifdef __GNUC__
 # define UINT_FAST64_MAX	(__UINT64_C(18446744073709551615))
 #endif
-
+#endif
 
 /** Values to test for integral types holding `void *' pointer.  */
+#ifndef INTPTR_MIN
 # define INTPTR_MIN		(-2147483647-1)
 # define INTPTR_MAX		(2147483647)
 # define UINTPTR_MAX		(4294967295U)
+#endif
 
 #ifdef __GNUC__
+#ifndef INTMAX_MIN
 /** Minimum for largest signed integral type.  */
 # define INTMAX_MIN		(-__INT64_C(9223372036854775807)-1)
 /** Maximum for largest signed integral type.  */
 # define INTMAX_MAX		(__INT64_C(9223372036854775807))
-
 /** Maximum for largest unsigned integral type.  */
 # define UINTMAX_MAX		(__UINT64_C(18446744073709551615))
+#endif
 #endif
 
 
 /** Limits of other integer types.  */
 
 /** Limits of `ptrdiff_t' type.  */
+#ifndef PTRDIFF_MIN
 # define PTRDIFF_MIN		(-2147483647-1)
 # define PTRDIFF_MAX		(2147483647)
+#endif
 
+#ifndef SIG_ATOMIC_MIN
 /** Limits of `sig_atomic_t'.  */
 # define SIG_ATOMIC_MIN		(-2147483647-1)
 # define SIG_ATOMIC_MAX		(2147483647)
+#endif
 
+#ifndef SIZE_MAX
 /** Limit of `size_t' type.  */
 # define SIZE_MAX		(4294967295U)
+#endif
 
 /** Limits of `wchar_t'.  */
 # ifndef WCHAR_MIN
@@ -243,25 +270,31 @@ typedef unsigned long long int	tUIntMax;
 #if !defined __cplusplus || defined __STDC_CONSTANT_MACROS
 
 /** Signed.  */
+#ifndef INT8_C
 # define INT8_C(c)	c
 # define INT16_C(c)	c
 # define INT32_C(c)	c
 #ifdef __GNUC__
 # define INT64_C(c)	c ## LL
 #endif
+#endif
 
 /** Unsigned.  */
+#ifndef UINT8_C
 # define UINT8_C(c)	c ## U
 # define UINT16_C(c)	c ## U
 # define UINT32_C(c)	c ## U
 #ifdef __GNUC__
 # define UINT64_C(c)	c ## ULL
 #endif
+#endif
 
 /** Maximal type.  */
 #ifdef __GNUC__
+#ifndef INTMAX_C
 # define INTMAX_C(c)	c ## LL
 # define UINTMAX_C(c)	c ## ULL
+#endif
 #endif
 
 #endif	/** C++ && constant macros */
