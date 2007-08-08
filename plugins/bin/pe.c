@@ -55,6 +55,7 @@ static tBool __NEAR__ __FASTCALL__ FindPubName(char *buff,unsigned cb_buff,__fil
 static void __FASTCALL__ pe_ReadPubNameList(BGLOBAL handle,void (__FASTCALL__ *mem_out)(const char *));
 static __filesize_t __FASTCALL__ peVA2PA(__filesize_t va);
 static __filesize_t __FASTCALL__ pePA2VA(__filesize_t pa);
+static __fileoff_t __NEAR__ CalcOverlayOffset( void );
 
 static tBool __FASTCALL__ peLowMemFunc( unsigned long need_mem )
 {
@@ -176,9 +177,11 @@ static const char * __NEAR__ __FASTCALL__ PECPUType(void)
 }
 
 static __filesize_t entryPE = 0L;
+static __fileoff_t overlayPE = -1L;
 
 static void __NEAR__ PaintNewHeaderPE_1( void )
 {
+  entryPE = RVA2Phys(pe.peEntryPointRVA);
   twPrintF("Signature                      = '%c%c'\n"
            "Required CPU Type              = %s\n"
            "Number of object entries       = %hu\n"
@@ -281,6 +284,12 @@ static void __NEAR__ PaintNewHeaderPE_2( void )
            ,pe.peHeapReserveSize
            ,pe.peHeapCommitSize
            ,pe.peDirSize);
+  if (CalcOverlayOffset() != -1) {
+    entryPE = overlayPE;
+    twSetColorAttr(dialog_cset.entry);
+    twPrintF("\nOverlay                        = %08lXH", entryPE); twClrEOL();
+    twSetColorAttr(dialog_cset.main);
+  }
 }
 
 static void (__NEAR__ * const pephead[])(void) = /* [dBorca] the table is const, not the void */
@@ -311,7 +320,6 @@ static __filesize_t __FASTCALL__ ShowNewHeaderPE( void )
 {
  __fileoff_t fpos;
  fpos = BMGetCurrFilePos();
- entryPE = RVA2Phys(pe.peEntryPointRVA);
  if(PageBox(70,21,NULL,2,PaintNewHeaderPE) != -1 && entryPE && entryPE < bmGetFLength()) fpos = entryPE;
  return fpos;
 }
@@ -391,6 +399,28 @@ static tBool __NEAR__ __FASTCALL__ __ReadObjectsPE(BGLOBAL handle,memArray * obj
     if(!ma_AddData(obj,&po,sizeof(PE_OBJECT),True)) break;
   }
   return True;
+}
+
+static __fileoff_t __NEAR__ CalcOverlayOffset( void )
+{
+  if (overlayPE == -1 && pe.peObjects) {
+    memArray *obj;
+    if ((obj = ma_Build(pe.peObjects, True))) {
+      bioSeek(pe_cache, 0x18 + pe.peNTHdrSize + headshift, SEEK_SET);
+      if (__ReadObjectsPE(pe_cache, obj, pe.peObjects)) {
+        int i;
+	for (i = 0; i < pe.peObjects; i++) {
+	  PE_OBJECT *o = (PE_OBJECT *)obj->data[i];
+	  __fileoff_t end = o->oPhysicalOffset + ((o->oPhysicalSize + (pe.peFileAlign - 1)) & ~(pe.peFileAlign - 1));
+	  if (overlayPE < end) {
+	    overlayPE = end;
+	  }
+	}
+      }
+      ma_Destroy(obj);
+    }
+  }
+  return overlayPE;
 }
 
 static __filesize_t __FASTCALL__ ShowObjectsPE( void )
