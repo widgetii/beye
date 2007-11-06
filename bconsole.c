@@ -13,6 +13,9 @@
  * @author      Nick Kurshev
  * @since       1995
  * @note        Development, fixes and improvements
+ * @author      Mauro Giachero
+ * @date        02.11.2007
+ * @note        Added "ungotstring" function to enable inline assemblers
 **/
 #include <stdarg.h>
 #include <string.h>
@@ -79,6 +82,16 @@ static tBool __NEAR__ __FASTCALL__ ungotkey(int keycode)
     ret = True;
   }
   return ret;
+}
+
+tBool __FASTCALL__ ungotstring(char *string)
+{
+  int pos;
+  for (pos = strlen(string)-1; pos>=0; pos--) {
+    if (ungotkey(string[pos]) == False)
+      return False;
+  }
+  return True;
 }
 
 int __FASTCALL__ xeditstring(char *s,const char *legal,unsigned maxlength, void (*func)(void))

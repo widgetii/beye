@@ -13,6 +13,9 @@
  * @author      Nick Kurshev
  * @since       1995
  * @note        Development, fixes and improvements
+ * @author      Mauro Giachero
+ * @date        02.11.2007
+ * @note        Added "ungotstring" function to enable inline assemblers
 **/
 #ifndef __BCONSOLE__H
 #define __BCONSOLE__H
@@ -157,6 +160,8 @@ extern tBool __FASTCALL__ _lb_searchtext(const char *str,const char *tmpl,
                                          unsigned searchlen,const int *cache,
                                          unsigned flg);
 extern void __FASTCALL__ __drawSinglePrompt(const char *prmt[]);
+
+extern tBool __FASTCALL__ ungotstring(char *string);
 
 #ifdef __cplusplus
 }

@@ -13,6 +13,9 @@
  * @author      Nick Kurshev
  * @since       1995
  * @note        Development, fixes and improvements
+ * @author      Mauro Giachero
+ * @date        02.11.2007
+ * @note        Implemented x86 inline assembler as a NASM wrapper
 **/
 #include <string.h>
 #include <limits.h>
@@ -2875,6 +2878,103 @@ static void __FASTCALL__ ix86WriteIni( hIniProfile *ini )
   biewWriteProfileString(ini,"Biew","Browser","SubSubMode3",tmps);
 }
 
+#define CODEBUFFER_LEN 64
+char codebuffer[CODEBUFFER_LEN];
+
+/*
+Assemble "code".
+On success, it returns:
+  .insn       = assembled bytes
+  .insn_len   = length of assembled code
+  .error_code = 0
+On error, it returns:
+  .insn       = an NULL-terminated error message
+  .insn_len   = undefined
+  .error_code = non-zero
+*/
+AsmRet __FASTCALL__ ix86Asm(const char *code)
+{
+  AsmRet result;
+  FILE *asmf, *bin, *err;
+  int i,c;
+
+  //File cleanup
+  system("rm -f /tmp/biew_out.bin /tmp/biew_src.asm /tmp/biew_err");
+
+  //Generate NASM input file
+  asmf = fopen("/tmp/biew_src.asm", "w");
+  if (!asmf) goto tmperror;
+  if (ix86GetBitness() == DAB_USE16)
+  {
+    fprintf(asmf, "BITS 16");
+  }
+  else
+  {
+    fprintf(asmf, "BITS 32");
+  }
+  fprintf(asmf, "\n%s",code);
+  fclose(asmf);
+
+  //Run NASM
+  system("nasm -s -f bin -o /tmp/biew_out.bin /tmp/biew_src.asm >/tmp/biew_err 2>/dev/null");
+
+  //Read result
+  bin = fopen("/tmp/biew_out.bin", "r");
+  if (!bin) goto nasmerror;
+  i=0;
+  while (((c = fgetc(bin)) != EOF) && (i<CODEBUFFER_LEN))
+  {
+    codebuffer[i++]=(char)c;
+  }
+  fclose(bin);
+
+  if (i==CODEBUFFER_LEN) goto codetoolongerror;
+  if (i==0) goto nasmerror;
+
+  result.err_code=0;
+  result.insn_len=i;
+  result.insn=codebuffer;
+  goto done;
+
+nasmerror:
+  //Read error message
+  err = fopen("/tmp/biew_err", "r");
+  if (!err) goto tmperror;
+  i=0;
+  while (((c = fgetc(err)) != EOF) && (i<CODEBUFFER_LEN-1))
+  {
+    codebuffer[i++]=(char)c;
+    /*
+    NASM error messages are in the form:
+      [filename]: error: [description]
+    Discarding everything before ':' we obtain the [description] alone
+    */
+    if ((char)c == ':')
+    {
+      i=0;
+    }
+  }
+  fclose(err);
+  codebuffer[i]='\0';
+  result.insn = codebuffer;
+  goto doneerror;
+
+codetoolongerror:
+  result.insn="Internal error (assembly code too long)";
+  goto doneerror;
+
+tmperror:
+  result.insn="NASM unavailable or insufficient /tmp access rights";
+  goto doneerror;
+
+doneerror:
+  result.err_code=1;
+
+done:
+  //Final cleanup
+  system("rm -f /tmp/biew_out.bin /tmp/biew_src.asm /tmp/biew_err");
+  return result;
+}
 
 REGISTRY_DISASM ix86_Disasm =
 {
@@ -2882,7 +2982,7 @@ REGISTRY_DISASM ix86_Disasm =
   { "x86Hlp", "Bitnes", NULL, NULL, NULL },
   { x86AsmRef, x86Select_Bitness, NULL, NULL, NULL },
   ix86Disassembler,
-  NULL,
+  ix86Asm,
   ix86HelpAsm,
   ix86MaxInsnLen,
   ix86GetAsmColor,

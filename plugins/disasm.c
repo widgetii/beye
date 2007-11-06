@@ -16,6 +16,9 @@
  * @author      Kostya Nosov <k-nosov@yandex.ru>
  * @date        12.09.2000
  * @note        Adding virtual address as argument of jump and call insns
+ * @author      Mauro Giachero
+ * @date        02.11.2007
+ * @note        Reworked inline assemblers support
 **/
 #include <string.h>
 #include <stdlib.h>
@@ -564,26 +567,46 @@ static int __NEAR__ __FASTCALL__ FullAsmEdit(TWindow * ewnd)
    CompressHex(&EditorMem.buff[start],outstr,EditorMem.alen[edit_y],False);
    switch(_lastbyte)
    {
-     case KE_TAB     :
+     case KE_CTL_F(4):
                       {
                        AsmRet aret;
                        if(activeDisasm->asm_f)
                        {
                          char code[81];
+                         code[0]='\0';
                          if(GetStringDlg(code,activeDisasm->name,
                                          NULL,"Enter assembler instruction:"))
                          {
                            aret = (*activeDisasm->asm_f)(code);
                            if(aret.err_code)
                            {
-                              ErrMessageBox("Syntax error",NULL);
+                              char *message="Syntax error";
+                              if (aret.insn[0])
+                              {
+                                message=aret.insn;
+                              }
+                              ErrMessageBox(message,NULL);
                               continue;
                            }
-                           else  memcpy(outstr,aret.insn,aret.insn_len);
+                           else
+                           {
+                              int i;
+                              char bytebuffer[3];
+
+                              for (i=aret.insn_len-1; i>=0; i--)
+                              {
+                                sprintf(bytebuffer, "%0.2x", aret.insn[i]);
+                                ungotstring(bytebuffer);
+                              }
+                           }
                          }
                          break;
                        }
-                       else continue;
+                       else
+                       {
+                         ErrMessageBox("Sorry, no assembler available",NULL);
+                         continue;
+                       }
                       }
      case KE_F(1)    : ExtHelp(); continue;
      case KE_CTL_F(1): activeDisasm->action[0](); continue;

@@ -13,6 +13,9 @@
  * @author      Nick Kurshev
  * @since       1995
  * @note        Development, fixes and improvements
+ * @author      Mauro Giachero
+ * @date        02.11.2007
+ * @note        Added ASSEMBle option to casmtext
 **/
 #include <stdio.h>
 #include <string.h>
@@ -188,7 +191,7 @@ static const char * casmtext[] =
   "AsmRef",
   "SysInf",
   "Tools ",
-  "      ",
+  "Assemb",
   "      ",
   "      ",
   "      ",
