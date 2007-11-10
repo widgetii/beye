@@ -14,8 +14,8 @@
  * @since       1995
  * @note        Development, fixes and improvements
  * @author      Mauro Giachero
- * @date        02.11.2007
- * @note        Implemented x86 inline assembler as a NASM wrapper
+ * @date        11.2007
+ * @note        Implemented x86 inline assembler as a NASM/YASM wrapper
 **/
 #include <string.h>
 #include <limits.h>
@@ -1965,6 +1965,8 @@ tBool Use32Addr,Use32Data,UseMMXSet,UseXMMXSet,Use64;
 
 const unsigned char leave_insns[] = { 0x07, 0x17, 0x1F, 0x58, 0x59, 0x5A, 0x5B, 0x5C, 0x5D, 0x5E, 0x5F, 0x61, 0x90, 0xC9 };
 
+char *assemblercommand=NULL;
+
 static tBool is_listed(unsigned char insn,const unsigned char *list,size_t listsize)
 {
   size_t i;
@@ -2845,6 +2847,16 @@ static void __FASTCALL__ ix86Init( void )
     MemOutBox("ix86 dissasembler initialization");
     exit(EXIT_FAILURE);
   }
+
+  //x86 disassembler initialization
+  if (!system("yasm --version >/dev/null 2>/dev/null"))
+  {
+    assemblercommand = "yasm -f bin -o /tmp/biew_out.bin /tmp/biew_src.asm 2>&1 >/dev/null |tail -n 2 |head -n 1 >/tmp/biew_err";
+  }
+  else if (!system("nasm -version >/dev/null 2>/dev/null"))
+  {
+    assemblercommand = "nasm -f bin -o /tmp/biew_out.bin /tmp/biew_src.asm >/dev/null 2>/tmp/biew_err";
+  }
 }
 
 static void __FASTCALL__ ix86Term( void )
@@ -2898,6 +2910,9 @@ AsmRet __FASTCALL__ ix86Asm(const char *code)
   FILE *asmf, *bin, *err;
   int i,c;
 
+  //Check assembler availability
+  if (!assemblercommand) goto noassemblererror;
+
   //File cleanup
   system("rm -f /tmp/biew_out.bin /tmp/biew_src.asm /tmp/biew_err");
 
@@ -2908,6 +2923,12 @@ AsmRet __FASTCALL__ ix86Asm(const char *code)
   {
     fprintf(asmf, "BITS 16");
   }
+#ifdef IX86_64
+  else if (ix86GetBitness() == DAB_USE64)
+  {
+    fprintf(asmf, "BITS 64");
+  }
+#endif
   else
   {
     fprintf(asmf, "BITS 32");
@@ -2915,12 +2936,12 @@ AsmRet __FASTCALL__ ix86Asm(const char *code)
   fprintf(asmf, "\n%s",code);
   fclose(asmf);
 
-  //Run NASM
-  system("nasm -s -f bin -o /tmp/biew_out.bin /tmp/biew_src.asm >/tmp/biew_err 2>/dev/null");
+  //Run external assembler
+  system(assemblercommand);
 
   //Read result
   bin = fopen("/tmp/biew_out.bin", "r");
-  if (!bin) goto nasmerror;
+  if (!bin) goto asmerror;
   i=0;
   while (((c = fgetc(bin)) != EOF) && (i<CODEBUFFER_LEN))
   {
@@ -2929,14 +2950,14 @@ AsmRet __FASTCALL__ ix86Asm(const char *code)
   fclose(bin);
 
   if (i==CODEBUFFER_LEN) goto codetoolongerror;
-  if (i==0) goto nasmerror;
+  if (i==0) goto asmerror;
 
   result.err_code=0;
   result.insn_len=i;
   result.insn=codebuffer;
   goto done;
 
-nasmerror:
+asmerror:
   //Read error message
   err = fopen("/tmp/biew_err", "r");
   if (!err) goto tmperror;
@@ -2945,9 +2966,9 @@ nasmerror:
   {
     codebuffer[i++]=(char)c;
     /*
-    NASM error messages are in the form:
-      [filename]: error: [description]
-    Discarding everything before ':' we obtain the [description] alone
+    Most error messages are in the form:
+      [something]: [error description]
+    Discarding everything before ':' we obtain the [error description] alone
     */
     if ((char)c == ':')
     {
@@ -2957,19 +2978,27 @@ nasmerror:
   fclose(err);
   codebuffer[i]='\0';
   result.insn = codebuffer;
+  while (result.insn[0] == ' ') //Drop leading spaces
+    result.insn++;
+  result.err_code=1;
   goto doneerror;
 
 codetoolongerror:
   result.insn="Internal error (assembly code too long)";
+  result.err_code=2;
   goto doneerror;
 
 tmperror:
-  result.insn="NASM unavailable or insufficient /tmp access rights";
+  result.insn="Insufficient /tmp access rights";
+  result.err_code=3;
+  goto doneerror;
+
+noassemblererror:
+  result.insn="No assembler available";
+  result.err_code=4;
   goto doneerror;
 
 doneerror:
-  result.err_code=1;
-
 done:
   //Final cleanup
   system("rm -f /tmp/biew_out.bin /tmp/biew_src.asm /tmp/biew_err");
