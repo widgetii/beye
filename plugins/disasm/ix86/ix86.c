@@ -21,6 +21,7 @@
 #include <limits.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <errno.h>
 
 #include "biewhelp.h"
 #include "bmfile.h"
@@ -1965,7 +1966,42 @@ tBool Use32Addr,Use32Data,UseMMXSet,UseXMMXSet,Use64;
 
 const unsigned char leave_insns[] = { 0x07, 0x17, 0x1F, 0x58, 0x59, 0x5A, 0x5B, 0x5C, 0x5D, 0x5E, 0x5F, 0x61, 0x90, 0xC9 };
 
-char *assemblercommand=NULL;
+struct assembler_t
+{
+  const char *run_command;
+  const char *detect_command;
+};
+
+/*
+  x86 disassemblers
+  The run_command is expected to be used in sprintf to generate the actual command line.
+  The argument is a single string containing the home directory. The temporary files
+  created are:
+    tmp0: input file
+    tmp1: output file
+    tmp2: output (stdout) / error (stderr) messages (note the "-s" option)
+  The detect_command is any command which prints something to stdout as long as the assembler
+  is available.
+  Yasm is preferred over Nasm only because at the time of writing only Yasm has 64-bit
+  support in its stable release.
+  The last element must be a structure containing only NULL pointers.
+*/
+struct assembler_t assemblers[] = {
+  {
+    "yasm -f bin -s -o %1$stmp1 %1$stmp0 >%1$stmp2",
+    "yasm -s --version",
+  },
+  {
+    "nasm -f bin -s -o %1$stmp1 %1$stmp0 >%1$stmp2",
+    "nasm -s -version",
+  },
+  {
+    NULL,
+    NULL,
+  }
+};
+
+signed char active_assembler = -1;
 
 static tBool is_listed(unsigned char insn,const unsigned char *list,size_t listsize)
 {
@@ -2828,7 +2864,7 @@ extern char *ix86_dtile;
 extern char *ix86_appbuffer;
 extern char *ix86_apistr;
 extern char *ix86_modrm_ret;
-
+#include <errno.h>
 static void __FASTCALL__ ix86Init( void )
 {
   ix86_voidstr = PMalloc(1000);
@@ -2848,14 +2884,23 @@ static void __FASTCALL__ ix86Init( void )
     exit(EXIT_FAILURE);
   }
 
-  //x86 disassembler initialization
-  if (!system("yasm --version >/dev/null 2>/dev/null"))
+  //Assembler initialization
+  //Look for an available assembler
+  if (active_assembler == -1) //Execute this only once
   {
-    assemblercommand = "yasm -f bin -o /tmp/biew_out.bin /tmp/biew_src.asm 2>&1 >/dev/null |tail -n 2 |head -n 1 >/tmp/biew_err";
-  }
-  else if (!system("nasm -version >/dev/null 2>/dev/null"))
-  {
-    assemblercommand = "nasm -f bin -o /tmp/biew_out.bin /tmp/biew_src.asm >/dev/null 2>/tmp/biew_err";
+    for (active_assembler = 0; assemblers[active_assembler].detect_command; active_assembler++)
+    {
+      //Assume that the assembler is available if the detect_command prints something to stdout.
+      //Note: using the return value of "system()" does not work, at least here.
+      FILE *fp;
+      fp = popen(assemblers[active_assembler].detect_command, "r");
+      if (fp == NULL) continue;
+      if (fgetc(fp) != EOF) {
+        fclose(fp);
+        break;
+      }
+      fclose(fp);
+    }
   }
 }
 
@@ -2894,30 +2939,40 @@ static void __FASTCALL__ ix86WriteIni( hIniProfile *ini )
 char codebuffer[CODEBUFFER_LEN];
 
 /*
-Assemble "code".
-On success, it returns:
-  .insn       = assembled bytes
-  .insn_len   = length of assembled code
-  .error_code = 0
-On error, it returns:
-  .insn       = an NULL-terminated error message
-  .insn_len   = undefined
-  .error_code = non-zero
+  Assemble "code".
+  On success, it returns:
+    .insn       = assembled bytes
+    .insn_len   = length of assembled code
+    .error_code = 0
+  On error, it returns:
+    .insn       = an NULL-terminated error message
+    .insn_len   = undefined
+    .error_code = non-zero
 */
 AsmRet __FASTCALL__ ix86Asm(const char *code)
 {
   AsmRet result;
   FILE *asmf, *bin, *err;
   int i,c;
+  char commandbuffer[FILENAME_MAX+1];
+  char *home;
 
   //Check assembler availability
-  if (!assemblercommand) goto noassemblererror;
+  if (!assemblers[active_assembler].run_command) goto noassemblererror;
+
+  home = __get_home_dir("biew");
 
   //File cleanup
-  system("rm -f /tmp/biew_out.bin /tmp/biew_src.asm /tmp/biew_err");
+  sprintf(commandbuffer, "%stmp0", home);
+  for (i=0; i<3; i++)
+  {
+    remove(commandbuffer);
+    commandbuffer[strlen(commandbuffer)-1]++;
+  }
 
   //Generate NASM input file
-  asmf = fopen("/tmp/biew_src.asm", "w");
+  sprintf(commandbuffer, "%stmp0", home);
+  asmf = fopen(commandbuffer, "w");
   if (!asmf) goto tmperror;
   if (ix86GetBitness() == DAB_USE16)
   {
@@ -2936,11 +2991,25 @@ AsmRet __FASTCALL__ ix86Asm(const char *code)
   fprintf(asmf, "\n%s",code);
   fclose(asmf);
 
+  //Build command line
+  i=snprintf(commandbuffer, FILENAME_MAX+1, assemblers[active_assembler].run_command, home);
+  if ((i >= FILENAME_MAX) || (i < 0)) goto commandtoolongerror;
+
   //Run external assembler
-  system(assemblercommand);
+  //It happens way too often that system() fails with EAGAIN with
+  //no apparent reason. So, don't give up immediately
+  i=0;
+  do
+  {
+    errno=0;
+    system(commandbuffer);
+    i++;
+  }
+  while ((errno == EAGAIN) && (i < 10));
 
   //Read result
-  bin = fopen("/tmp/biew_out.bin", "r");
+  sprintf(commandbuffer, "%stmp1", home);
+  bin = fopen(commandbuffer, "r");
   if (!bin) goto asmerror;
   i=0;
   while (((c = fgetc(bin)) != EOF) && (i<CODEBUFFER_LEN))
@@ -2959,11 +3028,15 @@ AsmRet __FASTCALL__ ix86Asm(const char *code)
 
 asmerror:
   //Read error message
-  err = fopen("/tmp/biew_err", "r");
+  sprintf(commandbuffer, "%stmp2", home);
+  err = fopen(commandbuffer, "r");
   if (!err) goto tmperror;
   i=0;
   while (((c = fgetc(err)) != EOF) && (i<CODEBUFFER_LEN-1))
   {
+    //Only get the 1st error line (usually the most informative)
+    if ((((char)c) == '\r') || (((char)c) == '\n')) break;
+
     codebuffer[i++]=(char)c;
     /*
     Most error messages are in the form:
@@ -2989,19 +3062,29 @@ codetoolongerror:
   goto doneerror;
 
 tmperror:
-  result.insn="Insufficient /tmp access rights";
+  result.insn="Can't write temporary files";
   result.err_code=3;
   goto doneerror;
 
 noassemblererror:
-  result.insn="No assembler available";
+  result.insn="No assembler available/usable";
   result.err_code=4;
+  goto doneerror;
+
+commandtoolongerror:
+  result.insn="Internal error (command too long)";
+  result.err_code=5;
   goto doneerror;
 
 doneerror:
 done:
   //Final cleanup
-  system("rm -f /tmp/biew_out.bin /tmp/biew_src.asm /tmp/biew_err");
+  sprintf(commandbuffer, "%stmp0", home);
+  for (i=0; i<3; i++)
+  {
+    remove(commandbuffer);
+    commandbuffer[strlen(commandbuffer)-1]++;
+  }
   return result;
 }
 
