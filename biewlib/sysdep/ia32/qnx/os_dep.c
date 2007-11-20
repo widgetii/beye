@@ -13,6 +13,10 @@
  * @author      Andrew Golovnia
  * @since       2001
  * @note        Development, fixes and improvements
+ *
+ * @author      Mauro Giachero
+ * @since       11.2007
+ * @note        Added __get_home_dir() and some optimizations
 **/
 
 #include <stdio.h>
@@ -33,22 +37,45 @@
 
 static char _ini_name[FILENAME_MAX+1];
 static char _rc_dir_name[FILENAME_MAX+1];
+static char _home_dir_name[FILENAME_MAX + 1];
 static tBool break_status;
 static pid_t proxy=0;
 static timer_t t=0;
 static struct sigevent evp;
 static struct itimerspec it;
 
+/*
+The home directory is a good place for configuration
+and temporary files.
+At least (strlen(progname) + 9) characters should be
+available before the buffer end.
+The trailing '/' is included in the returned string.
+*/
+char* __FASTCALL__ __get_home_dir(const char *progname)
+{
+	char *p;
+
+	if (_home_dir_name[0]) return _home_dir_name; //Already computed
+
+	if((p=getenv("HOME"))==NULL||strlen(p)>FILENAME_MAX-10)
+		strcpy(_home_dir_name,"/tmp");
+	else
+		strcpy(_home_dir_name,p);
+
+	strcat(_home_dir_name,"/");
+
+	return p;
+}
+
 char* __FASTCALL__ __get_ini_name(const char *progname)
 {
 	char *p;
 
-	if((p=getenv("HOME"))==NULL||strlen(p)>FILENAME_MAX-10)
-	strcpy(_ini_name,"/tmp");
-	else
-	strcpy(_ini_name,p);
+	if (_ini_name[0]) return _ini_name; //Already computed
 
-	strcat(_ini_name,"/.");
+	p=__get_home_dir(progname);
+	strcpy(_ini_name,progname);
+	strcat(_ini_name,".");
 	strcat(_ini_name,progname);
 	strcat(_ini_name,"rc");
 
@@ -57,6 +84,8 @@ char* __FASTCALL__ __get_ini_name(const char *progname)
 
 char* __FASTCALL__ __get_rc_dir(const char *progname)
 {
+	if (_rc_dir_name[0]) return _rc_dir_name; //Already computed
+
 	strcpy(_rc_dir_name,LIBDIR"/");
 	strcat(_rc_dir_name,progname);
 	strcat(_rc_dir_name,"/");
@@ -126,6 +155,10 @@ void __FASTCALL__ __init_sys(void)
 			perror("timer create");
 			exit(1);
 		}
+
+	_ini_name[0] = '\0';
+	_rc_dir_name[0] = '\0';
+	_home_dir_name[0] = '\0';
 }
 
 void __FASTCALL__ __term_sys(void)

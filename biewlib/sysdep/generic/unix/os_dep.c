@@ -13,6 +13,10 @@
  * @author      Konstantin Boldyshev
  * @since       1999
  * @note        Development, fixes and improvements
+ *
+ * @author      Mauro Giachero
+ * @since       11.2007
+ * @note        Added __get_home_dir() and some optimizations
 **/
 
 /*
@@ -63,6 +67,35 @@ static termdesc termtab[] = {
 
 static char _ini_name[FILENAME_MAX + 1];
 static char _rc_dir_name[FILENAME_MAX + 1];
+static char _home_dir_name[FILENAME_MAX + 1];
+
+/*
+The home directory is a good place for configuration
+and temporary files.
+At least (strlen(progname) + 9) characters should be
+available before the buffer end.
+The trailing '/' is included in the returned string.
+*/
+char * __FASTCALL__ __get_home_dir(const char *progname)
+{
+    char *p;
+
+    if (_home_dir_name[0]) return _home_dir_name; //Already computed
+
+    p = getenv("HOME");
+    if (p == NULL || strlen(p) < 2) {
+	struct passwd *psw = getpwuid(getuid());
+	if (psw != NULL) p = psw->pw_dir;
+    }
+
+    if (p == NULL || strlen(p) > FILENAME_MAX - (strlen(progname) + 10))
+	p = "/tmp";
+
+    strcpy(_home_dir_name, p);
+    strcat(_home_dir_name, "/");
+
+    return _home_dir_name;
+}
 
 /*
 
@@ -70,24 +103,21 @@ static char _rc_dir_name[FILENAME_MAX + 1];
 
 char * __FASTCALL__ __get_ini_name(const char *progname)
 {
-    char *p = getenv("HOME");
+    char *p;
 
-    if (p == NULL || strlen(p) < 2) {
-	struct passwd *psw = getpwuid(getuid());
-	if (psw != NULL) p = psw->pw_dir;
-    }	
+    if (_ini_name[0]) return _ini_name; //Already computed
 
-    if (p == NULL || strlen(p) > FILENAME_MAX - (strlen(progname) + 4))
-	p = "/tmp";
-
+    p = __get_home_dir(progname);
     strcpy(_ini_name, p);
-    strcat(_ini_name, "/.");
+    strcat(_ini_name, ".");
     strcat(_ini_name, progname);
     return strcat(_ini_name, "rc");
 }
 
 char * __FASTCALL__ __get_rc_dir(const char *progname)
 {
+    if (_rc_dir_name[0]) return _rc_dir_name; //Already computed
+
     strcpy(_rc_dir_name, DATADIR);
     /*strcat(_rc_dir_name, progname);*/
     return strcat(_rc_dir_name, "/");
@@ -150,6 +180,10 @@ void __FASTCALL__ __init_sys(void)
 	t = getenv("COLORTERM");
 	if (t != NULL && !strcasecmp(t, "Eterm")) transparent = 1;
     }
+
+    _ini_name[0] = '\0';
+    _rc_dir_name[0] = '\0';
+    _home_dir_name[0] = '\0';
 
     umask(0077);
     signal(SIGTERM, cleanup);

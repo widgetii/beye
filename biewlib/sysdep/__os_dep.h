@@ -17,6 +17,10 @@
  * @deprecated  OS File manipulating functions: I had problem with standard i/o
  *              function like: open, read, write in different C libraries such
  *              as emx and possible some one.  It cause to born this section.
+ *
+ * @author      Mauro Giachero
+ * @since       11.2007
+ * @note        Added __get_home_dir()
 **/
 #ifndef __OS_DEP_H
 #define __OS_DEP_H 1
@@ -304,6 +308,15 @@ extern tBool     __FASTCALL__ __OsGetCBreak( void );
                      *                        hard c-break.
                     **/
 extern void      __FASTCALL__ __OsSetCBreak( tBool state );
+
+                   /** Builds OS specific name of home directory
+                     * @return                Slash terminated path to home directory
+                     * @param progname        indicates name of program, that can be used to revert to a fallback in case the path gets too long
+                     * @note                  Best way it always pass to function
+                     *                        argv[0] program argument.
+                     * @see                   __get_home_dir
+                    **/
+extern char *    __FASTCALL__ __get_home_dir( const char *progname );
 
                    /** Builds OS specific name of initializing file
                      * @return                fully qualified name of .ini file
