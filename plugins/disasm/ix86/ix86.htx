@@ -675,6 +675,126 @@
 ³ movsldup    [F3_0F_12/rm]           Move packet Single-FP Low and dup   ³
 ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
 ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+³                     %BXeon5100 instruction mnemonics%b                      ³
+³ %BXeon5100%b%I is the name for a new (10th in biew terms) generation%i         ³
+³ %Iof IA32 processors which introduces new instructions (unofficially   %i   ³
+³ %Inamed as Supplemental SSE3 or SSSE3)%i                                    ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
+³ pabsb       [0F_38_1C/r]            Packet Absolute value for mmx bytes ³
+³ pabsb       [66_0F_38_1C/r]         Packet Absolute value for xmmx bytes³
+³ pabsw       [0F_38_1D/r]            Packet Absolute value for mmx words ³
+³ pabsw       [66_0F_38_1D/r]         Packet Absolute value for xmmx words³
+³ pabsd       [0F_38_1E/r]            Pack Absolute value for mmx dwords  ³
+³ pabsd       [66_0F_38_1E/r]         Pack Absolute value for xmmx dwords ³
+³ palignr     [0F_3A_0F]              Packet Align Right mmx              ³
+³ palignr     [66_0F_3A_0F]           Packet Align Right xmmx             ³
+³ phaddw      [0F_38_01]              Packet Horizontal Add mmx words     ³
+³ phaddw      [66_0F_38_01]           Packet Horizontal Add xmmx words    ³
+³ phaddd      [0F_38_02]              Packet Horizontal Add mmx dwords    ³
+³ phaddd      [66_0F_38_02]           Packet Horizontal Add xmmx dwords   ³
+³ phaddsw     [0F_38_03]              Packet Horz Add and Saturate mmx    ³
+³ phaddsw     [66_0F_38_03]           Packet Horz Add and Saturate xmmx   ³
+³ phsubw      [0F_38_05]              Packet Horizontal Sub mmx words     ³
+³ phsubw      [66_0F_38_05]           Packet Horizontal Sub xmmx words    ³
+³ phsubd      [0F_38_06]              Packet Horizontal Sub mmx dwords    ³
+³ phsubd      [66_0F_38_06]           Packet Horizontal Sub xmmx dwords   ³
+³ phsubsw     [0F_38_07]              Packet Horz Sub and Saturate mmx    ³
+³ phsubsw     [66_0F_38_07]           Packet Horz Sub and Saturate xmmx   ³
+³ pmaddubsw   [0F_38_04]              Multiply and Add Packet mmx         ³
+³ pmaddubsw   [66_0F_38_04]           Multiply and Add Packet xmmx        ³
+³ pmulhrsw    [0F_38_0B]              Multiply High w Round and Scale mmx ³
+³ pmulhrsw    [66_0F_38_0B]           Multiply High w Round and Scale xmmx³
+³ pshufb      [0F_38_00]              Packet Shuffle bytes mmx            ³
+³ pshufb      [66_0F_38_00]           Packet Shuffle bytes xmmx           ³
+³ psignb      [0F_38_08]              Negate Packet Signed bytes mmx      ³
+³ psignb      [66_0F_38_08]           Negate Packet Signed bytes xmmx     ³
+³ psignw      [0F_38_09]              Negate Packet Signed words mmx      ³
+³ psignw      [66_0F_38_09]           Negate Packet Signed words xmmx     ³
+³ psignd      [0F_38_0A]              Negate Packet Signed dwords mmx     ³
+³ psignd      [66_0F_38_0A]           Negate Packet Signed dwords xmmx    ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄSMXÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
+³ getsec      [0F_37]                 Get SMX (Safer Mode eXtension) func ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄVMXÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
+³ vmcall      [0F_01_C1]              Call to VM Monitor                  ³
+³ vmclear     [66_0F_01_C7/6]         Clear VM Control Structure          ³
+³ vmlaunch    [0F_01_C2]              Laungh VM Manager by current VMCS   ³
+³ vmptrld     [0F_C7/6]               Load Pointer to VM Control Structure³
+³ vmptrst     [0F_C7/7]               Store Ptr to VM Control Structure   ³
+³ vmread      [0F_78]                 Read Field from VMCS                ³
+³ vmresume    [0F_01_C3]              Resume VM Manager by current VMCS   ³
+³ vmwrite     [0F_79]                 Write Field to VMCS                 ³
+³ vmxoff      [0F_01_C4]              Leave VMX Operation                 ³
+³ vmxon       [F3_0F_C7/6]            Enter VMX Operation                 ³
+ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+³                     %BXeon5200 instruction mnemonics%b                      ³
+³ %BXeon5200%b%I is the name for a new (11th in biew terms) generation%i         ³
+³ %Iof IA32 processors which introduces new instructions (unofficially   %i   ³
+³ %Inamed as SSE4)%i                                                          ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ4.1ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
+³ blendpd     [66_0F_3A_OD/r]         Blend Packet Double-Floats          ³
+³ blendps     [66_0F_3A_OC/r]         Blend Packet Single-Floats          ³
+³ blendvpd    [66_0F_38_15/r]         Variable Blend Packet Double-Floats ³
+³ blendvps    [66_0F_38_14/r]         Variable Blend Packet Single-Floats ³
+³ dppd        [66_0F_3A_41/r]         Dot product of Packet Double-float  ³
+³ dppd        [66_0F_3A_40/r]         Dot product of Packet Single-float  ³
+³ extractps   [66_0F_3A_17/r]         Extract Packet Single-float         ³
+³ extractps   [66_Rex_0F_3A_17/r]     Extract Packet Single-float         ³
+³ insertps    [66_0F_3A_21/r]         Insert Packet Single-float          ³
+³ movntdqa    [66_0F_38_2A/r]         Load Double Quads Non-Temporal Align³
+³ mpsadbw     [66_0F_3A_42/r]         Multiple Packet Sums of Abs Diffs   ³
+³ packusdw    [66_0F_38_2B/r]         Pack with Unsigned Saturation       ³
+³ pblendvb    [66_0F_38_10/r]         Variable Blend Packet bytes         ³
+³ pblendw     [66_0F_3A_0E/r]         Blend Packet words                  ³
+³ pcmpeqq     [66_0F_38_29/r]         Compare Packet QWords for Equal     ³
+³ pextrb      [66_0F_3A_14/r]         Extract byte                        ³
+³ pextrb      [66_rex_0F_3A_14/r]     Extract byte                        ³
+³ pextrd      [66_0F_3A_16/r]         Extract DWord                       ³
+³ pextrq      [66_Rex_0F_3A_16/r]     Extract QWord                       ³
+³ pinsrb      [66_0F_3A_20/r]         Insert byte                         ³
+³ pinsrd      [66_0F_3A_22/r]         Insert DWord                        ³
+³ pinsrq      [66_Rex_0F_3A_22/r]     Insert QWord                        ³
+³ phminposuw  [66_0F_38_41/r]         Packet Horizontal Word Minimum      ³
+³ pmaxsb      [66_0F_38_3C/r]         Maximum of Packet Signed Bytes      ³
+³ pmaxsd      [66_0F_38_3D/r]         Maximum of Packet Signed DWords     ³
+³ pmaxud      [66_0F_38_3F/r]         Maximum of Packet Unsigned DWords   ³
+³ pmaxuw      [66_0F_38_3E/r]         Maximum of Packet Unsigned Words    ³
+³ pminsb      [66_0F_38_38/r]         Minimum of Packet Signed Bytes      ³
+³ pminsd      [66_0F_38_39/r]         Minimum of Packet Signed DWords     ³
+³ pminud      [66_0F_38_3B/r]         Minimum of Packet Unsigned DWords   ³
+³ pminuw      [66_0F_38_3A/r]         Minimum of Packet Unsigned Words    ³
+³ pmovsxbw    [66_0F_38_20/r]         Packet Move w Sign-Extend Words     ³
+³ pmovsxbd    [66_0F_38_21/r]         Packet Move w Sign-Extend DWords    ³
+³ pmovsxbq    [66_0F_38_22/r]         Packet Move w Sign-Extend QWords    ³
+³ pmovsxwd    [66_0F_38_23/r]         Packet Move w Sign-Extend DWords    ³
+³ pmovsxwq    [66_0F_38_24/r]         Packet Move w Sign-Extend QWords    ³
+³ pmovsxdq    [66_0F_38_25/r]         Packet Move w Sign-Extend QWords    ³
+³ pmovzxbw    [66_0F_38_30/r]         Packet Move w Zero-Extend Words     ³
+³ pmovzxbd    [66_0F_38_31/r]         Packet Move w Zero-Extend DWords    ³
+³ pmovzxbq    [66_0F_38_32/r]         Packet Move w Zero-Extend QWords    ³
+³ pmovzxwd    [66_0F_38_33/r]         Packet Move w Zero-Extend DWords    ³
+³ pmovzxwq    [66_0F_38_34/r]         Packet Move w Zero-Extend QWords    ³
+³ pmovzxdq    [66_0F_38_35/r]         Packet Move w Zero-Extend QWords    ³
+³ pmuldq      [66_0F_38_28/r]         Mul Packet S-Dwords                 ³
+³ pmulld      [66_0F_38_40/r]         Mul Packet S-Dwords and store Lows  ³
+³ ptest       [66_0F_38_17/r]         Packet Logical Compare              ³
+³ roundpd     [66_0F_3A_09/r]         Round Packet Double-Floats          ³
+³ roundps     [66_0F_3A_08/r]         Round Packet Single-Floats          ³
+³ roundsd     [66_0F_3A_0B/r]         Round Scalar Double-Floats          ³
+³ roundss     [66_0F_3A_0A/r]         Round Scalar Single-Floats          ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ4.2ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
+³ crc32       [F2_0F_38_F0/r]         Accumulate CRC-32 Value (011EDC6F41)³
+³ crc32       [F2_Rex_0F_38_F0/r]     Accumulate CRC-32 Value (011EDC6F41)³
+³ crc32       [F2_0F_38_F1/r]         Accumulate CRC-32 Value (011EDC6F41)³
+³ crc32       [F2_Rex_0F_38_F1/r]     Accumulate CRC-32 Value (011EDC6F41)³
+³ pcmpestri   [66_0F_3A_61/r]         Pack Cmp Explicit Length String, idx³
+³ pcmpestrm   [66_0F_3A_60/r]         Pack Cmp Explicit Length String, msk³
+³ pcmpistri   [66_0F_3A_63/r]         Pack Cmp Implicit Length String, idx³
+³ pcmpistrm   [66_0F_3A_62/r]         Pack Cmp Implicit Length String, msk³
+³ popcnt      [F3_0F_B8/r]            Count of Number set to 1 bits       ³
+³ popcnt      [F3_Rex_0F_B8/r]        Count of Number set to 1 bits       ³
+ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 ³                                   %BK5%b                                    ³
 ³ %IThe AMD-K5 processor is socket 7-compatible and software-compatible with%i³
 ³ %Ithe %BPentium%b processor. Compatible in this sense means the devices are%i   ³

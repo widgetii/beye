@@ -1066,43 +1066,70 @@ void __FASTCALL__ ix86_InOut(char * str,ix86Param *DisP)
 
 void  __FASTCALL__ ix86_ExOpCodes(char *str,ix86Param *DisP)
 {
+ int in_chain=1;
  unsigned char code;
+ ix86_ExOpcodes *extable=ix86_extable;
  DisP->RealCmd = &DisP->RealCmd[1];
  DisP->CodeAddress++;
  code = DisP->RealCmd[0];
  DisP->codelen++;
+ while(in_chain)
+ {
+#ifdef IX86_64
+    if(x86_Bitness == DAB_USE64)
+    {
+	if(extable[code].flags64&IX86_NAME_IS_TABLE)
+	{
+	    extable=extable[code].name64;
+	    DisP->RealCmd = &DisP->RealCmd[1];
+	    code = DisP->RealCmd[0];
+	    DisP->codelen++;
+	}
+	else in_chain=0;
+    }
+    else
+#endif
+    if(extable[code].pro_clone&IX86_NAME_IS_TABLE)
+    {
+	extable=extable[code].name;
+	DisP->RealCmd = &DisP->RealCmd[1];
+	code = DisP->RealCmd[0];
+	DisP->codelen++;
+    }
+    else in_chain=0;
+ }
 #ifdef IX86_64
  if(x86_Bitness == DAB_USE64)
  {
-    strcpy(str,ix86_extable[code].name64);
+    strcpy(str,extable[code].name64);
  }
  else
 #endif
- strcpy(str,ix86_extable[code].name);
+ strcpy(str,extable[code].name);
 #ifdef IX86_64
  if(x86_Bitness == DAB_USE64)
  {
-   if(ix86_extable[code].method64)
+   if(extable[code].method64)
    {
      TabSpace(str,TAB_POS);
-     ix86_extable[code].method64(str,DisP);
+     extable[code].method64(str,DisP);
    }
  }
  else
 #endif
- if(ix86_extable[code].method)
+ if(extable[code].method)
  {
    TabSpace(str,TAB_POS);
-   ix86_extable[code].method(str,DisP);
+   extable[code].method(str,DisP);
  }
 #ifdef IX86_64
- if(x86_Bitness == DAB_USE64) DisP->pro_clone = ix86_extable[code].flags64;
+ if(x86_Bitness == DAB_USE64) DisP->pro_clone = extable[code].flags64;
  else
 #endif
- if((DisP->pro_clone&IX86_CPUMASK) < (ix86_extable[code].pro_clone&IX86_CPUMASK))
+ if((DisP->pro_clone&IX86_CPUMASK) < (extable[code].pro_clone&IX86_CPUMASK))
  {
 	DisP->pro_clone &= ~IX86_CPUMASK;
-	DisP->pro_clone |= ix86_extable[code].pro_clone;
+	DisP->pro_clone |= extable[code].pro_clone;
  }
 }
 
@@ -1120,6 +1147,37 @@ void  __FASTCALL__ ix86_ArgExGr0(char *str,ix86Param *DisP)
  if(x86_Bitness != DAB_USE64)
 #endif
  if(rm < 4) DisP->pro_clone |= IX86_CPL0;
+}
+
+static char *ix86_vmxname[]={"???","???","???","???","???","???","vmclear","???",};
+void   __FASTCALL__ ix86_VMX(char *str,ix86Param *DisP)
+{
+    unsigned char rm = (DisP->RealCmd[1] & 0x38) >> 3;
+    unsigned char reg = (DisP->RealCmd[1] & 0x07);
+    unsigned char mod = (DisP->RealCmd[1] & 0xC0) >> 6;
+    strcpy(str,ix86_vmxname[reg]);
+    TabSpace(str,TAB_POS);
+    DisP->codelen++;
+    strcat(str,ix86_getModRM(True,mod,rm,DisP));
+    DisP->pro_clone |= IX86_P6CPU;
+}
+
+static char *ix86_0Fvmxname[]={"???","cmpxchg8b","???","???","???","???","vmptrld","vmptrst",};
+void   __FASTCALL__ ix86_0FVMX(char *str,ix86Param *DisP)
+{
+    unsigned char rm = (DisP->RealCmd[1] & 0x38) >> 3;
+    unsigned char reg = (DisP->RealCmd[1] & 0x07);
+    unsigned char mod = (DisP->RealCmd[1] & 0xC0) >> 6;
+#ifdef IX86_64
+    if(x86_Bitness == DAB_USE64 && reg==1)
+	strcpy(str,"cmpxchg16b");
+    else
+#endif
+    strcpy(str,ix86_0Fvmxname[reg]);
+    TabSpace(str,TAB_POS);
+    DisP->codelen++;
+    strcat(str,ix86_getModRM(True,mod,rm,DisP));
+    if(rm > 1) DisP->pro_clone |= IX86_P6CPU;
 }
 
 void  __FASTCALL__ ix86_ArgExGr1(char *str,ix86Param *DisP)
@@ -1142,6 +1200,55 @@ void  __FASTCALL__ ix86_ArgExGr1(char *str,ix86Param *DisP)
     }
 #endif
     {
+      if(DisP->RealCmd[1] == 0xC1)
+      {
+        strcpy(str,"vmcall");
+        DisP->codelen++;
+	DisP->pro_clone = IX86_P6CPU;
+        return;
+      }
+      else
+      if(DisP->RealCmd[1] == 0xC2)
+      {
+        strcpy(str,"vmlaunch");
+        DisP->codelen++;
+	DisP->pro_clone = IX86_P6CPU;
+        return;
+      }
+      else
+      if(DisP->RealCmd[1] == 0xC3)
+      {
+        strcpy(str,"vmresume");
+        DisP->codelen++;
+	DisP->pro_clone = IX86_P6CPU;
+        return;
+      }
+      else
+      if(DisP->RealCmd[1] == 0xC4)
+      {
+        strcpy(str,"vmxoff");
+        DisP->codelen++;
+	DisP->pro_clone = IX86_P6CPU;
+        return;
+      }
+      else
+      if(DisP->RealCmd[1] == 0xC7)
+      {
+	unsigned char rm = (DisP->RealCmd[1] & 0x38) >> 3;
+	unsigned char reg = (DisP->RealCmd[1] & 0x07);
+	unsigned char mod = (DisP->RealCmd[1] & 0xC0) >> 6;
+	DisP->codelen++;
+	if(rm==0x06)
+	{
+	    strcpy(str,"vmclear");
+	    TabSpace(str,TAB_POS);
+	    DisP->codelen++;
+	    strcat(str,ix86_getModRM(True,mod,reg,DisP));
+	    DisP->pro_clone = IX86_P6CPU;
+	}
+        return;
+      }
+      else
       if(DisP->RealCmd[1] == 0xC8)
       {
         strcpy(str,"monitor");
@@ -1149,6 +1256,7 @@ void  __FASTCALL__ ix86_ArgExGr1(char *str,ix86Param *DisP)
 	DisP->pro_clone = IX86_P5CPU&~IX86_CPL0;
         return;
       }
+      else
       if(DisP->RealCmd[1] == 0xC9)
       {
         strcpy(str,"mwait");
