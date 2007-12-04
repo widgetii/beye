@@ -297,7 +297,8 @@ static unsigned __FASTCALL__ drawAsm( unsigned keycode, unsigned textshift )
          tmp_off = disPanelMode < PANMOD_FULL ? full_off : med_off;
          if(len < tmp_off) len = tmp_off;
          if(activeDisasm->GetOpcodeColor) 
-		opc = HiLight ? activeDisasm->GetOpcodeColor(dret.pro_clone) : disasm_cset.opcodes;
+		opc =	HiLight == 2 ? activeDisasm->altGetOpcodeColor(dret.pro_clone) :
+			HiLight == 1 ? activeDisasm->GetOpcodeColor(dret.pro_clone) : disasm_cset.opcodes;
 	 else	opc = disasm_cset.opcodes;
          twSetColorAttr(opc);
          twDirectWrite(disPanelMode < PANMOD_FULL ? len_64+1 : 1,
@@ -312,7 +313,8 @@ static unsigned __FASTCALL__ drawAsm( unsigned keycode, unsigned textshift )
        }
        twSetColorAttr(browser_cset.main);
        twDirectWrite(len,i + 1," ",1);  len++;
-       cattr = HiLight ? activeDisasm->GetInsnColor(dret.pro_clone) :
+       cattr =	HiLight == 2 ?  activeDisasm->altGetInsnColor(dret.pro_clone) :
+		HiLight == 1 ?  activeDisasm->GetInsnColor(dret.pro_clone) :
                                 browser_cset.main;
        twSetColorAttr(cattr);
        j = strlen(dret.str);
@@ -436,7 +438,8 @@ static tBool __FASTCALL__ disSelectPanelMode( void )
 static const char *hilight_names[] =
 {
    "~Mono",
-   "~Highlight"
+   "~Highlight",
+   "~Alt Highlight"
 };
 
 static tBool __FASTCALL__ disSelectHiLight( void )

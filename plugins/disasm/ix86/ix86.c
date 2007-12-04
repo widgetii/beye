@@ -4553,6 +4553,36 @@ static ColorAttr  __FASTCALL__ ix86GetOpcodeColor(unsigned long clone)
   return ((clone & IX86_CPL0) == IX86_CPL0)?disasm_cset.opcodes0:disasm_cset.opcodes;
 }
 
+static ColorAttr  __FASTCALL__ ix86altGetAsmColor(unsigned long clone)
+{
+#ifdef IX86_64
+     if(x86_Bitness == DAB_USE64)
+     {
+	if((clone & K64_SSE) == K64_SSE) return disasm_cset.cpu_cset[2].clone[clone & K64_CLONEMASK];
+	else
+	if(clone & (K64_FPU|K64_MMX)) return disasm_cset.cpu_cset[1].clone[clone & K64_CLONEMASK];
+	else
+	return disasm_cset.cpu_cset[0].clone[clone & K64_CLONEMASK];
+     }
+     else
+#endif
+	if((clone & IX86_SSE) == IX86_SSE) return disasm_cset.cpu_cset[2].clone[0];
+	else
+	if(clone & (IX86_FPU|IX86_MMX)) return disasm_cset.cpu_cset[1].clone[0];
+	else
+	return disasm_cset.cpu_cset[0].clone[0];
+}
+
+static ColorAttr  __FASTCALL__ ix86altGetOpcodeColor(unsigned long clone)
+{
+#ifdef IX86_64
+   if(x86_Bitness == DAB_USE64)
+	return ((clone & K64_CPL0) == K64_CPL0)?disasm_cset.opcodes0:disasm_cset.opcodes;
+   else
+#endif
+  return ((clone & IX86_CPL0) == IX86_CPL0)?disasm_cset.opcodes0:disasm_cset.opcodes;
+}
+
 static tBool __FASTCALL__ x86AsmRef( void )
 {
   hlpDisplay(20000);
@@ -4935,6 +4965,8 @@ REGISTRY_DISASM ix86_Disasm =
   ix86MaxInsnLen,
   ix86GetAsmColor,
   ix86GetOpcodeColor, 
+  ix86altGetAsmColor,
+  ix86altGetOpcodeColor, 
   ix86GetBitness,
   ix86GetClone,
   ix86Init,

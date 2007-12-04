@@ -163,6 +163,8 @@ REGISTRY_DISASM Null_Disasm =
   nulMaxInsnLen,
   nulGetAsmColor,
   NULL, 
+  nulGetAsmColor,
+  NULL, 
   nulGetBitness,
   nulGetClone,
   nulInit,

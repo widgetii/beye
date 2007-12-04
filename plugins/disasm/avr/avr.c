@@ -585,6 +585,8 @@ REGISTRY_DISASM AVR_Disasm =
   AVRMaxInsnLen,                         /* max opcode length of 1 insn */
   AVRGetAsmColor,                        /* color of insn */
   AVRGetOpcodeColor,                     /* color of opcode */
+  AVRGetAsmColor,                        /* color of insn */
+  AVRGetOpcodeColor,                     /* color of opcode */
   AVRGetBitness,                         /* currently ised bitness */
   AVRGetClone,                           /* short clone name of insn */
   AVRInit,                               /* plugin initializer */

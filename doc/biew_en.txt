@@ -1168,7 +1168,7 @@ v5.0.2        ! Changes:
 		+ Added initial support for Sis and SisX formats of Symbian OS
 		* Fixed bug #1696442 (-extraincdir and -extralibdir can only handle one extra lib.)
 		* Added endian selection in hexmode viewer
-5.6.5         ! Changes:
+5.7.0         ! Changes:
 XX yyy 2007     * Fixes by Daniel Borca <dborca@yahoo.com>:
 		  * unix/vio.c use the correct alternate set for line drawing.
 		    see http://www.in-ulm.de/~mascheck/various/alternate_charset/
@@ -1184,6 +1184,7 @@ XX yyy 2007     * Fixes by Daniel Borca <dborca@yahoo.com>:
 		    block SIGIO events until we are finished setting up the keyboard.
                 * Assembling through the nasm/yasm. Patch by <mauro.giachero@gmail.com>
 		* New opcodes (SSSE3, SSE4.1, SSE4.2) in x86 disassembler.
+		* Provide alternative insns hilighting in ix86-32 disassembler.
 []======================================================================[]
 []  Thank you for your interest.                                        []
 []  Nick Kurshev (http://my666.boom.ru/666_en.html).                    []

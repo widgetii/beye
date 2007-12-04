@@ -646,6 +646,8 @@ REGISTRY_DISASM Java_Disasm =
   javaMaxInsnLen,
   javaGetAsmColor,
   NULL, 
+  javaGetAsmColor,
+  NULL, 
   javaGetBitness,
   javaGetClone,
   javaInit,
