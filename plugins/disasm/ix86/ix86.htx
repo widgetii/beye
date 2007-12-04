@@ -732,28 +732,26 @@
 ³ %Iof IA32 processors which introduces new instructions (unofficially   %i   ³
 ³ %Inamed as SSE4)%i                                                          ³
 ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ4.1ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
-³ blendpd     [66_0F_3A_OD/r]         Blend Packet Double-Floats          ³
-³ blendps     [66_0F_3A_OC/r]         Blend Packet Single-Floats          ³
+³ blendpd     [66_0F_3A_OD/r/i8]      Blend Packet Double-Floats          ³
+³ blendps     [66_0F_3A_OC/r/i8]      Blend Packet Single-Floats          ³
 ³ blendvpd    [66_0F_38_15/r]         Variable Blend Packet Double-Floats ³
 ³ blendvps    [66_0F_38_14/r]         Variable Blend Packet Single-Floats ³
-³ dppd        [66_0F_3A_41/r]         Dot product of Packet Double-float  ³
-³ dppd        [66_0F_3A_40/r]         Dot product of Packet Single-float  ³
-³ extractps   [66_0F_3A_17/r]         Extract Packet Single-float         ³
-³ extractps   [66_Rex_0F_3A_17/r]     Extract Packet Single-float         ³
-³ insertps    [66_0F_3A_21/r]         Insert Packet Single-float          ³
+³ dppd        [66_0F_3A_41/r/i8]      Dot product of Packet Double-float  ³
+³ dpps        [66_0F_3A_40/r/i8]      Dot product of Packet Single-float  ³
+³ extractps   [66_0F_3A_17/r/i8]      Extract Packet Single-float         ³
+³ insertps    [66_0F_3A_21/r/i8]      Insert Packet Single-float          ³
 ³ movntdqa    [66_0F_38_2A/r]         Load Double Quads Non-Temporal Align³
 ³ mpsadbw     [66_0F_3A_42/r]         Multiple Packet Sums of Abs Diffs   ³
 ³ packusdw    [66_0F_38_2B/r]         Pack with Unsigned Saturation       ³
 ³ pblendvb    [66_0F_38_10/r]         Variable Blend Packet bytes         ³
-³ pblendw     [66_0F_3A_0E/r]         Blend Packet words                  ³
+³ pblendw     [66_0F_3A_0E/r/i8]      Blend Packet words                  ³
 ³ pcmpeqq     [66_0F_38_29/r]         Compare Packet QWords for Equal     ³
-³ pextrb      [66_0F_3A_14/r]         Extract byte                        ³
-³ pextrb      [66_rex_0F_3A_14/r]     Extract byte                        ³
-³ pextrd      [66_0F_3A_16/r]         Extract DWord                       ³
-³ pextrq      [66_Rex_0F_3A_16/r]     Extract QWord                       ³
-³ pinsrb      [66_0F_3A_20/r]         Insert byte                         ³
-³ pinsrd      [66_0F_3A_22/r]         Insert DWord                        ³
-³ pinsrq      [66_Rex_0F_3A_22/r]     Insert QWord                        ³
+³ pextrb      [66_0F_3A_14/r/i8]      Extract byte                        ³
+³ pextrd      [66_0F_3A_16/r/i8]      Extract DWord                       ³
+³ pextrq      [66_Rex_0F_3A_16/r/i8]  Extract QWord                       ³
+³ pinsrb      [66_0F_3A_20/r/i8]      Insert byte                         ³
+³ pinsrd      [66_0F_3A_22/r/i8]      Insert DWord                        ³
+³ pinsrq      [66_Rex_0F_3A_22/r/i8]  Insert QWord                        ³
 ³ phminposuw  [66_0F_38_41/r]         Packet Horizontal Word Minimum      ³
 ³ pmaxsb      [66_0F_38_3C/r]         Maximum of Packet Signed Bytes      ³
 ³ pmaxsd      [66_0F_38_3D/r]         Maximum of Packet Signed DWords     ³
@@ -778,21 +776,18 @@
 ³ pmuldq      [66_0F_38_28/r]         Mul Packet S-Dwords                 ³
 ³ pmulld      [66_0F_38_40/r]         Mul Packet S-Dwords and store Lows  ³
 ³ ptest       [66_0F_38_17/r]         Packet Logical Compare              ³
-³ roundpd     [66_0F_3A_09/r]         Round Packet Double-Floats          ³
-³ roundps     [66_0F_3A_08/r]         Round Packet Single-Floats          ³
-³ roundsd     [66_0F_3A_0B/r]         Round Scalar Double-Floats          ³
-³ roundss     [66_0F_3A_0A/r]         Round Scalar Single-Floats          ³
+³ roundpd     [66_0F_3A_09/r/i8]      Round Packet Double-Floats          ³
+³ roundps     [66_0F_3A_08/r/i8]      Round Packet Single-Floats          ³
+³ roundsd     [66_0F_3A_0B/r/i8]      Round Scalar Double-Floats          ³
+³ roundss     [66_0F_3A_0A/r/i8]      Round Scalar Single-Floats          ³
 ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ4.2ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
 ³ crc32       [F2_0F_38_F0/r]         Accumulate CRC-32 Value (011EDC6F41)³
-³ crc32       [F2_Rex_0F_38_F0/r]     Accumulate CRC-32 Value (011EDC6F41)³
 ³ crc32       [F2_0F_38_F1/r]         Accumulate CRC-32 Value (011EDC6F41)³
-³ crc32       [F2_Rex_0F_38_F1/r]     Accumulate CRC-32 Value (011EDC6F41)³
-³ pcmpestri   [66_0F_3A_61/r]         Pack Cmp Explicit Length String, idx³
-³ pcmpestrm   [66_0F_3A_60/r]         Pack Cmp Explicit Length String, msk³
-³ pcmpistri   [66_0F_3A_63/r]         Pack Cmp Implicit Length String, idx³
-³ pcmpistrm   [66_0F_3A_62/r]         Pack Cmp Implicit Length String, msk³
+³ pcmpestri   [66_0F_3A_61/r/i8]      Pack Cmp Explicit Length String, idx³
+³ pcmpestrm   [66_0F_3A_60/r/i8]      Pack Cmp Explicit Length String, msk³
+³ pcmpistri   [66_0F_3A_63/r/i8]      Pack Cmp Implicit Length String, idx³
+³ pcmpistrm   [66_0F_3A_62/r/i8]      Pack Cmp Implicit Length String, msk³
 ³ popcnt      [F3_0F_B8/r]            Count of Number set to 1 bits       ³
-³ popcnt      [F3_Rex_0F_B8/r]        Count of Number set to 1 bits       ³
 ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
 ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 ³                                   %BK5%b                                    ³

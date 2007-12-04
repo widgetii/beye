@@ -55,107 +55,76 @@ extern tBool Use32Addr,Use32Data,UseMMXSet,UseXMMXSet,Use64;
 extern char * SJump[];
 typedef void (__FASTCALL__*ix86_method)(char *encode_str,ix86Param *);
 
-#define IX86_CPU086  0x00000000UL
-#define IX86_CPU186  0x00000001UL
-#define IX86_CPU286  0x00000002UL
-#define IX86_CPU386  0x00000003UL
-#define IX86_CPU486  0x00000004UL
-#define IX86_CPU586  0x00000005UL
-#define IX86_CPU686  0x00000006UL
-#define IX86_CPU786  0x00000007UL
-#define IX86_CPU886  0x00000008UL
-#define IX86_CPU986  0x00000009UL
-#define IX86_CPU1086 0x0000000AUL
-#define IX86_CPU1186 0x0000000BUL
-#define IX86_CPU1286 0x0000000CUL
+#define IX86_CPU086	0x00000000UL
+#define IX86_CPU186	0x00000001UL
+#define IX86_CPU286	0x00000002UL
+#define IX86_CPU386	0x00000003UL
+#define IX86_CPU486	0x00000004UL
+#define IX86_CPU586	0x00000005UL
+#define IX86_CPU686	0x00000006UL
+#define IX86_CPU786	0x00000007UL
+#define IX86_CPU886	0x00000008UL
+#define IX86_CPU986	0x00000009UL
+#define IX86_CPU1086	0x0000000AUL
+#define IX86_CPU1186	0x0000000BUL
+#define IX86_CPU1286	0x0000000CUL
+#define IX86_CPUMASK	0x00000FFFUL
 
-#define IX86_CPUMASK 0x000000FFUL
+#define IX86_REGGROUP	0x0000F000UL
+#define IX86_GPR	0x00000000UL /* insn works with general purpose registers */
+#define IX86_FPU	0x00001000UL /* insn works with fpu registers */
+#define IX86_MMX	0x00002000UL /* insn works with mmx registers */
+#define IX86_SSE	0x00003000UL /* insn works with sse registers */
 
-#define IX86_FPU087 0x000000FFUL
-#define IX86_FPU187 0x000001FFUL
-#define IX86_FPU287 0x000002FFUL
-#define IX86_FPU387 0x000003FFUL
-#define IX86_FPU487 0x000004FFUL
-#define IX86_FPU587 0x000005FFUL
-#define IX86_FPU687 0x000006FFUL
-#define IX86_FPU787 0x000007FFUL
-#define IX86_FPU887 0x000008FFUL
-#define IX86_FPU987 0x000009FFUL
-#define IX86_FPU1087 0x00000AFFUL
-#define IX86_FPU1187 0x00000BFFUL
-#define IX86_FPU1287 0x00000CFFUL
+#define IX86_CLONEMASK	0x0000F000UL
+#define IX86_INTEL	0x00000000UL
+#define IX86_AMD	0x00001000UL
+#define IX86_CYRIX	0x00002000UL
 
-#define IX86_FPUMASK 0x0000FF00UL
-
-#define IX86_MMX586 0x0005FFFFUL
-#define IX86_MMX686 0x0006FFFFUL
-#define IX86_MMX786 0x0007FFFFUL
-#define IX86_MMX886 0x0008FFFFUL
-#define IX86_MMX986 0x0009FFFFUL
-#define IX86_MMX1086 0x000AFFFFUL
-#define IX86_MMX1186 0x000BFFFFUL
-#define IX86_MMX1286 0x000CFFFFUL
-
-#define IX86_MMXMASK 0x00FF0000UL
-
-#define IX86_INTEL     0x00000000UL
-#define IX86_AMD       0x01000000UL
-#define IX86_CYRIX     0x02000000UL
-#define IX86_CLONEMASK 0x0F000000UL
-
-#define IX86_CPL0      0x10000000UL
-#define IX86_NAME_IS_TABLE	0x80000000UL
-
-#define IX86_P2        IX86_CPU686
-
-#define IX86_P3        IX86_CPU786
-#define IX86_P3FPU     IX86_FPU787
-#define IX86_P3MMX     IX86_MMX786
-
-#define IX86_P4        IX86_CPU886
-#define IX86_P4FPU     IX86_FPU887
-#define IX86_P4MMX     IX86_MMX886
-
-/* Prescott processor (SSE3) */
-#define IX86_P5CPU    IX86_CPU986
-#define IX86_P5FPU    IX86_FPU987
-#define IX86_P5MMX    IX86_MMX986
-
-/* Xeon5100 processor (SSSE3)*/
-#define IX86_P6CPU    IX86_CPU1086
-#define IX86_P6FPU    IX86_FPU1087
-#define IX86_P6MMX    IX86_MMX1086
-
-/* Xeon5200 processor (SSE4)*/
-#define IX86_P7CPU    IX86_CPU1186
-#define IX86_P7FPU    IX86_FPU1187
-#define IX86_P7MMX    IX86_MMX1186
+#define IX86_SYSTEMMASK	0x000F0000UL
+#define IX86_CPL0	0x00010000UL
 
 /* Furter processors */
-#define IX86_UNKCPU    IX86_CPU1286
-#define IX86_UNKFPU    IX86_FPU1287
-#define IX86_UNKMMX    IX86_MMX1286
+#define IX86_UNKCPU	IX86_CPU1286
+#define IX86_UNKFPU	(IX86_UNKCPU|IX86_FPU)
+#define IX86_UNKMMX	(IX86_UNKCPU|IX86_MMX)
+#define IX86_UNKSSE	(IX86_UNKCPU|IX86_SSE)
 
-#define IX86_K6        IX86_AMD | IX86_CPU586
-#define IX86_3DNOW     IX86_AMD | IX86_MMX686
-#define IX86_ATHLON    IX86_AMD | IX86_MMX786
-#define IX86_UNKAMD    IX86_AMD | IX86_CPU886
+#define IX86_P2		IX86_CPU686
+#define IX86_P3		IX86_CPU786
+#define IX86_P4		IX86_CPU886
+/* Prescott processor (SSE3) */
+#define IX86_P5		IX86_CPU986
+/* Xeon5100 processor (SSSE3)*/
+#define IX86_P6		IX86_CPU1086
+/* Xeon5200 processor (SSE4)*/
+#define IX86_P7		IX86_CPU1186
 
-#define IX86_CYRIX486  IX86_CYRIX | IX86_CPU486
-#define IX86_CYRIX686  IX86_CYRIX | IX86_CPU586
-#define IX86_CYRIX686MMX IX86_CYRIX | IX86_MMX586
-#define IX86_UNKCYRIX  IX86_CYRIX | IX86_CPU686
+#define IX86_K6		(IX86_AMD|IX86_CPU586)
+#define IX86_3DNOW	(IX86_AMD|IX86_CPU686|IX86_MMX)
+#define IX86_ATHLON	(IX86_AMD|IX86_CPU786|IX86_MMX)
+#define IX86_UNKAMD	(IX86_AMD|IX86_CPU886)
+
+#define IX86_CYRIX486		(IX86_CYRIX|IX86_CPU486)
+#define IX86_CYRIX686		(IX86_CYRIX|IX86_CPU586)
+#define IX86_CYRIX686MMX	(IX86_CYRIX|IX86_CPU586|IX86_MMX)
+#define IX86_UNKCYRIX		(IX86_CYRIX|IX86_CPU686)
 
 #define K64_ATHLON	0x00000000UL
-#define K64_CLONEMASK	0x00FFFFFFUL
-#define K64_REGGROUP    0x03000000UL
+#define K64_CLONEMASK	0x00000FFFUL
+#define K64_REGGROUP    0x0000F000UL
 #define K64_GPR         0x00000000UL /* insn works with general purpose registers */
-#define K64_FPU         0x01000000UL /* insn works with fpu registers */
-#define K64_MMX         0x02000000UL /* insn works with mmx registers */
-#define K64_SSE         0x03000000UL /* insn works with sse registers */
-#define K64_NOCOMPAT	0x04000000UL /* means insns has no 16 or 32 bit forms */
-#define K64_DEF32	0x08000000UL /* means insns size depends on default data size but not address size */
-#define K64_CPL0	0x10000000UL /* means insns requires cpl0 privilegies to be executed */
+#define K64_FPU         0x00001000UL /* insn works with fpu registers */
+#define K64_MMX         0x00002000UL /* insn works with mmx registers */
+#define K64_SSE         0x00003000UL /* insn works with sse registers */
+#define K64_NOCOMPAT	0x00004000UL /* means insns has no 16 or 32 bit forms */
+#define K64_DEF32	0x00008000UL /* means insns size depends on default data size but not address size */
+#define K64_SYSTEMMASK	0x000F0000UL
+#define K64_CPL0	0x00010000UL /* means insns requires cpl0 privilegies to be executed */
+
+/* Special features flags */
+#define TABDESC_MASK		0xFFF00000UL
+#define TAB_NAME_IS_TABLE	0x00100000UL
 
 typedef struct tag_ix86opcodes
 {
@@ -250,6 +219,7 @@ extern const char * ix86_KatmaiGr1Names[];
 extern const char * ix86_KatmaiGr2Names[];
 extern const char * ix86_KatmaiCmpSuffixes[];
 
+extern ix86_ExOpcodes* __FASTCALL__ ix86_prepare_flags(ix86_ExOpcodes *extable,ix86Param *DisP,unsigned char *code);
 extern char * __FASTCALL__ ix86_getModRM(tBool w,unsigned char mod,unsigned char rm,ix86Param *DisP);
 extern void   __FASTCALL__ ix86_setModifier(char *str,const char *modf);
 extern char * __FASTCALL__ ix86_CStile(char *str,const char *arg2);
