@@ -1182,7 +1182,8 @@ XX yyy 2007     * Fixes by Daniel Borca <dborca@yahoo.com>:
 		    spuriously between __init_vio and the end of __init_keyboard, where
 		    SIGIO is hooked as event handler. I think it's harmless to just or maybe
 		    block SIGIO events until we are finished setting up the keyboard.
-                * Assembling through the nasm. Patch by <mauro.giachero@gmail.com>
+                * Assembling through the nasm/yasm. Patch by <mauro.giachero@gmail.com>
+		* New opcodes (SSSE3, SSE4.1, SSE4.2) in x86 disassembler.
 []======================================================================[]
 []  Thank you for your interest.                                        []
 []  Nick Kurshev (http://my666.boom.ru/666_en.html).                    []
