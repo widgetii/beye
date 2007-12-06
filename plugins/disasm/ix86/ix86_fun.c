@@ -1107,7 +1107,7 @@ void  __FASTCALL__ ix86_ExOpCodes(char *str,ix86Param *DisP)
 #ifdef IX86_64
  if(x86_Bitness == DAB_USE64)
  {
-    strcpy(str,extable[code].name64?str,extable[code].name64:"???");
+    strcpy(str,extable[code].name64?extable[code].name64:"???");
  }
  else
 #endif
