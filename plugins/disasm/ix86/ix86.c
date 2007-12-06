@@ -3822,7 +3822,7 @@ struct assembler_t assemblers[] = {
   }
 };
 
-signed char active_assembler = -1;
+signed int active_assembler = -1;
 
 static tBool is_listed(unsigned char insn,const unsigned char *list,size_t listsize)
 {
@@ -4754,7 +4754,8 @@ static void __FASTCALL__ ix86Init( void )
   //Look for an available assembler
   if (active_assembler == -1) //Execute this only once
   {
-    for (active_assembler = 0; assemblers[active_assembler].detect_command; active_assembler++)
+    int i;
+    for (i = 0; assemblers[i].detect_command; i++)
     {
       //Assume that the assembler is available if the detect_command prints something to stdout.
       //Note: using the return value of "system()" does not work, at least here.
@@ -4763,6 +4764,7 @@ static void __FASTCALL__ ix86Init( void )
       if (fp == NULL) continue;
       if (fgetc(fp) != EOF) {
         fclose(fp);
+	active_assembler=i;
         break;
       }
       fclose(fp);
@@ -4824,6 +4826,7 @@ AsmRet __FASTCALL__ ix86Asm(const char *code)
   char *home;
 
   //Check assembler availability
+  if (active_assembler<0) goto noassemblererror;
   if (!assemblers[active_assembler].run_command) goto noassemblererror;
 
   home = __get_home_dir("biew");
