@@ -361,6 +361,34 @@ else
 fi
 fi
 
+echocheck "checking for popen"
+cat > $TMPC << EOF
+#include <stdio.h>
+int main(void){(void)popen; return 0;}
+EOF
+_popen=no
+cc_check && _popen=yes
+if test "$_popen" = yes ; then 
+    echores "yes"
+    _cdefos="-DHAVE_POPEN=1 $_cdefos"
+else
+    echores "no"
+fi
+
+echocheck "checking for pclose"
+cat > $TMPC << EOF
+#include <stdio.h>
+int main(void){(void)pclose; return 0;}
+EOF
+_pclose=no
+cc_check && _pclose=yes
+if test "$_pclose" = yes ; then 
+    echores "yes"
+    _cdefos="-DHAVE_PCLOSE=1 $_cdefos"
+else
+    echores "no"
+fi
+
 if test -z "$_x11libdir" ; then
  _cdefos="$_cdefos"
 else

@@ -3787,42 +3787,6 @@ tBool Use32Addr,Use32Data,UseMMXSet,UseXMMXSet,Use64;
 
 const unsigned char leave_insns[] = { 0x07, 0x17, 0x1F, 0x58, 0x59, 0x5A, 0x5B, 0x5C, 0x5D, 0x5E, 0x5F, 0x61, 0x90, 0xC9 };
 
-struct assembler_t
-{
-  const char *run_command;
-  const char *detect_command;
-};
-
-/*
-  x86 disassemblers
-  The run_command is expected to be used in sprintf to generate the actual command line.
-  The argument is a single string containing the home directory. The temporary files
-  created are:
-    tmp0: input file
-    tmp1: output file
-    tmp2: output (stdout) / error (stderr) messages (note the "-s" option)
-  The detect_command is any command which prints something to stdout as long as the assembler
-  is available.
-  Yasm is preferred over Nasm only because at the time of writing only Yasm has 64-bit
-  support in its stable release.
-  The last element must be a structure containing only NULL pointers.
-*/
-struct assembler_t assemblers[] = {
-  {
-    "yasm -f bin -s -o %1$stmp1 %1$stmp0 >%1$stmp2",
-    "yasm -s --version",
-  },
-  {
-    "nasm -f bin -s -o %1$stmp1 %1$stmp0 >%1$stmp2",
-    "nasm -s -version",
-  },
-  {
-    NULL,
-    NULL,
-  }
-};
-
-signed int active_assembler = -1;
 
 static tBool is_listed(unsigned char insn,const unsigned char *list,size_t listsize)
 {
@@ -4730,7 +4694,48 @@ extern char *ix86_dtile;
 extern char *ix86_appbuffer;
 extern char *ix86_apistr;
 extern char *ix86_modrm_ret;
-#include <errno.h>
+
+struct assembler_t
+{
+  const char *run_command;
+  const char *detect_command;
+};
+
+/*
+  x86 disassemblers
+  The run_command is expected to be used in sprintf to generate the actual command line.
+  The argument is a single string containing the home directory. The temporary files
+  created are:
+    tmp0: input file
+    tmp1: output file
+    tmp2: output (stdout) / error (stderr) messages (note the "-s" option)
+  The detect_command is any command which prints something to stdout as long as the assembler
+  is available.
+  Yasm is preferred over Nasm only because at the time of writing only Yasm has 64-bit
+  support in its stable release.
+  The last element must be a structure containing only NULL pointers.
+*/
+struct assembler_t assemblers[] = {
+  {
+    "yasm -f bin -s -o %1$stmp1 %1$stmp0 >%1$stmp2",
+    "yasm -s --version",
+  },
+  {
+    "nasm -f bin -s -o %1$stmp1 %1$stmp0 >%1$stmp2",
+    "nasm -s -version",
+  },
+  {
+    NULL,
+    NULL,
+  }
+};
+
+static signed int active_assembler = -1;
+
+#ifndef HAVE_PCLOSE
+#define pclose(fp) fclose(fp)
+#endif
+
 static void __FASTCALL__ ix86Init( void )
 {
   ix86_voidstr = PMalloc(1000);
@@ -4749,7 +4754,7 @@ static void __FASTCALL__ ix86Init( void )
     MemOutBox("ix86 dissasembler initialization");
     exit(EXIT_FAILURE);
   }
-
+#ifdef HAVE_POPEN
   //Assembler initialization
   //Look for an available assembler
   if (active_assembler == -1) //Execute this only once
@@ -4760,16 +4765,17 @@ static void __FASTCALL__ ix86Init( void )
       //Assume that the assembler is available if the detect_command prints something to stdout.
       //Note: using the return value of "system()" does not work, at least here.
       FILE *fp;
-      fp = popen(assemblers[active_assembler].detect_command, "r");
+      fp = popen(assemblers[i].detect_command, "r");
       if (fp == NULL) continue;
       if (fgetc(fp) != EOF) {
-        fclose(fp);
+        pclose(fp);
 	active_assembler=i;
         break;
       }
-      fclose(fp);
+      pclose(fp);
     }
   }
+#endif
 }
 
 static void __FASTCALL__ ix86Term( void )
