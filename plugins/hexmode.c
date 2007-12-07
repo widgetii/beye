@@ -114,23 +114,27 @@ static unsigned __FASTCALL__ drawHex( unsigned keycode,unsigned textshift )
        I = height-1;
        dir = -1;
        Limit = -1;
-       if(cpos >= HWidth)
+       if((__filesize_t)HWidth <= cpos)
        {
          twScrollWinDn(MainWnd,1,1);
          I = 0;
        }
-       else keycode = KE_SUPERKEY;
+       else goto full_redraw;
    }
    else
-   {
-       I = 0;
-       dir = 1;
-       Limit = height;
-   }
    if(keycode == KE_DOWNARROW && flen >= HWidth)
    {
      I = height-1;
+     dir = 1;
+     Limit = height;
      twScrollWinUp(MainWnd,I,1);
+   }
+   else
+   {
+    full_redraw:
+       I = 0;
+       dir = 1;
+       Limit = height;
    }
    SIndex = cpos + HWidth*I;
    lindex = flen - SIndex;

@@ -2106,7 +2106,7 @@ void __FASTCALL__ twScrollWinUp(TWindow *win,tRelCoord ypos, unsigned npos)
   accel.attrs = attrs;
   wwidth = win->wwidth;
   if((win->flags & TWS_FRAMEABLE) == TWS_FRAMEABLE) wwidth-=2;
-  for(i = 0;i < ypos;i++)
+  for(i = npos-1;i < ypos;i++)
   {
     twReadBuffer(win,1,i+2,&accel,wwidth);
     twWriteBuffer(win,1,i+1,&accel,wwidth);
