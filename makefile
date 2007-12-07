@@ -259,11 +259,11 @@ endif
 	$(INSTALL) -D -c -m 644 doc/biew.1 $(PREFIX)/man/man1/biew.1
 	$(INSTALL) -D -c -m 644 bin_rc/biew.hlp $(DATADIR)/biew.hlp
 	mkdir --parents $(DATADIR)/skn
-	$(INSTALL) -D -c -m 644 bin_rc/skn/* $(DATADIR)/skn
+	$(INSTALL) -D -c -m 644 bin_rc/skn/*.skn $(DATADIR)/skn
 	mkdir --parents $(DATADIR)/syntax
-	$(INSTALL) -D -c -m 644 bin_rc/syntax/* $(DATADIR)/syntax
+	$(INSTALL) -D -c -m 644 bin_rc/syntax/*.stx $(DATADIR)/syntax
 	mkdir --parents $(DATADIR)/xlt/russian
-	$(INSTALL) -D -c -m 644 bin_rc/xlt/russian/* $(DATADIR)/xlt/russian
+	$(INSTALL) -D -c -m 644 bin_rc/xlt/russian/*.xlt $(DATADIR)/xlt/russian
 	$(INSTALL) -D -c -m 644 bin_rc/xlt/*.xlt bin_rc/xlt/readme $(DATADIR)/xlt
 uninstall:
 	$(RM) $(PREFIX)/bin/$(TARGET)
