@@ -76,13 +76,13 @@ typedef void (__FASTCALL__*ix86_method)(char *encode_str,ix86Param *);
 #define IX86_MMX	0x00002000UL /* insn works with mmx registers */
 #define IX86_SSE	0x00003000UL /* insn works with sse registers */
 
-#define IX86_CLONEMASK	0x0000F000UL
+#define IX86_CLONEMASK	0x000F0000UL
 #define IX86_INTEL	0x00000000UL
-#define IX86_AMD	0x00001000UL
-#define IX86_CYRIX	0x00002000UL
+#define IX86_AMD	0x00010000UL
+#define IX86_CYRIX	0x00020000UL
 
-#define IX86_SYSTEMMASK	0x000F0000UL
-#define IX86_CPL0	0x00010000UL
+#define IX86_SYSTEMMASK	0x00F00000UL
+#define IX86_CPL0	0x00100000UL
 
 /* Furter processors */
 #define IX86_UNKCPU	IX86_CPU1286
@@ -103,7 +103,7 @@ typedef void (__FASTCALL__*ix86_method)(char *encode_str,ix86Param *);
 #define IX86_K6		(IX86_AMD|IX86_CPU586)
 #define IX86_3DNOW	(IX86_AMD|IX86_CPU686|IX86_MMX)
 #define IX86_ATHLON	(IX86_AMD|IX86_CPU786|IX86_MMX)
-#define IX86_UNKAMD	(IX86_AMD|IX86_CPU886)
+#define IX86_UNKAMD	(IX86_AMD|IX86_CPU886|IX86_MMX)
 
 #define IX86_CYRIX486		(IX86_CYRIX|IX86_CPU486)
 #define IX86_CYRIX686		(IX86_CYRIX|IX86_CPU586)

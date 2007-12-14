@@ -897,7 +897,7 @@ ix86_ExOpcodes ix86_extable[256] = /* for 0FH leading */
   /*0x0A*/ DECLARE_EX_INSN("???","???",NULL,NULL,IX86_UNKCPU,K64_ATHLON),
   /*0x0B*/ DECLARE_EX_INSN("ud","ud",NULL,NULL,IX86_CPU686,K64_ATHLON),
   /*0x0C*/ DECLARE_EX_INSN("???","???",NULL,NULL,IX86_UNKCPU,K64_ATHLON),
-  /*0x0D*/ DECLARE_EX_INSN("!!!","!!!",ix86_3dNowPrefetchGrp,ix86_3dNowPrefetchGrp,IX86_3DNOW,K64_ATHLON),
+  /*0x0D*/ DECLARE_EX_INSN("!!!","!!!",ix86_3dNowPrefetchGrp,ix86_3dNowPrefetchGrp,IX86_3DNOW,K64_ATHLON|K64_MMX),
   /*0x0E*/ DECLARE_EX_INSN("femms","femms",NULL,NULL,IX86_3DNOW,K64_ATHLON),
   /*0x0F*/ DECLARE_EX_INSN("!!!","!!!",ix86_3dNowOpCodes,ix86_3dNowOpCodes,IX86_3DNOW,K64_ATHLON|K64_MMX),
   /*0x10*/ DECLARE_EX_INSN("movups","movups",ix86_ArgXMMXnD,ix86_ArgXMMXnD,IX86_P3|IX86_SSE,K64_ATHLON|K64_SSE),
@@ -4501,10 +4501,10 @@ static ColorAttr  __FASTCALL__ ix86GetAsmColor(unsigned long clone)
      }
      else
 #endif
-     if((clone&IX86_MMX)|(clone&IX86_SSE)) return disasm_cset.cpu_cset[2].clone[(clone >> 16) & 0xFF];
+     if((clone&IX86_MMX)|(clone&IX86_SSE)) return disasm_cset.cpu_cset[2].clone[clone & IX86_CPUMASK];
      else
-       if(clone&IX86_FPU)	return disasm_cset.cpu_cset[1].clone[(clone >> 8) & 0xFF];
-       else			return disasm_cset.cpu_cset[0].clone[clone & 0xFF];
+       if((clone&IX86_FPU))	return disasm_cset.cpu_cset[1].clone[clone & IX86_CPUMASK];
+       else			return disasm_cset.cpu_cset[0].clone[clone & IX86_CPUMASK];
 }
 
 static ColorAttr  __FASTCALL__ ix86GetOpcodeColor(unsigned long clone)
@@ -4530,11 +4530,13 @@ static ColorAttr  __FASTCALL__ ix86altGetAsmColor(unsigned long clone)
      }
      else
 #endif
+     {
 	if((clone & IX86_SSE) == IX86_SSE) return disasm_cset.cpu_cset[2].clone[0];
 	else
 	if(clone & (IX86_FPU|IX86_MMX)) return disasm_cset.cpu_cset[1].clone[0];
 	else
 	return disasm_cset.cpu_cset[0].clone[0];
+     }
 }
 
 static ColorAttr  __FASTCALL__ ix86altGetOpcodeColor(unsigned long clone)

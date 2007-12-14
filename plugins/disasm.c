@@ -694,7 +694,7 @@ static void __FASTCALL__ disReadIni( hIniProfile *ini )
     if(disNeedRef > NEEDREF_PREDICT) disNeedRef = 0;
     biewReadProfileString(ini,"Biew","Browser","SubSubMode9","0",tmps,sizeof(tmps));
     HiLight = (int)strtoul(tmps,NULL,10);
-    if(HiLight > 1) HiLight = 1;
+    if(HiLight > 2) HiLight = 2;
     activeDisasm = mainDisasmTable[DefDisasmSel];
     disAcceptActions();
     if(activeDisasm->read_ini) activeDisasm->read_ini(ini);
