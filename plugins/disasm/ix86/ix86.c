@@ -94,7 +94,7 @@ tBool has67_in64;
 { n16, n32, func, flags }
 #endif
 
-ix86_Opcodes ix86_table[256] =
+const ix86_Opcodes ix86_table[256] =
 {
   /*0x00*/ DECLARE_BASE_INSN("add","add","add",ix86_ArgModRMnDnW,ix86_ArgModRMnDnW,IX86_CPU086,K64_ATHLON),
   /*0x01*/ DECLARE_BASE_INSN("add","add","add",ix86_ArgModRMnDW,ix86_ArgModRMnDW,IX86_CPU086,K64_ATHLON),
@@ -362,7 +362,7 @@ ix86_Opcodes ix86_table[256] =
 { n32, func, flags }
 #endif
 
-ix86_ExOpcodes ix86_0F38_Table[256] =
+const ix86_ExOpcodes ix86_0F38_Table[256] =
 {
   /*0x00*/ DECLARE_EX_INSN("pshufb", "pshufb",ix86_ArgMMXnD,ix86_ArgMMXnD, IX86_P6|IX86_MMX, K64_ATHLON|K64_MMX),
   /*0x01*/ DECLARE_EX_INSN("phaddw", "phaddw",ix86_ArgMMXnD,ix86_ArgMMXnD, IX86_P6|IX86_MMX, K64_ATHLON|K64_MMX),
@@ -622,7 +622,7 @@ ix86_ExOpcodes ix86_0F38_Table[256] =
   /*0xFF*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON)
 };
 
-ix86_ExOpcodes ix86_0F3A_Table[256] =
+const ix86_ExOpcodes ix86_0F3A_Table[256] =
 {
   /*0x00*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
   /*0x01*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
@@ -882,7 +882,7 @@ ix86_ExOpcodes ix86_0F3A_Table[256] =
   /*0xFF*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON)
 };
 
-ix86_ExOpcodes ix86_extable[256] = /* for 0FH leading */
+const ix86_ExOpcodes ix86_extable[256] = /* for 0FH leading */
 {
   /*0x00*/ DECLARE_EX_INSN("!!!","!!!",ix86_ArgExGr0,ix86_ArgExGr0,IX86_CPU286,K64_ATHLON|K64_CPL0),
   /*0x01*/ DECLARE_EX_INSN("!!!","!!!",ix86_ArgExGr1,ix86_ArgExGr1,IX86_CPU286|IX86_CPL0,K64_ATHLON|K64_CPL0),
@@ -1142,7 +1142,7 @@ ix86_ExOpcodes ix86_extable[256] = /* for 0FH leading */
   /*0xFF*/ DECLARE_EX_INSN("???","???",ix86_ArgMMXnD,ix86_ArgMMXnD,IX86_UNKMMX,K64_ATHLON)
 };
 
-ix86_3dNowopcodes ix86_3dNowtable[256] =
+const ix86_3dNowopcodes ix86_3dNowtable[256] =
 {
   /*0x00*/ { "???", IX86_UNKAMD },
   /*0x01*/ { "???", IX86_UNKAMD },
@@ -1409,7 +1409,7 @@ ix86_3dNowopcodes ix86_3dNowtable[256] =
 #define DECLARE_EX_INSN(n32, n64, func, func64, flags, flags64)\
 { n32, func, flags }
 #endif
-ix86_ExOpcodes ix86_660F01_Table[256] =
+const ix86_ExOpcodes ix86_660F01_Table[256] =
 {
   /*0x00*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
   /*0x01*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
@@ -1669,7 +1669,7 @@ ix86_ExOpcodes ix86_660F01_Table[256] =
   /*0xFF*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON)
 };
 
-ix86_ExOpcodes ix86_660F38_Table[256] =
+const ix86_ExOpcodes ix86_660F38_Table[256] =
 {
   /*0x00*/ DECLARE_EX_INSN("pshufb", "pshufb",ix86_ArgXMMXnD,ix86_ArgXMMXnD, IX86_P6|IX86_SSE, K64_ATHLON|K64_SSE),
   /*0x01*/ DECLARE_EX_INSN("phaddw", "phaddw",ix86_ArgXMMXnD,ix86_ArgXMMXnD, IX86_P6|IX86_SSE, K64_ATHLON|K64_SSE),
@@ -1929,7 +1929,7 @@ ix86_ExOpcodes ix86_660F38_Table[256] =
   /*0xFF*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON)
 };
 
-ix86_ExOpcodes ix86_660F3A_Table[256] =
+const ix86_ExOpcodes ix86_660F3A_Table[256] =
 {
   /*0x00*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
   /*0x01*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
@@ -2189,7 +2189,7 @@ ix86_ExOpcodes ix86_660F3A_Table[256] =
   /*0xFF*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON)
 };
 
-ix86_ExOpcodes ix86_660F_PentiumTable[256] =
+const ix86_ExOpcodes ix86_660F_PentiumTable[256] =
 {
   /*0x00*/ DECLARE_EX_INSN(NULL,NULL,NULL,NULL,IX86_UNKMMX,K64_ATHLON|K64_SSE),
   /*0x01*/ DECLARE_EX_INSN(ix86_660F01_Table,ix86_660F01_Table,NULL,NULL,TAB_NAME_IS_TABLE,TAB_NAME_IS_TABLE),
@@ -2449,7 +2449,7 @@ ix86_ExOpcodes ix86_660F_PentiumTable[256] =
   /*0xFF*/ DECLARE_EX_INSN(NULL,NULL,NULL,NULL,IX86_UNKMMX,K64_ATHLON|K64_SSE)
 };
 
-ix86_ExOpcodes ix86_F20F38_Table[256] =
+const ix86_ExOpcodes ix86_F20F38_Table[256] =
 {
   /*0x00*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
   /*0x01*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
@@ -2709,7 +2709,7 @@ ix86_ExOpcodes ix86_F20F38_Table[256] =
   /*0xFF*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON)
 };
 
-ix86_ExOpcodes ix86_F20F_PentiumTable[256] =
+const ix86_ExOpcodes ix86_F20F_PentiumTable[256] =
 {
   /*0x00*/ DECLARE_EX_INSN(NULL,NULL,NULL,NULL,IX86_UNKMMX,K64_ATHLON|K64_SSE),
   /*0x01*/ DECLARE_EX_INSN(NULL,NULL,NULL,NULL,IX86_UNKMMX,K64_ATHLON|K64_SSE),
@@ -2969,7 +2969,7 @@ ix86_ExOpcodes ix86_F20F_PentiumTable[256] =
   /*0xFF*/ DECLARE_EX_INSN(NULL,NULL,NULL,NULL,IX86_UNKMMX,K64_ATHLON|K64_SSE)
 };
 
-ix86_ExOpcodes ix86_F30F_PentiumTable[256] =
+const ix86_ExOpcodes ix86_F30F_PentiumTable[256] =
 {
   /*0x00*/ DECLARE_EX_INSN(NULL,NULL,NULL,NULL,IX86_UNKMMX,K64_ATHLON|K64_SSE),
   /*0x01*/ DECLARE_EX_INSN(NULL,NULL,NULL,NULL,IX86_UNKMMX,K64_ATHLON|K64_SSE),
@@ -3229,7 +3229,7 @@ ix86_ExOpcodes ix86_F30F_PentiumTable[256] =
   /*0xFF*/ DECLARE_EX_INSN(NULL,NULL,NULL,NULL,IX86_UNKMMX,K64_ATHLON|K64_SSE)
 };
 #if 0
-ix86_Opcodes ix86_NullTable[256] =
+const ix86_Opcodes ix86_NullTable[256] =
 {
   /*0x00*/ { "???", "???", NULL, IX86_UNKCPU },
   /*0x01*/ { "???", "???", NULL, IX86_UNKCPU },
@@ -3489,7 +3489,7 @@ ix86_Opcodes ix86_NullTable[256] =
   /*0xFF*/ { "???", "???", NULL, IX86_UNKCPU }
 };
 
-ix86_ExOpcodes ix86_Null64Table[256] =
+const ix86_ExOpcodes ix86_Null64Table[256] =
 {
   /*0x00*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
   /*0x01*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
@@ -4155,7 +4155,7 @@ static DisasmRet __FASTCALL__ ix86Disassembler(__filesize_t ulShift,
 		))
               {
 		unsigned char code = DisP.RealCmd[2];
-		ix86_ExOpcodes *extable=ix86_660F_PentiumTable;
+		const ix86_ExOpcodes *extable=ix86_660F_PentiumTable;
 		/** therefore it non rep prefix, but instruction of SSE2 */
 		DisP.RealCmd = &DisP.RealCmd[2];
 		code = DisP.RealCmd[0];
@@ -4216,7 +4216,7 @@ static DisasmRet __FASTCALL__ ix86Disassembler(__filesize_t ulShift,
 		))
               {
 		unsigned char code = DisP.RealCmd[2];
-		ix86_ExOpcodes *extable=ix86_F20F_PentiumTable;
+		const ix86_ExOpcodes *extable=ix86_F20F_PentiumTable;
                 /** therefore it non rep prefix, but instruction of SSE2 */
                 DisP.RealCmd = &DisP.RealCmd[2];
                 code = DisP.RealCmd[0];
@@ -4269,7 +4269,7 @@ static DisasmRet __FASTCALL__ ix86Disassembler(__filesize_t ulShift,
 		))
               {
 		unsigned char code = DisP.RealCmd[2];
-		ix86_ExOpcodes *extable=ix86_F30F_PentiumTable;
+		const ix86_ExOpcodes *extable=ix86_F30F_PentiumTable;
                 /** therefore it non rep prefix, but instruction of SSE */
                 DisP.RealCmd = &DisP.RealCmd[2];
                 code = DisP.RealCmd[0];
@@ -4475,9 +4475,9 @@ static const char * MMXNames[] =
 #ifdef IX86_64
 static const char * CPU64Names[] =
 {
-  " K86-64 ",
-  "       ",
-  "       ",
+  " K86-64 CPU ",
+  " K86-64 FPU/MMX ",
+  " K86-64 SSE ",
   "       ",
   "       ",
   "       ",
@@ -4487,9 +4487,25 @@ static const char * CPU64Names[] =
   "      "
 };
 #endif
+static const char * altPipesNames[] =
+{
+  " CPU ALU ",
+  " FPU/MMX ALU ",
+  " SSE ALU ",
+  "       ",
+  "       ",
+  "       ",
+  "       ",
+  "      ",
+  "      ",
+  "      "
+};
+
+static int color_mode=0;
 
 static ColorAttr  __FASTCALL__ ix86GetAsmColor(unsigned long clone)
 {
+    color_mode=0;
 #ifdef IX86_64
      if(x86_Bitness == DAB_USE64)
      {
@@ -4519,6 +4535,7 @@ static ColorAttr  __FASTCALL__ ix86GetOpcodeColor(unsigned long clone)
 
 static ColorAttr  __FASTCALL__ ix86altGetAsmColor(unsigned long clone)
 {
+    color_mode=1;
 #ifdef IX86_64
      if(x86_Bitness == DAB_USE64)
      {
@@ -4607,25 +4624,29 @@ static void __FASTCALL__ ix86HelpAsm( void )
  PFree(msgAsmText);
  twGotoXY(5,3);
 #ifdef IX86_64
- if(x86_Bitness == DAB_USE64)
+ if(x86_Bitness == DAB_USE64 || color_mode==1)
  {
-   twGotoXY(5,4);
-   for(i = 0;i < 10;i++)
+   twGotoXY(5,3);
+   i=0;
+//   for(i = 0;i < 10;i++)
    {
      twSetColorAttr(disasm_cset.cpu_cset[0].clone[i]);
-     twPutS(CPU64Names[i]);
+     twPutS((x86_Bitness == DAB_USE64)?CPU64Names[0]:altPipesNames[0]);
+     twClrEOL();
    }
-   twGotoXY(5,5);
-   for(i = 0;i < 10;i++)
+   twGotoXY(5,4);
+//   for(i = 0;i < 10;i++)
    {
      twSetColorAttr(disasm_cset.cpu_cset[1].clone[i]);
-     twPutS(CPU64Names[i]);
+     twPutS((x86_Bitness == DAB_USE64)?CPU64Names[1]:altPipesNames[1]);
+     twClrEOL();
    }
-   twGotoXY(5,6);
-   for(i = 0;i < 10;i++)
+   twGotoXY(5,5);
+//   for(i = 0;i < 10;i++)
    {
      twSetColorAttr(disasm_cset.cpu_cset[2].clone[i]);
-     twPutS(CPU64Names[i]);
+     twPutS((x86_Bitness == DAB_USE64)?CPU64Names[2]:altPipesNames[2]);
+     twClrEOL();
    }
  }
  else
