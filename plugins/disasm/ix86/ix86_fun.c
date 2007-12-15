@@ -1062,7 +1062,7 @@ void __FASTCALL__ ix86_InOut(char * str,ix86Param *DisP)
   ix86_CStile(str,reg2);
 }
 
-ix86_ExOpcodes* __FASTCALL__ ix86_prepare_flags(ix86_ExOpcodes *extable,ix86Param *DisP,unsigned char *code)
+const ix86_ExOpcodes* __FASTCALL__ ix86_prepare_flags(const ix86_ExOpcodes *extable,ix86Param *DisP,unsigned char *code)
 {
  int in_chain=1;
  while(in_chain)
@@ -1098,7 +1098,7 @@ ix86_ExOpcodes* __FASTCALL__ ix86_prepare_flags(ix86_ExOpcodes *extable,ix86Para
 void  __FASTCALL__ ix86_ExOpCodes(char *str,ix86Param *DisP)
 {
  unsigned char code;
- ix86_ExOpcodes *extable=ix86_extable;
+ const ix86_ExOpcodes *extable=ix86_extable;
  DisP->RealCmd = &DisP->RealCmd[1];
  DisP->CodeAddress++;
  code = DisP->RealCmd[0];

@@ -38,9 +38,9 @@
 
 struct avr_opcodes_s
 {
-  char *name;
-  char *constraints;
-  char *opcode;
+  const char *name;
+  const char *constraints;
+  const char *opcode;
   int insn_size;		/* in words */
   int isa;
   unsigned int bin_opcode;
@@ -347,7 +347,7 @@ static DisasmRet __FASTCALL__ AVRDisassembler( __filesize_t ulShift,
   {
     if (ok)
     {
-      char *op = opcode->constraints;
+      const char *op = opcode->constraints;
 
       if (*op && *op != '?')
       {
@@ -551,7 +551,7 @@ static void __FASTCALL__ AVRInit( void )
 	   opcode->name;
 	   opcode++, maskptr++)
   {
-    char * s;
+    const char * s;
     unsigned int bin = 0;
     unsigned int mask = 0;
 	

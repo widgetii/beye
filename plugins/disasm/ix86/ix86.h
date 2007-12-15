@@ -163,9 +163,9 @@ typedef struct tag_ix3dNowopcodes
 
 extern unsigned x86_Bitness;
 
-extern ix86_Opcodes ix86_table[];
-extern ix86_ExOpcodes ix86_extable[];
-extern ix86_3dNowopcodes ix86_3dNowtable[];
+extern const ix86_Opcodes ix86_table[];
+extern const ix86_ExOpcodes ix86_extable[];
+extern const ix86_3dNowopcodes ix86_3dNowtable[];
 
 extern char ix86_segpref[];
 extern const char * ix86_sizes[];
@@ -219,7 +219,7 @@ extern const char * ix86_KatmaiGr1Names[];
 extern const char * ix86_KatmaiGr2Names[];
 extern const char * ix86_KatmaiCmpSuffixes[];
 
-extern ix86_ExOpcodes* __FASTCALL__ ix86_prepare_flags(ix86_ExOpcodes *extable,ix86Param *DisP,unsigned char *code);
+extern const ix86_ExOpcodes* __FASTCALL__ ix86_prepare_flags(const ix86_ExOpcodes *extable,ix86Param *DisP,unsigned char *code);
 extern char * __FASTCALL__ ix86_getModRM(tBool w,unsigned char mod,unsigned char rm,ix86Param *DisP);
 extern void   __FASTCALL__ ix86_setModifier(char *str,const char *modf);
 extern char * __FASTCALL__ ix86_CStile(char *str,const char *arg2);

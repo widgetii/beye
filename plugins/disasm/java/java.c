@@ -34,7 +34,7 @@
 
 typedef struct java_codes_s
 {
-    char * name;
+    const char * name;
 #define JVM_TAIL	0x000000FFUL /* n-bytes of insn's tail */
 #define JVM_OBJREF1	0x00000100UL /* insns refers object as 1-byte idx */
 #define JVM_OBJREF2	0x00000200UL /* insns refers object as 2-byte idx */
@@ -52,7 +52,7 @@ typedef struct java_codes_s
 }java_codes_t;
 
 
-java_codes_t java_codes[256]=
+const java_codes_t java_codes[256]=
 {
   /*0x00*/ { "nop", 0 },
   /*0x01*/ { "aconst_null", 0 },
@@ -494,7 +494,7 @@ static DisasmRet __FASTCALL__ javaDisassembler(__filesize_t ulShift,
 	    {
 		case 1:
 		{
-		    char *p;
+		    const char *p;
 		    if(jflags & JVM_OBJREFMASK) strcat(outstr,"#");
 		    p=NULL;
 		    if(jflags & JVM_ATYPE) 
