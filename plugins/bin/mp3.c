@@ -235,6 +235,7 @@ static int read_id3v23_tags(unsigned flags,unsigned hsize)
 	bmReadBuffer(buf,ID3V23_FRAME_HEADER_SIZE);
 	id=*((unsigned long *)buf);
 	len=(buf[4] << 21) + (buf[5] << 14) + (buf[6] << 7) + buf[7];
+	if((int)len <= 0) return 0;
 	bmReadBuffer(data,min(len,4096));
 	data[len]=0;
 #if 0
@@ -416,7 +417,7 @@ static int Xing_test(char *hdr,int *scale,int *lsf,int *srate,long *nframes,long
     bmSeek(fpos,BM_SEEK_SET);
     return is_xing;
 }
-
+#include <stdio.h>
 static tBool  __FASTCALL__ mp3_check_fmt( void )
 {
     unsigned i;
@@ -441,6 +442,7 @@ static tBool  __FASTCALL__ mp3_check_fmt( void )
     }
     else
     {
+	if(mp_decode_mp3_header(hdr,NULL,NULL,NULL,NULL) < 0) return False;
 	find_next_mp3_hdr(hdr);
 	if(bmEOF()) return False;
 	for(i=0;i<5;i++)
