@@ -433,6 +433,9 @@ case "$_target_system" in
 	_oslibs="-lncurses $_oslibs"
 	;;
     linux)
+        if test $_ld=gcc ; then
+            _osldef="-m32 $_osldef"
+        fi
 	_cdefos="-D__LINUX__ -D__UNIX__ -D__OS_NAME__='\"Linux\"' -D__OS__=\"linux\" -Ulinux -D_VT100_ -DHAVE_TERMINAL_OUT=1 -DPREFIX=\"$_prefix\" $_cdefos"
 echocheck "gpm.h"
 	cat > $TMPC << EOF
