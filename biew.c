@@ -399,7 +399,7 @@ void PaintTitle( void )
  twClrEOL();
  twPrintF("File : %s",shortname);
  twGotoXY(twGetClientWidth(TitleWnd)-43,1);
- twPrintF("Size : %8lu bytes",BMGetFLength());
+ twPrintF("Size : %8llu bytes",BMGetFLength());
  twRefreshWin(TitleWnd);
 }
 

@@ -158,9 +158,12 @@ __fileoff_t __FASTCALL__ __FileLength(int handle)
 	while(1)
 	{
 	   off = min + ((max - min) / 2);
-	   lseek(handle,off,SEEK_SET);
+	   if (lseek(handle,off,SEEK_SET) == -1)
+	   	max=off;
+	   else {
 	   if(read(handle,&ch,1) == 1) min = off;
 	   else                        max = off;
+	   }
 	   if(max - min < 5)
 	   {
 	     retval = min;
