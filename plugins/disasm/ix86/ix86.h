@@ -123,8 +123,8 @@ typedef void (__FASTCALL__*ix86_method)(char *encode_str,ix86Param *);
 #define K64_CPL0	0x00010000UL /* means insns requires cpl0 privilegies to be executed */
 
 /* Special features flags */
-#define TABDESC_MASK		0xFFF00000UL
-#define TAB_NAME_IS_TABLE	0x00100000UL
+#define TABDESC_MASK		0xFF000000UL
+#define TAB_NAME_IS_TABLE	0x01000000UL
 
 typedef struct tag_ix86opcodes
 {

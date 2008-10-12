@@ -23,6 +23,7 @@
 #include <signal.h>
 #include <limits.h>
 #include <sys/stat.h>
+#include <sys/resource.h>
 #include <stdlib.h>
 #include <errno.h>
 
@@ -528,6 +529,18 @@ int main( int argc, char *argv[] )
  hIniProfile *ini;
  tBool skin_err;
  int retval;
+#ifndef NDEBUG
+#ifdef RLIMIT_CORE
+  {
+    /* on many systems default coresize is 0.
+       Enable any coresize here. */
+    struct rlimit rl;
+    getrlimit(RLIMIT_CORE,&rl);
+    rl.rlim_cur = rl.rlim_max;
+    setrlimit(RLIMIT_CORE,&rl);
+  }
+#endif
+#endif
  ArgCount = argc;
  ArgVector = argv;
  if(ArgCount < 2) goto show_usage;
