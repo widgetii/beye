@@ -983,7 +983,7 @@ void __FASTCALL__ ix86_ArgGrp2(char *str,ix86Param *DisP)
      wrd = code2 == 0x06 || code2 == 0x07 ? 0 : wrd; /** push / pop; */
 #ifdef IX86_64
      if(x86_Bitness == DAB_USE64)
-	sizptr = REX_w(k86_REX)?QWORD_PTR:DWORD_PTR;
+	sizptr = has_REX?REX_w(k86_REX)?QWORD_PTR:DWORD_PTR:QWORD_PTR;
      else
 #endif
      if(!wrd) sizptr = Use32Data?DWORD_PTR:WORD_PTR;
