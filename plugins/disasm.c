@@ -1253,6 +1253,8 @@ int __FASTCALL__ disAppendFAddr(char * str,__fileoff_t ulShift,__fileoff_t disti
                                             Get4SignDig((unsigned)distin);
          else
           if(type & DISADR_NEAR32)   pstr = Get8SignDig(distin);
+	  else
+	   if(type & DISADR_NEAR64) pstr = Get16SignDig(distin);
        strcat(str,pstr);
      }
      disNeedRef = needref;

@@ -298,15 +298,29 @@ void __FASTCALL__ ix86_ArgNear(char * str,ix86Param *DisP)
 {
   long lshift = 0L;
   unsigned long newpos;
+  unsigned modifier;
   if(!((DisP->flags & __DISF_SIZEONLY) == __DISF_SIZEONLY))
     lshift = Use32Data ? *((long  *)(&DisP->RealCmd[1])) :
                          (long)(*((short  *)(&DisP->RealCmd[1])));
-  DisP->codelen += Use32Data ? 4 : 2;
+/*
+In 64-bit mode, the operand size defaults to 64 bits. The processor sign-extends
+the 8-bit or 32-bit displacement value to 64 bits before adding it to the RIP.
+*/
+#ifdef IX86_64
+  if(x86_Bitness == DAB_USE64) {
+    DisP->codelen += 8;
+    modifier=DISADR_NEAR64;
+  }
+  else 
+#endif
+  {
+    DisP->codelen += Use32Data ? 4 : 2;
+    modifier = Use32Data ? DISADR_NEAR32 : DISADR_NEAR16;
+  }
   if(!((DisP->flags & __DISF_SIZEONLY) == __DISF_SIZEONLY))
   {
     newpos = DisP->DisasmPrefAddr + lshift + DisP->codelen;
-    disAppendFAddr(str,DisP->CodeAddress + 1,lshift,newpos,
-                   Use32Data ? DISADR_NEAR32 : DISADR_NEAR16,0,DisP->codelen-1);
+    disAppendFAddr(str,DisP->CodeAddress + 1,lshift,newpos,modifier,0,DisP->codelen-1);
   }
 }
 

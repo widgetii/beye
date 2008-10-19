@@ -184,7 +184,8 @@ extern int __FASTCALL__  disAppendDigits(char *str,__filesize_t ulShift,int flag
 #define DISADR_SHORT   0x00
 #define DISADR_NEAR16  0x01
 #define DISADR_NEAR32  0x02
-#define DISADR_USESEG  0x04
+#define DISADR_NEAR64  0x04
+#define DISADR_USESEG  0x10
 #define DISADR_FAR16   (DISADR_USESEG | DISADR_NEAR16)
 #define DISADR_FAR32   (DISADR_USESEG | DISADR_NEAR32)
 /** Appends symbolic information to address field of jump instructions
