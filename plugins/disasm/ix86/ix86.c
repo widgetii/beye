@@ -3803,7 +3803,7 @@ static tBool is_listed(unsigned char insn,const unsigned char *list,size_t lists
 static int is_REX(unsigned char code)
 {
 #ifdef IX86_64
-    if((code & 0x40) == 0x40) return 1;
+    if((code & 0xF0) == 0x40) return 1;
     else
 #endif
     return 0;
@@ -4375,7 +4375,7 @@ static DisasmRet __FASTCALL__ ix86Disassembler(__filesize_t ulShift,
                 if(DisP.RealCmd[1] == 0x90)
                 {
                   /* this is pause insns */
-                  strcpy(Ret.str,x86_Bitness == DAB_USE64?"???":"pause");
+                  strcpy(Ret.str,x86_Bitness == DAB_USE64?"pause":"pause");
                   DisP.codelen++;
                   DisP.pro_clone = DAB_USE64?K64_ATHLON:IX86_P4;
                   goto ExitDisAsm;
