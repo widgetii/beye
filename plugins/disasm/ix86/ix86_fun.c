@@ -302,11 +302,11 @@ void __FASTCALL__ ix86_ArgNear(char * str,ix86Param *DisP)
   if(!((DisP->flags & __DISF_SIZEONLY) == __DISF_SIZEONLY))
     lshift = Use32Data ? *((long  *)(&DisP->RealCmd[1])) :
                          (long)(*((short  *)(&DisP->RealCmd[1])));
+#if 0
 /*
 In 64-bit mode, the operand size defaults to 64 bits. The processor sign-extends
 the 8-bit or 32-bit displacement value to 64 bits before adding it to the RIP.
 */
-#ifdef IX86_64
   if(x86_Bitness == DAB_USE64) {
     DisP->codelen += 8;
     modifier=DISADR_NEAR64;
