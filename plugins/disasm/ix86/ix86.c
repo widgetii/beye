@@ -3795,6 +3795,30 @@ static tBool is_listed(unsigned char insn,const unsigned char *list,size_t lists
   return False;
 }
 
+/*
+  For long 64 mode:
+  [legacy prefix] [REX] [Opcode] ...
+  legacy prefixes: 26 2E 36 3E 64 65 66 67 F0 F3 F2
+*/
+static int is_REX(unsigned char code)
+{
+#ifdef IX86_64
+    if((code & 0x40) == 0x40) return 1;
+    else
+#endif
+    return 0;
+}
+
+static MBuffer parse_REX_type(unsigned char code,MBuffer insn,char *up,char *has_rex)
+{
+    if(x86_Bitness == DAB_USE64 && !has_rex) {
+	(*has_rex)++;
+	k86_REX = insn[0];
+    }
+    (*up)++;
+    return &insn[1];
+}
+
 static void ix86_gettype(DisasmRet *dret,ix86Param *_DisP)
 {
  MBuffer insn;
@@ -3838,8 +3862,10 @@ static void ix86_gettype(DisasmRet *dret,ix86Param *_DisP)
    case 0x4C:
    case 0x4D:
    case 0x4E:
-   case 0x4F: if(x86_Bitness == DAB_USE64 && !has_rex) { has_rex++; k86_REX = insn[0]; goto MakePref; }
-              break;
+   case 0x4F:
+		insn=parse_REX_type(insn[0],insn,&up,&has_rex);
+		goto RepeateByPrefix;
+                break;
 #endif
    case 0x26:
    case 0x2E:
@@ -3851,6 +3877,10 @@ static void ix86_gettype(DisasmRet *dret,ix86Param *_DisP)
               has_seg++;
               goto MakePref;
    case 0x66:
+#ifdef IX86_64
+		if(is_REX(insn[1]))
+		    insn=parse_REX_type(insn[0],insn,&up,&has_rex);
+#endif
               /** First check for SSE2 extensions */
               if(insn[1] == 0x0F &&
 	        (
@@ -3871,6 +3901,10 @@ static void ix86_gettype(DisasmRet *dret,ix86Param *_DisP)
               has_lock++;
               goto MakePref;
    case 0xF2:
+#ifdef IX86_64
+		if(is_REX(insn[1]))
+		    insn=parse_REX_type(insn[0],insn,&up,&has_rex);
+#endif
               /** First check for SSE2 extensions */
               if(insn[1] == 0x0F &&
 	        (
@@ -3885,6 +3919,10 @@ static void ix86_gettype(DisasmRet *dret,ix86Param *_DisP)
               has_rep++;
               goto MakePref;
    case 0xF3:
+#ifdef IX86_64
+		if(is_REX(insn[1]))
+		    insn=parse_REX_type(insn[0],insn,&up,&has_rex);
+#endif
               /** First check for SSE extensions */
               if(insn[1] == 0x0F &&
 	        (
@@ -3995,6 +4033,23 @@ static void ix86_gettype(DisasmRet *dret,ix86Param *_DisP)
      }
 }
 
+static unsigned char parse_REX(unsigned char code,ix86Param* DisP,char *up)
+{
+#ifdef IX86_64
+    if(x86_Bitness == DAB_USE64 && !has_REX) 
+    {
+        has_REX++;
+        k86_REX = code;
+        Use64 = (code & 0x0F)>>3;
+    }
+    DisP->CodeAddress++;
+    DisP->RealCmd = &DisP->RealCmd[1];
+    (*up)++;
+#endif
+    return DisP->RealCmd[0];
+}
+
+
 static DisasmRet __FASTCALL__ ix86Disassembler(__filesize_t ulShift,
                                                MBuffer buffer,
                                                unsigned flags)
@@ -4088,10 +4143,8 @@ static DisasmRet __FASTCALL__ ix86Disassembler(__filesize_t ulShift,
    case 0x4E:
    case 0x4F: if(x86_Bitness == DAB_USE64 && !has_REX) 
               {
-                 has_REX++;
-                 k86_REX = code;
-                 Use64 = (code & 0x0F)>>3;
-                 goto MakePref;
+                 code=parse_REX(code,&DisP,&up);
+                 goto RepeateByPrefix;
               }
               break;
 #endif
@@ -4144,6 +4197,10 @@ static DisasmRet __FASTCALL__ ix86Disassembler(__filesize_t ulShift,
               DisP.pro_clone = IX86_CPU386;
               goto MakePref;
    case 0x66:
+#ifdef IX86_64
+		if(is_REX(DisP.RealCmd[1]))
+			code=parse_REX(DisP.RealCmd[1],&DisP,&up);
+#endif
               /** First check for SSE2 extensions */
               if(DisP.RealCmd[1] == 0x0F &&
 	        (
@@ -4205,6 +4262,10 @@ static DisasmRet __FASTCALL__ ix86Disassembler(__filesize_t ulShift,
               strcat(ix86_da_out,"lock; ");
               goto MakePref;
    case 0xF2:
+#ifdef IX86_64
+		if(is_REX(DisP.RealCmd[1]))
+			code=parse_REX(DisP.RealCmd[1],&DisP,&up);
+#endif
               /** First check for SSE2 extensions */
               if(DisP.RealCmd[1] == 0x0F &&
 	        (
@@ -4258,6 +4319,10 @@ static DisasmRet __FASTCALL__ ix86Disassembler(__filesize_t ulShift,
               strcat(ix86_da_out,"repne; ");
               goto MakePref;
    case 0xF3:
+#ifdef IX86_64
+		if(is_REX(DisP.RealCmd[1]))
+			code=parse_REX(DisP.RealCmd[1],&DisP,&up);
+#endif
               /** First check for SSE extensions */
               if(DisP.RealCmd[1] == 0x0F &&
 	        (
