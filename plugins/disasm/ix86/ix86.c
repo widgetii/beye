@@ -4588,11 +4588,11 @@ static ColorAttr  __FASTCALL__ ix86GetAsmColor(unsigned long clone)
 #ifdef IX86_64
      if(x86_Bitness == DAB_USE64)
      {
-	if((clone & K64_SSE) == K64_SSE) return disasm_cset.cpu_cset[2].clone[clone & K64_CLONEMASK];
+	if((clone & K64_SSE) == K64_SSE) return disasm_cset.cpu_cset[2].clone[0];
 	else
-	if(clone & (K64_FPU|K64_MMX)) return disasm_cset.cpu_cset[1].clone[clone & K64_CLONEMASK];
+	if(clone & (K64_FPU|K64_MMX)) return disasm_cset.cpu_cset[1].clone[0];
 	else
-	return disasm_cset.cpu_cset[0].clone[clone & K64_CLONEMASK];
+	return disasm_cset.cpu_cset[0].clone[0];
      }
      else
 #endif
