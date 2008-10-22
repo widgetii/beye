@@ -111,6 +111,9 @@ typedef void (__FASTCALL__*ix86_method)(char *encode_str,ix86Param *);
 #define IX86_UNKCYRIX		(IX86_CYRIX|IX86_CPU686)
 
 #define K64_ATHLON	0x00000000UL
+#define K64_FAM9	0x00000001UL
+#define K64_FAM10	0x00000002UL
+#define K64_FAM11	0x00000003UL
 #define K64_CLONEMASK	0x00000FFFUL
 #define K64_REGGROUP    0x0000F000UL
 #define K64_GPR         0x00000000UL /* insn works with general purpose registers */
