@@ -788,6 +788,23 @@
 ³ pcmpistri   [66_0F_3A_63/r/i8]      Pack Cmp Implicit Length String, idx³
 ³ pcmpistrm   [66_0F_3A_62/r/i8]      Pack Cmp Implicit Length String, msk³
 ³ popcnt      [F3_0F_B8/r]            Count of Number set to 1 bits       ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄK64 Fam10 sse4aÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
+³ extrq       [66_0F_78/0/ib/ib]      Extracts from lower 64-bit reg      ³
+³ extrq       [66_0F_79/r]            Extracts from lower 64-bit reg      ³
+³ insertq     [F2_0F_78/0/ib/ib]      Inserts from lower 64-bit reg       ³
+³ insertq     [F2_0F_79/r]            Inserts from lower 64-bit reg       ³
+³ movntsd     [F2_0F_2B/r]            Stores Scalar Double-FP non temporar³
+³ movntss     [F3_0F_79/r]            Stores Scalar Single-FP non temporar³
+³ lzcnt       [F3_0F_BD/r]            Count of Number of leading zeros    ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄK64 Fam10 SVMÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
+³ clgi        [0F_01_DD]              Clear global interrupt flag         ³
+³ invlpga     [0F_01_DF]              Invalidates TLB mapping for vrt.page³
+³ skinit      [0F_01_DE]              Securely reinit CPU to run VMM      ³
+³ stgi        [0F_01_DC]              Store global interrupt flag         ³
+³ vmload      [0F_01_DA]              Load additional guest stat from VMCB³
+³ vmmcall     [0F_01_D9]              Explicit communication with VMM     ³
+³ vmrun       [0F_01_D8]              Start execution of VMM              ³
+³ vmsave      [0F_01_DB]              Save additional guest state to VMCB ³
 ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
 ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 ³                                   %BK5%b                                    ³
@@ -1350,4 +1367,4 @@
 ³ %IRetirement unit%i linearly searches the instruction pool for completed    ³
 ³ instructions that no longer have data dependencies with other           ³
 ³ instructions or unresolved branch predictions.                          ³
-ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ

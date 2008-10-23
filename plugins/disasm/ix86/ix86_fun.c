@@ -796,6 +796,7 @@ void __FASTCALL__ ix86_ArgAXIReg(char *str,ix86Param *DisP)
   ix86_CStile(str,k86_getREG(DisP->RealCmd[0] & 0x07,True,brex,use64));
 }
 
+
 void __FASTCALL__ ix86_ArgSInt(char *str,ix86Param *DisP)
 {
   unsigned sizptr;
@@ -1295,6 +1296,72 @@ void  __FASTCALL__ ix86_ArgExGr1(char *str,ix86Param *DisP)
 	DisP->pro_clone |= IX86_P5;
         return;
       }
+#ifdef IX86_64
+      else
+      if(DisP->RealCmd[1] == 0xD8)
+      {
+        strcpy(str,"vmrun");
+        DisP->codelen++;
+	DisP->pro_clone = K64_FAM10|K64_CPL0;
+        return;
+      }
+      else
+      if(DisP->RealCmd[1] == 0xD9)
+      {
+        strcpy(str,"vmmcall");
+        DisP->codelen++;
+	DisP->pro_clone = K64_FAM10|K64_CPL0;
+        return;
+      }
+      else
+      if(DisP->RealCmd[1] == 0xDA)
+      {
+        strcpy(str,"vmload");
+        DisP->codelen++;
+	DisP->pro_clone = K64_FAM10|K64_CPL0;
+        return;
+      }
+      else
+      if(DisP->RealCmd[1] == 0xDB)
+      {
+        strcpy(str,"vmsave");
+        DisP->codelen++;
+	DisP->pro_clone = K64_FAM10|K64_CPL0;
+        return;
+      }
+      else
+      if(DisP->RealCmd[1] == 0xDC)
+      {
+        strcpy(str,"stgi");
+        DisP->codelen++;
+	DisP->pro_clone = K64_FAM10|K64_CPL0;
+        return;
+      }
+      else
+      if(DisP->RealCmd[1] == 0xDD)
+      {
+        strcpy(str,"clgi");
+        DisP->codelen++;
+	DisP->pro_clone = K64_FAM10|K64_CPL0;
+        return;
+      }
+      else
+      if(DisP->RealCmd[1] == 0xDE)
+      {
+        strcpy(str,"skinit");
+        DisP->codelen++;
+	DisP->pro_clone = K64_FAM10|K64_CPL0;
+        return;
+      }
+      else
+      if(DisP->RealCmd[1] == 0xDF)
+      {
+        strcpy(str,"invlpga");
+        DisP->codelen++;
+	DisP->pro_clone = K64_FAM10|K64_CPL0;
+        return;
+      }
+#endif
     }
     strcpy(str,ix86_ExGrp1[rm]);
     TabSpace(str,TAB_POS);
@@ -1797,6 +1864,79 @@ void __FASTCALL__  ix86_ArgXMMRMDigit(char *str,ix86Param *DisP)
    a2 = ix86_GetDigitTile(DisP,0,0,DisP->codelen-1);
    ix86_CStile(str,a2);
    UseXMMXSet = False;
+}
+
+void __FASTCALL__ ix86_ArgXMM1IReg(char *str,ix86Param *DisP)
+{
+  tBool brex,use64;
+  brex = use64 = 0;
+  DisP->codelen++;
+#ifdef IX86_64
+  if(x86_Bitness == DAB_USE64)
+  {
+    brex = k86_REX&1;
+    use64 = Use64;
+  }
+#endif
+  UseXMMXSet = True;
+  strcat(str,k86_getREG(1,True,0,use64));
+  ix86_CStile(str,k86_getREG(DisP->RealCmd[1] & 0x07,True,brex,use64));
+  UseXMMXSet = False;
+}
+
+void __FASTCALL__ ix86_ArgXMM1DigDig(char *str,ix86Param *DisP)
+{
+  tBool brex,use64;
+  brex = use64 = 0;
+#ifdef IX86_64
+  if(x86_Bitness == DAB_USE64)
+  {
+    brex = k86_REX&1;
+    use64 = Use64;
+  }
+#endif
+  UseXMMXSet = True;
+  strcat(str,k86_getREG(1,True,0,use64));
+  UseXMMXSet = False;
+  strcat(str,",");
+  if(!((DisP->flags & __DISF_SIZEONLY) == __DISF_SIZEONLY))
+    disAppendDigits(str,DisP->CodeAddress+DisP->codelen,
+                 APREF_USE_TYPE,1,&DisP->RealCmd[DisP->codelen],DISARG_BYTE);
+  DisP->codelen++;
+  strcat(str,",");
+  if(!((DisP->flags & __DISF_SIZEONLY) == __DISF_SIZEONLY))
+    disAppendDigits(str,DisP->CodeAddress+DisP->codelen,
+                 APREF_USE_TYPE,1,&DisP->RealCmd[DisP->codelen],DISARG_BYTE);
+  DisP->codelen++;
+  DisP->codelen++;
+}
+
+void __FASTCALL__ ix86_ArgXMM1RegDigDig(char *str,ix86Param *DisP)
+{
+  tBool brex,use64;
+  brex = use64 = 0;
+#ifdef IX86_64
+  if(x86_Bitness == DAB_USE64)
+  {
+    brex = k86_REX&1;
+    use64 = Use64;
+  }
+#endif
+  UseXMMXSet = True;
+  strcat(str,k86_getREG(1,True,0,use64));
+  ix86_CStile(str,k86_getREG(DisP->RealCmd[1] & 0x07,True,brex,use64));
+  UseXMMXSet = False;
+  strcat(str,",");
+  if(!((DisP->flags & __DISF_SIZEONLY) == __DISF_SIZEONLY))
+    disAppendDigits(str,DisP->CodeAddress+DisP->codelen,
+                 APREF_USE_TYPE,1,&DisP->RealCmd[DisP->codelen],DISARG_BYTE);
+  DisP->codelen++;
+  strcat(str,",");
+  if(!((DisP->flags & __DISF_SIZEONLY) == __DISF_SIZEONLY))
+    disAppendDigits(str,DisP->CodeAddress+DisP->codelen,
+                 APREF_USE_TYPE,1,&DisP->RealCmd[DisP->codelen],DISARG_BYTE);
+  DisP->codelen++;
+  DisP->codelen++;
 }
 
 void __FASTCALL__  ix86_ArgXMMCmp(char *str,ix86Param *DisP)

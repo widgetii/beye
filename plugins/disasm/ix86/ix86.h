@@ -315,6 +315,10 @@ extern void   __FASTCALL__ ix86_ArgMovYX(char *str,ix86Param *);
 extern void   __FASTCALL__ ix86_VMX(char *str,ix86Param *);
 extern void   __FASTCALL__ ix86_0FVMX(char *str,ix86Param *DisP);
 
+extern void   __FASTCALL__ ix86_ArgXMM1IReg(char *str,ix86Param *DisP);
+extern void   __FASTCALL__ ix86_ArgXMM1DigDig(char *str,ix86Param *DisP);
+extern void   __FASTCALL__ ix86_ArgXMM1RegDigDig(char *str,ix86Param *DisP);
+
 #endif
 
 
