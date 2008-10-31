@@ -259,8 +259,6 @@ void __FillCPUInfo(char *buff,unsigned cbBuff,void (*percent_callback)(int))
             static char p4_name[128];
            
             cpu_suffix = p4_name;
-            family += extfamily;
-            model |= extmodel << 4;
             __eax = 1;
             __edx = __cpuid_edx(&__eax);
             __ecx = 1;
@@ -286,7 +284,7 @@ void __FillCPUInfo(char *buff,unsigned cbBuff,void (*percent_callback)(int))
                   case 15: strcpy(p4_name, "(Cel M"); break;
                   default: strcpy(p4_name, "(P4"); break;
             }
-            switch(model)
+            switch(model |( extmodel << 4))
             {
                   case 0:
                   case 1: strcat(p4_name, " Foster/Willamette)"); break;
@@ -359,8 +357,8 @@ void __FillCPUInfo(char *buff,unsigned cbBuff,void (*percent_callback)(int))
           case 0xF:
             {
               int msb;
-              family += extfamily;
-              model |= extmodel << 4;
+              unsigned _model;
+              _model = model|(extmodel << 4);
               __eax = 1;
               __edx = __cpuid_edx(&__eax);
               __ecx = 1;
@@ -396,7 +394,7 @@ void __FillCPUInfo(char *buff,unsigned cbBuff,void (*percent_callback)(int))
               { 
                  case 0:  cpu_suffix = "(Engineering sample)"; break; /* [dBorca] */
                  case 4:
-                   switch(model)
+                   switch(_model)
                    {
                        case 4:  cpu_suffix = "(A64 ClawHammer)"; break;
                        case 8:
@@ -410,7 +408,7 @@ void __FillCPUInfo(char *buff,unsigned cbBuff,void (*percent_callback)(int))
                  case 5:  cpu_suffix = "(A64 X2 Toledo/Manchester)"; break;
                  case 8:
                  case 9:
-                   switch(model)
+                   switch(_model)
                    {
                        case 4:  cpu_suffix = "(M A64 ClawHammer)"; break;
                        case 8:  cpu_suffix = "(M A64 Paris/NewCastle/ClawHammer)"; break;
@@ -425,25 +423,25 @@ void __FillCPUInfo(char *buff,unsigned cbBuff,void (*percent_callback)(int))
                  case 12:
                  case 14:
                  case 15: cpu_suffix =
-                          model == 5?  "(Opteron 1xx SledgeHammer)":
-                          model == 37? "(Opteron 1xx Athens)":
+                          _model == 5?  "(Opteron 1xx SledgeHammer)":
+                          _model == 37? "(Opteron 1xx Athens)":
                                        "(Opteron 1xx)"; break;
                  case 16:
                  case 17:
                  case 18:
                  case 19: cpu_suffix =
-                          model == 5?  "(Opteron 2xx SledgeHammer)":
-                          model == 37? "(Opteron 2xx Troy)":
+                          _model == 5?  "(Opteron 2xx SledgeHammer)":
+                          _model == 37? "(Opteron 2xx Troy)":
                                        "(Opteron 2xx)"; break;
                  case 20:
                  case 22:
                  case 23: cpu_suffix =
-                          model == 5?  "(Opteron 8xx SledgeHammer)":
-                          model == 37? "(Opteron 8xx Venus)":
+                          _model == 5?  "(Opteron 8xx SledgeHammer)":
+                          _model == 37? "(Opteron 8xx Venus)":
                                        "(Opteron 8xx)"; break;
                  case 34:
                  case 38:
-                   switch(model)
+                   switch(_model)
                    {
                        case 4:
                        case 7:
@@ -458,7 +456,7 @@ void __FillCPUInfo(char *buff,unsigned cbBuff,void (*percent_callback)(int))
                    } break;
                  case 33:
                  case 35:
-                   switch(model)
+                   switch(_model)
                    {
                        case 4:
                        case 8:  cpu_suffix = "(M Sempron Dublin)"; break;
@@ -468,7 +466,7 @@ void __FillCPUInfo(char *buff,unsigned cbBuff,void (*percent_callback)(int))
                        case 28: cpu_suffix = "(M Sempron Sonora)"; break;
                    } break;
                  case 36:
-                   switch(model)
+                   switch(_model)
                    {
                        case 5:  cpu_suffix = "(A64 FX SledgeHammer)"; break;
                        case 7:
@@ -480,7 +478,7 @@ void __FillCPUInfo(char *buff,unsigned cbBuff,void (*percent_callback)(int))
                  case 52: cpu_suffix = "(Opteron Egypt)"; break;
                  case 48: cpu_suffix = "(Opteron Italy)"; break;
                  default:
-                   switch(model)
+                   switch(_model)
                    {
                        case 0:
                        case 4:
@@ -700,7 +698,7 @@ void __FillCPUInfo(char *buff,unsigned cbBuff,void (*percent_callback)(int))
     __ecx = 1;
     __ebx = __cpuid_ebxecx(&__ecx);
     sprintf(&buff[strlen(buff)],
-"OEM info : Stepping=%hu Model=%hu Family=%hu Type=%s BrandID=%d\n"
+"OEM info : Stepping=%02X Model=%02X Family=%02X Type=%s BrandID=%04X\n"
 "           [%c] - FPU on chip    [%c] - VM86 Ext       [%c] - Debug exts\n"
 "           [%c] - PSE 4MB pages  [%c] - TSC present    [%c] - Intel MSRs\n"
 "           [%c] - Phys Addr Ext  [%c] - Mach.Chck Exc  [%c] - CMPXCHG8B\n"
@@ -719,8 +717,8 @@ void __FillCPUInfo(char *buff,unsigned cbBuff,void (*percent_callback)(int))
 "           [%c] - POPCNT         [%c] - AES            [%c] - OXSAVE\n"
 "           [%c] - AVX\n"
             ,stepping
-            ,model
-            ,family
+            ,extmodel?((extmodel<<4)|model):model
+            ,family=0xF?(family+extfamily):family
             ,cpu_types[type]
             ,brand_id
             ,__edx & BIT_NO( 0) ? 'x' : ' '
