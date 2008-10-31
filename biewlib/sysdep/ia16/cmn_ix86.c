@@ -995,22 +995,40 @@ void __FillCPUInfo(char *buff,unsigned cbBuff,void (*percent_callback)(int))
           sprintf(&buff[strlen(buff)],
 "           [%c] - K86 compatible MSRs        [%c] - Support syscall/sysret\n"
 "           [%c] - Execute Disable Bit        [%c] - AMD MMX Extensions\n"
-"           [%c] - Fast FXSAVE/FXRSTOR        [%c] - RDTSCP Instruction\n"
-"           [%c] - Long Mode                  [%c] - Extended 3D-Now!\n"
-"           [%c] - 3D-Now! technology         [%c] - LAHF/SAHF (64-bit)\n"
-"           [%c] - CMP Legacy                 [%c] - CR8 in Legacy Mode\n"
+"           [%c] - Fast FXSAVE/FXRSTOR        [%c] - 1-Gb large page support\n"
+"           [%c] - RDTSCP Instruction         [%c] - Long Mode\n"
+"           [%c] - Extended 3D-Now!           [%c] - 3D-Now! technology\n"
+"           [%c] - LAHF/SAHF (64-bit)         [%c] - CMP Legacy\n"
+"           [%c] - SVM (secure machine)       [%c] - Extended APIC\n"
+"           [%c] - CR8 in Legacy Mode         [%c] - ABM\n"
+"           [%c] - SSE4a                      [%c] - Misalign SSE\n"
+"           [%c] - PREFETCH insns             [%c] - OSVW\n"
+"           [%c] - IBS (sampling)             [%c] - SSE5\n"
+"           [%c] - SKINIT/STGI                [%c] - WDT (timer)\n"
             ,__edx & BIT_NO( 5) ? 'x' : ' '
             ,__edx & BIT_NO(11) ? 'x' : ' '
             ,__edx & BIT_NO(20) ? 'x' : ' '
             ,__edx & BIT_NO(22) ? 'x' : ' '
             ,__edx & BIT_NO(25) ? 'x' : ' '
+            ,__edx & BIT_NO(26) ? 'x' : ' '
             ,__edx & BIT_NO(27) ? 'x' : ' '
             ,__edx & BIT_NO(29) ? 'x' : ' '
             ,__edx & BIT_NO(30) ? 'x' : ' '
             ,__edx & BIT_NO(31) ? 'x' : ' '
             ,__ecx & BIT_NO( 0) ? 'x' : ' '
             ,__ecx & BIT_NO( 1) ? 'x' : ' '
+            ,__ecx & BIT_NO( 2) ? 'x' : ' '
+            ,__ecx & BIT_NO( 3) ? 'x' : ' '
             ,__ecx & BIT_NO( 4) ? 'x' : ' '
+            ,__ecx & BIT_NO( 5) ? 'x' : ' '
+            ,__ecx & BIT_NO( 6) ? 'x' : ' '
+            ,__ecx & BIT_NO( 7) ? 'x' : ' '
+            ,__ecx & BIT_NO( 8) ? 'x' : ' '
+            ,__ecx & BIT_NO( 9) ? 'x' : ' '
+            ,__ecx & BIT_NO(10) ? 'x' : ' '
+            ,__ecx & BIT_NO(11) ? 'x' : ' '
+            ,__ecx & BIT_NO(12) ? 'x' : ' '
+            ,__ecx & BIT_NO(13) ? 'x' : ' '
             );
         if(__highest_excpuid >= 0x80000007LU)
         {
@@ -1022,24 +1040,58 @@ void __FillCPUInfo(char *buff,unsigned cbBuff,void (*percent_callback)(int))
 "           [%c] - Temperature Sensor         [%c] - Frequency ID Control\n"
 "           [%c] - Voltage ID Control         [%c] - Thermal Trip\n"
 "           [%c] - Thermal Monitoring         [%c] - Software Thermal Control\n"
+"           [%c] - 100MHz step                [%c] - HWPState\n"
+"           [%c] - TSCInvariant\n"
             ,__edx & BIT_NO( 0) ? 'x' : ' '
             ,__edx & BIT_NO( 1) ? 'x' : ' '
             ,__edx & BIT_NO( 2) ? 'x' : ' '
             ,__edx & BIT_NO( 3) ? 'x' : ' '
             ,__edx & BIT_NO( 4) ? 'x' : ' '
             ,__edx & BIT_NO( 5) ? 'x' : ' '
+            ,__edx & BIT_NO( 6) ? 'x' : ' '
+            ,__edx & BIT_NO( 7) ? 'x' : ' '
+            ,__edx & BIT_NO( 8) ? 'x' : ' '
             );
         }
+        if(__highest_excpuid >= 0x80000008LU)
+        {
+          __eax = 0x80000008UL;
+          __edx = __cpuid_edx(&__eax);
+          __ecx = 0x80000008UL;
+          __ebx = __cpuid_ebxecx(&__ecx);
+          physical_cpus=(__ecx&0xFF)+1;
           sprintf(&buff[strlen(buff)],
-"           %d Physical Core%s in the Package\n"
+"           %d/%d - Maximal linear / physical address size (bits)\n"
+	    ,(__eax>>8)&0xFF,(__eax)&0xFF);
+        }
+          sprintf(&buff[strlen(buff)],
+"           %d Physical Core%s / %d Logical Processor%s in the Package\n"
             ,physical_cpus
             ,(physical_cpus == 1) ? "" : "s"
-          );
-          sprintf(&buff[strlen(buff)],
-"           %d Logical Processor%s in the Package\n"
             ,logical_cpus
-            ,(physical_cpus == 1) ? "" : "s"
+            ,(logical_cpus == 1) ? "" : "s"
           );
+        if(__highest_excpuid >= 0x8000000ALU)
+        {
+          __eax = 0x8000000AUL;
+          __edx = __cpuid_edx(&__eax);
+          __ecx = 0x8000000AUL;
+          __ebx = __cpuid_ebxecx(&__ecx);
+          sprintf(&buff[strlen(buff)],
+"           %02X - SVM revision\n"
+	    ,(__eax)&0xFF);
+        }
+        if(__highest_excpuid >= 0x8000001ALU)
+        {
+          __eax = 0x8000001AUL;
+          __edx = __cpuid_edx(&__eax);
+          __ecx = 0x8000001AUL;
+          __ebx = __cpuid_ebxecx(&__ecx);
+          sprintf(&buff[strlen(buff)],
+"           [%c] - Fullwidth int. 128-bit SSE [%c] - prefer MOVUPS to MOVH(L)PD\n"
+            ,__eax & BIT_NO( 0) ? 'x' : ' '
+            ,__eax & BIT_NO( 1) ? 'x' : ' ');
+        }
       }
       else
       if(is_cyrix)

@@ -37,7 +37,8 @@
 static unsigned __NEAR__ __FASTCALL__ __cpu_type( void )
 {
   register unsigned retval;
-  __asm("pushl	%%esp\n"
+  __asm __volatile(
+      "	pushl	%%esp\n"
       "	pushfl\n"
       "	movl	%%esp, %%edx\n"
       "	andl	$~3, %%esp\n"
@@ -96,7 +97,7 @@ static unsigned __NEAR__ __FASTCALL__ __cpu_type( void )
 
 static void __NEAR__ __FASTCALL__ __cpu_name(char *buff)
 {
-  __asm("xorl	%%eax, %%eax\n"
+  __asm __volatile("xorl	%%eax, %%eax\n"
       "	.short	0xA20F\n" /* cpuid */
       "	movl	%%ebx, %%eax\n"
       "	stosl\n"
@@ -113,7 +114,7 @@ static void __NEAR__ __FASTCALL__ __cpu_name(char *buff)
 
 static void __NEAR__ __FASTCALL__ __extended_name(char *buff)
 {
-   __asm("movl	$0x80000002, %%eax\n"
+   __asm __volatile("movl	$0x80000002, %%eax\n"
       ".short	0xA20F\n" /* cpuid */
       "	stosl\n"
       "	movl	%%ebx, %%eax\n"
@@ -149,36 +150,33 @@ static void __NEAR__ __FASTCALL__ __extended_name(char *buff)
 
 static unsigned long __NEAR__ __FASTCALL__ __cpuid_edx(unsigned long *__r_eax)
 {
-  register unsigned long __r_edx;
-   __asm("lodsl\n"
-      ".short	0xA20F\n"  /* cpuid */
-      "	stosl\n"	:
-      "=d"(__r_edx)	:
-      "D"(__r_eax),        /* assume ds == es */
-      "S"(__r_eax)	:
-      "eax", "ecx", "ebx");
-  return __r_edx;
+  register unsigned long r_eax,r_edx,r_ecx,r_ebx;
+  r_eax=*__r_eax;
+   __asm __volatile(
+	".short	0xA20F": /* cpuid */
+	"=a"(r_eax),"=d"(r_edx),"=b"(r_ebx),"=c"(r_ecx):
+	"0"(r_eax));
+  *__r_eax=r_eax;
+  return r_edx;
 }
 
 static unsigned long __NEAR__ __FASTCALL__ __cpuid_ebxecx(unsigned long *__r_eax)
 {
-  register unsigned long __r_ebx;
-   __asm("lodsl\n"
-      ".short	0xA20F\n"  /* cpuid */
-      "	movl	%%ecx, %%eax\n"
-      "	stosl\n"	:
-      "=b"(__r_ebx)	:
-      "D"(__r_eax),     /* assume ds == es */
-      "S"(__r_eax)	:
-      "eax", "edx", "ecx");
-  return __r_ebx;
+  register unsigned long r_eax,r_edx,r_ecx,r_ebx;
+  r_eax=*__r_eax;
+   __asm __volatile(
+	".short	0xA20F": /* cpuid */
+	"=a"(r_eax),"=d"(r_edx),"=b"(r_ebx),"=c"(r_ecx):
+	"0"(r_eax));
+  *__r_eax=r_ecx;
+  return r_ebx;
 }
 
 static unsigned __NEAR__ __FASTCALL__ __fpu_type( void )
 {
   unsigned __cw;
   register unsigned retval;
-   __asm("fninit\n"                     /* initialize 80387 (nowait) */
+   __asm __volatile("fninit\n"                     /* initialize 80387 (nowait) */
       "	movl	$0x20, %%ecx\n"
 "1:\n"
       "	loop	1b\n"                 /* wait for it to complete */
@@ -205,7 +203,7 @@ static unsigned __NEAR__ __FASTCALL__ __fpu_type( void )
 static unsigned long __NEAR__ __FASTCALL__ __OPS_nop(volatile unsigned *time_val)
 {
   register unsigned long retval;
-   __asm(
+   __asm __volatile(
 "1:\n"
       "	cmpl	$0, (%1)\n"
       "	jz	1b\n"
@@ -324,7 +322,7 @@ static unsigned long __NEAR__ __FASTCALL__ __OPS_nop(volatile unsigned *time_val
 static unsigned long __NEAR__ __FASTCALL__ __OPS_std(volatile unsigned *counter,char *arr8byte)
 {
   register unsigned long retval;
-   __asm("xorl	%0, %0\n"
+   __asm __volatile("xorl	%0, %0\n"
 "1:\n"
       "	cmpl	$0, (%1)\n"
       "	jz	1b\n"
@@ -428,7 +426,7 @@ static unsigned long __NEAR__ __FASTCALL__ __OPS_std(volatile unsigned *counter,
 static unsigned long __NEAR__ __FASTCALL__ __FOPS_nowait(volatile unsigned *counter,char *arr18bytes)
 {
   register unsigned long retval;
-   __asm("xorl	%0, %0\n"
+   __asm __volatile("xorl	%0, %0\n"
 "1:\n"
       "	cmpl	$0, (%1)\n"
       "	jz	1b\n"
@@ -538,7 +536,7 @@ static unsigned long __NEAR__ __FASTCALL__ __MOPS_std(volatile unsigned *counter
 {
   register unsigned long retval;
   UNUSED(arr);
-   __asm("xorl	%0, %0\n"
+   __asm __volatile("xorl	%0, %0\n"
 "1:\n"
       "	cmpl	$0, (%1)\n"
       "	jz	1b\n"
@@ -645,7 +643,7 @@ static unsigned long __NEAR__ __FASTCALL__ __MOPS_std(volatile unsigned *counter
 static unsigned long __NEAR__ __FASTCALL__ __SSEOPS_std(volatile unsigned *counter,char *arr)
 {
   register unsigned long retval;
-   __asm("xorl	%0, %0\n"
+   __asm __volatile("xorl	%0, %0\n"
 "1:\n"
       "	cmpl	$0, (%1)\n"
       "	jz	1b\n"
