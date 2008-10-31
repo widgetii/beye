@@ -95,16 +95,15 @@ void __FillCPUInfo(char *buff,unsigned cbBuff,void (*percent_callback)(int))
   unsigned char stepping = 0,model = 0,family = 0,type = 0;
   unsigned char extfamily = 0,extmodel = 0;
   unsigned short brand_id = 0;
-  unsigned short logical_cpus = 1;
-  unsigned short physical_cpus = 1;
+  unsigned short cpu_cores = 1;
   int i,j;
   unsigned short long_mod;
   char cpu_name[10],fpu_name[10];
   char cpu_oemname[13],cache_info[80];
   tBool is_amd = False,is_cyrix = False, is_intel = False, is_umc = False, 
         is_nexgen = False, is_centaur = False, is_rise = False,
-        is_transmeta = False, is_sis = False, is_nsc = False;
-
+        is_transmeta = False, is_sis = False, is_nsc = False,
+	is_htt=False,is_core_smp_legacy=False;
   strcpy(cache_info,"n/a\n");
   fulltype = __cpu_type();
   cpu_class = fulltype & CPU_CLONE;
@@ -267,15 +266,16 @@ void __FillCPUInfo(char *buff,unsigned cbBuff,void (*percent_callback)(int))
             __ecx = 1;
             __ebx = __cpuid_ebxecx(&__ecx);
             brand_id = __ebx & 0x000000FFUL;
-            if(__edx & BIT_NO(28)) // HTT
+            is_htt=__edx & BIT_NO(28);
+            if(is_htt) // HTT
             {
-               logical_cpus = ((__ebx & 0x00FF0000UL) >> 16) + 1;
+               cpu_cores = ((__ebx>>16)&0xFF) + 1;
             }
             if(__highest_cpuid > 4)
             {
                __eax = 4;
                __cpuid_edx(&__eax);
-               physical_cpus = (__eax >> 26) + 1;
+               cpu_cores = (__eax >> 26) + 1;
             }
             switch(brand_id)
             {
@@ -367,20 +367,21 @@ void __FillCPUInfo(char *buff,unsigned cbBuff,void (*percent_callback)(int))
               __ebx = __cpuid_ebxecx(&__ecx);
               brand_id = __ebx & 0x000000FFUL;
               msb = brand_id >> 3;
-              if(__edx & BIT_NO(28)) // HTT
+              if(is_htt) // HTT
               {
                  __ecx = 0x80000001;
                  __ebx = __cpuid_ebxecx(&__ecx);
-                 if(__ecx & BIT_NO( 1)) // CMP Legacy
-                    physical_cpus = ((__ebx & 0x00FF0000UL) >> 16) + 1;
+                 is_core_smp_legacy=__ecx & BIT_NO(1);
+                 if(is_core_smp_legacy) // CMP Legacy
+                    cpu_cores = ((__ebx>>16)&0xFF) + 1;
                  else
                  {
-                    logical_cpus = ((__ebx & 0x00FF0000UL) >> 16) + 1;
+                    cpu_cores = ((__ebx>>16)&0xFF) + 1;
                     if(__highest_excpuid >= 0x80000008LU)
                     {
                        __ecx = 0x80000008UL;
                        __ebx = __cpuid_ebxecx(&__ecx);
-                       physical_cpus = (__ecx & 0x000000FF) + 1;
+                       cpu_cores = (__ecx & 0x000000FF) + 1;
                     }
                  }
               }
@@ -978,45 +979,18 @@ void __FillCPUInfo(char *buff,unsigned cbBuff,void (*percent_callback)(int))
       *((unsigned long*)&extended_name[44]) = __edx;
       *((unsigned long*)&extended_name[48]) = 0;
       sprintf(&buff[strlen(buff)],"%s\n",extended_name);
-      if(is_intel)
       {
-          __eax = 0x80000001UL;
-          __edx = __cpuid_edx(&__eax);
-          __ecx = 0x80000001UL;
-          __ebx = __cpuid_ebxecx(&__ecx);
-          sprintf(&buff[strlen(buff)],
-"           [%c] - Syscall/sysret (64-bit)    [%c] - Execute Disable Bit\n"
-"           [%c] - Intel EM64T available      [%c] - LAHF/SAHF (64-bit)\n"
-            ,__edx & BIT_NO(11) ? 'x' : ' '
-            ,__edx & BIT_NO(20) ? 'x' : ' '
-            ,__edx & BIT_NO(29) ? 'x' : ' '
-            ,__ecx & BIT_NO( 0) ? 'x' : ' '
-            );
-          sprintf(&buff[strlen(buff)],
-"           %d physical core%s in the package\n"
-            ,physical_cpus
-            ,(physical_cpus == 1) ? "" : "s"
-          );
-          sprintf(&buff[strlen(buff)],
-"           %d logical processor%s in the package\n"
-            ,logical_cpus
-            ,(physical_cpus == 1) ? "" : "s"
-          );
-      }
-      else
-      if(is_amd)
-      {
-          __eax = 0x80000001UL;
-          __edx = __cpuid_edx(&__eax);
-          __ecx = 0x80000001UL;
-          __ebx = __cpuid_ebxecx(&__ecx);
-          sprintf(&buff[strlen(buff)],
+      __eax = 0x80000001UL;
+      __edx = __cpuid_edx(&__eax);
+      __ecx = 0x80000001UL;
+      __ebx = __cpuid_ebxecx(&__ecx);
+      sprintf(&buff[strlen(buff)],
 "           [%c] - K86 compatible MSRs        [%c] - Support syscall/sysret\n"
 "           [%c] - Execute Disable Bit        [%c] - AMD MMX Extensions\n"
 "           [%c] - Fast FXSAVE/FXRSTOR        [%c] - 1-Gb large page support\n"
 "           [%c] - RDTSCP Instruction         [%c] - Long Mode\n"
 "           [%c] - Extended 3D-Now!           [%c] - 3D-Now! technology\n"
-"           [%c] - LAHF/SAHF (64-bit)         [%c] - CMP Legacy\n"
+"           [%c] - LAHF/SAHF (64-bit)         [%c] - Core SMP Legacy\n"
 "           [%c] - SVM (secure machine)       [%c] - Extended APIC\n"
 "           [%c] - CR8 in Legacy Mode         [%c] - ABM\n"
 "           [%c] - SSE4a                      [%c] - Misalign SSE\n"
@@ -1048,6 +1022,7 @@ void __FillCPUInfo(char *buff,unsigned cbBuff,void (*percent_callback)(int))
             ,__ecx & BIT_NO(12) ? 'x' : ' '
             ,__ecx & BIT_NO(13) ? 'x' : ' '
             );
+        is_core_smp_legacy=__ecx & BIT_NO( 1);
         if(__highest_excpuid >= 0x80000007LU)
         {
           __eax = 0x80000007UL;
@@ -1073,22 +1048,21 @@ void __FillCPUInfo(char *buff,unsigned cbBuff,void (*percent_callback)(int))
         }
         if(__highest_excpuid >= 0x80000008LU)
         {
+	  unsigned apicid;
           __eax = 0x80000008UL;
           __edx = __cpuid_edx(&__eax);
           __ecx = 0x80000008UL;
           __ebx = __cpuid_ebxecx(&__ecx);
-          physical_cpus=(__ecx&0xFF)+1;
+          /* legacy method */
+          apicid=((__ecx>>12)&0x0F);
+          cpu_cores=(__ecx&0xFF)+1;
+          sprintf(&buff[strlen(buff)],
+"           %d CPU Cores (theoretical maximum for this model = %d cores)\n"
+            ,cpu_cores,2<<apicid);
           sprintf(&buff[strlen(buff)],
 "           %d/%d - Maximal linear / physical address size (bits)\n"
 	    ,(__eax>>8)&0xFF,(__eax)&0xFF);
         }
-          sprintf(&buff[strlen(buff)],
-"           %d Physical Core%s / %d Logical Processor%s in the Package\n"
-            ,physical_cpus
-            ,(physical_cpus == 1) ? "" : "s"
-            ,logical_cpus
-            ,(logical_cpus == 1) ? "" : "s"
-          );
         if(__highest_excpuid >= 0x8000000ALU)
         {
           __eax = 0x8000000AUL;
@@ -1111,7 +1085,6 @@ void __FillCPUInfo(char *buff,unsigned cbBuff,void (*percent_callback)(int))
             ,__eax & BIT_NO( 1) ? 'x' : ' ');
         }
       }
-      else
       if(is_cyrix)
       {
           __eax = 0x80000001UL;
