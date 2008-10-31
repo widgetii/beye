@@ -701,7 +701,7 @@ void __FillCPUInfo(char *buff,unsigned cbBuff,void (*percent_callback)(int))
     sprintf(&buff[strlen(buff)],
 "OEM info : Stepping=%hu Model=%hu Family=%hu Type=%s BrandID=%d\n"
 "           [%c] - FPU on chip    [%c] - VM86 Ext       [%c] - Debug exts\n"
-"           [%c] - 4MB pages      [%c] - TSC present    [%c] - Intel MSRs\n"
+"           [%c] - PSE 4MB pages  [%c] - TSC present    [%c] - Intel MSRs\n"
 "           [%c] - Phys Addr Ext  [%c] - Mach.Chck Exc  [%c] - CMPXCHG8B\n"
 "           [%c] - Local APIC     [%c] - Fast syscall   [%c] - MTRR\n"
 "           [%c] - Page Global    [%c] - Mach.Chck Arch [%c] - (F)CMOVxx\n"
@@ -711,8 +711,12 @@ void __FillCPUInfo(char *buff,unsigned cbBuff,void (*percent_callback)(int))
 "           [%c] - SSE2           [%c] - Self Snoop     [%c] - Hyper-Thread\n"
 "           [%c] - Therm.Monitor  [%c] - IA-64 Itanium  [%c] - Pend. Brk. En\n"
 "           [%c] - SSE3           [%c] - MONITOR/MWAIT  [%c] - DS-CPL\n"
-"           [%c] - VMX            [%c] - EST            [%c] - Therm.Monitor2\n"
-"           [%c] - CNXT-ID        [%c] - CMPXCHG16B     [%c] - xTPR\n"
+"           [%c] - VMX            [%c] - SMX            [%c] - EST\n"
+"           [%c] - Therm.Mon2     [%c] - SSSE3          [%c] - CNXT-ID\n"
+"           [%c] - CMPXCHG16B     [%c] - xTPR           [%c] - PDCM\n"
+"           [%c] - DCA            [%c] - SSE4.1         [%c] - SSE4.2\n"
+"           [%c] - POPCNT         [%c] - AES            [%c] - OXSAVE\n"
+"           [%c] - AVX\n"
             ,stepping
             ,model
             ,family
@@ -754,15 +758,25 @@ void __FillCPUInfo(char *buff,unsigned cbBuff,void (*percent_callback)(int))
             ,__ecx & BIT_NO( 3) ? 'x' : ' '
             ,__ecx & BIT_NO( 4) ? 'x' : ' '
             ,__ecx & BIT_NO( 5) ? 'x' : ' '
+            ,__ecx & BIT_NO( 6) ? 'x' : ' '
             ,__ecx & BIT_NO( 7) ? 'x' : ' '
             ,__ecx & BIT_NO( 8) ? 'x' : ' '
+            ,__ecx & BIT_NO( 9) ? 'x' : ' '
             ,__ecx & BIT_NO(10) ? 'x' : ' '
             ,__ecx & BIT_NO(13) ? 'x' : ' '
             ,__ecx & BIT_NO(14) ? 'x' : ' '
+            ,__ecx & BIT_NO(15) ? 'x' : ' '
+            ,__ecx & BIT_NO(18) ? 'x' : ' '
+            ,__ecx & BIT_NO(19) ? 'x' : ' '
+            ,__ecx & BIT_NO(20) ? 'x' : ' '
+            ,__ecx & BIT_NO(23) ? 'x' : ' '
+            ,__ecx & BIT_NO(25) ? 'x' : ' '
+            ,__ecx & BIT_NO(27) ? 'x' : ' '
+            ,__ecx & BIT_NO(28) ? 'x' : ' '
             );
     strcat(buff,"CPU Cache: ");
     /* determine cache info */
-    if(__highest_cpuid > 1)
+    if(__highest_cpuid > 1 && __highest_excpuid < 0x80000005LU)
     {
          unsigned long __erx[4];
          unsigned char cache_i;
@@ -886,6 +900,8 @@ void __FillCPUInfo(char *buff,unsigned cbBuff,void (*percent_callback)(int))
                            ,(unsigned)((__ecx >> 24) & 0xFF));
          if(__highest_excpuid > 0x80000005LU)
          {
+           __eax = 0x80000006UL;
+           __edx = __cpuid_edx(&__eax);
            __ecx = 0x80000006UL;
            __ebx = __cpuid_ebxecx(&__ecx);
            /*
@@ -898,9 +914,11 @@ void __FillCPUInfo(char *buff,unsigned cbBuff,void (*percent_callback)(int))
               www.amd.com */
            if(family == 6 && model == 3 && stepping == 0) __ecx |= 0x00400000UL;
          }
-         else __ecx = 0;
-         sprintf(&cache_info[strlen(cache_info)]," L2=%uK"
-                           ,(unsigned)((__ecx >> 16) & 0xFFFF));
+         else __ecx = __edx = 0;
+         sprintf(&cache_info[strlen(cache_info)]," L2=%uK L3=%uM"
+                           ,(unsigned)((__ecx >> 16) & 0xFFFF)
+                           ,(unsigned)((__edx >> 18) & 0xFFFF)/2
+                           );
       }
       /*
       Note: Cyrix has support for eax=2
@@ -1040,7 +1058,7 @@ void __FillCPUInfo(char *buff,unsigned cbBuff,void (*percent_callback)(int))
 "           [%c] - Temperature Sensor         [%c] - Frequency ID Control\n"
 "           [%c] - Voltage ID Control         [%c] - Thermal Trip\n"
 "           [%c] - Thermal Monitoring         [%c] - Software Thermal Control\n"
-"           [%c] - 100MHz step                [%c] - HWPState\n"
+"           [%c] - 100MHz step Overclocking   [%c] - HWPState\n"
 "           [%c] - TSCInvariant\n"
             ,__edx & BIT_NO( 0) ? 'x' : ' '
             ,__edx & BIT_NO( 1) ? 'x' : ' '
