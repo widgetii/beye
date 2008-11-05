@@ -18,37 +18,13 @@
 ##############################################################################
 #  Main configure section of this makefile                                   #
 ##############################################################################
-
-# Please select target platform. For detail see ../../makefile
-TARGET_PLATFORM=i386
-
-# Please select target operation system. For detail see ../../ makefile
-TARGET_OS=unix
-
-# For detail see ../../makefile
 HOST_CFLAGS=
-
-# For detail see ../../makefile
 HOST_LDFLAGS=
 
-# For detail see ../../makefile
-TARGET_SCREEN_LIB = curses
+include ../../config.mak
 
-# For detail see ../../makefile
-USE_MOUSE=n
-
-# For detail see ../../makefile
-USE_SELECT=y
-
-# For detail see ../../makefile
-compilation=normal
-
-ifeq ($(findstring qnx,$(TARGET_OS)),qnx)
-include ../../make_qnx.inc
-else
-include ../../makefile.inc
-endif
-
+CFLAGS = $(CDEFOS) $(CDEFSYS) $(HOST_CFLAGS)
+LDFLAGS = $(OSLDEF) $(HOST_LDFLAGS)
 ###########################################################################
 # TARGET: put name of executable image here                               #
 ###########################################################################
@@ -63,7 +39,9 @@ LIBS = -L../../biewlib -lbiew $(OS_LIBS)
 OBJS =\
 biewhlp.o
 all: $(TARGET)
+help: $(TARGET)
 
+distclean:
 clean:
 	$(RM) $(OBJS)
 	$(RM) $(TARGET)
@@ -76,14 +54,6 @@ $(TARGET): $(OBJS)
 	$(LD) $(LDFLAGS) -o $@ $(OBJS) $(LIBS)
 
 %.o : %.c
-ifeq ($(bad_os),yes)
-	@echo Please select valid TARGET_OS
-	@exit
-endif
-ifeq ($(bad_machine),yes)
-	@echo Please select valid TARGET_MACHINE
-	@exit
-endif
 	$(CC) $(CFLAGS) $(INCS) -c $< -o $@
 
 biewhlp.o:                     biewhlp.c

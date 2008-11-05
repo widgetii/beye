@@ -6,13 +6,20 @@
 
 # Prefer these macros to full length text !
 # These macros only return an error code - NO display is done
+log(){
+    echo "$@" >>"$TMPLOG"
+}
+
+check_cmd(){
+    log "$@"
+    "$@" >>"$TMPLOG" 2>&1
+}
+
 cc_check() {
   echo >> "$TMPLOG"
   cat "$TMPC" >> "$TMPLOG"
   echo >> "$TMPLOG"
-  echo "$_cc $_extraincdir $_extralibdir $TMPC -o $TMPO $@" >> "$TMPLOG"
-  > "$TMPO"
-  ( "$_cc" $_extraincdir $_extralibdir "$TMPC" -o "$TMPO" "$@" ) >> "$TMPLOG" 2>&1
+  ( check_cmd $_cc $_extraincdir $_extralibdir "$TMPC" -o "$TMPO" "$@" ) >> "$TMPLOG" 2>&1
   TMP="$?"
   echo >> "$TMPLOG"
   echo "ldd $TMPO" >> "$TMPLOG"
@@ -77,6 +84,9 @@ Base features:
   --ar=AR                use this AR to build biewlib    [ar]
   --ranlib=RANLIB        use RANLIB to build indexes on builib [ranlib]
   --rm=RM                use RM program to cleanup files [rm]
+  --ln=LN                use LN program to make soft link [ln]
+  --cd=CD                use CD program to change directory [cd]
+  --cd=CP                use CP program to copy files [cp]
   --target-system=SYSTEM target system (linux, freebsd, win32, etc)  [auto,unix]
   --target-arch=ARCH     target architecture (i386, alpha, etc)   [auto,generic]
   --enable-debug[=1-3]   compile debugging information into biew [disable]
@@ -100,6 +110,9 @@ _ld=gcc
 _ar="ar -rcu"
 _ranlib=ranlib
 _rm="rm -f"
+_ln=sln
+_cd=cd
+_cp=cp
 _libext=a
 _libprefix=lib
 test "$CC" && _cc="$CC"
@@ -129,6 +142,12 @@ for ac_option do
   --ld=*)
     _ld=`echo $ac_option | cut -d '=' -f 2`
     ;;
+  --cd=*)
+    _cd=`echo $ac_option | cut -d '=' -f 2`
+    ;;
+  --cp=*)
+    _cp=`echo $ac_option | cut -d '=' -f 2`
+    ;;
   --disable-profile)
     _profile=
     ;;
@@ -149,6 +168,9 @@ for ac_option do
     ;;
   --rm=*)
     _rm=`echo $ac_option | cut -d '=' -f 2`
+    ;;
+  --ln=*)
+    _ln=`echo $ac_option | cut -d '=' -f 2`
     ;;
   --target-system=*)
     _target_system=`echo $ac_option | cut -d '=' -f 2`
@@ -543,6 +565,9 @@ LD=$_ld
 AR=$_ar
 RANLIB=$_ranlib
 RM=$_rm
+LN=$_ln
+CD=$_cd
+CP=$_cp
 INSTALL=$_install
 LIBEXT=$_libext
 LIBPREFIX=$_libprefix

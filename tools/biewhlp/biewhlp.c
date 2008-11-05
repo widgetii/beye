@@ -33,7 +33,7 @@ char o_cache[0x1000];
 BGLOBAL bOutput;
 
 #define BBIO_CACHE_SIZE 0x1000
-#define ARCHIVER  "lzss e"
+#define ARCHIVER  "./lzss e"
 #define COMPNAME  "temp_fil.tmp"
 #define TEMPFNAME "temp_hlp.tmp"
 

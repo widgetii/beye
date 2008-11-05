@@ -125,10 +125,14 @@ biewlib/sysdep/$(MACHINE)/$(HOST)/3rto3s.o\
 biewlib/sysdep/$(MACHINE)/$(HOST)/3sto3r.o
 endif
 
+HLP_SUBDIRS=tools/biewhlp tools/lzss
+DO_HELP = @ for i in $(HLP_SUBDIRS); do $(MAKE) -C $$i $@ || exit; done
+
 all: $(BIEWLIB) $(TARGET)
 biewlib: $(BIEWLIB)
 
 clean:
+	$(DO_HELP)
 	$(RM) $(OBJS)
 	$(RM) $(BIEWLIB_OBJS)
 	$(RM) $(TARGET)
@@ -137,7 +141,11 @@ clean:
 	$(RM) *.err
 
 distclean: clean
+	$(DO_HELP)
 	$(RM) config.log config.mak
+	$(RM) -f ./hlp/biew.hlp
+	$(RM) -f ./hlp/biewhlp
+	$(RM) -f ./hlp/lzss
 
 cleansys:
 	$(RM) biewlib/sysdep/$(MACHINE)/{*.o,$(HOST)/*.o}
@@ -277,3 +285,13 @@ uninstall:
 	rmdir -p --ignore-fail-on-non-empty $(DATADIR)/xlt
 	$(RM) $(DATADIR)/*
 	rmdir -p --ignore-fail-on-non-empty $(DATADIR)
+
+help:
+	$(DO_HELP)
+	$(RM) -f hlp/biewhlp
+	$(RM) -f hlp/lzss
+	$(LN) ../tools/biewhlp/biewhlp hlp/biewhlp
+	$(LN) ../tools/lzss/lzss hlp/lzss
+	($(CD) ./hlp && ./biewhlp biewhlp.prj && $(CD) .. )
+	$(RM) -f ./bin_rc/biew.hlp
+	$(CP) ./hlp/biew.hlp ./bin_rc
