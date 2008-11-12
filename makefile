@@ -95,6 +95,9 @@ plugins/hexmode.o\
 plugins/textmode.o\
 plugins/nls/russian.o\
 plugins/disasm/null_da.o\
+plugins/disasm/arm/arm.o\
+plugins/disasm/arm/arm16.o\
+plugins/disasm/arm/arm32.o\
 plugins/disasm/avr/avr.o\
 plugins/disasm/java/java.o\
 plugins/disasm/ix86/ix86.o\
@@ -224,6 +227,9 @@ plugins/textmode.o:           plugins/textmode.c
 plugins/nls/russian.o:        plugins/nls/russian.c
 plugins/disasm/null_da.o:     plugins/disasm/null_da.c
 plugins/disasm/java/java.o:   plugins/disasm/java/java.c
+plugins/disasm/arm/arm.o:     plugins/disasm/arm/arm.c
+plugins/disasm/arm/arm16.o:   plugins/disasm/arm/arm16.c
+plugins/disasm/arm/arm32.o:   plugins/disasm/arm/arm32.c
 plugins/disasm/avr/avr.o:     plugins/disasm/avr/avr.c
 plugins/disasm/ix86/ix86.o:   plugins/disasm/ix86/ix86.c
 plugins/disasm/ix86/ix86_fpu.o: plugins/disasm/ix86/ix86_fpu.c
