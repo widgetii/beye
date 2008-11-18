@@ -66,7 +66,13 @@ static DisasmRet __FASTCALL__ armDisassembler(__filesize_t ulShift,
 
 static void  __FASTCALL__ armHelpAsm( void )
 {
+  hlpDisplay(20041);
+}
+
+static tBool __FASTCALL__ armAsmRef( void )
+{
   hlpDisplay(20040);
+  return False;
 }
 
 static int    __FASTCALL__ armMaxInsnLen( void ) { return 8; }
@@ -167,7 +173,7 @@ REGISTRY_DISASM ARM_Disasm =
 {
   "A~RMv4", /* TODO: ARMv5TE*/
   { "ARMHlp", "Bitnes", "Endian", NULL, NULL },
-  { NULL, armSelect_bitness, armSelect_endian, NULL, NULL },
+  { armAsmRef, armSelect_bitness, armSelect_endian, NULL, NULL },
   armDisassembler,
   NULL,
   armHelpAsm,

@@ -1,9 +1,171 @@
- ARM assembly reference 
- %BARM disassembler specification:%b
-ÚÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
-³ Shorting ³      Meaning                IDEAL              MASM,TASM  ³
-ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
-³  db      ³      1 byte                 db                   db       ³
-³  dw      ³      2 bytes                dw                   dw       ³
-³  dd      ³      4 bytes                dd                   dd       ³
-ÀÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+ ARM (Advanced RISC Machine, and prior to that Acorn RISC Machine)
+ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+³ %BARM Summary%b                                                             ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
+³                                                                         ³
+³ %IDescription%i                                                             ³
+³                                                                         ³
+³ The ARM is a 32-bit RISC processor architecture developed by ARM Limited³
+³ that is widely used in embedded designs. Because of their power saving  ³
+³ features, ARM CPUs are widely present in the mobile electronics market, ³
+³ where low power consumption is a critical design goal.                  ³
+³                                                                         ³
+³ The ARM design was started in 1983 as a development project at Acorn    ³
+³ Computers Ltd to build a compact RISC CPU. They completed development   ³
+³ samples called ARM1 by April 1985, and the first %Ireal%i production systems³
+³ as ARM2 the following year.                                             ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
+³ ARM has 16 visible general-purpose 32-bit registers:                    ³
+³ %IR0-R8%i  - unbanked registers                                             ³
+³ %IR8-R12%i - banked registers                                               ³
+³ %IR13(SP)%i- normally used as Stack Pointer and is also known as the SP     ³
+³ %IR14(LR)%i- normally used as Link Register and is also known as the LR     ³
+³ %IR15(PC)%i- normally used as Program Counter register                      ³
+³                                                                         ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
+³ There also are two special regsiters:                                   ³
+³                                                                         ³
+³ %ICPSR%i   - current program status register                                ³
+³ %ISPSR%i   - saved program status register                                  ³
+³ Format of these registers:                                              ³
+³     31 30 29 28 27 26         8 7 6 5 4 3 2 1 0                         ³
+³    ÚÄÄÂÄÄÂÄÄÂÄÄÂÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÂÄÂÄÂÄÂÄÂÄÂÄÂÄÂÄ¿                        ³
+³    ³  ³  ³  ³  ³  ³            ³ ³ ³ ³M³M³M³M³M³                        ³
+³    ³ N³ Z³ C³ V³ Q³   DNM(RAZ) ³I³F³T³4³3³2³1³0³                        ³
+³    ÀÄÄÁÄÄÁÄÄÁÄÄÁÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÁÄÁÄÁÄÁÄÁÄÁÄÁÄÁÄÙ                        ³
+³ %IN%i      - Negative flag                                                  ³
+³ %IZ%i      - Zero flag                                                      ³
+³ %IC%i      - Carry flag                                                     ³
+³ %IV%i      - oVerflow flag                                                  ³
+³ %IQ%i      - saturation flag in Qxxx insns or overflow in SMLAxy insns      ³
+³ %IRAZ%i    - Reserved Always Zero bits                                      ³
+³ %II%i      - disable IRQ interrupts                                         ³
+³ %IF%i      - disable FIQ interrupts                                         ³
+³ %IT%i      - Thumb mode of instructions                                     ³
+³ %IM[4:0]%i - Determine mode of processor:                                   ³
+³  %B10000%b - User mode (PC, R0-R14, CPSR are accesible)                     ³
+³  %B10001%b - FIQ mode                                                       ³
+³  %B10010%b - IRQ mode                                                       ³
+³  %B10011%b - Supervisor mode                                                ³
+³  %B10111%b - Abort mode                                                     ³
+³  %B11011%b - Undefined mode                                                 ³
+³  %B11111%b - System mode                                                    ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
+³ %IInstruction set encoding:%i                                               ³
+³                                                                         ³
+³ All instructions in ARM architecture are 4-byte long. The fields of     ³
+³ instruction are located as follow:                                      ³
+³                                                                         ³
+³    31-28 27-25 24-21  20 19-16 15-12 11-7  6-5   4 3-0                  ³
+³   ÚÄÄÄÄÄÂÄÄÄÄÄÂÄÄÄÄÄÄÂÄÄÂÄÄÄÄÄÂÄÄÄÄÄÂÄÄÄÄÂÄÄÄÄÄÄÂÄÄÂÄÄÄ¿                ³
+³   ³cond ³ext  ³opcode³S ³  Rn ³ Rd  ³ Rs ³ Shift³X ³Rm ³                ³
+³   ÃÄÄÄÄÄÅÄÄÄÄÄÅÄÄÄÄÄÄÅÄÄÅÄÄÄÄÄÅÄÄÄÄÄÅÄÄÄÄÅÄÄÄÄÄÄÁÄÄÁÄÄÄ´                ³
+³   ³cond ³ext  ³opcode³S ³  Rn ³ Rd  ³ rot³  Immediate  ³                ³
+³   ÃÄÄÄÄÄÅÄÄÄÄÄÅÄÄÄÄÄÄÅÄÄÅÄÄÄÄÄÅÄÄÄÄÄÅÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄ´                ³
+³   ³cond ³ext  ³opcode³S ³  Rn ³ Rd  ³   Immediate      ³                ³
+³   ÃÄÄÄÄÄÅÄÄÄÄÄÅÄÄÄÄÄÄÅÄÄÅÄÄÄÄÄÅÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´                ³
+³   ³cond ³ext  ³opcode³S ³  Rn ³   Register list        ³                ³
+³   ÃÄÄÄÄÄÅÄÄÄÄÄÅÄÄÄÄÄÄÁÄÄÁÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´                ³
+³   ³cond ³ext  ³        24-bit offset or SWI number     ³                ³
+³   ÀÄÄÄÄÄÁÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ                ³
+³ Due architecture limitation branch instruction can specify %I+-32MB%i only  ³
+³                                                                         ³
+³ cond   - means condition of instruction execution                       ³
+³ ext    - high part of extended opcode                                   ³
+³ opcode - opcode itself                                                  ³
+³ S      - means modification of CPSR                                     ³
+³ Rn     - specifies first operand of operation                           ³
+³ Rd     - specifies destinition register                                 ³
+³ Rs     - specifies shifter register                                     ³
+³ Rm     - specifies multiplier register                                  ³
+³ Rg lst - specifies list of registers for some insns                     ³
+³ S - means modification of CPSR                                          ³
+³ X - low part of extended opcode if present                              ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
+³ Almost all ARM instructions can be conditionally executed, which means  ³
+³ that they only have their normal effect on the programmerâ€™s model state,³
+³ memory and coprocessors if the %IN%i, %IZ%i, %IC%i and %IV%i flags in the %ICPSR%i satisfy a³
+³ condition specified in the instruction. If the flags do not satisfy this³
+³ condition, the instruction acts as a %INOP%i: that is, execution advances to³
+³ the next instruction as normal, including any relevant checks for       ³
+³ interrupts and prefetch aborts, but has no other effect.                ³
+³                                                                         ³
+³ Condition encoding:                                                     ³
+³ÚÄÄÄÄÄÂÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿     ³
+³³31:28³exten³ Meaning                          ³ Condition flag    ³     ³
+³ÃÄÄÄÄÄÅÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´     ³
+³³0000 ³  EQ ³ Equal                            ³Z=1                ³     ³
+³³0001 ³  NE ³ Not equal                        ³Z=0                ³     ³
+³³0010 ³CS/HS³ Carry set/unsigned higher or same³C=1                ³     ³
+³³0011 ³CC/LO³ Carry clear/unsigned lower       ³C=0                ³     ³
+³³0100 ³  MI ³ Minus/negative                   ³N=1                ³     ³
+³³0101 ³  PL ³ Plus/positive or zero            ³N=0                ³     ³
+³³0110 ³  VS ³ Overflow                         ³V=1                ³     ³
+³³0111 ³  VC ³ No overflow                      ³V=0                ³     ³
+³³1000 ³  HI ³ Unsigned higher                  ³C=1 && Z=0         ³     ³
+³³1001 ³  LS ³ Unsigned lower or same           ³C=0 || Z=1         ³     ³
+³³1010 ³  GE ³ Signed greater than or equal     ³N=1 && V=1 or N==V ³     ³
+³³1011 ³  LT ³ Signed less than                 ³N=1 && V=0 or N!=V ³     ³
+³³1100 ³  GT ³ Signed greater than              ³Z=0 || N==V        ³     ³
+³³1101 ³  LE ³ Signed less than or equal        ³Z=1 || N!=V        ³     ³
+³³1110 ³  AL ³ Always (unconditional)           ³-                  ³     ³
+³³1111 ³ (NV)³ Not valid except some cases      ³                   ³     ³
+³ÀÄÄÄÄÄÁÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ     ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
+³ %IIntructions set in format of [ext][opcode]<X>:%i                          ³
+³ ADC          [0]i[5]              Add with carry                        ³
+³ ADD          [0]i[4]              Add                                   ³
+³ AND          [0]i[0]              Bitwise AND                           ³
+³ B            [ 5][0]              Branch                                ³
+³ BL           [ 5][8]              Branch and link (analog of call)      ³
+³ BIC          [0]i[E]              Bit Clear                             ³
+³ BKPT         [ 1][2]              Break-Point                           ³
+³ BLX          [ 5][8]              Branch Link and Exchange (Thumb mode) ³
+³ BLX          [ 0][9]<0>           Branch Link and Exchange (Thumb mode) ³
+³ BX           [ 0][9]<1>           Branch Exchange (Thumb mode)          ³
+³ CPD          [7]0[FPU_op]         Coprocessor data processing           ³
+³ CLZ          [0]1[6]              Count Leading Zero                    ³
+³ CMN          [0]i[B]1             Compare Negative                      ³
+³ CMP          [0]i[A]1             Compare                               ³
+³ EOR          [0]i[1]              Exclusive OR                          ³
+³ LDC          [6][punw]1           Load coprocessor                      ³
+³ LDM          [5][pu0w]1           Load and multiply                     ³
+³ LDM          [5][pu1w]1           Load and multiply                     ³
+³ LDR          [2]i[pu0w]1          Load register                         ³
+³ LDRB         [2]i[pu1w]1          Load register byte                    ³
+³ LDRBT        [2]i[0u3]1           Load register byte with translation   ³
+³ LDRH         [0][pui1w]1<B>       Load register halfword                ³
+³ LDRSB        [0][pui1w]1<F>       Load register signed halfword         ³
+³ LDRT         [1]i[0u2]1           Load register with translation        ³
+³ MCR          [E]0[FPU_op]0<1>     Load register to coprocessor          ³
+³ MLA          [0][1]<9>            Multiply accumulate                   ³
+³ MOV          [0]i[E]              Move                                  ³
+³ MRC          [E]1[FPU_op]1<1>     Load register from coprocessor        ³
+³ MRS          [0][1R0]             Move PSR to GPR                       ³
+³ MSR          [1][1R0]0 imm8       Move PSR from GPR                     ³
+³ MSR          [0][1R0]0<0>         Move PSR from GPR                     ³
+³ MUL          [0][0]<9>            Multiply                              ³
+³ MVN          [0]i[F]              Move negative                         ³
+³ ORR          [0]i[C]              Logical OR                            ³
+³ RSB          [0]i[3]              Reverse substract                     ³
+³ RSC          [0]i[7]              Reverse substract with carry          ³
+³ SBC          [0]i[6]              Substract with carry                  ³
+³ SMLAL        [0]i[7]<9>           Signed Multiply Accumulate Long       ³
+³ SMULL        [0]i[6]<9>           Signed Multiply Long                  ³
+³ STC          [6][punw]0           Store coprocessor                     ³
+³ STM          [5][pu0w]            Store multiply                        ³
+³ STM          [4][pu10]0 rg. list  Store multiply                        ³
+³ STR          [1]i[pu0w0]          Store register                        ³
+³ STRB         [1]i[pu1w0]          Store register byte                   ³
+³ STRBT        [1]i[0u110]          Store register byte with translation  ³
+³ STRH         [0][puiw0]<A>        Store register halfword               ³
+³ STRT         [1][0u010]           Store register with translation       ³
+³ SUB          [0]i[2]              Substract                             ³
+³ SWI          [7]1                 Software interrupt                    ³
+³ SWP          [0][8]0<9>           Swap                                  ³
+³ SWPB         [0][A]0<9>           Swap byte                             ³
+³ TEQ          [0]i[9]1             Test Equivalence                      ³
+³ TST          [0]i[8]1             Test                                  ³
+³ UMLAL        [0][5]<9>            Unsigned Multiply Accumulate Long     ³
+³ UMULL        [0][4]<9>            Unsigned Multiply Long                ³
+ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
