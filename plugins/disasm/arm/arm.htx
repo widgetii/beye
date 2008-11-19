@@ -262,4 +262,27 @@
 ³ SUB          {161}                Substract                             ³
 ³ SWI          {DF}                 Software Interrupt                    ³
 ³ TST          {010}[8]             Test                                  ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
+³ %IDSP extension%i.                                                          ³
+³ Many digital signal processing (DSP) algorithms operate on arrays of    ³
+³ 16-bit data, where the 16-bit value is to be interpreted as a signed    ³
+³ fixed-point number with 15 binary places. Such values are sometimes     ³
+³ called Q15 numbers, and represent numeric values ranging from â€“1 up to  ³
+³ +1*2eâ€“15.                                                               ³
+³                                                                         ³
+³ %I32-bit DSP Intructions set in format of {ext.i}[opcode.S]<X>:%i           ³
+³ LDRD         {  0}[puiw0]<D>      Load pair of ARM registers            ³
+³ MCRR         {  6}[2.0]<fpu>      Move pair registers to coprocessor    ³
+³ MRRC         {  6}[2.1]<fpu>      Move pair registers from coprocessor  ³
+³ PLD          {1,i}[1u101]<F>      Prefetch load double registers        ³
+³ QADD         {  0}[8.0]<5>        Q-numbers Add with saturation         ³
+³ QDADD        {  0}[A.0]<5>        Double Q-numbers & Add with saturation³
+³ QDSUB        {  0}[B.0]<5>        Double Q-numbers & Substract          ³
+³ QSUB         {  0}[9.0]<5>        Q-numbers Substract                   ³
+³ SMLA<x><y>   {  0}[8.0]<1yx0>     Signed Multiply and Accumulate        ³
+³ SMLAL<x><y>  {  0}[A.0]<1yx0>     Signed Multiply and Accumulate 16-bit ³
+³ SMLAW<y>     {  0}[9.0]<1y00>     Signed Multiply and Accumulate words  ³
+³ SMUL<x><y>   {  0}[B.0]<1yx0>     Unsigned Multiply and Accumulate      ³
+³ SMULW<y>     {  0}[9.0]<1y10>     Unsigned Multiply and Accumulate words³
+³ STRD         {  0}[puiw0]<F>      Store pair of ARM registers           ³
 ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
