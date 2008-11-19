@@ -56,10 +56,12 @@
 ³ All instructions in ARM architecture are 4-byte long. The fields of     ³
 ³ instruction are located as follow:                                      ³
 ³                                                                         ³
-³    31-28 27-25 24-21  20 19-16 15-12 11-7  6-5   4 3-0                  ³
+³    31-28 27-25 24-21  20 19-16 15-12 11-7  6-5   4  3-0                 ³
 ³   ÚÄÄÄÄÄÂÄÄÄÄÄÂÄÄÄÄÄÄÂÄÄÂÄÄÄÄÄÂÄÄÄÄÄÂÄÄÄÄÂÄÄÄÄÄÄÂÄÄÂÄÄÄ¿                ³
 ³   ³cond ³ext  ³opcode³S ³  Rn ³ Rd  ³ Rs ³ Shift³X ³Rm ³                ³
-³   ÃÄÄÄÄÄÅÄÄÄÄÄÅÄÄÄÄÄÄÅÄÄÅÄÄÄÄÄÅÄÄÄÄÄÅÄÄÄÄÅÄÄÄÄÄÄÁÄÄÁÄÄÄ´                ³
+³   ÃÄÄÄÄÄÅÄÄÄÄÄÅÄÄÄÄÄÄÅÄÄÅÄÄÄÄÄÅÄÄÄÄÄÅÄÄÄÂÁÄÄÄÄÄÄÁÄÄÅÄÄÄ´                ³
+³   ³cond ³ext  ³opcode³S ³  Rn ³ Rd  ³ Rs³ XXXXXXX  ³Rm ³                ³
+³   ÃÄÄÄÄÄÅÄÄÄÄÄÅÄÄÄÄÄÄÅÄÄÅÄÄÄÄÄÅÄÄÄÄÄÅÄÄÄÁÂÄÄÄÄÄÄÄÄÄÁÄÄÄ´                ³
 ³   ³cond ³ext  ³opcode³S ³  Rn ³ Rd  ³ rot³  Immediate  ³                ³
 ³   ÃÄÄÄÄÄÅÄÄÄÄÄÅÄÄÄÄÄÄÅÄÄÅÄÄÄÄÄÅÄÄÄÄÄÅÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄ´                ³
 ³   ³cond ³ext  ³opcode³S ³  Rn ³ Rd  ³   Immediate      ³                ³
@@ -112,60 +114,152 @@
 ³³1111 ³ (NV)³ Not valid except some cases      ³                   ³     ³
 ³ÀÄÄÄÄÄÁÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ     ³
 ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
-³ %IIntructions set in format of [ext][opcode]<X>:%i                          ³
-³ ADC          [0]i[5]              Add with carry                        ³
-³ ADD          [0]i[4]              Add                                   ³
-³ AND          [0]i[0]              Bitwise AND                           ³
-³ B            [ 5][0]              Branch                                ³
-³ BL           [ 5][8]              Branch and link (analog of call)      ³
-³ BIC          [0]i[E]              Bit Clear                             ³
-³ BKPT         [ 1][2]              Break-Point                           ³
-³ BLX          [ 5][8]              Branch Link and Exchange (Thumb mode) ³
-³ BLX          [ 0][9]<0>           Branch Link and Exchange (Thumb mode) ³
-³ BX           [ 0][9]<1>           Branch Exchange (Thumb mode)          ³
-³ CPD          [7]0[FPU_op]         Coprocessor data processing           ³
-³ CLZ          [0]1[6]              Count Leading Zero                    ³
-³ CMN          [0]i[B]1             Compare Negative                      ³
-³ CMP          [0]i[A]1             Compare                               ³
-³ EOR          [0]i[1]              Exclusive OR                          ³
-³ LDC          [6][punw]1           Load coprocessor                      ³
-³ LDM          [5][pu0w]1           Load and multiply                     ³
-³ LDM          [5][pu1w]1           Load and multiply                     ³
-³ LDR          [2]i[pu0w]1          Load register                         ³
-³ LDRB         [2]i[pu1w]1          Load register byte                    ³
-³ LDRBT        [2]i[0u3]1           Load register byte with translation   ³
-³ LDRH         [0][pui1w]1<B>       Load register halfword                ³
-³ LDRSB        [0][pui1w]1<F>       Load register signed halfword         ³
-³ LDRT         [1]i[0u2]1           Load register with translation        ³
-³ MCR          [E]0[FPU_op]0<1>     Load register to coprocessor          ³
-³ MLA          [0][1]<9>            Multiply accumulate                   ³
-³ MOV          [0]i[E]              Move                                  ³
-³ MRC          [E]1[FPU_op]1<1>     Load register from coprocessor        ³
-³ MRS          [0][1R0]             Move PSR to GPR                       ³
-³ MSR          [1][1R0]0 imm8       Move PSR from GPR                     ³
-³ MSR          [0][1R0]0<0>         Move PSR from GPR                     ³
-³ MUL          [0][0]<9>            Multiply                              ³
-³ MVN          [0]i[F]              Move negative                         ³
-³ ORR          [0]i[C]              Logical OR                            ³
-³ RSB          [0]i[3]              Reverse substract                     ³
-³ RSC          [0]i[7]              Reverse substract with carry          ³
-³ SBC          [0]i[6]              Substract with carry                  ³
-³ SMLAL        [0]i[7]<9>           Signed Multiply Accumulate Long       ³
-³ SMULL        [0]i[6]<9>           Signed Multiply Long                  ³
-³ STC          [6][punw]0           Store coprocessor                     ³
-³ STM          [5][pu0w]            Store multiply                        ³
-³ STM          [4][pu10]0 rg. list  Store multiply                        ³
-³ STR          [1]i[pu0w0]          Store register                        ³
-³ STRB         [1]i[pu1w0]          Store register byte                   ³
-³ STRBT        [1]i[0u110]          Store register byte with translation  ³
-³ STRH         [0][puiw0]<A>        Store register halfword               ³
-³ STRT         [1][0u010]           Store register with translation       ³
-³ SUB          [0]i[2]              Substract                             ³
-³ SWI          [7]1                 Software interrupt                    ³
-³ SWP          [0][8]0<9>           Swap                                  ³
-³ SWPB         [0][A]0<9>           Swap byte                             ³
-³ TEQ          [0]i[9]1             Test Equivalence                      ³
-³ TST          [0]i[8]1             Test                                  ³
-³ UMLAL        [0][5]<9>            Unsigned Multiply Accumulate Long     ³
-³ UMULL        [0][4]<9>            Unsigned Multiply Long                ³
+³ %IThumb instruction set encoding:%i                                         ³
+³ The Thumb instruction set is a re-encoded subset of the ARM instruction ³
+³ set. Thumb is designed to increase the performance of ARM               ³
+³ implementations that use a 16-bit or narrower memory data bus and to    ³
+³ allow better code density than ARM. T variants of the ARM architecture  ³
+³ incorporate both a full 32-bit ARM instruction set and the 16-bit Thumb ³
+³ instruction set. Every Thumb instruction is encoded in 16 bits:         ³
+³                                                                         ³
+³ 15-13 12-11  10      6 5     3 2    0   Here:                           ³
+³ÚÄÄÄÄÄÂÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÂÄÄÄÄÄÄ¿                                  ³
+³³ ext ³opcode³immediate³   Rm  ³  Rd  ³   ext    - extension of opcode   ³
+³³ÄÄÄÄÄÅÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÅÄÄÄÄÄÄ´   opcode - instruction code      ³
+³³ ext ³opcode³    Rn   ³   Rm  ³  Rd  ³   cond   - 4-bit condition       ³
+³³ÄÄÄÄÄÁÂÄÄÄÄÄÁÄÄÂÄÄÄÄÄÄÁÄÄÄÄÄÄÄÁÄÄÄÄÄÄ´   offset - immediate offset      ³
+³³ ext  ³ cond   ³     offset          ³                                  ³
+³³ÄÄÄÄÄÂÁÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´                                  ³
+³³ ext ³       XXXXXXXXX               ³                                  ³
+³³ÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÂÄÄÄÄÄÄ´                                  ³
+³³ ext ³  offset        ³   Rn  ³  Rd  ³                                  ³
+³³ÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÅÄÄÄÄÄÄÄÁÄÄÄÄÄÄ´                                  ³
+³³ ext. opcode   ³  Rd  ³  offset      ³                                  ³
+³³ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´                                  ³
+³³ ext. opcode   ³  XXXXXXXXXXXXX      ³                                  ³
+³³ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´                                  ³
+³³ ext. opcode       ³     Rm / SBZ    ³                                  ³
+³ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ                                  ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
+³ %I32-bit Intructions set in format of {ext.i}[opcode.S]<X>:%i                   ³
+³ ADC          {0.i}[5]             Add with carry                        ³
+³ ADD          {0.i}[4]             Add                                   ³
+³ AND          {0.i}[0]             Bitwise AND                           ³
+³ B            {  5}[0]             Branch                                ³
+³ BL           {  5}[8]             Branch and link (analog of call)      ³
+³ BIC          {0.i}[E]             Bit Clear                             ³
+³ BKPT         {  1}[2]             Break-Point                           ³
+³ BLX          {  5}[8]             Branch Link and Exchange (Thumb mode) ³
+³ BLX          {  0}[9]<0>          Branch Link and Exchange (Thumb mode) ³
+³ BX           {  0}[9]<1>          Branch Exchange (Thumb mode)          ³
+³ CPD          {7.0}[FPU_op]        Coprocessor data processing           ³
+³ CLZ          {0.1}[6]             Count Leading Zero                    ³
+³ CMN          {0.i}[B.1]           Compare Negative                      ³
+³ CMP          {0.i}[A.1]           Compare                               ³
+³ EOR          {0.i}[1]             Exclusive OR                          ³
+³ LDC          {  6}[punw.1]        Load coprocessor                      ³
+³ LDM          {  5}[pu0w.1]        Load and multiply                     ³
+³ LDM          {  5}[pu1w.1]        Load and multiply                     ³
+³ LDR          {2.i}[pu0w.1]        Load register                         ³
+³ LDRB         {2.i}[pu1w.1]        Load register byte                    ³
+³ LDRBT        {2.i}[0u11.1]        Load register byte with translation   ³
+³ LDRH         {  0}[pui1w.1]<B>    Load register halfword                ³
+³ LDRSB        {  0}[pui1w.1]<F>    Load register signed halfword         ³
+³ LDRT         {1.i}[0u10.1]        Load register with translation        ³
+³ MCR          {E.0}[FPU_op.0]<1>   Load register to coprocessor          ³
+³ MLA          {  0}[1]<9>          Multiply accumulate                   ³
+³ MOV          {0.i}[E]             Move                                  ³
+³ MRC          {E.1}[FPU_op.1]<1>   Load register from coprocessor        ³
+³ MRS          {  0}[1R00]          Move PSR to GPR                       ³
+³ MSR          {  1}[1R00.0] imm8   Move PSR from GPR                     ³
+³ MSR          {  0}[1R00.0]<0>     Move PSR from GPR                     ³
+³ MUL          {  0}[0]<9>          Multiply                              ³
+³ MVN          {0.1}[F]             Move negative                         ³
+³ ORR          {0.1}[C]             Logical OR                            ³
+³ RSB          {0.i}[3]             Reverse substract                     ³
+³ RSC          {0.i}[7]             Reverse substract with carry          ³
+³ SBC          {0.i}[6]             Substract with carry                  ³
+³ SMLAL        {0.i}[7]<9>          Signed Multiply Accumulate Long       ³
+³ SMULL        {0.i}[6]<9>          Signed Multiply Long                  ³
+³ STC          {  6}[punw.0]        Store coprocessor                     ³
+³ STM          {  5}[pu0w]          Store multiply                        ³
+³ STM          {  4}[pu10]0 rg.list Store multiply                        ³
+³ STR          {1.i}[pu0w0]         Store register                        ³
+³ STRB         {1.i}[pu1w0]         Store register byte                   ³
+³ STRBT        {1.i}[0u110]         Store register byte with translation  ³
+³ STRH         {  0}[puiw0]<A>      Store register halfword               ³
+³ STRT         {  1}[0u010]         Store register with translation       ³
+³ SUB          {0.i}[2]             Substract                             ³
+³ SWI          {7.1}                Software interrupt                    ³
+³ SWP          {0  }[8]0<9>         Swap                                  ³
+³ SWPB         {0  }[A]0<9>         Swap byte                             ³
+³ TEQ          {0.i}[9.1]           Test Equivalence                      ³
+³ TST          {0.i}[8.1]           Test                                  ³
+³ UMLAL        {  0}[5]<9>          Unsigned Multiply Accumulate Long     ³
+³ UMULL        {  0}[4]<9>          Unsigned Multiply Long                ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
+³ %IThumb instruction format in format {ext}<opcode>:%i                       ³
+³ ADC          {010}[5]             Add with carry                        ³
+³ ADD          {0E}                 Add                                   ³
+³ ADD          {5}                  Add                                   ³
+³ ADD          {0C}                 Add                                   ³
+³ ADD          {08}[4]              Add                                   ³
+³ ADD          {14}                 Add                                   ³
+³ ADD          {16}[0]              Add                                   ³
+³ AND          {010}[0]             Logical AND                           ³
+³ ASR          {2}                  Arithmetic shift right                ³
+³ ASR          {010}[4]             Arithmetic shift right                ³
+³ B            {D}[cond]            Branch                                ³
+³ B            {1}[B]               Branch                                ³
+³ BIC          {010}[E]             Bit Clear                             ³
+³ BKPT         {B}[E]               Breakpoint                            ³
+³ BL           {7.h}                Branch and Link                       ³
+³ BLX          {08}[F]              Branch, Link and eXchange             ³
+³ BX           {08}[E]              Branch and eXchange                   ³
+³ CMN          {08}[B]              Compare Negative                      ³
+³ CMP          {05}                 Compare                               ³
+³ CMP          {08}[A]              Compare                               ³
+³ CMP          {08}[5.h1.h2]        Compare                               ³
+³ EOR          {08}[1]              Exclusive OR                          ³
+³ LDMIA        {19}                 Load Multiple Increment After         ³
+³ LDR          {0D}                 Load Register                         ³
+³ LDR          {2C}                 Load Register                         ³
+³ LDR          {09}                 Load Register                         ³
+³ LDR          {13}                 Load Register                         ³
+³ LDRB         {0F}                 Load Register Byte                    ³
+³ LDRB         {2E}                 Load Register Byte                    ³
+³ LDRH         {11}                 Load Register Halfword                ³
+³ LDRH         {2D}                 Load Register Halfword                ³
+³ LDRSB        {2B}                 Load Register Signed Byte             ³
+³ LDRSH        {2F}                 Load Register Signed Halfword         ³
+³ LSL          {0}                  Logical Shift Left                    ³
+³ LSL          {010}[2]             Logical Shift Left                    ³
+³ LSR          {01}                 Logical Shift Right                   ³
+³ LSR          {10}[3]              Logical Shift Right                   ³
+³ MOV          {04}                 Move                                  ³
+³ MOV          {0E}[0]              Move                                  ³
+³ MOV          {45}                 Move                                  ³
+³ MUL          {010}[D]             Multiply                              ³
+³ MVN          {010}[F]             Move NOT                              ³
+³ NEG          {010}[9]             Negate                                ³
+³ ORR          {010}[C]             Logical OR                            ³
+³ POP          {BC}[r]              Pop multiple registers                ³
+³ PUSH         {B5}[r]              Push multiple registers               ³
+³ ROR          {010}[7]             Rotate right register                 ³
+³ SBC          {010}[4]             Substract with Carry                  ³
+³ STMIA        {18}                 Store Multiply Increment After        ³
+³ STR          {0C}                 Store Register                        ³
+³ STR          {028}                Store Register                        ³
+³ STR          {12}                 Store Register                        ³
+³ STRB         {0E}                 Store Register Byte                   ³
+³ STRB         {2A}                 Store Register Byte                   ³
+³ STRH         {10}                 Store Register Halfword               ³
+³ STRH         {10}                 Store Register Halfword               ³
+³ STRH         {051}                Store Register Halfword               ³
+³ SUB          {01F}                Substract                             ³
+³ SUB          {07}                 Substract                             ³
+³ SUB          {0D}                 Substract                             ³
+³ SUB          {161}                Substract                             ³
+³ SWI          {DF}                 Software Interrupt                    ³
+³ TST          {010}[8]             Test                                  ³
 ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
