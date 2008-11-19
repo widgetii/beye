@@ -234,10 +234,10 @@ const char *armCCnames[16] =
     ""/*AL - Always or unconditional*/,
     "NV" /* NEVER */
 };
-const char *arm_sysfreg_name[32] = 
+const char *arm_sysfreg_name[16] =
 {
     "fpsid", "fpscr", "fp???", "fp???", "fp???", "fp???", "fp???", "fp???",
-    "fpexc"
+    "fpexc", "fp???", "fp???", "fp???", "fp???", "fp???", "fp???", "fp???",
 };
 
 const char *arm_freg_name[32] = 
