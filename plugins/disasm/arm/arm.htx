@@ -285,4 +285,99 @@
 ³ SMUL<x><y>   {  0}[B.0]<1yx0>     Unsigned Multiply and Accumulate      ³
 ³ SMULW<y>     {  0}[9.0]<1y10>     Unsigned Multiply and Accumulate words³
 ³ STRD         {  0}[puiw0]<F>      Store pair of ARM registers           ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
+³ %IVector Floating-Point extension.%i                                        ³
+³ The Vector Floating-Point (VFP) architecture is a coprocessor extension ³
+³ to the ARM architecture. It provides single-precision and               ³
+³ double-precision floating-point arithmetic, as defined by ANSI/IEEE Std.³
+³ 754-1985 IEEE Standard for Binary Floating-Point Arithmetic.            ³
+³                                                                         ³
+³ To date, there has only been one major version of the VFP architecture  ³
+³ (Version 1, or VFPv1). Double-precision support is optional, with its   ³
+³ presence being indicated by the variant letter D. So the VFPv1D variant ³
+³ has both single precision and double precision, while VFPv1xD supports  ³
+³ single precision only. By default, double-precision support is present. ³
+³
+³ VFP has 32 general-purpose registers, each capable of holding a         ³
+³ single-precision floating-point number or a 32-bit integer. In D variant³
+³ of the architecture, these registers can also be used in pairs to hold  ³
+³ up to 16 double-precision floating-point numbers. There are also three  ³
+³ or more system registers:                                               ³
+³ %BFPSID%b     Is read-only. It can be read to determine which implementation³
+³           of the VFP architecture is being used.                        ³
+³ %BFPSCR%b     Supplies all user-level status and control. Status bits hold  ³
+³           comparison results and cumulative flags for floating-point    ³
+³           exceptions. Control bits are provided to select rounding      ³
+³           options and vector length/stride, and to enable floating-point³
+³           exception traps.                                              ³
+³ %BFPEXC%b     Contains a few bits for system-level status and control.      ³
+³                                                                         ³
+³ VFP instruction set in format {ext}[]opcode]<fpu_opcode>:               ³
+³ FABSD      {E.1}[0.3.0]<B.1.1>  FP Absolute Value, Double-precision     ³
+³ FABSS      {E.1}[x.3.0]<A.1.1>  FP Absolute Value, Single-precision     ³
+³ FADDD      {E.0}[0.3]<B.0.0>    FP Addition, Double-precision           ³
+³ FADDS      {E.0}[x.3]<A.0.0>    FP Addition, Single-precision           ³
+³ FCMPD      {E.1}[0.3.4]<B.0.1>  FP Comparision, Double-precision        ³
+³ FCMPS      {E.1}[x.3.4]<A.0.1>  FP Comparision, Single-precision        ³
+³ FCMPED     {E.1}[0.3.4]<B.1.1>  FP Comparision, Double-precision for Nan³
+³ FCMPES     {E.1}[x.3.4]<A.1.1>  FP Comparision, Single-precision for Nan³
+³ FCMPEZD    {E.1}[0.3.5]<B.1.1>  FP Comparision, Double-precision for Zer³
+³ FCMPEZS    {E.1}[x.3.5]<A.1.1>  FP Comparision, Single-precision for Zer³
+³ FCMPZD     {E.1}[0.3.5]<B.0.1>  FP Comparision, Double-precision for Zer³
+³ FCMPZS     {E.1}[x.3.5]<A.0.1>  FP Comparision, Single-precision for Zer³
+³ FCPYD      {E.1}[0.3.0]<B.0.1>  FP Copy Double-precision                ³
+³ FCPYS      {E.1}[x.3.0]<A.0.1>  FP Copy Single-precision                ³
+³ FCVTDS     {E.1}[0.3.7]<A.1.1>  FP Conevrt Single to Double             ³
+³ FCVTSD     {E.1}[x.3.7]<B.1.1>  FP Conevrt Double to Single             ³
+³ FDIVD      {E.1}[0.0]<B.0.0>    FP Divide, Double-precision             ³
+³ FDIVS      {E.1}[x.0]<A.0.0>    FP Divide, Single-precision             ³
+³ FLDD       {D.u}[0.0.1]<B>      FP Load, Double-precision               ³
+³ FLDS       {D.u}[x.0.1]<A>      FP Load, Single-precision               ³
+³ FLDMD      {6.p}[u.0.w.1]<B>    FP Load, Multiple Double-precision      ³
+³ FLDMS      {6.p}[u.0.w.1]<A>    FP Load, Multiple Single-precision      ³
+³ FLDMX      {6.p}[u.0.w.1]<A>    FP Load, Multiple Unknown-precision     ³
+³ FMACD      {E.0}[0.0]<B.0.0>    FP Multiply and Accumulate Double       ³
+³ FMACS      {E.0}[x.0]<B.0.0>    FP Multiply and Accumulate Single       ³
+³ FMDHR      {E.0}[2]<B.0.0.1>    FP Load High of Double from Register    ³
+³ FMDLR      {E.0}[0]<B.0.0.1>    FP Load Low of Double from Register     ³
+³ FMRDH      {E.0}[3]<B.0.0.1>    FP Load High of Double to Register      ³
+³ FMRDL      {E.0}[1]<B.0.0.1>    FP Load Low of Double to Register       ³
+³ FMRS       {E.1}[1]<A.x.0.1>    FP Load Single to Register              ³
+³ FMRX       {E.F}[1]<A.0.0.1>    FP system FP-reg to Register            ³
+³ FMSCD      {E.0}[0.1]<B.0.0>    FP Multiply and Substract Double        ³
+³ FMSCS      {E.0}[x.1]<A.0.0>    FP Multiply and Substract Single        ³
+³ FMSR       {E.0}[1]<A.x.0.1>    FP Load Single from Register            ³
+³ FMSTAT     {E.F}[1.F]<A.0.0.1>  FP Move Status                          ³
+³ FMULD      {E.0}[0.2]<B.0.0>    FP Multiply, Double-precision           ³
+³ FMULS      {E.0}[x.2]<A.0.0>    FP Multiply, Single-precision           ³
+³ FMXR       {E.E}<A.0.0.1>       FP system FP-reg from Register          ³
+³ FNEGD      {E.1}[0.3.01]<B.0.1> FP Negate, Double-precision             ³
+³ FNEGS      {E.1}[x.3.01]<A.0.1> FP Negate, Single-precision             ³
+³ FNMACD     {E.0}[0.0]<B.0.1>    FP Negate Multiply And Accumulate Double³
+³ FNMACS     {E.0}[x.0]<A.0.1>    FP Negate Multiply And Accumulate Single³
+³ FNMSCD     {E.0}[0.1]<B.0.1>    FP Negate Multiply And Substract Double ³
+³ FNMSCS     {E.0}[x.1]<A.0.1>    FP Negate Multiply And Substract Single ³
+³ FNMULD     {E.0}[0.2]<B.0.1>    FP Negate Multiply Double               ³
+³ FNMULS     {E.0}[x.2]<A.0.1>    FP Negate Multiply Single               ³
+³ FSITOD     {E.1}[0.3.8]<B.1.1>  FP Convert Single-Interger to Double-FP ³
+³ FSITOS     {E.1}[x.3.8]<A.1.1>  FP Convert Single-Interger to Single-FP ³
+³ FSQRTD     {E.1}[0.3.1]<B.1.1>  FP Square Root, Double-precision        ³
+³ FSQRTS     {E.1}[x.3.1]<A.1.1>  FP Square Root, Single-precision        ³
+³ FSTD       {D.u}[0.0]<B>        FP Store, Double-precision              ³
+³ FSTS       {D.u}[0.0]<A>        FP Store, Single-precision              ³
+³ FSTMD      {6.p}[u.0.w.0]<B>    FP Load, Multiple Double-precision      ³
+³ FSTMS      {6.p}[u.0.w.0]<A>    FP Load, Multiple Single-precision      ³
+³ FSTMX      {6.p}[u.0.w.0]<B>    FP Load, Multiple Unknown-precision     ³
+³ FSUBD      {E.0}[0.3]<B.0.1>    FP Substract, Double-precision          ³
+³ FSUBS      {E.0}[0.3]<B.0.1>    FP Substract, Single-precision          ³
+³ FTOSID     {E.1}[x.3.B]<B.0.1>  FP Convert Double-FP to Single-Interger ³
+³ FTOSIZD    {E.1}[x.3.B]<B.1.1>  FP Convert Double-FP to Single-Interger ³
+³ FTOSIS     {E.1}[x.3.B]<A.0.1>  FP Convert Single-FP to Single-Interger ³
+³ FTOSIZS    {E.1}[x.3.B]<A.1.1>  FP Convert Single-FP to Single-Interger ³
+³ FTOUID     {E.1}[x.3.C]<B.0.1>  FP Convert Double-FP to USingle-Interger³
+³ FTOUIZD    {E.1}[x.3.C]<B.1.1>  FP Convert Double-FP to USingle-Interger³
+³ FTOUIS     {E.1}[x.3.C]<A.0.1>  FP Convert Single-FP to USingle-Interger³
+³ FTOUIZS    {E.1}[x.3.C]<A.1.1>  FP Convert Single-FP to USingle-Interger³
+³ FUITOD     {E.1}[x.3.8]<B.1.1>  FP Convert USingle-Interger to Double-FP³
+³ FUITOS     {E.1}[x.3.8]<A.1.1>  FP Convert USingle-Interger to Single-FP³
 ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
