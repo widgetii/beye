@@ -80,8 +80,6 @@ static arm_opcode32 opcode_table[]=
     { "CMN", "cccc00I10111ssss0000<<<<<<<<<<<<", ARM_V1|ARM_INTEGER },
     { "CMP", "cccc00I10101ssss0000<<<<<<<<<<<<", ARM_V1|ARM_INTEGER },
     { "EOR", "cccc00I0001Sssssdddd<<<<<<<<<<<<", ARM_V1|ARM_INTEGER },
-    { "LDC2","1111110PUNW1TTTTVVVVxxxxOOOOOOOO", ARM_V5|ARM_FPU },
-    { "LDC", "cccc110PUNW1TTTTVVVVxxxxOOOOOOOO", ARM_V2|ARM_FPU },
     { "LDM", "cccc100PU0W1ssssRRRRRRRRRRRRRRRR", ARM_V1|ARM_INTEGER },
     { "LDM", "cccc100PU101ssss0RRRRRRRRRRRRRRR", ARM_V1|ARM_INTEGER },
     { "LDR", "cccc01IPU0W1ssssddddaaaaaaaaaaaa", ARM_V1|ARM_INTEGER },
@@ -93,8 +91,6 @@ static arm_opcode32 opcode_table[]=
     { "LDRT","cccc01I0U011ssssddddaaaaaaaaaaaa", ARM_V1|ARM_INTEGER },
     { "MLA", "cccc0000001Sddddnnnnssss1001mmmm", ARM_V2|ARM_INTEGER },
     { "MOV", "cccc00I1101S0000dddd<<<<<<<<<<<<", ARM_V1|ARM_INTEGER },
-    { "MRC2","11111110fff1ttttddddxxxxFFF1yyyy", ARM_V5|ARM_INTEGER },
-    { "MRC", "cccc1110fff1ttttddddxxxxFFF1yyyy", ARM_V2|ARM_INTEGER },
     { "MRS", "cccc00010R000000dddd000000000000", ARM_V3|ARM_INTEGER },
     { "MSR", "cccc00110R10bbbb1111iiiiiiiiiiii", ARM_V3|ARM_INTEGER },
     { "MSR", "cccc00010R10bbbb111100000000mmmm", ARM_V3|ARM_INTEGER },
@@ -106,8 +102,6 @@ static arm_opcode32 opcode_table[]=
     { "SBC", "cccc00I0110Sssssdddd<<<<<<<<<<<<", ARM_V1|ARM_INTEGER },
     {"SMLAL","cccc0000111SDDDDddddssss1001mmmm", ARM_V1|ARM_INTEGER },
     {"SMULL","cccc0000110SDDDDddddssss1001mmmm", ARM_V1|ARM_INTEGER },
-    { "STC2","1111110PUNW0ssssTTTTxxxxiiiiiiii", ARM_V5|ARM_INTEGER },
-    { "STC", "cccc110PUNW0ssssTTTTxxxxiiiiiiii", ARM_V2|ARM_INTEGER },
     { "STM", "cccc100PU0W0ssssRRRRRRRRRRRRRRRR", ARM_V1|ARM_INTEGER },
     { "STM", "cccc100PU100ssssRRRRRRRRRRRRRRRR", ARM_V1|ARM_INTEGER },
     { "STR", "cccc01IPU0W0ssssddddaaaaaaaaaaaa", ARM_V1|ARM_INTEGER },
@@ -139,8 +133,14 @@ static arm_opcode32 opcode_table[]=
     {"SMULW","cccc00010010dddd0000ssss1Y10mmmm", ARM_V5|ARM_DSP },
     { "STRD","cccc000PUIW0nnnnddddaaaa1111aaaa", ARM_V5|ARM_DSP },
  /* VFP */
-    { "CDP2","11111110ffffTTTTttttxxxxFFF0yyyy", ARM_V5|ARM_FPU },
-    { "CDP", "cccc1110ffffTTTTttttxxxxFFF0yyyy", ARM_V2|ARM_FPU },
+//    { "CDP2","11111110ffffTTTTttttxxxxFFF0yyyy", ARM_V5|ARM_FPU },
+//    { "CDP", "cccc1110ffffTTTTttttxxxxFFF0yyyy", ARM_V2|ARM_FPU },
+//    { "LDC2","1111110PUNW1TTTTVVVVxxxxOOOOOOOO", ARM_V5|ARM_FPU },
+//    { "LDC", "cccc110PUNW1TTTTVVVVxxxxOOOOOOOO", ARM_V2|ARM_FPU },
+//    { "MRC2","11111110fff1ttttddddxxxxFFF1yyyy", ARM_V5|ARM_INTEGER },
+//    { "MRC", "cccc1110fff1ttttddddxxxxFFF1yyyy", ARM_V2|ARM_INTEGER },
+//    { "STC2","1111110PUNW0ssssTTTTxxxxiiiiiiii", ARM_V5|ARM_INTEGER },
+//    { "STC", "cccc110PUNW0ssssTTTTxxxxiiiiiiii", ARM_V2|ARM_INTEGER },
 
     {"FABSD","cccc111010110000VVVV10111100TTTT", ARM_V5|ARM_FPU },
     {"FABSS","cccc11101v110000VVVV101111t0TTTT", ARM_V5|ARM_FPU },
@@ -312,6 +312,16 @@ void __FASTCALL__ arm32EncodeTail(DisasmRet *dret,__filesize_t ulShift,
 	if(prev) strcat(dret->str,","); prev=1;
 	strcat(dret->str,arm_reg_name[val&0xF]);
     }
+    p=strchr(msk,'V');
+    if(p)
+    {
+	unsigned val2;
+	READ_IMM32('V');
+	val2=val;
+	if(prev) strcat(dret->str,","); prev=1;
+	READ_IMM32('v');
+	strcat(dret->str,arm_freg_name[(val2&0x1F<<1)|(val&1)]);
+    }
     p=strchr(msk,'s');
     if(p)
     {
@@ -332,16 +342,6 @@ void __FASTCALL__ arm32EncodeTail(DisasmRet *dret,__filesize_t ulShift,
 	READ_IMM32('Q');
 	if(prev) strcat(dret->str,","); prev=1;
 	strcat(dret->str,arm_sysfreg_name[val&0xF]);
-    }
-    p=strchr(msk,'V');
-    if(p)
-    {
-	unsigned val2;
-	READ_IMM32('V');
-	val2=val;
-	if(prev) strcat(dret->str,","); prev=1;
-	READ_IMM32('v');
-	strcat(dret->str,arm_freg_name[(val2&0x1F<<1)|(val&1)]);
     }
     p=strchr(msk,'T');
     if(p)
