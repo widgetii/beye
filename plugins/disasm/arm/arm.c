@@ -25,6 +25,7 @@
 #include "biewhelp.h"
 #include "biewutil.h"
 #include "plugins/disasm/arm/arm.h"
+#include "biewlib/kbd_code.h"
 #include "biewlib/file_ini.h"
 #include "biewlib/pmalloc.h"
 
@@ -64,23 +65,94 @@ static DisasmRet __FASTCALL__ armDisassembler(__filesize_t ulShift,
   return ret;
 }
 
-static void  __FASTCALL__ armHelpAsm( void )
-{
-  hlpDisplay(20041);
-}
-
 static tBool __FASTCALL__ armAsmRef( void )
 {
   hlpDisplay(20040);
   return False;
 }
 
+static void __FASTCALL__ armHelpAsm( void )
+{
+ char *msgAsmText,*title;
+ char **strs;
+ unsigned size,i,evt;
+ unsigned long nstrs;
+ TWindow * hwnd;
+ if(!hlpOpen(True)) return;
+ size = (unsigned)hlpGetItemSize(20041);
+ if(!size) goto ix86hlp_bye;
+ msgAsmText = PMalloc(size+1);
+ if(!msgAsmText)
+ {
+   mem_off:
+   MemOutBox(" Help Display ");
+   goto ix86hlp_bye;
+ }
+ if(!hlpLoadItem(20041,msgAsmText))
+ {
+   PFree(msgAsmText);
+   goto ix86hlp_bye;
+ }
+ msgAsmText[size] = 0;
+ if(!(strs = hlpPointStrings(msgAsmText,size,&nstrs))) goto mem_off;
+ title = msgAsmText;
+ hwnd = CrtHlpWndnls(title,72,21);
+ twUseWin(hwnd);
+ for(i = 0;i < nstrs;i++)
+ {
+   unsigned rlen;
+   tvioBuff it;
+   t_vchar chars[__TVIO_MAXSCREENWIDTH];
+   t_vchar oem_pg[__TVIO_MAXSCREENWIDTH];
+   ColorAttr attrs[__TVIO_MAXSCREENWIDTH];
+   it.chars = chars;
+   it.oem_pg = oem_pg;
+   it.attrs = attrs;
+   rlen = strlen(strs[i]);
+   rlen = hlpFillBuffer(&it,__TVIO_MAXSCREENWIDTH,strs[i],rlen,0,NULL,0);
+   twWriteBuffer(hwnd,2,i+2,&it,rlen);
+ }
+ PFree(msgAsmText);
+ twGotoXY(2,3);
+ {
+   twGotoXY(2,3);
+   i=0;
+   {
+     twSetColorAttr(disasm_cset.cpu_cset[0].clone[i]);
+     twPutS("ARM CPU");
+     twClrEOL();
+   }
+   twGotoXY(2,4);
+   {
+     twSetColorAttr(disasm_cset.cpu_cset[1].clone[i]);
+     twPutS("VFP extension");
+     twClrEOL();
+   }
+   twGotoXY(2,5);
+   {
+     twSetColorAttr(disasm_cset.cpu_cset[2].clone[i]);
+     twPutS("");
+     twClrEOL();
+   }
+ }
+ do
+ {
+   evt = GetEvent(drawEmptyPrompt,NULL,hwnd);
+ }
+ while(!(evt == KE_ESCAPE || evt == KE_F(10)));
+ CloseWnd(hwnd);
+ ix86hlp_bye:
+ hlpClose();
+}
+
 static int    __FASTCALL__ armMaxInsnLen( void ) { return 8; }
 static ColorAttr __FASTCALL__ armGetAsmColor( unsigned long clone )
 {
-  UNUSED(clone);
-  return disasm_cset.cpu_cset[0].clone[0];
+  if((clone & ARM_FPU)==ARM_FPU) return disasm_cset.cpu_cset[1].clone[0];
+  else
+	return disasm_cset.cpu_cset[0].clone[0];
 }
+
 static int       __FASTCALL__ armGetBitness( void ) { return armBitness; }
 static char      __FASTCALL__ armGetClone( unsigned long clone )
 {
@@ -171,7 +243,7 @@ static tBool __FASTCALL__ armSelect_endian( void )
 
 REGISTRY_DISASM ARM_Disasm =
 {
-  "A~RMv4", /* TODO: ARMv5TE*/
+  "A~RMv5TE",
   { "ARMHlp", "Bitnes", "Endian", NULL, NULL },
   { armAsmRef, armSelect_bitness, armSelect_endian, NULL, NULL },
   armDisassembler,

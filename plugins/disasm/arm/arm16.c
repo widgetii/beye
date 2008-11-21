@@ -289,6 +289,7 @@ void __FASTCALL__ arm16Disassembler(DisasmRet *dret,__filesize_t ulShift,
 	    }
 	    TabSpace(dret->str,TAB_POS);
 	    arm16EncodeTail(dret,opcode,ulShift,opcode_table[i].mask,opcode_table[i].flags);
+	    dret->pro_clone=opcode_table[i].flags;
 	    done=1;
 	    break;
 	}

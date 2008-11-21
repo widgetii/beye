@@ -51,7 +51,6 @@ typedef struct tag_arm_opcode32
     v	 - low index of destinition fpu register
     Z	 - third fpu register
     z	 - low index of third fpu register
-    x	 - number of fpu
     <	 - shifter operand
     f    - fpu opcode 1
     F    - fpu opcode 2
@@ -119,8 +118,6 @@ static arm_opcode32 opcode_table[]=
     {"UMULL","cccc0000100SDDDDddddssss1001mmmm", ARM_V1|ARM_INTEGER },
  /* DSP */
     { "LDRD","cccc000PUIW0ssssddddaaaa1101aaaa", ARM_V5|ARM_DSP },
-    { "MCRR","cccc11000100nnnnddddxxxxFFFFyyyy", ARM_V5|ARM_DSP },
-    { "MRRC","cccc11000101nnnnddddxxxxFFFFyyyy", ARM_V5|ARM_DSP },
     { "PLD", "111101I1U101ssss1111aaaaaaaaaaaa", ARM_V5|ARM_DSP },
     {"QADD", "cccc00010000ssssdddd00000101mmmm", ARM_V5|ARM_DSP },
     {"QDADD","cccc00010100ssssdddd00000101mmmm", ARM_V5|ARM_DSP },
@@ -139,6 +136,10 @@ static arm_opcode32 opcode_table[]=
 //    { "LDC", "cccc110PUNW1TTTTVVVVxxxxOOOOOOOO", ARM_V2|ARM_FPU },
 //    { "MRC2","11111110fff1ttttddddxxxxFFF1yyyy", ARM_V5|ARM_INTEGER },
 //    { "MRC", "cccc1110fff1ttttddddxxxxFFF1yyyy", ARM_V2|ARM_INTEGER },
+//    { "MCRR","cccc11000100nnnnddddxxxxFFFFyyyy", ARM_V5|ARM_DSP },
+//    { "MRRC","cccc11000101nnnnddddxxxxFFFFyyyy", ARM_V5|ARM_DSP },
+//    { "MCR2","11111110fff0TTTTssssxxxxFFF1yyyy", ARM_V5|ARM_FPU },
+//    { "MCR", "cccc1110fff0TTTTssssxxxxFFF1yyyy", ARM_V2|ARM_FPU }
 //    { "STC2","1111110PUNW0ssssTTTTxxxxiiiiiiii", ARM_V5|ARM_INTEGER },
 //    { "STC", "cccc110PUNW0ssssTTTTxxxxiiiiiiii", ARM_V2|ARM_INTEGER },
 
@@ -210,8 +211,6 @@ static arm_opcode32 opcode_table[]=
    {"FUITOD","cccc111010111000VVVV101101t0TTTT", ARM_V5|ARM_FPU },
    {"FUITOS","cccc11101v111000VVVV101001t0TTTT", ARM_V5|ARM_FPU },
 
-    { "MCR2","11111110fff0TTTTssssxxxxFFF1yyyy", ARM_V5|ARM_FPU },
-    { "MCR", "cccc1110fff0TTTTssssxxxxFFF1yyyy", ARM_V2|ARM_FPU }
 //    { "XYZ", "ccccaaaabbbbddddeeeeffffgggghhhh", ARM_V5|ARM_INTEGER }
 };
 
@@ -247,11 +246,7 @@ const char *arm_freg_name[32] =
     "F16", "F17", "F18", "F19", "F20", "F21", "F22", "F23",
     "F24", "F25", "F26", "F27", "F28", "F29", "F30", "F31"
 };
-const char *arm_funit_name[16] = 
-{
-    "P0", "P1", "P2", "P3", "P4", "P5", "P6", "P7",
-    "P8", "P9", "P10", "P11", "P12", "P13", "P14", "P15"
-};
+
 extern const char * arm_reg_name[];
 #define READ_IMM32(chr)\
 {\
@@ -284,13 +279,6 @@ void __FASTCALL__ arm32EncodeTail(DisasmRet *dret,__filesize_t ulShift,
     char *p;
     prev=0;
     bracket=0;
-    p=strchr(msk,'x');
-    if(p)
-    {
-	READ_IMM32('x');
-	if(prev) strcat(dret->str,","); prev=1;
-	strcat(dret->str,arm_funit_name[val&0xF]);
-    }
     p=strchr(msk,'f');
     if(p)
     {
@@ -453,6 +441,7 @@ void __FASTCALL__ arm32Disassembler(DisasmRet *dret,__filesize_t ulShift,
 	    }
 	    TabSpace(dret->str,TAB_POS);
 	    arm32EncodeTail(dret,ulShift,opcode,flags,ix);
+	    dret->pro_clone=opcode_table[ix].flags;
 	    done=1;
 	    break;
 	}
