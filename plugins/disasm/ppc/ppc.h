@@ -1,0 +1,10 @@
+#ifndef POWER_PC_G5
+#define POWER_PC_G5 1
+
+#define TAB_POS 10
+
+#define PPC_INTEGER	0x00000000UL
+#define PPC_FPU		0x00000100UL
+#define PPC_ALTIVEC	0x00000200UL
+
+#endif

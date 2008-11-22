@@ -47,6 +47,7 @@ extern REGISTRY_DISASM ix86_Disasm;
 extern REGISTRY_DISASM Null_Disasm;
 extern REGISTRY_DISASM AVR_Disasm;
 extern REGISTRY_DISASM ARM_Disasm;
+extern REGISTRY_DISASM PPC_Disasm;
 extern REGISTRY_DISASM Java_Disasm;
 
 static REGISTRY_DISASM *mainDisasmTable[] =
@@ -55,6 +56,7 @@ static REGISTRY_DISASM *mainDisasmTable[] =
   &Null_Disasm,
   &AVR_Disasm,
   &ARM_Disasm,
+  &PPC_Disasm,
   &Java_Disasm
 };
 

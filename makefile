@@ -99,6 +99,7 @@ plugins/disasm/arm/arm.o\
 plugins/disasm/arm/arm16.o\
 plugins/disasm/arm/arm32.o\
 plugins/disasm/avr/avr.o\
+plugins/disasm/ppc/ppc.o\
 plugins/disasm/java/java.o\
 plugins/disasm/ix86/ix86.o\
 plugins/disasm/ix86/ix86_fpu.o\
@@ -231,6 +232,7 @@ plugins/disasm/arm/arm.o:     plugins/disasm/arm/arm.c
 plugins/disasm/arm/arm16.o:   plugins/disasm/arm/arm16.c
 plugins/disasm/arm/arm32.o:   plugins/disasm/arm/arm32.c
 plugins/disasm/avr/avr.o:     plugins/disasm/avr/avr.c
+plugins/disasm/ppc/ppc.o:     plugins/disasm/ppc/ppc.c
 plugins/disasm/ix86/ix86.o:   plugins/disasm/ix86/ix86.c
 plugins/disasm/ix86/ix86_fpu.o: plugins/disasm/ix86/ix86_fpu.c
 plugins/disasm/ix86/ix86_fun.o: plugins/disasm/ix86/ix86_fun.c

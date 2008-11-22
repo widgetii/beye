@@ -1,0 +1,16 @@
+ How to see
+   This product %Bhighlights%b assembly instructions for different chips
+and different execution units :
+
+
+
+ %BPowerPC disassembler specification:%b
+ÚÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+³ Shorting ³      Meaning                IDEAL              MASM,TASM  ³
+ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
+³  db      ³      1 byte                 db                   db       ³
+³  dw      ³      2 bytes                dw                   dw       ³
+³  dd      ³      4 bytes                dd                   dd       ³
+³  dq      ³      8 bytes                dq                   dq       ³
+³  dx      ³     16 bytes                dx                   dx       ³
+ÀÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ

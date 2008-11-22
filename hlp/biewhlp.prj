@@ -51,3 +51,5 @@ id = BIEW_HLP v5.6.0
 20031 = ../plugins/disasm/java/javasize.htx
 20040 = ../plugins/disasm/arm/arm.htx
 20041 = ../plugins/disasm/arm/armsize.htx
+20050 = ../plugins/disasm/ppc/ppc.htx
+20051 = ../plugins/disasm/ppc/ppcsize.htx
