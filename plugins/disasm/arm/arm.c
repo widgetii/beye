@@ -1,7 +1,7 @@
 /**
  * @namespace   biew_plugins_II
  * @file        plugins/disasm/arm.c
- * @brief       This file contains implementation of Data disassembler.
+ * @brief       This file contains implementation of ARM disassembler.
  * @version     -
  * @remark      this source file is part of Binary vIEW project (BIEW).
  *              The Binary vIEW (BIEW) is copyright (C) 1995 Nick Kurshev.
@@ -80,18 +80,18 @@ static void __FASTCALL__ armHelpAsm( void )
  TWindow * hwnd;
  if(!hlpOpen(True)) return;
  size = (unsigned)hlpGetItemSize(20041);
- if(!size) goto ix86hlp_bye;
+ if(!size) goto armhlp_bye;
  msgAsmText = PMalloc(size+1);
  if(!msgAsmText)
  {
    mem_off:
    MemOutBox(" Help Display ");
-   goto ix86hlp_bye;
+   goto armhlp_bye;
  }
  if(!hlpLoadItem(20041,msgAsmText))
  {
    PFree(msgAsmText);
-   goto ix86hlp_bye;
+   goto armhlp_bye;
  }
  msgAsmText[size] = 0;
  if(!(strs = hlpPointStrings(msgAsmText,size,&nstrs))) goto mem_off;
@@ -141,7 +141,7 @@ static void __FASTCALL__ armHelpAsm( void )
  }
  while(!(evt == KE_ESCAPE || evt == KE_F(10)));
  CloseWnd(hwnd);
- ix86hlp_bye:
+ armhlp_bye:
  hlpClose();
 }
 
