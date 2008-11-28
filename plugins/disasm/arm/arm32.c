@@ -39,7 +39,6 @@ typedef struct tag_arm_opcode32
     a	 - address mode
     d	 - destinition register
     D	 - hipart of destinition register
-    b	 - field-bit mask
     s	 - source register
     n	 - Rn register
     m	 - Rm register
@@ -62,6 +61,11 @@ typedef struct tag_arm_opcode32
     O    - offset value
     XY   - XY values of 'TB' suffixes for DSP<x><y> instructions
     SIPUNW - addresing modes
+XScale extension:
+    EJG  - dest,1st src and 2nd source registers of XScale coprocessor
+    B	 - BWH bits of XScale
+    9	 - Saturation mode
+    U	 - 0 - unsigned 1 - signed
 */
 
 static arm_opcode32 opcode_table[]=
@@ -211,8 +215,83 @@ static arm_opcode32 opcode_table[]=
   {"FTOSIZS","cccc11101v111100VVVV101011t0TTTT", ARM_V5|ARM_FPU },
    {"FUITOD","cccc111010111000VVVV101101t0TTTT", ARM_V5|ARM_FPU },
    {"FUITOS","cccc11101v111000VVVV101001t0TTTT", ARM_V5|ARM_FPU },
-
-//    { "XYZ", "ccccaaaabbbbddddeeeeffffgggghhhh", ARM_V5|ARM_INTEGER }
+/* Intel XScale coprocessor */
+  {"TANDC",  "cccc1110BB0100111111000100110000", ARM_V5|ARM_XSCALE },
+  {"TBCST",  "cccc11100100EEEEssss0000BB010000", ARM_V5|ARM_XSCALE },
+  {"TEXTRC", "cccc1110BB0100111111000101110+++", ARM_V5|ARM_XSCALE },
+  {"TEXTRM", "cccc1110BB01EEEEssss00000111----", ARM_V5|ARM_XSCALE },
+  {"TINSR",  "cccc11100110EEEEssss0000BB010+++", ARM_V5|ARM_XSCALE },
+  {"TMIA",   "cccc111000100000ssss000EEEE1mmmm", ARM_V5|ARM_XSCALE },
+  {"TMIAPH", "cccc111000101000ssss000EEEE1mmmm", ARM_V5|ARM_XSCALE },
+  {"TMIA",   "cccc1110001011XYssss000EEEE1mmmm", ARM_V5|ARM_XSCALE },
+  {"TMOVMSK","cccc1110BB01EEEEssss000000110000", ARM_V5|ARM_XSCALE },
+  {"TORC",   "cccc1110BB0100111111000101010000", ARM_V5|ARM_XSCALE },
+  {"TORVSC", "cccc1110BB0100101111000110010000", ARM_V5|ARM_XSCALE },
+// vectors
+  {  "WABS", "cccc1110BB10JJJJEEEE000111000000", ARM_V5|ARM_XSCALE },
+ {"WABSDIFF","cccc1110BB01JJJJEEEE00011100GGGG", ARM_V5|ARM_XSCALE },
+  {  "WACC", "cccc1110BB00JJJJEEEE000111000000", ARM_V5|ARM_XSCALE },
+  {  "WADD", "cccc1110BB99JJJJEEEE00011000GGGG", ARM_V5|ARM_XSCALE },
+{"WADDSUBHX","cccc11101010JJJJEEEE00011010GGGG", ARM_V5|ARM_XSCALE },
+ {"WALIGNI", "cccc11100+++JJJJEEEE00000010GGGG", ARM_V5|ARM_XSCALE },
+ {"WALIGNR", "cccc111010++JJJJEEEE00000010GGGG", ARM_V5|ARM_XSCALE },
+  { "WAND",  "cccc11100010JJJJEEEE00000000GGGG", ARM_V5|ARM_XSCALE },
+  { "WANDN", "cccc11100011JJJJEEEE00000000GGGG", ARM_V5|ARM_XSCALE },
+  { "WAGV2", "cccc11101B00JJJJEEEE00000000GGGG", ARM_V5|ARM_XSCALE },
+  { "WAGV2R","cccc11101B01JJJJEEEE00000000GGGG", ARM_V5|ARM_XSCALE },
+  { "WAGV4", "cccc11100100JJJJEEEE00000000GGGG", ARM_V5|ARM_XSCALE },
+  { "WAGV4R","cccc11100101JJJJEEEE00000000GGGG", ARM_V5|ARM_XSCALE },
+  { "WCMPEQ","cccc1110BB00JJJJEEEE00000110GGGG", ARM_V5|ARM_XSCALE },
+  { "WCMPGT","cccc1110BBU1JJJJEEEE00000110GGGG", ARM_V5|ARM_XSCALE },
+  { "WLDRB", "cccc110PU0W1ssssEEEE0000OOOOOOOO", ARM_V5|ARM_XSCALE },
+  { "WLDRH", "cccc110PU1W1ssssEEEE0000OOOOOOOO", ARM_V5|ARM_XSCALE },
+  { "WLDRW", "cccc110PU0W1ssssEEEE0001OOOOOOOO", ARM_V5|ARM_XSCALE },
+  { "WMAC",  "cccc111001U0JJJJEEEE00010000GGGG", ARM_V5|ARM_XSCALE },
+  { "WMACZ" ,"cccc111001U1JJJJEEEE00010000GGGG", ARM_V5|ARM_XSCALE },
+  { "WMADD" ,"cccc111010UXJJJJEEEE00010000GGGG", ARM_V5|ARM_XSCALE },
+  { "WMADD" ,"cccc111010UXJJJJEEEE00010000GGGG", ARM_V5|ARM_XSCALE },
+  { "WMSUB" ,"cccc111011UXJJJJEEEE00010000GGGG", ARM_V5|ARM_XSCALE },
+  {  "WMAX" ,"cccc1110BBU0JJJJEEEE00010110GGGG", ARM_V5|ARM_XSCALE },
+  { "WMERGE","cccc1110+++0JJJJEEEE00001000GGGG", ARM_V5|ARM_XSCALE },
+  {  "WMIA", "cccc111000XYJJJJEEEE00001010GGGG", ARM_V5|ARM_XSCALE },
+  { "WMIAN", "cccc111001XYJJJJEEEE00001010GGGG", ARM_V5|ARM_XSCALE },
+  { "WMIAW", "cccc111010XYJJJJEEEE00010010GGGG", ARM_V5|ARM_XSCALE },
+  { "WMIAWN","cccc111011XYJJJJEEEE00010010GGGG", ARM_V5|ARM_XSCALE },
+  {  "WMIN" ,"cccc1110BBU1JJJJEEEE00010110GGGG", ARM_V5|ARM_XSCALE },
+  {  "WMUL" ,"cccc111000ULJJJJEEEE00010000GGGG", ARM_V5|ARM_XSCALE },
+  { "WMULR", "cccc111011ULJJJJEEEE00010000GGGG", ARM_V5|ARM_XSCALE },
+  {  "WMULW","cccc11101LU0JJJJEEEE00001100GGGG", ARM_V5|ARM_XSCALE },
+  { "WMULWR","cccc11101LU1JJJJEEEE00001100GGGG", ARM_V5|ARM_XSCALE },
+  {  "WOR" , "cccc11100000JJJJEEEE00000000GGGG", ARM_V5|ARM_XSCALE },
+  { "WPACK", "cccc1110BB99JJJJEEEE00001000GGGG", ARM_V5|ARM_XSCALE },
+  { "WQMIA", "cccc111010XYJJJJEEEE00001010GGGG", ARM_V5|ARM_XSCALE },
+  { "WQMIAN","cccc111011XYJJJJEEEE00001010GGGG", ARM_V5|ARM_XSCALE },
+  { "WQMULM","cccc11100001JJJJEEEE00001000GGGG", ARM_V5|ARM_XSCALE },
+  {"WQMULMR","cccc11100011JJJJEEEE00001000GGGG", ARM_V5|ARM_XSCALE },
+  {"WQMULWM","cccc11101100JJJJEEEE00001110GGGG", ARM_V5|ARM_XSCALE },
+ {"WQMULWMR","cccc11101110JJJJEEEE00001110GGGG", ARM_V5|ARM_XSCALE },
+  {  "WROR" ,"cccc1110BB11JJJJEEEE00000100GGGG", ARM_V5|ARM_XSCALE },
+  {  "WROR" ,"cccc1110BB11JJJJEEEE00010100ssss", ARM_V5|ARM_XSCALE },
+  {  "WSAD" ,"cccc11100B00JJJJEEEE00010010GGGG", ARM_V5|ARM_XSCALE },
+  { "WSADZ" ,"cccc11100B01JJJJEEEE00010010GGGG", ARM_V5|ARM_XSCALE },
+  { "WSHUFH","cccc1110++++JJJJEEEE00011110++++", ARM_V5|ARM_XSCALE },
+  {  "WSSL", "cccc1110BB01JJJJEEEE00000100GGGG", ARM_V5|ARM_XSCALE },
+  {  "WSSL", "cccc1110BB01JJJJEEEE00010100ssss", ARM_V5|ARM_XSCALE },
+  {  "WSRA", "cccc1110BB00JJJJEEEE00000100GGGG", ARM_V5|ARM_XSCALE },
+  {  "WSRA", "cccc1110BB00JJJJEEEE00010100ssss", ARM_V5|ARM_XSCALE },
+  {  "WSRL", "cccc1110BB10JJJJEEEE00000100GGGG", ARM_V5|ARM_XSCALE },
+  {  "WSRL", "cccc1110BB10JJJJEEEE00010100ssss", ARM_V5|ARM_XSCALE },
+  {  "WSTRB","cccc110PU0W0ssssJJJJ0000OOOOOOOO", ARM_V5|ARM_XSCALE },
+  {  "WSTRH","cccc110PU1W0ssssJJJJ0000OOOOOOOO", ARM_V5|ARM_XSCALE },
+  {  "WSTRW","cccc110PU0W0ssssJJJJ0001OOOOOOOO", ARM_V5|ARM_XSCALE },
+  {  "WSTRD","cccc110PU1W0ssssJJJJ0001OOOOOOOO", ARM_V5|ARM_XSCALE },
+  {  "WSUB", "cccc1110BB99JJJJEEEE00011010GGGG", ARM_V5|ARM_XSCALE },
+{"WSUBADDHX","cccc11101101JJJJEEEE00011100GGGG", ARM_V5|ARM_XSCALE },
+ {"WUNPCKEH","cccc1110BBU0JJJJEEEE00001100GGGG", ARM_V5|ARM_XSCALE },
+ {"WUNPCKIH","cccc1110BB01JJJJEEEE00001100GGGG", ARM_V5|ARM_XSCALE },
+ {"WUNPCKEL","cccc1110BBU0JJJJEEEE00001110GGGG", ARM_V5|ARM_XSCALE },
+ {"WUNPCKIL","cccc1110BB01JJJJEEEE00001110GGGG", ARM_V5|ARM_XSCALE },
+ {   "WXOR", "cccc11100001JJJJEEEE00000000GGGG", ARM_V5|ARM_XSCALE },
 };
 
 const char *armCCnames[16] = 
@@ -246,6 +325,12 @@ const char *arm_freg_name[32] =
     "F8", "F9", "F10", "F11", "F12", "F13", "F14", "F15",
     "F16", "F17", "F18", "F19", "F20", "F21", "F22", "F23",
     "F24", "F25", "F26", "F27", "F28", "F29", "F30", "F31"
+};
+
+const char * arm_wreg_name[] =
+{
+   "wR0", "wR1", "wR2", "wR3", "wR4", "wR5", "wR6", "wR7",
+   "wR8", "wR9", "wR10", "wR11", "wR12", "wR13", "wR14", "wR15",
 };
 
 extern const char * arm_reg_name[];
@@ -311,6 +396,13 @@ void __FASTCALL__ arm32EncodeTail(DisasmRet *dret,__filesize_t ulShift,
 	READ_IMM32('v');
 	strcat(dret->str,arm_freg_name[(val2&0x1F<<1)|(val&1)]);
     }
+    p=strchr(msk,'E');
+    if(p)
+    {
+	READ_IMM32('E');
+	if(prev) strcat(dret->str,","); prev=1;
+	strcat(dret->str,arm_wreg_name[val&0xF]);
+    }
     p=strchr(msk,'s');
     if(p)
     {
@@ -342,6 +434,13 @@ void __FASTCALL__ arm32EncodeTail(DisasmRet *dret,__filesize_t ulShift,
 	READ_IMM32('t');
 	strcat(dret->str,arm_freg_name[(val2&0x1F<<1)|(val&1)]);
     }
+    p=strchr(msk,'J');
+    if(p)
+    {
+	READ_IMM32('J');
+	if(prev) strcat(dret->str,","); prev=1;
+	strcat(dret->str,arm_wreg_name[val&0xF]);
+    }
     p=strchr(msk,'Z');
     if(p)
     {
@@ -351,6 +450,13 @@ void __FASTCALL__ arm32EncodeTail(DisasmRet *dret,__filesize_t ulShift,
 	if(prev) strcat(dret->str,","); prev=1;
 	READ_IMM32('z');
 	strcat(dret->str,arm_freg_name[(val2&0x1F<<1)|(val&1)]);
+    }
+    p=strchr(msk,'G');
+    if(p)
+    {
+	READ_IMM32('G');
+	if(prev) strcat(dret->str,","); prev=1;
+	strcat(dret->str,arm_wreg_name[val&0xF]);
     }
     p=strchr(msk,'R');
     if(p)
@@ -434,6 +540,27 @@ void __FASTCALL__ arm32Disassembler(DisasmRet *dret,__filesize_t ulShift,
 	    {
 		READ_IMM32('Y');
 		strcat(dret->str,val?"T":"B");
+	    }
+	    p=strchr(msk,'B');
+	    if(p)
+	    {
+		const char *X_sub_fields[4] = { "D", "W", "H", "B" };
+		READ_IMM32('B');
+		strcat(dret->str,X_sub_fields[val&3]);
+	    }
+	    p=strchr(msk,'9');
+	    if(p)
+	    {
+		const char *X_sub_fields[4] = { "SS", "C", "US", "" };
+		READ_IMM32('9');
+		strcat(dret->str,X_sub_fields[val&3]);
+	    }
+	    p=strchr(msk,'U');
+	    if(p)
+	    {
+		const char *X_sub_fields[4] = { "S", "U" };
+		READ_IMM32('U');
+		strcat(dret->str,X_sub_fields[val&1]);
 	    }
 	    p=strchr(msk,'c');
 	    if(p)

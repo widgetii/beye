@@ -131,7 +131,7 @@ static void __FASTCALL__ armHelpAsm( void )
    twGotoXY(2,5);
    {
      twSetColorAttr(disasm_cset.cpu_cset[2].clone[i]);
-     twPutS("");
+     twPutS("XScale extensions");
      twClrEOL();
    }
  }
@@ -148,6 +148,8 @@ static void __FASTCALL__ armHelpAsm( void )
 static int    __FASTCALL__ armMaxInsnLen( void ) { return 8; }
 static ColorAttr __FASTCALL__ armGetAsmColor( unsigned long clone )
 {
+  if((clone & ARM_XSCALE)==ARM_XSCALE) return disasm_cset.cpu_cset[2].clone[0];
+  else
   if((clone & ARM_FPU)==ARM_FPU) return disasm_cset.cpu_cset[1].clone[0];
   else
 	return disasm_cset.cpu_cset[0].clone[0];
@@ -243,7 +245,7 @@ static tBool __FASTCALL__ armSelect_endian( void )
 
 REGISTRY_DISASM ARM_Disasm =
 {
-  "A~RMv5TE",
+  "A~RMv5TE/XScale",
   { "ARMHlp", "Bitnes", "Endian", NULL, NULL },
   { armAsmRef, armSelect_bitness, armSelect_endian, NULL, NULL },
   armDisassembler,

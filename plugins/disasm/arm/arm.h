@@ -12,6 +12,7 @@
 #define ARM_INTEGER	0x00000000UL
 #define ARM_FPU		0x00000100UL
 #define ARM_DSP		0x00000200UL
+#define ARM_XSCALE	0x00000400UL
 
 extern void __FASTCALL__ arm16Init(void);
 extern void __FASTCALL__ arm16Term(void);
