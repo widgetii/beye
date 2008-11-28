@@ -56,7 +56,8 @@ typedef struct tag_arm_opcode32
     F    - fpu opcode 2
     L    - L suffix of insn
     H    - indicates Half-word offset
-    i    - immediate value
+    +    - unsigned immediate value
+    -    - signed immediate value
     o    - code offset value
     O    - offset value
     XY   - XY values of 'TB' suffixes for DSP<x><y> instructions
@@ -71,7 +72,7 @@ static arm_opcode32 opcode_table[]=
     { "AND", "cccc00I0000Sssssdddd<<<<<<<<<<<<", ARM_V1|ARM_INTEGER },
     { "B",   "cccc101Loooooooooooooooooooooooo", ARM_V1|ARM_INTEGER },
     { "BIC", "cccc00I1110Sssssdddd<<<<<<<<<<<<", ARM_V1|ARM_INTEGER },
-    { "BKPT","111000010010iiiiiiiiiiii0111iiii", ARM_V5|ARM_INTEGER },
+    { "BKPT","111000010010++++++++++++0111++++", ARM_V5|ARM_INTEGER },
     { "BLX", "1111101Hoooooooooooooooooooooooo", ARM_V5|ARM_INTEGER },
     { "BLX", "cccc000100101111111111110011dddd", ARM_V5|ARM_INTEGER },
     { "BX",  "cccc000100101111111111110001dddd", ARM_V5|ARM_INTEGER },
@@ -91,7 +92,7 @@ static arm_opcode32 opcode_table[]=
     { "MLA", "cccc0000001Sddddnnnnssss1001mmmm", ARM_V2|ARM_INTEGER },
     { "MOV", "cccc00I1101S0000dddd<<<<<<<<<<<<", ARM_V1|ARM_INTEGER },
     { "MRS", "cccc00010R000000dddd000000000000", ARM_V3|ARM_INTEGER },
-    { "MSR", "cccc00110R10bbbb1111iiiiiiiiiiii", ARM_V3|ARM_INTEGER },
+    { "MSR", "cccc00110R10bbbb1111++++++++++++", ARM_V3|ARM_INTEGER },
     { "MSR", "cccc00010R10bbbb111100000000mmmm", ARM_V3|ARM_INTEGER },
     { "MUL", "cccc0000000Sdddd0000ssss1001mmmm", ARM_V2|ARM_INTEGER },
     { "MVN", "cccc00I1111S0000dddd<<<<<<<<<<<<", ARM_V1|ARM_INTEGER },
@@ -109,7 +110,7 @@ static arm_opcode32 opcode_table[]=
     { "STRH","cccc000PUIW0ssssddddaaaa1011aaaa", ARM_V4|ARM_INTEGER },
     { "STRT","cccc01I0U010ssssddddaaaaaaaaaaaa", ARM_V1|ARM_INTEGER },
     { "SUB", "cccc00I0010Sssssdddd<<<<<<<<<<<<", ARM_V1|ARM_INTEGER },
-    { "SWI", "cccc1111iiiiiiiiiiiiiiiiiiiiiiii", ARM_V1|ARM_INTEGER },
+    { "SWI", "cccc1111++++++++++++++++++++++++", ARM_V1|ARM_INTEGER },
     { "SWP", "cccc00010000ssssdddd00001001mmmm", ARM_V3|ARM_INTEGER },
     { "SWPB","cccc00010100ssssdddd00001001mmmm", ARM_V3|ARM_INTEGER },
     { "TEQ", "cccc00I10011ssss0000<<<<<<<<<<<<", ARM_V1|ARM_INTEGER },
@@ -266,7 +267,7 @@ extern const char * arm_reg_name[];
 	READ_IMM32(chr);\
 	if(prev) strcat(dret->str,",");\
 	strcat(dret->str,"#");\
-	disAppendDigits(dret->str,ulShift,APREF_USE_TYPE,4,&val,DISARG_WORD);\
+	disAppendDigits(dret->str,ulShift,APREF_USE_TYPE,4,&val,chr=='-'?DISARG_SHORT:DISARG_WORD);\
 	if(smul) strcat(dret->str,smul);\
 	prev=1;\
     }
@@ -388,7 +389,8 @@ void __FASTCALL__ arm32EncodeTail(DisasmRet *dret,__filesize_t ulShift,
 			DISADR_NEAR32,0,3);
 	prev=1;
     }
-    PARSE_IMM32('i',NULL);
+    PARSE_IMM32('+',NULL);
+    PARSE_IMM32('-',NULL);
 
     p=strchr(msk,'F');
     if(p)
