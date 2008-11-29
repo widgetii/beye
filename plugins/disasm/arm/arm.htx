@@ -141,7 +141,7 @@
 ³³ ext. opcode       ³     Rm / SBZ    ³                                  ³
 ³ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ                                  ³
 ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
-³ %I32-bit Intructions set in format of {ext.i}[opcode.S]<X>:%i                   ³
+³ %I32-bit Intructions set in format of {ext.i}[opcode.S]<X>:%i               ³
 ³ ADC          {0.i}[5]             Add with carry                        ³
 ³ ADD          {0.i}[4]             Add                                   ³
 ³ AND          {0.i}[0]             Bitwise AND                           ³
@@ -380,4 +380,90 @@
 ³ FTOUIZS    {E.1}[x.3.C]<A.1.1>  FP Convert Single-FP to USingle-Interger³
 ³ FUITOD     {E.1}[x.3.8]<B.1.1>  FP Convert USingle-Interger to Double-FP³
 ³ FUITOS     {E.1}[x.3.8]<A.1.1>  FP Convert USingle-Interger to Single-FP³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
+³ %BIntel's XScale extension%b                                                ³
+³ XScale is Intel Wireless MMX 2 coprocessor for ARM architecture.        ³
+³ To use the Intel Wireless MMX 2 coprocessor the coprocessors need to    ³
+³ be enabled in the coprocessor access register which is located in       ³
+³ register 15 of coprocessor 15. Both bits 0 and 1 of this register       ³
+³ (corresponding to coprocessor 0 and 1) should be set to a 1 to enable   ³
+³ access to the Intel Wireless MMX 2 coprocessor. If the Intel Wireless   ³
+³ MMX 2 coprocessor is not enabled in this way, all Intel Wireless MMX 2  ³
+³ coprocessor instructions take the undefined instruction trap.           ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
+³ XScale coprocessor has 16 64-bit registers wih names: %IwR0-wR15%i          ³
+³ In addition Intel XScale coprocessor has additional registers:          ³
+³ %IwCASF%i        - Arithmetic SIMD flags.                                   ³
+³ %IwCSSF%i        - Saturation status register.                              ³
+³ %IwCGR0-wCGR3%i  - 32-bit GPR used for alignment, and shift.                ³
+³ %IwCID%i         - coprocessor ID.                                          ³
+³ %IwCon%i         - coprocessor control regsiter.                            ³
+³                                                                         ³
+³ All instructions (except load/store) of XScale coprocessor are 4-byte   ³
+³ long. The fields of instruction are located as follow:                  ³
+³                                                                         ³
+³    31-28   27-24  24-20   19-16 15-12 11-8   7-4   3-0                  ³
+³   ÚÄÄÄÄÄÄÂÄÄÄÄÄÄÂÄÄÄÄÄÄÄÂÄÄÄÄÄÄÂÄÄÄÄÄÂÄÄÄÄÄÂÄÄÄÄÄÂÄÄÄÄÄ¿                ³
+³   ³cond  ³1110  ³opcode1³ wRn  ³ wRd ³cpnum³opc2 ³ wRS ³                ³
+³   ÀÄÄÄÄÄÄÁÄÄÄÄÄÄÁÄÄÄÄÄÄÄÁÄÄÄÄÄÄÁÄÄÄÄÄÁÄÄÄÄÄÁÄÄÄÄÄÁÄÄÄÄÄÙ                ³
+³                                                                         ³
+³ Below presented list of XScale insns in form: opcode1.cpnum.opc2:       ³
+³ TANDC<B,H.W>  ww01.0001.0011    Performs AND operation across wCASF     ³
+³ TBCST<B,H.W>  0100.0000.ww01    Broadcast value from ARM to SIMD reg    ³
+³ TEXTRC<B,H.W> ww01.0001.0111    Extracts fields from wCASF to CPSR      ³
+³ TEXTRC<B,H.W> ww01.0001.0111    Extracts fields from wCASF to CPSR      ³
+³ TEXTRM<B,H.W> ww01.0000.0111    Extracts fields SIMD to ARM reg         ³
+³ TINSR<B,H.W>  0110.0000.ww01    Inserts fields from ARM to SIMD reg     ³
+³ TMIA          0010.<1000>000..1 Multiply and Accumulate 32-bit operands ³
+³ TMIAPH        0010.<1000>000..1 Multiply and Accumulate 16-bit operands ³
+³ TMIA<T,B>     0010.<11xy>000..1 Multiply and Accumulate 16-bit operands ³
+³ TMOVMSK<B,H,W>ww01.0000.0011    Transfers Mask from SIMD to ARM reg     ³
+³ TORC<B,H,W>   ww01.0001.0101    Performs OR operation across wCASF      ³
+³ TORVSC<B,H,W> ww01.0001.0101    Performs OR operation across wCSSF      ³
+³ WABS<B,H,W>   ww10.0001.1100    Vector Absolute Value                   ³
+³ WABSDIFF<B,H,W>ww01.0001.1100   Vector Absolute Value of the difference ³
+³ WACC<B,H,W>   ww00.0001.1100    Vector Accumulate                       ³
+³ WADD<B,H,W>   wwss.0001.1000    Vector Addition                         ³
+³ WADDSUBHX     1010.0001.1010    Vector Complex Addition/Substraction    ³
+³ WALIGNI       0vvv.0000.0010    Extract 64-bit and store with off as imm³
+³ WALIGNR       10vv.0000.0010    Extract 64-bit and store with off as reg³
+³ WAND          0010.0000.0000    Vector AND                              ³
+³ WANDN         0011.0000.0000    Vector AND and NOT                      ³
+³ WAVG2<B,H>{R} 1h0r.0000.0000    Vector 2-pixel average with(out) Roundng³
+³ WAVG4{R}      010r.0000.0000    Vector 4-pixel average with(out) Roundng³
+³ WCMPEQ<B,H,W> ww00.0000.0110    Vector Equality Comparision             ³
+³ WCMPGT<B,H,W> wws1.0000.0110    Vector Magnitude Comparision            ³
+³ WLDR<B,H,W,D> <110>[punw1]{000M}Vector Load from memory                 ³
+³ WMAC<U,S>     01sz.0001.0000    Vector Multiplication and ACcumulate    ³
+³ WMADD<U,S>    nnsx.0001.0000    Vector Multiplication and ADdition      ³
+³ WMAX<B,H,W>   wws0.0001.0110    Vector Maximum selection                ³
+³ WMERGE        cba0.0000.1000    Vector Merge elements                   ³
+³ WMIA<T,B>     0nxy.0000.1010    16-bit parallel multiply-Negate after Ac³
+³ WMIAW<T,B>    1nxy.0000.1010    32-bit parallel multiply-Negate after Ac³
+³ WMIN<B,H,W>   wws1.0001.0110    Vector Minimum selection                ³
+³ WMUL<U,S>     rrsf.0001.0000    Vector 16-bit Multiplication            ³
+³ WMULW<U,S>    1fsr.0001.1100    Vector 32-bit Multiplication            ³
+³ WOR           0000.0000.0000    Vector OR                               ³
+³ WPACK<B,H,W>  wwss.0000.1000    Vector Pack Data                        ³
+³ WQMIAxy       1nxy.0000.1010    Fractional 16-bit MUL-NEG after 32bt Acc³
+³ WQMULM{R}     00r1.0000.1000    Vector 16-bit MUL with Round to nearest ³
+³ WQMULWM{R}    11r0.0000.1110    Vector 32-bit MUL with Round to nearest ³
+³ WROR<B,H,W>   ww11.000g.0100    Vector Logical Rotate Right             ³
+³ WSAD<B,H>{Z}  0h0z.0001.0010    Vector Summ of Absolute Difference {w Zr³
+³ WSHUFH        ddcc.0001.1110.ba Vector Shuffle 16-bit values            ³
+³ WSLL<H,W,D>   ww01.000g.0100    Vector Logical Shift Left               ³
+³ WSRA<H,W,D>   ww00.000g.0100    Vector Arithmetic Shift Right           ³
+³ WSRL<H,W,D>   ww10.000g.0100    Vector Logical Shift Right              ³
+³ WSTR<B,H,W,D> <110>[punw0]{000M}Vector Store to memory                  ³
+³ WSUB<B,H,W>   wwss.0001.1010    Vector Substract                        ³
+³ WSUBADDHX     1011.0001.1100    Vector Complex Substraction/Addition    ³
+³ WUNPCKEH<B,H,W>wws0.0000.1100   Vector Unpack from Top Half of SIMD Reg ³
+³ WUNPCKIH<B,H,W>ww01.0000.1100   Vector Unpack from Top Half Interleaved ³
+³ WUNPCKEL<B,H,W>wws0.0000.1110   Vector Unpack from Low Half of SIMD Reg ³
+³ WUNPCKIL<B,H,W>ww01.0000.1110   Vector Unpack from Low Half Interleaved ³
+³ WXOR          0001.0000.0000    Vector bitwise XOR                      ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
+³ Pseudo instructions:                                                    ³
+³ WMOV   r1,r2  is alias for      WOR r1,r2,r2                            ³
+³ WZERO  r1     is alias for      WANDN r1,r1,r1                          ³
 ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
