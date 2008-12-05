@@ -20,5 +20,1106 @@
 ³ run on both if some care is taken in preparation; newer chips in the    ³
 ³ POWER series implement the full PowerPC instruction set.                ³
 ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
+³ PowerPC processor has:                                                  ³
+³ 32 64-bit general-prurpose registers: %IGPR0-GPR31%i                        ³
+³ 32 64-bit floating point registers:   %IFPR0-FPR31%i                        ³
+³ 32 128-bit vector registers:          %IVR0-VR31%i                          ³
 ³                                                                         ³
+³ in addition PowerPC has:                                                ³
+³ %ICR%i      - conditional register                                          ³
+³ %ICTR%i     - count register                                                ³
+³ %ILR%i      - link register (holds return address for branch insn)          ³
+³ %IXER%i     - fixed-point exception register                                ³
+³                                                                         ³
+³ %IFPSCR%i   - floating-point status and control register                    ³
+³ %IVSCR%i    - vector status and control register                            ³
+³                                                                         ³
+³ Some implementations may have:                                          ³
+³ %IAccum%i  - signal processing and embedded                                 ³
+³ %ISPEFSCR%i- signal processing and embedded FP status + control reg.        ³
+³ %IVRSAVE%i - indicates which VR are in use to minimize content switching    ³
+³                                                                         ³
+³ Modern PowerPC processors support both 32-bit and 64-bit modes. In      ³
+³ 32-bit mode processor ignores high part of address computation. In      ³
+³ 32-bit mode, many instructions use only the lower 32 bits of a GPR and  ³
+³ produce a 32-bit result. Results written to the GPRs write only the     ³
+³ lower 32-bits and the upper 32 bits are undefined.                      ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
+³ All instructions of PowerPC architecture are 32-bit in length. They can ³
+³ be represented in form:                                                 ³
+³  0      6                   31                                          ³
+³ ÚÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿                                         ³
+³ ³ OPCD ³      insn tail       ³                                         ³
+³ ÀÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ                                         ³
+³ There are several forms of instructions:                                ³
+³          0      6      11     16     20 21             26 27 28  30 31  ³
+³         ÚÄÄÄÄÄÄÂÄÄÄÄÄÄÂÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÂÄÄ¿ ³
+³  A-Form ³ OPCD ³  FRT ³  FRA ³  FRB    ³    FRC          ³   XO    ³Rc³ ³
+³         ÃÄÄÄÄÄÄÅÄÄÄÄÄÄÅÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÂÄÄÅÄÄ´ ³
+³  B-Form ³ OPCD ³  BO  ³  BI  ³             BD                   ³AA³LK³ ³
+³         ÃÄÄÄÄÄÄÅÄÄÄÄÄÄÅÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÁÄÄ´ ³
+³  D-Form ³ OPCD ³  RT  ³  RA  ³               D                        ³ ³
+³         ÃÄÄÄÄÄÄÅÄÄÄÄÄÄÅÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´ ³
+³  D-Form ³ OPCD ³ BF/L ³  RA  ³               I                        ³ ³
+³         ÃÄÄÄÄÄÄÅÄÄÄÄÄÄÅÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄ´ ³
+³  DS-Form³ OPCD ³  RT  ³  RA  ³               D                  ³ XO  ³ ³
+³         ÃÄÄÄÄÄÄÅÄÄÄÄÄÄÅÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÁÄÄÄÄÄ´ ³
+³  DQ-Form³ OPCD ³  RT  ³  RA  ³               DQ             ³   ////  ³ ³
+³         ÃÄÄÄÄÄÄÅÄÄÄÄÄÄÅÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄ´ ³
+³  E-Form ³ OPCD ³  RT  ³   RA ³    RB  ³              XO               ³ ³
+³         ÃÄÄÄÄÄÄÅÄÄÄÄÄÄÁÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÂÄÄ´ ³
+³  I-Form ³ OPCD ³                   LI                           ³AA³LK³ ³
+³         ÃÄÄÄÄÄÄÅÄÄÄÄÄÄÂÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÁÄÄÅÄÄ´ ³
+³  M-Form ³ OPCD ³  RS  ³  RA  ³   RB    ³     MB           ³    ME  ³Rc³ ³
+³         ÃÄÄÄÄÄÄÅÄÄÄÄÄÄÁÄÄÄÄÄÄÁÄÄÄÄÄÄÂÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÂÄÄÄÄÄÄÄÁÄÄ´ ³
+³  SC-Form³ OPCD ³        //////      ³       LEV            ³  /////   ³ ³
+³         ÃÄÄÄÄÄÄÅÄÄÄÄÄÄÂÄÄÄÄÄÄÂÄÄÄÄÄÄÁÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄ´ ³
+³  V-Form ³ OPCD ³  VRT ³  VRA ³   VRB  ³              XO               ³ ³
+³         ÃÄÄÄÄÄÄÅÄÄÄÄÄÄÅÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄ´ ³
+³  X-Form ³ OPCD ³  RT  ³  RA  ³   RB   ³      XO                    ³Rc³ ³
+³         ÃÄÄÄÄÄÄÅÄÄÄÄÄÄÅÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÅÄÄ´ ³
+³  XL-Form³ OPCD ³  BT  ³  BA  ³   BB   ³      XO                    ³ /³ ³
+³         ÃÄÄÄÄÄÄÅÄÂÄÄÄÄÁÄÄÄÄÂÄÅÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÅÄÄ´ ³
+³ XFL-Form³ OPCD ³L³   FLM   ³W³  FRB   ³      XO                    ³Rc³ ³
+³         ÃÄÄÄÄÄÄÅÄÁÄÄÄÄÂÄÄÄÄÁÄÁÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÅÄÄ´ ³
+³ XFX-Form³ OPCD ³  RT  ³   spr         ³   XO                       ³ /³ ³
+³         ÀÄÄÄÄÄÄÁÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÙ ³
+³  Many of these forms may have subforms.                                 ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
+³ Abbreviations:                                                          ³
+³ %ISI%i        - signed                                                      ³
+³ %IUS%i        - unsigned                                                    ³
+³ %IByte%i      - 8-bit integer                                               ³
+³ %IHWord%i     - 16-bit integer                                              ³
+³ %IWord%i      - 32-bit integer                                              ³
+³ %IDWord%i     - 64-bit integer                                              ³
+³ %ISingle-FP%i - 32-bit floating point                                       ³
+³ %IDouble-FP%i - 64-bit floating point                                       ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
+³ Below represented list of CPU instructions in form:                     ³
+³ Form   mnemonic   OPCD.XO<oe.rc>(dec) meaning                           ³
+³  XO    add        31.266.0.0          Add                               ³
+³  XO    add.       31.266.0.1          Add and record                    ³
+³  XO    addo       31.266.1.0          Add overflow                      ³
+³  XO    addo.      31.266.1.1          Add overflow and record           ³
+³  XO    adc        31.10.0.0           Add Carrying                      ³
+³  XO    adc.       31.10.0.1           Add Carrying and record           ³
+³  XO    adco       31.10.1.0           Add Carrying overflow             ³
+³  XO    adco.      31.10.1.1           Add Carrying overflow and record  ³
+³  XO    ade        31.138.0.0          Add Extended                      ³
+³  XO    ade.       31.138.0.1          Add Extended and record           ³
+³  XO    adeo       31.138.1.0          Add Extended overflow             ³
+³  XO    adeo.      31.138.1.1          Add Extended overflow and record  ³
+³  XO    adme       31.234.0.0          Add to -1 Extended                ³
+³  XO    adme.      31.234.0.1          Add to -1 Extended and record     ³
+³  XO    admeo      31.234.1.0          Add to -1 Extended overflow       ³
+³  XO    admeo.     31.234.1.1          Add to -1 Extended overflow  rec. ³
+³  XO    addg6s     31.74               Add and generate sixes            ³
+³   D    addi       14                  Add Immediate                     ³
+³   D    addic      12                  Add Immediate Carrying            ³
+³   D    addic.     13                  Add Immediate Carrying and record ³
+³   D    addis      15                  Add Immediate Shifted             ³
+³   X    and        31.28.0             AND                               ³
+³   X    and.       31.28.1             AND and record                    ³
+³   X    andc       31.60.0             AND with Complement               ³
+³   X    andc.      31.60.1             AND with Complement and record    ³
+³   D    andi       28                  Add Immediate                     ³
+³   D    andis      29                  Add Immediate Shifted             ³
+³  XO    adze       31.202.0.0          Add to 0 Extended                 ³
+³  XO    adze.      31.202.0.1          Add to 0 Extended and record      ³
+³  XO    adzeo      31.202.1.0          Add to 0 Extended overflow        ³
+³  XO    adzeo.     31.202.1.1          Add to 0 Extended overflow  rec.  ³
+³   I    b          18..0.0             Branch                            ³
+³   I    ba         18..1.0             Branch                            ³
+³   I    bl         18..0.1             Branch and Link                   ³
+³   I    bla        18..1.1             Branch and Link                   ³
+³   I    bc         16..0.0             Branch conditional                ³
+³   I    bca        16..1.0             Branch conditional                ³
+³   I    bcl        16..0.1             Branch conditional and Link       ³
+³   I    bcla       16..1.1             Branch conditional and Link       ³
+³  XL    bclr       19.16..0            Branch conditional to Link Reg    ³
+³  XL    bclrl      16.16..1            Branch conditional to Link Reg    ³
+³  XL    bcctr      16.528..0           Branch conditional to CountReg    ³
+³  XL    bcctrl     16.528..1           Branch conditional to CountReg    ³
+³   X    cbcdtd     31.314.             Convert Binary Coded Decimal to DL³
+³   X    cbtbcd     31.282.             Convert Declets to BCD            ³
+³   X    cmp        31.0.               Compare                           ³
+³   X    cmpb       31.508.             Compare Bytes                     ³
+³   D    cmpi       11                  Compare Immediate                 ³
+³   X    cmpl       31.32.              Compare Logical                   ³
+³   D    cmpli      10                  Compare Logical Immediate         ³
+³   X    cntlzd     31.58.0             Count Leading Zeros DWord         ³
+³   X    cntlzd.    31.58.1             Count Leading Zeros DWord rec     ³
+³   X    cntlzw     31.26.0             Count Leading Zeros Word          ³
+³   X    cntlzw.    31.26.1             Count Leading Zeros Word and rec. ³
+³  XL    crand      19.257.             Condition Register AND            ³
+³  XL    crandc     19.129.             Condition Register AND with Complm³
+³  XL    creqv      19.289.             Condition Register Equivalent     ³
+³  XL    crnand     19.225.             Condition Register NAND           ³
+³  XL    crnor      19.33.              Condition Register NOR            ³
+³  XL    cror       19.449.             Condition Register OR             ³
+³  XL    crorc      19.129.             Condition Register OR with Complem³
+³  XL    crxor      19.193.             Condition Register XOR            ³
+³   X    dcba       31.758.             Data Cache Block Allocate         ³
+³   X    dcbf       31.86.              Data Cache Block Flush            ³
+³   X    dcbfep     31.127.             Data Cache Block Flush be Ext PID ³
+³   X    dcbi       31.470.             Data Cache Block Invalidate       ³
+³   X    dcblc      31.390.             Data Cache Block Lock Clear       ³
+³   X    dcbst      31.54.              Data Cache Block Store            ³
+³   X    dcbstep    31.63.              Data Cache Block Store by Ext PID ³
+³   X    dcbt       31.278.             Data Cache Block Touch            ³
+³   X    dcbtep     31.319.             Data Cache Block Touch by Ext PID ³
+³   X    dcbtls     31.166.             Data Cache Block Touch & Lock Set ³
+³   X    dcbtst     31.246.             Data CacheBlockTouch for Store    ³
+³   X    dcbtstep   31.255.             Data CacheBlockTouch for Stor by E³
+³   X    dcbtstls   31.134.             Data CacheBlockTouch for St & Lock³
+³   X    dcbz       31.1014.            Data Cache Block set to Zero      ³
+³   X    dcbzep     31.991.             Data Cache Block set to Zero By Ex³
+³   X    dci        31.454.             Data Cache Invalidate             ³
+³   X    dcread     31.486.             Data Cache Read                   ³
+³   X    dcread     31.326.             Data Cache Read (alt form)        ³
+³  XO    divd       31.489.0.0          Divide DWord                      ³
+³  XO    divd.      31.489.0.1          Divide DWord & rec                ³
+³  XO    divdo      31.489.1.0          Divide DWord overflow             ³
+³  XO    divdo.     31.489.1.1          Divide DWord overflow & rec       ³
+³  XO    divdu      31.457.0.0          Divide US DWord                   ³
+³  XO    divdu.     31.457.0.1          Divide US DWord & rec             ³
+³  XO    divduo     31.457.1.0          Divide US DWord overflw           ³
+³  XO    divduo.    31.457.1.1          Divide US DWord ov & rc           ³
+³  XO    divw       31.491.0.0          Divide Word                       ³
+³  XO    divw.      31.491.0.1          Divide Word & rec                 ³
+³  XO    divwo      31.491.1.0          Divide Word overflow              ³
+³  XO    divwo.     31.491.1.1          Divide Word overflow & rec        ³
+³  XO    divwu      31.459.0.0          Divide US Word                    ³
+³  XO    divwu.     31.459.0.1          Divide US Word & rec              ³
+³  XO    divwuo     31.459.1.0          Divide US Word overflw            ³
+³  XO    divwuo.    31.459.1.1          Divide US Word ov & rc            ³
+³   X    dlmzb      31.78.0             Determine Leftmost Zero Byte      ³
+³   X    dlmzb.     31.78.1             Determine Leftmost Zero Byte & rec³
+³ XFX    dnh        19.198              Debbuger Notify Halt              ³
+³  XL    doze       19.402              Doze                              ³
+³   X    ecivw      31.310.             External Control In Word Indexed  ³
+³   X    ecovw      31.438.             External Control Out Word Indexed ³
+³   X    eieio      31.854.             Enforce In-Order Execution of I/O ³
+³   X    eqv        31.284.0            Equivalent                        ³
+³   X    eqv.       31.284.1            Equivalent & Rec                  ³
+³   X    extsb      31.954.0            Extend SI Byte                    ³
+³   X    extsb.     31.954.1            Extend SI Byte & Rec              ³
+³   X    extsh      31.922.0            Extend SI HWord                   ³
+³   X    extsh.     31.922.1            Extend SI HWord & Rec             ³
+³   X    extsw      31.986.0            Extend SI Word                    ³
+³   X    extsw.     31.986.1            Extend SI Word & Rec              ³
+³  XL    hrfid      19.274.             Hypervisor Return From Intr DWord ³
+³   X    icbi       31.982.             Insn Cache Block Invalidate       ³
+³   X    icbiep     31.991.             Insn Cache Block Invalidate by ExP³
+³   X    icblc      31.230.             Insn Cache Block Lock Clear       ³
+³   X    icbt       31.22.              Insn Cache Block Touch            ³
+³   X    icbtls     31.486.             Insn Cache Block Touch and Lock   ³
+³   X    ici        31.966.             Insn Cache Invalidate             ³
+³   X    icread     31.998.             Insn Cache Read                   ³
+³   A    isel       31.15.              Integer Select                    ³
+³  XL    isync      19.150.             Instruction Synchronize           ³
+³   X    lbepx      31.95.              Load Byte By External ProcessID Ix³
+³   D      lbz      34                  Load Byte and Zero                ³
+³   X   lbzcix      31.853              Load Byte and Zero Caching Inhib I³
+³   D     lbzu      35                  Load Byte and Zero with Update    ³
+³   X    lbzux      31.119              Load Byte and Zero with Update Idx³
+³   X     lbzx      31.87               Load Byte and Zero Indexed        ³
+³  DS       ld      58..0               Load DWord                        ³
+³   X    ldarx      31.84.              Load DWord & Reserve Indexed      ³
+³   X    ldcix      31.885.             Load DWord Caching Inhib Idx      ³
+³   X    ldepx      31.29.              Load DWord By ExPID Indexed       ³
+³  DS      ldu      58..1               Load DWord with Update            ³
+³   X     ldux      31.53.              Load DWord with Update Indx       ³
+³   X      ldx      31.21.              Load DWord Indexed                ³
+³   D      lfd      50                  Load Floating-Point Double        ³
+³   X   lfdepx      31.607              Load FP Double by ExtPID Indexed  ³
+³  DS     lfdp      57..0               Load FP Double Pair               ³
+³   X    lfdpx      31.791.             Load FP Double Pair Indexed       ³
+³   D     lfdu      51                  Load Floating-Point Double w Updat³
+³   X    lfdux      31.631.             Load FP Double with Update Indexed³
+³   X     lfdx      31.599.             Load FP Double Indexed            ³
+³   X   lfiwax      31.855.             Load FP as Int Word Algebraic Idx ³
+³   D      lfs      48                  Load Floating-Point Single        ³
+³   D     lfsu      49                  Load Floating-Point Single w Updat³
+³   X    lfsux      31.567.             Load FP Single with Update Indexed³
+³   X     lfsx      31.535.             Load FP Single Indexed            ³
+³   D      lha      42                  Load HWord Algbraic               ³
+³   D     lhau      43                  Load HWord Algbraic w Update      ³
+³   X    lhaux      31.375.             Load HWord Alg with Update Indexed³
+³   X     lhax      31.343.             Load HWord Algbraic Indexed       ³
+³   X    lhbrx      31.790.             Load HWord Byte-Reverse Indexed   ³
+³   X    lhepx      31.287.             Load HWord By External ProcID Idx ³
+³   D      lhz      40                  Load HWord and Zero               ³
+³   X   lhzcix      31.821              Load HWord & Zero Caching Inhib Ix³
+³   D     lhzu      41                  Load HWord and Zero w Update      ³
+³   X    lhzux      31.311.             Load HWord & Z with Update Indexed³
+³   X     lhzx      31.279.             Load HWord & Zero Indexed         ³
+³   D      lmw      46                  Load Multiple Words               ³
+³  DQ       lq      56                  Load QuadWord                     ³
+³   X     lswi      31.597.             Load Sting Word Immediate         ³
+³   X     lswx      31.533.             Load Sting Word Indexed           ³
+³   X    lvebx      31.7.               Load Vector Element Byte Indexed  ³
+³   X    lvehx      31.39.              Load Vector Element HWord Indexed ³
+³   X    lvepx      31.295.             Load Vector by ExtPID Indexed     ³
+³   X   lvepxl      31.263.             Load Vector by ExtPID Indexed LRU ³
+³   X    lvewx      31.71.              Load Vector Element Word Indexed  ³
+³   X     lvsl      31.6.               Load Vector for Shift Left Indexed³
+³   X     lvsr      31.38.              Load Vector for Shift Right Indexd³
+³   X      lvx      31.103.             Load Vector Indexed               ³
+³   X     lvxl      31.359.             Load Vector Indexed LRU           ³
+³  DS      lwa      58..2               Load Word Algebraic               ³
+³   X    lwarx      31.20.              Load Word Algebraic & Reserve Indx³
+³   X    lwaux      31.373.             Load Word Algebraic w Update Indx ³
+³   X     lwax      31.341.             Load Word Algebraic Indexed       ³
+³   X    lwbrx      31.534.             Load Word Byte-Reverse Indexed    ³
+³   X    lwepx      31.31.              Load Word By ExPID Indexed        ³
+³   D      lwz      32                  Load Word & Zero                  ³
+³   X   lwzcix      31.789              Load Word and Zero Caching Inhib I³
+³   D     lwzu      33                  Load Word & Zero with Update      ³
+³   X    lwzux      31.55               Load Word & Zero with Update Idx  ³
+³   X     lwzx      31.23               Load Word & Zero Indexed          ³
+³  XO   macchw      4.172.0.0           Mult Acc CrossHWord to WrdModSI   ³
+³  XO   macchw.     4.172.0.1           Mult Acc CrossHWord to WrdModSgn&r³
+³  XO   macchwo     4.172.1.0           Mult Acc CrossHWord to WrdModSgn o³
+³  XO   macchwo.    4.172.1.1           Mult Acc CrsHWord to WrdModSgn o&r³
+³  XO   macchws     4.236.0.0           Mult Acc CrossHWord to WrdSatSI   ³
+³  XO   macchws.    4.236.0.1           Mult Acc CrossHWord to WrdSatSgn&r³
+³  XO   macchwso    4.236.1.0           Mult Acc CrossHWord to WrdSatSgn o³
+³  XO   macchwso.   4.236.1.1           Mult Acc CrsHWord to WrdSatSgn o&r³
+³  XO   macchwsu    4.204.0.0           Mult Acc CrossHWord to WrdSatUSgn ³
+³  XO   macchwsu.   4.204.0.1           Mult Acc CrossHWord to WrdSatUS &r³
+³  XO   macchwsuo   4.204.1.0           Mult Acc CrossHWord to WrdSatUS  o³
+³  XO   macchwsuo.  4.204.1.1           Mult Acc CrsHWord to WrdSatUS  o&r³
+³  XO   macchwu     4.140.0.0           Mult Acc CrossHWord to WrdModUSgn ³
+³  XO   macchwu.    4.140.0.1           Mult Acc CrossHWord to WrdModUS &r³
+³  XO   macchwuo    4.140.1.0           Mult Acc CrossHWord to WrdModUS  o³
+³  XO   macchwuo.   4.140.1.1           Mult Acc CrsHWord to WrdModUS  o&r³
+³  XO   machhw      4.44.0.0            Mult Acc HighHWord to WrdModSI    ³
+³  XO   machhw.     4.44.0.1            Mult Acc HighHWord to WrdModSgn&r ³
+³  XO   machhwo     4.44.1.0            Mult Acc HighHWord to WrdModSgn o ³
+³  XO   machhwo.    4.44.1.1            Mult Acc HiHWord to WrdModSgn o&r ³
+³  XO   machhws     4.108.0.0           Mult Acc HighHWord to WrdSatSI    ³
+³  XO   machhws.    4.108.0.1           Mult Acc HighHWord to WrdSatSgn&r ³
+³  XO   machhwso    4.108.1.0           Mult Acc HighHWord to WrdSatSgn o ³
+³  XO   machhwso.   4.108.1.1           Mult Acc HiHWord to WrdSatSgn o&r ³
+³  XO   machhwsu    4.76.0.0            Mult Acc HighHWord to WrdSatUSgn  ³
+³  XO   machhwsu.   4.76.0.1            Mult Acc HighHWord to WrdSatUS &r ³
+³  XO   machhwsuo   4.76.1.0            Mult Acc HighHWord to WrdSatUS  o ³
+³  XO   machhwsuo.  4.76.1.1            Mult Acc HiHWord to WrdSatUS  o&r ³
+³  XO   machhwu     4.12.0.0            Mult Acc HighHWord to WrdModUSgn  ³
+³  XO   machhwu.    4.12.0.1            Mult Acc HighHWord to WrdModUS &r ³
+³  XO   machhwuo    4.12.1.0            Mult Acc HighHWord to WrdModUS  o ³
+³  XO   machhwuo.   4.12.1.1            Mult Acc HiHWord to WrdModUS  o&r ³
+³  XO   maclhw      4.428.0.0           Mult Acc LowHWord to WrdModSI     ³
+³  XO   maclhw.     4.428.0.1           Mult Acc LowHWord to WrdModSgn&r  ³
+³  XO   maclhwo     4.428.1.0           Mult Acc LowHWord to WrdModSgn o  ³
+³  XO   maclhwo.    4.428.1.1           Mult Acc LowHWord to WrdModSgn o&r³
+³  XO   maclhws     4.492.0.0           Mult Acc LowHWord to WrdSatSI     ³
+³  XO   maclhws.    4.492.0.1           Mult Acc LowHWord to WrdSatSgn&r  ³
+³  XO   maclhwso    4.492.1.0           Mult Acc LowHWord to WrdSatSgn o  ³
+³  XO   maclhwso.   4.492.1.1           Mult Acc LowHWord to WrdSatSgn o&r³
+³  XO   maclhwsu    4.460.0.0           Mult Acc LowHWord to WrdSatUSgn   ³
+³  XO   maclhwsu.   4.460.0.1           Mult Acc LowHWord to WrdSatUS &r  ³
+³  XO   maclhwsuo   4.460.1.0           Mult Acc LowHWord to WrdSatUS  o  ³
+³  XO   maclhwsuo.  4.460.1.1           Mult Acc LowHWord to WrdSatUS  o&r³
+³  XO   maclhwu     4.396.0.0           Mult Acc LowHWord to WrdModUSgn   ³
+³  XO   maclhwu.    4.396.0.1           Mult Acc LowHWord to WrdModUS &r  ³
+³  XO   maclhwuo    4.396.1.0           Mult Acc LowHWord to WrdModUS  o  ³
+³  XO   maclhwuo.   4.396.1.1           Mult Acc LowHWord to WrdModUS  o&r³
+³   X    mbar       31.854.             Memory Barrier                    ³
+³   X    mcrf       19.0.               Move Condition Register Field     ³
+³   X    mcrfs      63.64.              Move to Cond Register from FPSCR  ³
+³   X    mcrxr      31.512.             Move to Cond Register from XER    ³
+³   X    mfapidi    31.275.             Move from APID Indirect           ³
+³ XFX    mfcr       31.0.19.            Move from Condition Register      ³
+³ XFX    mfdcr      31.323.             Move from Device Control Register ³
+³   X    mfdcrux    31.291.             Move from DCR User-Mode Indexed   ³
+³   X    mfdcrx     31.259.             Move from DCR Indexed             ³
+³   X    mffs       63.583.             Move from FPSCR                   ³
+³   X    mfmsr      31.83.              Move from MSR                     ³
+³ XFX    mfocrf     31.1.19.            Move from One Condition Register  ³
+³ XFX    mfpmr      31.334.             Move from Performance Mon Register³
+³ XFX    mfspr      31.339.             Move from Special Purpose Register³
+³   X    mfsr       31.595.             Move from Segment Register        ³
+³   X    mfsrin     31.659.             Move from Segment Register Indirec³
+³ XFX    mftb       31.371.             Move from Time Base               ³
+³  VX    mfvcsr     4.1540.             Move from Vec-Status and Ctrl Reg ³
+³   X    msgclr     31.238.             Message Clear                     ³
+³   X    msgsnd     31.206.             Message Send                      ³
+³ XFX    mtcrf      31.0.144.           Move to Condition Register Fields ³
+³ XFX    mtdcr      31.451.             Move to Device Control Register   ³
+³   X    mtdcrux    31.419.             Move to DCR User-Mode Indexed     ³
+³   X    mtdcrx     31.387.             Move to DCR Indexed               ³
+³   X    mtfsb0     63.70.              Move to FPCSR bit 0               ³
+³   X    mtfsb1     63.38.              Move to FPCSR bit 1               ³
+³   X    mtfsf      63.711.             Move to FPCSR Fields              ³
+³   X    mtfsfi     63.134.             Move to FPCSR Fields Immediate    ³
+³   X    mtmsr      31.146.             Move to MSR                       ³
+³   X    mtmsrd     31.178.             Move to MSR DWord                 ³
+³ XFX    mtocrf     31.1.144.           Move to One Condition Register Fld³
+³ XFX    mtpmr      31.462.             Move to Performance Mon Register  ³
+³ XFX    mtspr      31.467.             Move to Special Purpose Register  ³
+³   X    mtsr       31.210.             Move to Segment Register          ³
+³   X    mtsrin     31.242.             Move to Segment Register Indirect ³
+³  VX    mtvcsr     4.1604.             Move to Vec-Status and Ctrl Reg   ³
+³   X    mulchw     4.168.              Mul Cross HWord to Word SI        ³
+³   X    mulchwu    4.136.              Mul Cross HWord to Word US        ³
+³  XO    mulhd      31.73..             Multiply High DWord SI            ³
+³  XO    mulhdu     31.9..              Multiply High DWord US            ³
+³   X    mulhhw     4.40.               Mul High HWord to Word SI         ³
+³   X    mulhhwu    4.8.                Mul High HWord to Word US         ³
+³  XO    mulhw      31.75..             Multiply High Word SI             ³
+³  XO    mulhwu     31.11..             Multiply High Word US             ³
+³  XO    mulld      31.233.0.0          Multiply Low DWord SI             ³
+³  XO    mulld.     31.233.0.1          Multiply Low DWord SI & rec       ³
+³  XO    mulldo     31.233.1.0          Multiply Low DWord SI overfl      ³
+³  XO    mulldo.    31.233.1.1          Multiply Low DWord SI ov&rec      ³
+³   X    mullhw     4.424.              Mul Low HWord to Word SI          ³
+³   X    mullhwu    4.392.              Mul Low HWord to Word US          ³
+³   D    mulli      7                   Multiply Low Immediate            ³
+³  XO    mullw      31.235.0.0          Multiply Low Word SI              ³
+³  XO    mullw.     31.235.0.1          Multiply Low Word SI & rec        ³
+³  XO    mullwo     31.235.1.0          Multiply Low Word SI overfl       ³
+³  XO    mullwo.    31.235.1.1          Multiply Low Word SI ov&rec       ³
+³   X    nand       31.476.0            NAND                              ³
+³   X    nand.      31.476.1            NAND & Rec                        ³
+³  XL    nap        19.434              Nap                               ³
+³  XO    neg        31.104.0.0          Negate                            ³
+³  XO    neg.       31.104.0.1          Negate & rec                      ³
+³  XO    nego       31.104.1.0          Negate overflow                   ³
+³  XO    nego.      31.104.1.1          Negate overflow & rec             ³
+³  XO   nmacchw     4.174.0.0           NegMulAccCrossHWord to WrdModSI   ³
+³  XO   nmacchw.    4.174.0.1           NegMulAccCrossHWord to WrdModSgn&r³
+³  XO   nmacchwo    4.174.1.0           NegMulAccCrossHWord to WrdModSgn o³
+³  XO   nmacchwo.   4.174.1.1           NegMulAccCrsHWord to WrdModSgn o&r³
+³  XO   nmacchws    4.238.0.0           NegMulAccCrossHWord to WrdSatSI   ³
+³  XO   nmacchws.   4.238.0.1           NegMulAccCrossHWord to WrdSatSgn&r³
+³  XO   nmacchwso   4.238.1.0           NegMulAccCrossHWord to WrdSatSgn o³
+³  XO   nmacchwso.  4.238.1.1           NegMulAccCrsHWord to WrdSatSgn o&r³
+³  XO   nmachhw     4.46.0.0            NegMulAccHighHWord to WrdModSI    ³
+³  XO   nmachhw.    4.46.0.1            NegMulAccHighHWord to WrdModSgn&r ³
+³  XO   nmachhwo    4.46.1.0            NegMulAccHighHWord to WrdModSgn o ³
+³  XO   nmachhwo.   4.46.1.1            NegMulAccHiHWord to WrdModSgn o&r ³
+³  XO   nmachhws    4.110.0.0           NegMulAccHighHWord to WrdSatSI    ³
+³  XO   nmachhws.   4.110.0.1           NegMulAccHighHWord to WrdSatSgn&r ³
+³  XO   nmachhwso   4.110.1.0           NegMulAccHighHWord to WrdSatSgn o ³
+³  XO   nmachhwso.  4.110.1.1           NegMulAccHiHWord to WrdSatSgn o&r ³
+³  XO   nmaclhw     4.430.0.0           NegMulAccLowHWord to WrdModSI     ³
+³  XO   nmaclhw.    4.430.0.1           NegMulAccLowHWord to WrdModSgn&r  ³
+³  XO   nmaclhwo    4.430.1.0           NegMulAccLowHWord to WrdModSgn o  ³
+³  XO   nmaclhwo.   4.430.1.1           NegMulAccLowHWord to WrdModSgn o&r³
+³  XO   nmaclhws    4.494.0.0           NegMulAccLowHWord to WrdSatSI     ³
+³  XO   nmaclhws.   4.494.0.1           NegMulAccLowHWord to WrdSatSgn&r  ³
+³  XO   nmaclhwso   4.494.1.0           NegMulAccLowHWord to WrdSatSgn o  ³
+³  XO   nmaclhwso.  4.494.1.1           NegMulAccLowHWord to WrdSatSgn o&r³
+³   X    nor        31.124.0            NOR                               ³
+³   X    nor.       31.124.1            NOR & Rec                         ³
+³   X     or        31.444.0            OR                                ³
+³   X     or.       31.444.1            OR & Rec                          ³
+³   X    orc        31.412.0            OR with Complement                ³
+³   X    orc.       31.412.1            OR with Complement & Rec          ³
+³   D    ori        24                  OR Immediate                      ³
+³   D    oris       25                  OR Immediate Shifted              ³
+³   X    popcntb    31.122.0            Populate Count Bytes              ³
+³   X    popcntb.   31.122.1            Populate Count Bytes & rec        ³
+³   X    prtyd      31.186.             Parity DWord                      ³
+³   X    prtyw      31.154.             Parity Word                       ³
+³  XL    rfci       19.51.              Return From Critical Interrupt    ³
+³  XL    rfdi       19.39.              Return From Debug Interrupt       ³
+³  XL     rfi       19.50.              Return From Interrupt             ³
+³  XL    rfid       19.18.              Return From Interrupt Double Word ³
+³  XL    rfmci      19.38.              Return From MachineCheck Interrupt³
+³ MDS    rldcl      30.8.               Rotate Left DWord&Clear Left      ³
+³ MDS    rldcr      30.9.               Rotate Right DWord&Clear Righ     ³
+³  MD    rldic      30.2.               Rotate Left DWord Imm & Clear     ³
+³  MD    rldicl     30.0.               Rotate Left DWord Imm & ClLef     ³
+³  MD    rldicr     30.1.               Rotate Left DWord Imm & ClRgh     ³
+³  MD    rldimi     30.3.               Rotate Left DWord Imm&MaskIns     ³
+³   M    rlwimi     20.                 Rotate Left Word Imm & Mask Insert³
+³   M    rlwinm     21.                 Rotate Left Word Imm & AND Mask   ³
+³   M    rlwnm      23.                 Rotate Left Word then AND with Msk³
+³  XL    rvwinkle   19.498.             Rip Van Winkle                    ³
+³  SC      sc       17.1                System Call                       ³
+³   X    slbfee.    31.979.             SLB Find Entry ESID               ³
+³   X    slbia      31.498.             SLB Invalidate All                ³
+³   X    slbie      31.434.             SLB Invalidate Entry              ³
+³   X    slbmfee    31.915.             SLB Move From Entry ESID          ³
+³   X    slbmfev    31.851.             SLB Move From Entry VSID          ³
+³   X    slbmte     31.402.             SLB Move To Entry                 ³
+³   X      sld      31.27.              Shift Left DWord                  ³
+³  XL     sleep     19.466.             Sleep                             ³
+³   X      slw      31.24.              Shift Left Word                   ³
+³   X      srad     31.794.             Shift Right Algebraic DWord       ³
+³   X      sradi    31.413.             Shift Right Algebraic DWord Imm   ³
+³   X      sraw     31.792.             Shift Right Algebraic Word        ³
+³   X      srawi    31.824.             Shift Right Algebraic Word Imm    ³
+³   X      srd      31.539.             Shift Right DWord                 ³
+³   X      srw      31.536.             Shift Right Word                  ³
+³   D      stb      38                  Store Byte                        ³
+³   D      stbu     39                  Store Byte with Update            ³
+³   X      stbcix   31.981.             Store Byte Caching Inhibited Idx  ³
+³   X      stbepx   31.223.             Store Byte by Ext PID Indexed     ³
+³   X      stbux    31.247.             Store Byte with Update Indexed    ³
+³   X      stbx     31.215.             Store Byte Indexed                ³
+³  DS      std      62.0                Store DWord                       ³
+³   X      stdcix   31.1013.            Store DWord Caching Inhibited Idx ³
+³   X      stdcx    31.214.             Store DWord Conditional Index     ³
+³   X      stdepx   31.157.             Store Word by Ext PID Indexed     ³
+³  DS      stdu     62.1                Store DWord with Update           ³
+³   X      stdux    31.181.             Store DWord with Update Indexed   ³
+³   X      stdx     31.149.             Store DWord Indexed               ³
+³   D      stfd     54                  Store FP-Double                   ³
+³   X    stfdepx    31.735.             Store FP-Double by ExtPID Indexed ³
+³  DS     stfdp     61..0               Store FP-Double Pair              ³
+³   X    stfdpx     31.919.             Store FP-Double Pair Indexed      ³
+³   D     stfdu     55                  Store FP-Double with Update       ³
+³   X     stfdux    31.759.             Store FP-Double with Update Idx   ³
+³   X     stfdx     31.727.             Store FP-Double Indexed           ³
+³   X     stfiwx    31.983.             Store FP-Double as Integer Word   ³
+³   D     stfs      52                  Store FP-Single                   ³
+³   D     stfsu     53                  Store FP-Single with Update       ³
+³   X     stfsux    31.695.             Store FP-Single with Update Idx   ³
+³   X     stfsx     31.663.             Store FP-Single Indexed           ³
+³   D      sth      44                  Store HWord                       ³
+³   X    sthbrx     31.918.             Store HWord Byte-Reverse Indexed  ³
+³   X    sthcix     31.949.             Store HWord Caching Inhibited Idx ³
+³   X    sthepx     31.415.             Store HWord by Ext PID Indexed    ³
+³   D     sthu      45                  Store HWord with Update           ³
+³   X     sthux     31.439.             Store HWord with Update Indexed   ³
+³   X     sthx      31.407.             Store HWord Indexed               ³
+³   D     stmw      47                  Store Multiple Words              ³
+³  DS      stq      62..2               Store QuadWord                    ³
+³   X     stswi     31.725.             Store String Word Immediate       ³
+³   X     stswx     31.661.             Store String Word Indexed         ³
+³   X     stvebx    31.135.             Vec Store Byte Indexed            ³
+³   X     stvehx    31.167.             Vec Store HWord Indexed           ³
+³   X     stvepx    31.807.             Store Vector by ExtPID Indexed    ³
+³   X     stvepxl   31.775.             Store Vector by ExtPID Indexed LRU³
+³   X     stvewx    31.199.             Vec Store Word Indexed            ³
+³   X     stvx      31.231.             Store Vector Indexed              ³
+³   X     stvxl     31.487.             Store Vector Indexed LRU          ³
+³   D      stw      36                  Store Word                        ³
+³   X     stwbrx    31.662.             Store Word Byte-Reverse Indexed   ³
+³   X     stwcix    31.917.             Store Word Caching Inhibited Idx  ³
+³   X     stwcx.    31.150.             Store Word Conditional Indexed    ³
+³   X     stwepx    31.159.             Store Word by Ext PID Indexed     ³
+³   D     stwu      37                  Store Word with Update            ³
+³   X     stwux     31.183.             Store Word with Update Indexed    ³
+³   X     stwx      31.151.             Store Word Indexed                ³
+³  XO    subf       31.40.0.0           Substract From                    ³
+³  XO    subf.      31.40.0.1           Substract From and record         ³
+³  XO    subfo      31.40.1.0           Substract From overflow           ³
+³  XO    subfo.     31.40.1.1           Substract From overflow and record³
+³  XO    subfc      31.8.0.0            Substract From Carrying           ³
+³  XO    subfc.     31.8.0.1            Substract From Carrying and record³
+³  XO    subfco     31.8.1.0            Substract From Carrying overflow  ³
+³  XO    subfco.    31.8.1.1            Substract From Carrying ovflw rec.³
+³  XO    subfe      31.136.0.0          Substract From Extended           ³
+³  XO    subfe.     31.136.0.1          Substract From Extended and record³
+³  XO    subfeo     31.136.1.0          Substract From Extended overflow  ³
+³  XO    subfeo.    31.136.1.1          Substract From Extended ovflw rec.³
+³   D    subfic     8                   Substract From Immediate Carrying ³
+³  XO    subfme     31.232.0.0          Substract From -1 Extended        ³
+³  XO    subfme.    31.232.0.1          Substract From -1 Extended and rec³
+³  XO    subfmeo    31.232.1.0          Substract From -1 Extended overflo³
+³  XO    subfmeo.   31.232.1.1          Substract From -1 Extended ovl rec³
+³  XO    subfze     31.200.0.0          Substract From 0 Extended         ³
+³  XO    subfze.    31.200.0.1          Substract From 0 Extended and rec ³
+³  XO    subfzeo    31.200.1.0          Substract From 0 Extended overflow³
+³  XO    subfzeo.   31.200.1.1          Substract From 0 Extended ovl rec ³
+³   X    sync       31.598.             Synchronize                       ³
+³   X    td         31.68.              Trap DWord                        ³
+³   D    tdi        2.                  Trap DWord Immediate              ³
+³   X    tlbia      31.370.             TLB Invalidate All                ³
+³   X    tlbie      31.306.             TLB Invalidate Entry              ³
+³   X    tlbiel     31.274.             TLB Invalidate Entry Local        ³
+³   X    tlbivax    31.786.             TLB Invalidate Virtual Addr Idx   ³
+³   X    tlbre      31.946.             TLB Read Entry                    ³
+³   X    tlbsx      31.914.             TLB Search Indexed                ³
+³   X    tlbsync    31.566.             TLB Synchronize                   ³
+³   X    tlbwe      31.978.             TLB Write Entry                   ³
+³   X    tw         31.4.               Trap Word                         ³
+³   D    twi        3.                  Trap Word Immediate               ³
+³   X    wait       31.62.              Wait                              ³
+³   X    wrtee      31.131.             Write MSR Extrenal Enable         ³
+³   X    wrteei     31.163.             Write MSR Extrenal Enable Imm     ³
+³   X    xor        31.316.0            XOR                               ³
+³   X    xor.       31.316.1            XOR & Rec                         ³
+³   D    xori       26                  XOR Immediate                     ³
+³   D    xoris      27                  XOR Immediate Shifted             ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
+³ %BDFP is Decimal-FloatingPoint Engine%b.                                    ³
+³ For 32-bit FP values 1 fp register contains pair of values              ³
+³ For 64-bit FP values pair of fp registers contains pair of values       ³
+³ Below represented list of Dual-FPU engine instructions in form:         ³
+³ Form   mnemonic   OPCD.XO<oe.rc>(dec) meaning                           ³
+³   X    dadd       59.2.0              DFP Add                           ³
+³   X    dadd.      59.2.1              DFP Add and Record                ³
+³   X    daddq      63.2.0              DFP Add Quad                      ³
+³   X    daddq.     63.2.1              DFP Add Quad and Record           ³
+³   X    dcffixq    63.802.0            DFP Convert from Fixed Quad       ³
+³   X    dcffixq.   63.802.1            DFP Convert from Fixed Quad and Rc³
+³   X    dcmpo      59.130.             DFP Compare Ordered               ³
+³   X    dcmpoq     63.130.             DFP Compare Ordered Quad          ³
+³   X    dcmpu      59.642.             DFP Compare Unordered             ³
+³   X    dcmpuq     63.642.             DFP Compare Unordered Quad        ³
+³   X    dcffixq    63.802.0            DFP Convert From Fixed Quad       ³
+³   X    dcffixq.   63.802.1            DFP Convert From Fixed Quad & Rec ³
+³   X    dctdp      59.258.0            DFP Convert to Long               ³
+³   X    dctdp.     59.258.1            DFP Convert to Long & Rec         ³
+³   X    dctfix     59.290.0            DFP Convert to Fixed              ³
+³   X    dctfix.    59.290.1            DFP Convert to Fixed & Rec        ³
+³   X    dctfixq    63.290.0            DFP Convert to Fixed Quad         ³
+³   X    dctfixq.   63.290.1            DFP Convert to Fixed Quad & Rec   ³
+³   X    dctqpq     63.258.0            DFP Convert to Extended           ³
+³   X    dctqpq.    63.258.1            DFP Convert to Extended & Rec     ³
+³   X    ddedpd     59.322.0            DFP Decode DPD to BCD             ³
+³   X    ddedpd.    59.322.1            DFP Decode DPD to BCD & Rec       ³
+³   X    ddedpdq    63.322.0            DFP Decode DPD to BCD Quad        ³
+³   X    ddedpdq.   63.322.1            DFP Decode DPD to BCD Quad & Rec  ³
+³   X    ddiv       59.546.0            DFP Divide                        ³
+³   X    ddiv.      59.546.1            DFP Divide & Rec                  ³
+³   X    ddivq      63.546.0            DFP Divide Quad                   ³
+³   X    ddivq.     63.546.1            DFP Divide Quad & Rec             ³
+³   X    denbcd     59.834.0            DFP Encode BCD to DPD             ³
+³   X    denbcd.    59.834.1            DFP Encode BCD to DPD & Rec       ³
+³   X    denbcdq    63.834.0            DFP Encode BCD to DPD Quad        ³
+³   X    denbcdq.   63.834.1            DFP Encode BCD to DPD Quad & Rec  ³
+³   X    diex       59.866.0            DFP Insert Biased Exponent        ³
+³   X    diex.      59.866.1            DFP Insert Biased Exponent & Rec  ³
+³   X    diexq      63.866.0            DFP Insert Biased Exponent Quad   ³
+³   X    diexq.     63.866.1            DFP Insert Biased Exponent Q & Rec³
+³   X    dmul       59.34.0             DFP Multiply                      ³
+³   X    dmul.      59.34.1             DFP Multiply & Rec                ³
+³   X    dmulq      63.34.0             DFP Multiply Quad                 ³
+³   X    dmulq.     63.34.1             DFP Multiply Quad & Rec           ³
+³ Z23    dqua       59.3.0              DFP Quantize                      ³
+³ Z23    dqua.      59.3.1              DFP Quantize & Rec                ³
+³ Z23    dquai      59.67.0             DFP Quantize Immediate            ³
+³ Z23    dquai.     59.67.1             DFP Quantize Immediate & Rec      ³
+³ Z23    dquaiq     63.67.0             DFP Quantize Immediate Quad       ³
+³ Z23    dquaiq.    63.67.1             DFP Quantize Immediate Quad & Rec ³
+³ Z23    dquaq      63.3.0              DFP Quantize Quad                 ³
+³ Z23    dquaq.     63.3.1              DFP Quantize Quad & Rec           ³
+³   X    drdpq      63.770.0            DFP Round to Long                 ³
+³   X    drdpq.     63.770.1            DFP Round to Long & Rec           ³
+³ Z23    drintn     59.227.0            DFP Round To FPInt without Inexact³
+³ Z23    drintn.    59.227.1            DFP Round To FPInt without In & Rc³
+³ Z23    drintnq    63.227.0            DFP Round To FPInt wo Inexact Quad³
+³ Z23    drintnq.   63.227.1            DFP Round To FPInt wo Inx Q & Rec ³
+³ Z23    drintx     59.99.0             DFP Round To FPInt with Inexact   ³
+³ Z23    drintx.    59.99.1             DFP Round To FPInt with Inx & Rec ³
+³ Z23    drintxq    63.99.0             DFP Round To FPInt w Inexact Quad ³
+³ Z23    drintxq.   63.99.1             DFP Round To FPInt w Inx Q & Rec  ³
+³ Z23    drrnd      59.35.0             DFP ReRound                       ³
+³ Z23    drrnd.     59.35.1             DFP ReRound & Rec                 ³
+³ Z23    drrndq     63.35.0             DFP ReRound Quad                  ³
+³ Z23    drrndq.    63.35.1             DFP ReRound Quad & Rec            ³
+³   X    drsp       59.770.0            DFP Round to Short                ³
+³   X    drsp.      59.770.1            DFP Round to Short & Rec          ³
+³ Z22    dscli      59.66.0             DFP Shift Left Immediate          ³
+³ Z22    dscli.     59.66.1             DFP Shift Left Immediate & Rec    ³
+³ Z22    dscliq     63.66.0             DFP Shift Left Immediate Quad     ³
+³ Z22    dscliq.    63.66.1             DFP Shift Left Immediate Q & Rec  ³
+³ Z22    dscri      59.98.0             DFP Shift Right Immediate         ³
+³ Z22    dscri.     59.98.1             DFP Shift Right Immediate & Rec   ³
+³ Z22    dscriq     63.98.0             DFP Shift Right Immediate Quad    ³
+³ Z22    dscriq.    63.98.1             DFP Shift Right Immediate Q & Rec ³
+³   X    dsub       59.514.0            DFP Substract                     ³
+³   X    dsub.      59.514.1            DFP Substract and Record          ³
+³   X    dsubq      63.514.0            DFP Substract Quad                ³
+³   X    dsubq.     63.514.1            DFP Substract Quad and Record     ³
+³ Z22    dtstdc     59.66.0             DFP Test Data Class               ³
+³ Z22    dtstdcq    63.66.0             DFP Test Data Class Quad          ³
+³ Z22    dtstdg     59.226.0            DFP Test Data Group               ³
+³ Z22    dtstdgq    63.226.0            DFP Test Data Group Quad          ³
+³   X    dtstex     59.162.             DFP Test Exponent                 ³
+³   X    dtstexq    63.162.             DFP Test Exponent Quad            ³
+³   X    dtstsf     59.674.             DFP Test Significance             ³
+³   X    dtstsfq    63.674.             DFP Test Significance Quad        ³
+³   X    dxex       59.354.0            DFP Extract Biased Exponent       ³
+³   X    dxex.      59.354.1            DFP Extract Biased Exponent & Rec ³
+³   X    dxexq      63.354.0            DFP Extract Biased Exponent Quad  ³
+³   X    dxexq.     63.354.1            DFP Extract Biased Exponent Q & Rc³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
+³ %BSFP is Scalar-FloatingPoint Engine%b.                                     ³
+³ Below represented list of Scalar-FPU engine instructions in form:       ³
+³ Form   mnemonic   OPCD.XO<oe.rc>(dec) meaning                           ³
+³   X    fabs       63.264.0            SFP Absolute Value                ³
+³   X    fabs.      63.264.1            SFP Absolute Value & Rec          ³
+³   A    fadd       63.21.0             SFP Add                           ³
+³   A    fadd.      63.21.1             SFP Add & Rec                     ³
+³   A    fadds      59.21.0             SFP Add Single                    ³
+³   A    fadds.     59.21.1             SFP Add Single & Rec              ³
+³   X    fcfid      63.846.0            SFP Cvt From Integer DWord        ³
+³   X    fcfid.     63.846.1            SFP Cvt From Int DoubelWord & Rec ³
+³   X    fcmpo      63.32.              SFP Compare Ordered               ³
+³   X    fcmpu      63.0.               SFP Compare Unordered             ³
+³   X    fcpsgn     63.8.0              SFP Copy Sign                     ³
+³   X    fcpsgn.    63.8.1              SFP Copy Sign & Rec               ³
+³   X    fctid      63.814.0            SFP Cvt To Integer DWord          ³
+³   X    fctid.     63.814.1            SFP Cvt To Int DWord & Rec        ³
+³   X    fctidz     63.815.0            SFP Cvt To Int DWord RoundZer     ³
+³   X    fctidz.    63.815.1            SFP Cvt To Int DblWrd RoundZero&R ³
+³   X    fctiw      63.14.0             SFP Cvt To IntWord                ³
+³   X    fctiw.     63.14.1             SFP Cvt To IntWord & Rec          ³
+³   X    fctiwz     63.15.0             SFP Cvt To IntWord w RndZero      ³
+³   X    fctiwz.    63.15.1             SFP Cvt To IntWord w RndZ & Rec   ³
+³   A    fdiv       63.18.0             SFP Divide                        ³
+³   A    fdiv.      63.18.1             SFP Divide & Rec                  ³
+³   A    fdivs      59.18.0             SFP Divide Single                 ³
+³   A    fdivs.     59.18.1             SFP Divide Single & Rec           ³
+³   A    fmadd      63.29.0             SFP Mul-Add                       ³
+³   A    fmadd.     63.29.1             SFP Mul-Add & Rec                 ³
+³   A    fmadds     59.29.0             SFP Mul-Add Single                ³
+³   A    fmadds.    59.29.1             SFP Mul-Add Single & Rec          ³
+³   X       fmr     63.72.0             SFP Move Register                 ³
+³   X       fmr.    63.72.1             SFP Move Register & Rec           ³
+³   A    fmsub      63.28.0             SFP Mul-Sub                       ³
+³   A    fmsub.     63.28.1             SFP Mul-Sub & Rec                 ³
+³   A    fmsubs     59.28.0             SFP Mul-Sub Single                ³
+³   A    fmsubs.    59.28.1             SFP Mul-Sub Single & Rec          ³
+³   A    fmul       63.25.0             SFP Multiply                      ³
+³   A    fmul.      63.25.1             SFP Multiply & Rec                ³
+³   A    fmuls      59.25.0             SFP Multiply Single               ³
+³   A    fmuls.     59.25.1             SFP Multiply Single & Rec         ³
+³   X    fnabs      63.136.0            SFP Negative Absolute Value       ³
+³   X    fnabs.     63.136.1            SFP Negative Absolute Value & Rec ³
+³   X     fneg      63.40.0             SFP Negate                        ³
+³   X     fneg.     63.40.1             SFP Negate & Rec                  ³
+³   A   fnmadd      63.30.0             SFP Negative Mul-Add              ³
+³   A   fnmadd.     63.30.1             SFP Negative Mul-Add & Rec        ³
+³   A   fnmadds     59.30.0             SFP Negative Mul-Add Single       ³
+³   A   fnmadds.    59.30.1             SFP Negative Mul-Add Single & Rec ³
+³   A   fnmsub      63.31.0             SFP Negative Mul-Sub              ³
+³   A   fnmsub.     63.31.1             SFP Negative Mul-Sub & Rec        ³
+³   A   fnmsubs     59.31.0             SFP Negative Mul-Sub Single       ³
+³   A   fnmsubs.    59.31.1             SFP Negative Mul-Sub Single & Rec ³
+³   A    fre        63.24.0             SFP Reciprocal Estimate           ³
+³   A    fre.       63.24.1             SFP Reciprocal Estimate & Rec     ³
+³   A    fres       59.24.0             SFP Reciprocal Estimate Single    ³
+³   A    fres.      59.24.1             SFP Reciprocal Estimate Single&Rec³
+³   X    frim       63.488.0            SFP Round To Integer Minus        ³
+³   X    frim.      63.488.1            SFP Round To Integer Minus & Rec  ³
+³   X    frin       63.392.0            SFP Round To Integer Nearest      ³
+³   X    frin.      63.392.1            SFP Round To Integer Nearest & Rec³
+³   X    frip       63.24.0             SFP Round To Integer Plus         ³
+³   X    frip.      63.24.1             SFP Round To Integer Plus & Rec   ³
+³   X    friz       63.424.0            SFP Round To Integer Towards Zero ³
+³   X    friz.      63.424.1            SFP Round To Integer Towards Zer&R³
+³   X    frsp       63.12.0             SFP Round Double To Single-FP     ³
+³   X    frsp.      63.12.1             SFP Round Fouble To Single-FP & Rc³
+³   A    frsqrte    63.26.0             SFP Reproc. SQRT Estimate         ³
+³   A    frsqrte.   63.26.1             SFP Reproc. SQRT Estimate & Rec   ³
+³   A    frsqrtes   59.26.0             SFP Reproc. SQRT Estimate Single  ³
+³   A    frsqrtes.  59.26.1             SFP Reproc. SQRT Estimate Single&R³
+³   A    fsel       63.23.0             SFP Select                        ³
+³   A    fsel.      63.23.1             SFP Select & Rec                  ³
+³   A    fsqrt      63.22.0             SFP Square Root                   ³
+³   A    fsqrt.     63.22.1             SFP Square Root & Rec             ³
+³   A    fsqrts     59.22.0             SFP Square Root Single            ³
+³   A    fsqrts.    59.22.1             SFP Square Root Single & Rec      ³
+³   A    fsub       63.20.0             SFP Substract                     ³
+³   A    fsub.      63.20.1             SFP Substract & Rec               ³
+³   A    fsubs      59.20.0             SFP Substract Single              ³
+³   A    fsubs.     59.20.1             SFP Substract Single & Rec        ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
+³ %BFreeScale Semiconductor AltiVec extension%b in form:                      ³
+³ Form   mnemonic   OPCD.XO(dec)        meaning                           ³
+³ VX     vaddcuw    4.384               Vec ADD and Write Carry-Out US    ³
+³ VX     vaddfp     4.10                Vec ADD Single-FP                 ³
+³ VX     vaddsbs    4.768               Vec ADD SI Byte & Saturate        ³
+³ VX     vaddshs    4.832               Vec ADD SI HWord & Saturate       ³
+³ VX     vaddsws    4.896               Vec ADD SI Word & Saturate        ³
+³ VX     vaddubm    4.0                 Vec ADD US Byte Modulo            ³
+³ VX     vaddubs    4.512               Vec ADD US Byte Saturate          ³
+³ VX     vadduhm    4.64                Vec ADD US HWord Modulo           ³
+³ VX     vadduhs    4.576               Vec ADD US HWord Saturate         ³
+³ VX     vadduwm    4.128               Vec ADD US Word Modulo            ³
+³ VX     vadduws    4.640               Vec ADD US Word Saturate          ³
+³ VX     vand       4.1028              Vec Logical AND                   ³
+³ VX     vandc      4.1092              Vec Logical AND with Complement   ³
+³ VX     vavgsb     4.1282              Vec Average SI Byte               ³
+³ VX     vavgsh     4.1346              Vec Average SI HWord              ³
+³ VX     vavgsw     4.1410              Vec Average SI Word               ³
+³ VX     vavgub     4.1026              Vec Average US Byte               ³
+³ VX     vavguh     4.1090              Vec Average US HWord              ³
+³ VX     vavguw     4.1154              Vec Average US Word               ³
+³ VX     vcfsx      4.842               Vec Convert From SI Fix-Point Word³
+³ VX     vcfux      4.778               Vec Convert From US Fix-Point Word³
+³ VC     vcmpbfp    4..966              Vec Compare Bounds Single-FP      ³
+³ VC     vcmpeqfp   4..198              Vec Compare Equal To Single-FP    ³
+³ VC     vcmpequb   4..6                Vec Compare Equal To US Byte      ³
+³ VC     vcmpequh   4..70               Vec Compare Equal To US HWord     ³
+³ VC     vcmpequw   4..134              Vec Compare Equal To US Word      ³
+³ VC     vcmpgefp   4..454              Vec Compare Greater or Equal SFP  ³
+³ VC     vcmpgtfp   4..710              Vec Compare Greater Than Single-FP³
+³ VC     vcmpgtsb   4..774              Vec Compare Greater Than SI Byte  ³
+³ VC     vcmpgtsh   4..838              Vec Compare Greater Than SI HWord ³
+³ VC     vcmpgtsw   4..902              Vec Compare Greater Than SI Word  ³
+³ VC     vcmpgtub   4..518              Vec Compare Greater Than US Byte  ³
+³ VC     vcmpgtuh   4..582              Vec Compare Greater Than US HWord ³
+³ VC     vcmpgtuw   4..646              Vec Compare Greater Than US Word  ³
+³ VX     vctsxs     4.970               Vec Convert To SI Fix-Point Word  ³
+³ VX     vctuxs     4.906               Vec Convert To US Fix-Point Word  ³
+³ VX     vexpefp    4.394               Vec 2 Raiser to the Exp EstimateFP³
+³ VX     vlogefp    4.458               Vec Log Base 2 Estimate FP        ³
+³ VA     vmaddfp    4.46                Vec Multiply Add Single-FP        ³
+³ VX     vmaxfp     4.1034              Vec Maximum Single-FP             ³
+³ VX     vmaxsb     4.258               Vec Maximum SI Byte               ³
+³ VX     vmaxsh     4.322               Vec Maximum SI HWord              ³
+³ VX     vmaxsw     4.386               Vec Maximum SI Word               ³
+³ VX     vmaxub     4.2                 Vec Maximum US Byte               ³
+³ VX     vmaxuh     4.66                Vec Maximum US HWord              ³
+³ VX     vmaxuw     4.130               Vec Maximum US Word               ³
+³ VA     vmhaddshs  4.32                Vec Multiply High-Add SI HWord Sat³
+³ VA     vmhraddshs 4.33                Vec Mul High-Rnd-Add SI HWord Sat ³
+³ VX     vminfp     4.1098              Vec Minimum Single-FP             ³
+³ VX     vminsb     4.770               Vec Minimum SI Byte               ³
+³ VX     vminsh     4.834               Vec Minimum SI HWord              ³
+³ VX     vminsw     4.898               Vec Minimum SI Word               ³
+³ VX     vminub     4.540               Vec Minimum US Byte               ³
+³ VX     vminuh     4.578               Vec Minimum US HWord              ³
+³ VX     vminuw     4.642               Vec Minimum US Word               ³
+³ VA     vmladduhm  4.34                Vec Multiply Low-Add US HWord Mod ³
+³ VX     vmrghb     4.12                Vec Merge High Byte               ³
+³ VX     vmrghh     4.76                Vec Merge High HWord              ³
+³ VX     vmrghw     4.140               Vec Merge High Word               ³
+³ VX     vmrglb     4.268               Vec Merge Low Byte                ³
+³ VX     vmrglh     4.332               Vec Merge Low HWord               ³
+³ VX     vmrglw     4.396               Vec Merge Low Word                ³
+³ VA     vmsummbm   4.37                Vec Multiply Sum Mixed Byte Modulo³
+³ VA     vmsumshm   4.40                Vec Multiply Sum SI HWord Modulo  ³
+³ VA     vmsumshs   4.41                Vec Multiply Sum SI HWord Saturate³
+³ VA     vmsumubm   4.36                Vec Multiply Sum US Byte Modulo   ³
+³ VA     vmsumuhm   4.38                Vec Multiply Sum US HWord Modulo  ³
+³ VA     vmsumuhs   4.39                Vec Multiply Sum US HWord Saturate³
+³ VX     vmulesb    4.776               Vec Multiply Even SI Byte         ³
+³ VX     vmulesh    4.840               Vec Multiply Even SI HWord        ³
+³ VX     vmuleub    4.520               Vec Multiply Even US Byte         ³
+³ VX     vmuleuh    4.584               Vec Multiply Even US HWord        ³
+³ VX     vmulosb    4.264               Vec Multiply Odd SI Byte          ³
+³ VX     vmulosh    4.328               Vec Multiply Odd SI HWord         ³
+³ VX     vmuloub    4.8                 Vec Multiply Odd US Byte          ³
+³ VX     vmulouh    4.72                Vec Multiply Odd US HWord         ³
+³ VA     vnmsubfp   4.47                Vec Negative Mul Sub Single-FP    ³
+³ VX     vnor       4.1284              Vec Logical NOR                   ³
+³ VX     vor        4.1156              Vec Logical OR                    ³
+³ VA     vperm      4.43                Vec Permute                       ³
+³ VX     vpkpx      4.782               Vec Pack Pixel                    ³
+³ VX     vpkshss    4.398               Vec Pack SI HWord Saturate        ³
+³ VX     vpkshus    4.270               Vec Pack US HWord Saturate        ³
+³ VX     vpkswss    4.462               Vec Pack SI Word Saturate         ³
+³ VX     vpkswus    4.334               Vec Pack US Word Saturate         ³
+³ VX     vpkuhum    4.14                Vec Pack US HWord US Modulo       ³
+³ VX     vpkuhus    4.142               Vec Pack US HWord US Saturate     ³
+³ VX     vpkuwum    4.78                Vec Pack US Word US Modulo        ³
+³ VX     vpkuwus    4.206               Vec Pack US Word US Saturate      ³
+³ VX     vrefp      4.266               Vec Reciprocal Estimate Single-FP ³
+³ VX     vrfim      4.714               Vec Round to SingeInt toward -Inf ³
+³ VX     vrfin      4.522               Vec Round to SingeInt toward Nears³
+³ VX     vrfip      4.650               Vec Round to SingeInt toward +Inf ³
+³ VX     vrfiz      4.586               Vec Round to SingeInt toward Zero ³
+³ VX     vrlb       4.4                 Vec Rotate Left Byte              ³
+³ VX     vrlh       4.68                Vec Rotate Left HWord             ³
+³ VX     vrlw       4.132               Vec Rotate Left Word              ³
+³ VX     vrsqrtefp  4.330               Vec Recipr SQRT Estimate Single-FP³
+³ VA     vsel       4.42                Vec Select                        ³
+³ VX     vsl        4.452               Vec Shift Left                    ³
+³ VX     vslb       4.260               Vec Shift Left Byte               ³
+³ VA     vsldoi     4.44                Vec Shift Left Double By Octet Imm³
+³ VX     vslh       4.324               Vec Shift Left HWord              ³
+³ VX     vslo       4.1036              Vec Shift Left By Octet           ³
+³ VX     vslw       4.388               Vec Shift Left Word               ³
+³ VX     vspltb     4.524               Vec Splat Byte                    ³
+³ VX     vsplth     4.588               Vec Splat HWord                   ³
+³ VX     vspltisb   4.780               Vec Splat Immediate SI Byte       ³
+³ VX     vspltish   4.844               Vec Splat Immediate SI HWord      ³
+³ VX     vspltisw   4.908               Vec Splat Immediate SI Word       ³
+³ VX     vspltw     4.652               Vec Splat Word                    ³
+³ VX     vsr        4.708               Vec Shift Right                   ³
+³ VX     vsrab      4.772               Vec Shift Right Algebraic Byte    ³
+³ VX     vsrah      4.836               Vec Shift Right Algebraic HWord   ³
+³ VX     vsraw      4.900               Vec Shift Right Algebraic Word    ³
+³ VX     vsrb       4.516               Vec Shift Right Byte              ³
+³ VX     vsrh       4.580               Vec Shift Right HWord             ³
+³ VX     vsro       4.1100              Vec Shift Right By Octet          ³
+³ VX     vsrw       4.644               Vec Shift Right Word              ³
+³ VX     vsubcuw    4.1480              Vec SUB and Write Carry-Out US    ³
+³ VX     vsubfp     4.74                Vec SUB Single-FP                 ³
+³ VX     vsubsbs    4.1792              Vec SUB SI Byte & Saturate        ³
+³ VX     vsubshs    4.1856              Vec SUB SI HWord & Saturate       ³
+³ VX     vsubsws    4.1920              Vec SUB SI Word & Saturate        ³
+³ VX     vsububm    4.1024              Vec SUB US Byte Modulo            ³
+³ VX     vsububs    4.1536              Vec SUB US Byte Saturate          ³
+³ VX     vsubuhm    4.1088              Vec SUB US HWord Modulo           ³
+³ VX     vsubuhs    4.1600              Vec SUB US HWord Saturate         ³
+³ VX     vsubuwm    4.1152              Vec SUB US Word Modulo            ³
+³ VX     vsubuws    4.1664              Vec SUB US Word Saturate          ³
+³ VX     vsum2sws   4.1928              Vec SUM Across SI HWord Saturate  ³
+³ VX     vsum4sbs   4.1800              Vec SUM Across Quarter SI Byte Sat³
+³ VX     vsum4shs   4.1608              Vec SUM Across Quarter SI HWrd Sat³
+³ VX     vsum4ubs   4.1544              Vec SUM Across Quarter US Byte Sat³
+³ VX     vsumsws    4.1672              Vec SUM Across SI Word Saturate   ³
+³ VX     vupkhpx    4.846               Vec Unpack High Pixel             ³
+³ VX     vupkhsb    4.526               Vec Unpack High SI Byte           ³
+³ VX     vupkhsh    4.590               Vec Unpack High SI HWord          ³
+³ VX     vupklpx    4.974               Vec Unpack Low Pixel              ³
+³ VX     vupklsb    4.654               Vec Unpack Low SI Byte            ³
+³ VX     vupklsh    4.718               Vec Unpack Low SI HWord           ³
+³ VX     vxor       4.1220              Vec Logical XOR                   ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
+³ %BBelow represented list of SPE (Signal Processing Engine)%b insn in form:  ³
+³ Form   mnemonic   OPCD.XO<oe.rc>(dec) meaning                           ³
+³ EVX    brinc      4.527               Bit Reversed Increment            ³
+³ EVX    efdabs     4.740               FP-Double Absolute                ³
+³ EVX    efdadd     4.736               FP-Double Add                     ³
+³ EVX    efdcfs     4.751               FP-Double Convert from Single-FP  ³
+³ EVX    efdcfsi    4.753               FP-Double Convert from SI-Int     ³
+³ EVX    efdcfsid   4.739               FP-Double Convert from SI-DWord   ³
+³ EVX    efdcfsf    4.755               FP-Double Convert from SI Frac    ³
+³ EVX    efdcfui    4.752               FP-Double Convert from US-In      ³
+³ EVX    efdcfuf    4.754               FP-Double Convert from US-Fr      ³
+³ EVX    efdcfuid   4.738               FP-Double Convert from US-DWord   ³
+³ EVX    efdcmpeq   4.750               FP-Double Compare Equal           ³
+³ EVX    efdcmpgt   4.748               FP-Double Compare Great Than      ³
+³ EVX    efdcmplt   4.749               FP-Double Compare Less Than       ³
+³ EVX    efdctfs    4.759               FP-Double Convert to Single-FP    ³
+³ EVX    efdctsi    4.757               FP-Double Convert to SI Int       ³
+³ EVX    efdctsidz  4.747               FP-Double Convert to SDwd w RndZer³
+³ EVX    efdctsiz   4.762               FP-Double Convert to SInt w RndZer³
+³ EVX    efdctuf    4.758               FP-Double Convert to US Frac      ³
+³ EVX    efdctui    4.756               FP-Double Convert to US Int       ³
+³ EVX    efdctuidz  4.746               FP-Double Convert to UDwd w RndZer³
+³ EVX    efdctuiz   4.760               FP-Double Convert to US w RndZer  ³
+³ EVX    efddiv     4.745               FP-Double Divide                  ³
+³ EVX    efdmul     4.744               FP-Double Multiply                ³
+³ EVX    efdnabs    4.741               FP-Double Negative Absolute       ³
+³ EVX    efdneg     4.742               FP-Double Negate                  ³
+³ EVX    efdsub     4.737               FP-Double Substract               ³
+³ EVX    efdtsteq   4.766               FP-Double Test Equal              ³
+³ EVX    efdtstgt   4.764               FP-Double Test Great Than         ³
+³ EVX    efdtstlt   4.765               FP-Double Test Less Than          ³
+³ EVX    efsabs     4.708               FP-Single Absolute                ³
+³ EVX    efsadd     4.704               FP-Single Add                     ³
+³ EVX    efscfd     4.719               FP-Single Convert from Double-FP  ³
+³ EVX    efscfsi    4.721               FP-Single Convert from SI-Int     ³
+³ EVX    efscfsf    4.723               FP-Single Convert from SI Frac    ³
+³ EVX    efscfui    4.720               FP-Single Convert from US-In      ³
+³ EVX    efscfuf    4.722               FP-Single Convert from US-Fr      ³
+³ EVX    efscmpeq   4.718               FP-Single Compare Equal           ³
+³ EVX    efscmpgt   4.716               FP-Single Compare Great Than      ³
+³ EVX    efscmplt   4.717               FP-Single Compare Less Than       ³
+³ EVX    efsctsf    4.723               FP-Single Convert to SI Frac      ³
+³ EVX    efsctsi    4.725               FP-Single Convert to SI Int       ³
+³ EVX    efsctsiz   4.730               FP-Single Convert to SInt w RndZer³
+³ EVX    efsctuf    4.726               FP-Single Convert to US Frac      ³
+³ EVX    efsctui    4.724               FP-Single Convert to US Int       ³
+³ EVX    efsctuiz   4.728               FP-Single Convert to UInt w RndZer³
+³ EVX    efsdiv     4.713               FP-Single Divide                  ³
+³ EVX    efsmul     4.712               FP-Single Multiply                ³
+³ EVX    efsnabs    4.709               FP-Single Negative Absolute       ³
+³ EVX    efsneg     4.710               FP-Single Negate                  ³
+³ EVX    efssub     4.705               FP-Single Substract               ³
+³ EVX    efststeq   4.734               FP-Single Test Equal              ³
+³ EVX    efststgt   4.732               FP-Single Test Great Than         ³
+³ EVX    efststlt   4.733               FP-Single Test Less Than          ³
+³ EVX    evabs      4.520               Vector Absolute Value             ³
+³ EVX    evaddiw    4.514               Vector Add Immediate Word         ³
+³ EVX   evaddsmiaaw 4.1225              Vector Add SI Modulo Int to AccW  ³
+³ EVX   evaddssiaaw 4.1217              Vector Add SI Satur. Int to AccW  ³
+³ EVX   evaddumiaaw 4.1224              Vector Add USI Modul Int to AccW  ³
+³ EVX   evaddusiaaw 4.1216              Vector Add USI Satur Int to AccW  ³
+³ EVX    evaddw     4.512               Vector Add Word                   ³
+³ EVX    evand      4.529               Vector And                        ³
+³ EVX    evandc     4.530               Vector And with Complement        ³
+³ EVX    evcmpeq    4.564               Vector Compare Equal              ³
+³ EVX    evcmpgts   4.561               Vector Compare Greater Than SI    ³
+³ EVX    evcmpgtu   4.560               Vector Compare Greater Than US    ³
+³ EVX    evcmplts   4.563               Vector Compare Less Than SI       ³
+³ EVX    evcmpttu   4.562               Vector Compare Less Than US       ³
+³ EVX    evcntlsw   4.526               Vector Count Leading SignBits Word³
+³ EVX    evcntlzw   4.525               Vector Count Leading ZeroBits Word³
+³ EVX    evdivws    4.1222              Vector Divide Word SI             ³
+³ EVX    evdivwu    4.1223              Vector Divide Word US             ³
+³ EVX    eveqv      4.537               Vector Equivalent                 ³
+³ EVX    evextsb    4.522               Vector Extend SI Byte             ³
+³ EVX    evextsh    4.523               Vector Extend SI HWord            ³
+³ EVX    evfsabs    4.644               Vector SP-Single Absolute Value   ³
+³ EVX    evfsadd    4.640               Vector SP-Single Add              ³
+³ EVX    evfscfsf   4.659               Vector Cvt SP-Single frm Sing-Frac³
+³ EVX    evfscfsi   4.657               Vector Cvt SP-Single frm Sing-Int ³
+³ EVX    evfscfuf   4.658               Vector Cvt SP-Single frm Using-Fra³
+³ EVX    evfscfui   4.656               Vector Cvt SP-Single frm Using-Int³
+³ EVX    evfscmpeq  4.654               Vector SP-Single Compare Equal    ³
+³ EVX    evfscmpgt  4.652               Vector SP-Single Compare Greater T³
+³ EVX    evfscmplt  4.653               Vector SP-Single Compare Less Than³
+³ EVX    evfsctsf   4.663               Vector Cvt SP-Single to Sing-Frac ³
+³ EVX    evfsctsi   4.661               Vector Cvt SP-Single to Sing-Int  ³
+³ EVX    evfsctsiz  4.666               Vector Cvt SP-Single to Sing-Int  ³
+³ EVX    evfsctuf   4.662               Vector Cvt SP-Single to U-Frac Rnd³
+³ EVX    evfsctui   4.660               Vector Cvt SP-Single to Using-Int ³
+³ EVX    evfsctuiz  4.664               Vector Cvt SP-Single to UInt RndZr³
+³ EVX    evfsdiv    4.649               Vector SP-Single Divide           ³
+³ EVX    evfsmul    4.648               Vector SP-Single Multiply         ³
+³ EVX    evfsnabs   4.645               Vector SP-Single Negative Absolute³
+³ EVX    evfsneg    4.646               Vector SP-Single Negate           ³
+³ EVX    evfssub    4.641               Vector SP-Single Substract        ³
+³ EVX    evfststeq  4.670               Vector SP-Single Test Equal       ³
+³ EVX    evfststgt  4.668               Vector SP-Single Test Greater Than³
+³ EVX    evfststlt  4.669               Vector SP-Single Test Less Than   ³
+³ EVX    evldd      4.769               Vector Load Double Word into DWord³
+³ EVX    evlddx     4.768               Vector Load DWord into DWord Index³
+³ EVX    evldh      4.773               Vector Load DWord into 4 HWord    ³
+³ EVX    evldhx     4.772               Vector Load DWord into 4 Hwrds Ind³
+³ EVX    evldw      4.771               Vector Load DWord into 2 words    ³
+³ EVX    evldwx     4.770               Vector Load DWord into 4 Wrds Indx³
+³ EVX   evlhhesplat 4.777               Vector Load HWord into Hwrds Evn S³
+³ EVX  evlhhesplatx 4.776               Vector Load HWord into Hwrds EvnSI³
+³ EVX   evlhhosplat 4.783               Vector Load HWord into Hwrds Odd S³
+³ EVX  evlhhosplatx 4.782               Vector Load HWord into Hwrds OddSI³
+³ EVX  evlhhousplat 4.781               Vector Load HWord into Hwrds Odd S³
+³ EVX evlhhousplatx 4.780               Vector Load HWord into Hwrds OddSI³
+³ EVX    evlwhe     4.785               Vector Load Word into 2 Hwrds Even³
+³ EVX    evlwhex    4.784               Vector Load Word into 2 Hwrds EvIx³
+³ EVX    evlwhos    4.791               Vector Load Word into 2 Hwrds OdSg³
+³ EVX    evlwhosx   4.790               Vector Load Word into 2 Hwrds OSI ³
+³ EVX    evlwhou    4.789               Vector Load Word into 2 Hwrds OdUn³
+³ EVX    evlwhoux   4.788               Vector Load Word into 2 Hwrds OUI ³
+³ EVX    evlwhsplat 4.797               Vector Load Word into 2 Hwrds Splt³
+³ EVX   evlwhsplatx 4.796               Vector Load Word into 2 Hwrds SplI³
+³ EVX   evlwwsplat  4.793               Vector Load Word into Word & Splat³
+³ EVX   evlwwsplatx 4.792               Vector Load Word into Word&SplIndx³
+³ EVX    evmergehi  4.556               Vector Merge High                 ³
+³ EVX   evmergehilo 4.558               Vector Merge High/Low             ³
+³ EVX    evmergelo  4.557               Vector Merge Low                  ³
+³ EVX   evmergelohi 4.559               Vector Merge Low/High             ³
+³ EVX   evmhegsmfaa 4.1323              Vec Mul HWord EvnGuarSModFr&Acc   ³
+³ EVX   evmhegsmfan 4.1451              Vec Mul HWord EvnGuarSModFr&AccNg ³
+³ EVX   evmhegsmiaa 4.1321              Vec Mul HWord EvnGuarSModInt&Acc  ³
+³ EVX   evmhegsmian 4.1449              Vec Mul HWord EvnGuarSModIn&AccNg ³
+³ EVX   evmhegumiaa 4.1320              Vec Mul HWord EvnGuarSModUint&Acc ³
+³ EVX   evmhegumian 4.1448              Vec Mul HWord EvnGuarSModUi&AccNg ³
+³ EVX    evmhesmf   4.1035              Vec Mul HWord EvnSIModFract       ³
+³ EVX    evmhesmfa  4.1067              Vec Mul HWord EvnSIModFractToAc   ³
+³ EVX   evmhesmfaaw 4.1291              Vec Mul HWord EvnSIModFr&AccToW   ³
+³ EVX   evmhesmfanw 4.1419              Vec Mul HWord EvnSIModFr&AcNToW   ³
+³ EVX    evmhesmi   4.1033              Vec Mul HWord EvnSIMod Int        ³
+³ EVX    evmhesmia  4.1065              Vec Mul HWord EvnSIModIntToAc     ³
+³ EVX   evmhesmiaaw 4.1289              Vec Mul HWord EvnSIModIn&AccToW   ³
+³ EVX   evmhesmianw 4.1417              Vec Mul HWord EvnSIModIn&AcNToW   ³
+³ EVX    evmhessf   4.1027              Vec Mul HWord EvnSISatur Frac     ³
+³ EVX    evmhessfa  4.1059              Vec Mul HWord EvnSISatFrToAc      ³
+³ EVX   evmhessfaaw 4.1283              Vec Mul HWord EvnSISatFr&AccToW   ³
+³ EVX   evmhessfanw 4.1411              Vec Mul HWord EvnSISatFr&AcNToW   ³
+³ EVX   evmhessiaaw 4.1281              Vec Mul HWord EvnSISatIn&AccToW   ³
+³ EVX   evmhessianw 4.1409              Vec Mul HWord EvnSISatIn&AcNToW   ³
+³ EVX    evmheumi   4.1032              Vec Mul HWord EvnUSMod Int        ³
+³ EVX    evmheumia  4.1064              Vec Mul HWord EvnUSModIntToAc     ³
+³ EVX   evmheumiaaw 4.1288              Vec Mul HWord EvnUSModIn&AccToW   ³
+³ EVX   evmheumianw 4.1416              Vec Mul HWord EvnUSModIn&AcNgToW  ³
+³ EVX   evmheusiaaw 4.1280              Vec Mul HWord EvnUSSatIn&AccToWd  ³
+³ EVX   evmheusianw 4.1408              Vec Mul HWord EvnUSSatIn&AcNToWd  ³
+³ EVX   evmhogsmfaa 4.1327              Vec Mul HWord OddGuarSModFr&Acc   ³
+³ EVX   evmhogsmfan 4.1455              Vec Mul HWord OddGuarSModFr&AccNg ³
+³ EVX   evmhogsmiaa 4.1325              Vec Mul HWord OddGuarSModInt&Acc  ³
+³ EVX   evmhogsmian 4.1453              Vec Mul HWord OddGuarSModIn&AccNg ³
+³ EVX   evmhogumiaa 4.1324              Vec Mul HWord OddGuarSModUint&Acc ³
+³ EVX   evmhogumian 4.1452              Vec Mul HWord OddGuarSModUi&AccNg ³
+³ EVX    evmhosmf   4.1039              Vec Mul HWord OddSignModFract     ³
+³ EVX    evmhosmfa  4.1071              Vec Mul HWord OddSignModFractToAc ³
+³ EVX   evmhosmfaaw 4.1295              Vec Mul HWord OddSignModFr&AccToW ³
+³ EVX   evmhosmfanw 4.1423              Vec Mul HWord OddSignModFr&AcNToW ³
+³ EVX    evmhosmi   4.1037              Vec Mul HWord OddSignMod Int      ³
+³ EVX    evmhosmia  4.1069              Vec Mul HWord OddSignModIntToAc   ³
+³ EVX   evmhosmiaaw 4.1293              Vec Mul HWord OddSignModIn&AccToW ³
+³ EVX   evmhosmianw 4.1421              Vec Mul HWord OddSignModIn&AcNToW ³
+³ EVX    evmhossf   4.1031              Vec Mul HWord OddSignSatur Frac   ³
+³ EVX    evmhossfa  4.1063              Vec Mul HWord OddSignSatFrToAc    ³
+³ EVX   evmhossfaaw 4.1287              Vec Mul HWord OddSignSatFr&AccToW ³
+³ EVX   evmhossfanw 4.1415              Vec Mul HWord OddSignSatFr&AcNToW ³
+³ EVX   evmhossiaaw 4.1285              Vec Mul HWord OddSignSatIn&AccToW ³
+³ EVX   evmhossianw 4.1413              Vec Mul HWord OddSignSatIn&AcNToW ³
+³ EVX    evmhoumi   4.1036              Vec Mul HWord OddUSMod Int        ³
+³ EVX    evmhoumia  4.1068              Vec Mul HWord OddUSModIntToAc     ³
+³ EVX   evmhoumiaaw 4.1292              Vec Mul HWord OddUSModIn&AccToW   ³
+³ EVX   evmhoumianw 4.1420              Vec Mul HWord OddUSModIn&AcNgToW  ³
+³ EVX   evmhousiaaw 4.1284              Vec Mul HWord OddUSSatIn&AccToWd  ³
+³ EVX   evmhousianw 4.1412              Vec Mul HWord OddUSSatIn&AcNToWd  ³
+³ EVX    evmra      4.1220              Initalize Accumulator             ³
+³ EVX    evmwhsmf   4.1103              Vec Mul Word HighSignModuloFract  ³
+³ EVX    evmwhsmfa  4.1135              Vec Mul Word HigSignModFractToAcc ³
+³ EVX    evmwhsmi   4.1101              Vec Mul Word HighSignMod Int      ³
+³ EVX    evmwhsmia  4.1133              Vec Mul Word HighSignModIntToAcc  ³
+³ EVX    evmwhssf   4.1095              Vec Mul Word HighSignSaturate Frac³
+³ EVX    evmwhssfa  4.1127              Vec Mul Word HighSignSaturFrToAcc ³
+³ EVX    evmwhumi   4.1100              Vec Mul Word HighUSignMod Int     ³
+³ EVX    evmwhumia  4.1132              Vec Mul Word HighUSignModIntToAcc ³
+³ EVX   evmwlsmiaaw 4.1353              Vec Mul Word LowSignModIn&AccToWrd³
+³ EVX   evmwlsmianw 4.1481              Vec Mul Word LowSignModIn&AcNToWrd³
+³ EVX   evmwlssiaaw 4.1345              Vec Mul Word LowSignSatIn&AccToWrd³
+³ EVX   evmwlssianw 4.1473              Vec Mul Word LowSignSatIn&AcNToWrd³
+³ EVX    evmwlumi   4.1096              Vec Mul Word LowUSignModulo Int   ³
+³ EVX    evmwlumia  4.1128              Vec Mul Word LowUSignModIntToAcc  ³
+³ EVX   evmwlumiaaw 4.1352              Vec Mul Word LowUSignModIn&AccToW ³
+³ EVX   evmwlumianw 4.1480              Vec Mul Word LowUSignModIn&AcNToW ³
+³ EVX   evmwlusiaaw 4.1344              Vec Mul Word LowUSSatIn&AccToWrd  ³
+³ EVX   evmwlusianw 4.1472              Vec Mul Word LowUSSatIn&AcNToWrd  ³
+³ EVX    evmwsmf    4.1115              Vec Mul Word SIModuloFract        ³
+³ EVX    evmwsmfa   4.1147              Vec Mul Word SIModFractToAcc      ³
+³ EVX    evmwsmfaa  4.1371              Vec Mul Word SIModuloFract&Acc    ³
+³ EVX    evmwsmfan  4.1499              Vec Mul Word SIModFract&AccNeg    ³
+³ EVX    evmwsmi    4.1113              Vec Mul Word SIModuloInteger      ³
+³ EVX    evmwsmia   4.1145              Vec Mul Word SIModIntToAcc        ³
+³ EVX    evmwsmiaa  4.1369              Vec Mul Word SIModuloInt&Acc      ³
+³ EVX    evmwsmian  4.1497              Vec Mul Word SIModInt&AccNeg      ³
+³ EVX    evmwssf    4.1107              Vec Mul Word SISaturateFract      ³
+³ EVX    evmwssfa   4.1139              Vec Mul Word SISatFractToAcc      ³
+³ EVX    evmwssfaa  4.1363              Vec Mul Word SISaturFract&Acc     ³
+³ EVX    evmwssfan  4.1491              Vec Mul Word SISatFract&AccNeg    ³
+³ EVX    evmwumi    4.1112              Vec Mul Word USModuloInt          ³
+³ EVX    evmwumia   4.1144              Vec Mul Word USModIntToAcc        ³
+³ EVX    evmwumiaa  4.1368              Vec Mul Word USModInt&Acc         ³
+³ EVX    evmwumian  4.1496              Vec Mul Word USModInt&AccNeg      ³
+³ EVX      evnand   4.542               Vec NAND                          ³
+³ EVX       evneg   4.521               Vec Negate                        ³
+³ EVX       evnor   4.536               Vec NOR                           ³
+³ EVX        evor   4.535               Vec OR                            ³
+³ EVX       evorc   4.539               Vec OR with Complement            ³
+³ EVX       evrlw   4.552               Vec Rotate Left Word              ³
+³ EVX      evrlwi   4.554               Vec Rotate Left Word Immediate    ³
+³ EVX      evrndw   4.524               Vec Round Word                    ³
+³ EVS       evsel   4.79                Vector Select                     ³
+³ EVX       evslw   4.548               Vec Shift Left Word               ³
+³ EVX      evslwi   4.550               Vec Shift Left Word Immediate     ³
+³ EVX   evsplatfi   4.555               Vec Splat Fractional Immediate    ³
+³ EVX    evsplati   4.553               Vec Splat Immediate               ³
+³ EVX     evsrwis   4.547               Vec Shift Right Word Immediate    ³
+³ EVX     evsrwiu   4.553               Vec Shift Right Word Immediate US ³
+³ EVX     evsrwiu   4.553               Vec Shift Right Word Immediate US ³
+³ EVX      evsrws   4.545               Vec Shift Right Word SI           ³
+³ EVX      evsrwu   4.544               Vec Shift Right Word US           ³
+³ EVX      evstdd   4.801               Vec Store Double of Double        ³
+³ EVX    evstdepd  31.636               Vec Store Dbl into Dbl by ExtPID  ³
+³ EVX     evstddx   4.800               Vec Store Double of Double Indexed³
+³ EVX      evstdh   4.805               Vec Store Double of 4 HWord       ³
+³ EVX     evstdhx   4.804               Vec Store Dbl of 4 HWord Idx      ³
+³ EVX      evstdw   4.803               Vec Store Double of 2 Words       ³
+³ EVX     evstdwx   4.802               Vec Store Dbl of 2 Words Indexed  ³
+³ EVX     evstwhe   4.817               Vec Store Word of 2 HWord Evn     ³
+³ EVX    evstwhex   4.816               Vec Store Word of 2 HWord Evn Idx ³
+³ EVX     evstwho   4.821               Vec Store Word of 2 HWord Odd     ³
+³ EVX    evstwhox   4.820               Vec Store Word of 2 HWord Odd Idx ³
+³ EVX     evstwwe   4.825               Vec Store Word of Word Even       ³
+³ EVX    evstwwex   4.824               Vec Store Word of Word Even Indexd³
+³ EVX     evstwwo   4.829               Vec Store Word of Word Odd        ³
+³ EVX    evstwwox   4.828               Vec Store Word of Word Odd Indexed³
+³ EVX  evsubfsmiaaw 4.1227              Vec Sub SI ModInt to AccWord      ³
+³ EVX  evsubfssiaaw 4.1219              Vec Sub SI SatInt to AccWord      ³
+³ EVX  evsubfumiaaw 4.1226              Vec Sub US ModInt to AccWord      ³
+³ EVX  evsubfusiaaw 4.1218              Vec Sub US SatInt to AccWord      ³
+³ EVX    evsubfw    4.516               Vec Substract from Word           ³
+³ EVX    evsubifw   4.518               Vec Substract Immediate from Word ³
+³ EVX    evxor      4.534               Vec XOR                           ³
 ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
