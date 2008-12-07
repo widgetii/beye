@@ -637,6 +637,7 @@ static void __FASTCALL__ javaWriteIni( hIniProfile *ini )
 
 REGISTRY_DISASM Java_Disasm =
 {
+  DISASM_JAVA,
   "~Java",
   { "JvmAsm", NULL, NULL, NULL, NULL },
   { javaAsmHelp, NULL, NULL, NULL, NULL },

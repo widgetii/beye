@@ -438,16 +438,17 @@ static const char *__NEAR__ __FASTCALL__ elf_otype(unsigned id)
     only common machine types are used, add remaining if needed
 */
 
-static const char *__NEAR__ __FASTCALL__ elf_machine(unsigned id)
+static const char *__NEAR__ __FASTCALL__ elf_machine(unsigned id,unsigned *disasm)
 {
+  *disasm=DISASM_DATA;
   switch(id)
   {
     case EM_NONE:	return "None";
     case EM_M32:	return "AT&T WE32100";
     case EM_SPARC:	return "Sun SPARC";
-    case EM_386:	return "Intel 386";
-    case EM_68K:	return "Motorola m68k";
-    case EM_88K:	return "Motorola m88k";
+    case EM_386:	*disasm = DISASM_CPU_IX86; return "Intel 386";
+    case EM_68K:	*disasm = DISASM_CPU_PPC; return "Motorola m68k";
+    case EM_88K:	*disasm = DISASM_CPU_PPC; return "Motorola m88k";
     case EM_860:	return "Intel 80860";
     case EM_MIPS:	return "MIPS I";
     case EM_S370:	return "IBM System/370";
@@ -455,14 +456,14 @@ static const char *__NEAR__ __FASTCALL__ elf_machine(unsigned id)
     case EM_PARISC:	return "HP PA-RISC";
     case EM_SPARC32PLUS:return "SPARC v8plus";
     case EM_960:	return "Intel 80960";
-    case EM_PPC:	return "Power PC 32-bit";
-    case EM_PPC64:	return "Power PC 64-bit";
+    case EM_PPC:	*disasm = DISASM_CPU_PPC; return "Power PC 32-bit";
+    case EM_PPC64:	*disasm = DISASM_CPU_PPC; return "Power PC 64-bit";
     case EM_S390:	return "IBM System/390";
     case EM_V800:	return "NEC V800";
     case EM_FR20:	return "Fujitsu FR20";
     case EM_RH32:	return "TRW RH-32";
     case EM_RCE:	return "Motorola RCE";
-    case EM_ARM:	return "ARM";
+    case EM_ARM:	*disasm=DISASM_CPU_ARM; return "ARM";
     case EM_ALPHA:	return "DEC Alpha";
     case EM_SH:		return "Hitachi SH";
     case EM_SPARCV9:	return "SPARC v9 64-bit";
@@ -484,7 +485,7 @@ static const char *__NEAR__ __FASTCALL__ elf_machine(unsigned id)
     case EM_ME16:	return "Toyota ME16 processor";
     case EM_ST100:	return "STMicroelectronics ST100 processor";
     case EM_TINYJ:	return "Advanced Logic Corp. TinyJ";
-    case EM_X86_64:	return "AMD x86-64";
+    case EM_X86_64:	*disasm = DISASM_CPU_IX86; return "AMD x86-64";
     case EM_PDSP:	return "Sony DSP Processor";
     case EM_PDP10:	return "DEC PDP-10";
     case EM_PDP11:	return "DEC PDP-11";
@@ -505,7 +506,7 @@ static const char *__NEAR__ __FASTCALL__ elf_machine(unsigned id)
     case EM_MMIX:	return "Donald Knuth's educational 64-bit processor";
     case EM_HUANY:	return "Harvard University machine-independent object files";
     case EM_PRISM:	return "SiTera Prism";
-    case EM_AVR:	return "Atmel AVR 8-bit";
+    case EM_AVR:	*disasm=DISASM_CPU_AVR; return "Atmel AVR 8-bit";
     case EM_FR30:	return "Fujitsu FR30";
     case EM_D10V:	return "Mitsubishi D10V";
     case EM_D30V:	return "Mitsubishi D30V";
@@ -603,7 +604,7 @@ static __filesize_t __FASTCALL__ ShowELFHeader( void )
   __filesize_t fpos;
   TWindow *w;
   char hdr[81];
-  unsigned keycode;
+  unsigned keycode,dummy;
   __filesize_t entrya;
   fpos = BMGetCurrFilePos();
   entrya = elfVA2PA(ELF_ADDR(ELF_EHDR(elf,e_entry)));
@@ -629,7 +630,7 @@ static __filesize_t __FASTCALL__ ShowELFHeader( void )
 	    ,ELF_EHDR(elf,e_ident[EI_OSABI]),	elf_osabi(ELF_EHDR(elf,e_ident[EI_OSABI]))
 	    ,ELF_EHDR(elf,e_ident[EI_ABIVERSION]),ELF_EHDR(elf,e_ident[EI_ABIVERSION])
 	    ,ELF_HALF(ELF_EHDR(elf,e_type)),	elf_otype(ELF_HALF(ELF_EHDR(elf,e_type)))
-	    ,ELF_HALF(ELF_EHDR(elf,e_machine)),	elf_machine(ELF_HALF(ELF_EHDR(elf,e_machine)))
+	    ,ELF_HALF(ELF_EHDR(elf,e_machine)),	elf_machine(ELF_HALF(ELF_EHDR(elf,e_machine)),&dummy)
 	    ,ELF_WORD(ELF_EHDR(elf,e_version)),	elf_version(ELF_WORD(ELF_EHDR(elf,e_version)))
   );
   twSetColorAttr(dialog_cset.entry);
@@ -1901,7 +1902,11 @@ static unsigned __FASTCALL__ elfGetObjAttr(__filesize_t pa,char *name,unsigned c
   return ret;
 }
 
-static int __FASTCALL__ ELFplatform( void ) { return DISASM_CPU_IX86; }
+static int __FASTCALL__ ELFplatform( void ) {
+    unsigned id;
+    elf_machine(ELF_HALF(ELF_EHDR(elf,e_machine)),&id);
+    return id;
+}
 
 REGISTRY_BIN elf386Table =
 {

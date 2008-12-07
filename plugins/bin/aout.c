@@ -55,15 +55,16 @@ static const char * __NEAR__ __FASTCALL__ aout_encode_hdr(unsigned long info)
    }
 }
 
-static const char * __NEAR__ __FASTCALL__ aout_encode_machine(unsigned long info)
+static const char * __NEAR__ __FASTCALL__ aout_encode_machine(unsigned long info,unsigned* id)
 {
+   *id=DISASM_DATA;
    switch(N_MACHTYPE(AOUT_WORD(&info)))
    {
      case 0: return "Old Sun-2";
-     case 1: return "M-68010";
-     case 2: return "M-68020";
+     case 1: return *id=DISASM_CPU_PPC; "M-68010";
+     case 2: return *id=DISASM_CPU_PPC; "M-68020";
      case 3: return "Sparc";
-     case 100: return "i386";
+     case 100: return *id=DISASM_CPU_IX86; "i386";
      case 151: return "MIPS1(R3000)";
      case 152: return "MIPS2(R6000)";
      default:  return "Unknown CPU";
@@ -74,7 +75,7 @@ static __filesize_t __FASTCALL__ ShowAOutHeader( void )
 {
   struct external_exec aout;
   __filesize_t fpos;
-  unsigned keycode;
+  unsigned keycode,dummy;
   TWindow *w;
   fpos = BMGetCurrFilePos();
   bmReadBufferEx(&aout,sizeof(struct external_exec),0,SEEKF_START);
@@ -85,7 +86,7 @@ static __filesize_t __FASTCALL__ ShowAOutHeader( void )
            "Length of data section      = %08lXH\n"
            "Length of bss area          = %08lXH\n"
            "Length of symbol table      = %08lXH\n"
-	   ,N_FLAGS(*((unsigned long *)&aout.e_info)),aout_encode_machine(*((unsigned long *)&aout.e_info)),is_msbf?"big-endian":"little-endian"
+	   ,N_FLAGS(*((unsigned long *)&aout.e_info)),aout_encode_machine(*((unsigned long *)&aout.e_info),&dummy),is_msbf?"big-endian":"little-endian"
            ,AOUT_WORD((unsigned long *)&aout.e_text)
            ,AOUT_WORD((unsigned long *)&aout.e_data)
            ,AOUT_WORD((unsigned long *)&aout.e_bss)
@@ -158,7 +159,13 @@ static __filesize_t __FASTCALL__ aout_help( void )
   return BMGetCurrFilePos();
 }
 
-static int __FASTCALL__ aout_platform( void ) { return DISASM_CPU_IX86; }
+static int __FASTCALL__ aout_platform( void ) {
+ unsigned id;
+ struct external_exec aout;
+ bmReadBufferEx(&aout,sizeof(struct external_exec),0,SEEKF_START);
+ aout_encode_machine(*((unsigned long *)&aout.e_info),&id);
+ return id;
+}
 
 REGISTRY_BIN aoutTable =
 {

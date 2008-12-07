@@ -154,6 +154,7 @@ static void __FASTCALL__ nulWriteIni( hIniProfile *ini )
 
 REGISTRY_DISASM Null_Disasm =
 {
+  DISASM_DATA,
   "~Data",
   { NULL, "Width ", NULL, NULL, NULL },
   { NULL, nulSelect_width, NULL, NULL, NULL },

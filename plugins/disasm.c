@@ -52,12 +52,12 @@ extern REGISTRY_DISASM Java_Disasm;
 
 static REGISTRY_DISASM *mainDisasmTable[] =
 {
-  &ix86_Disasm,
   &Null_Disasm,
+  &ix86_Disasm,
+  &Java_Disasm,
   &AVR_Disasm,
   &ARM_Disasm,
-  &PPC_Disasm,
-  &Java_Disasm
+  &PPC_Disasm
 };
 
 static unsigned DefDisasmSel = __DEFAULT_DISASM;
@@ -707,6 +707,7 @@ static void __FASTCALL__ disReadIni( hIniProfile *ini )
 
 static void __FASTCALL__ disInit( void )
 {
+  unsigned i;
   int def_platform;
   CurrStrLenBuff = PMalloc(tvioHeight);
   PrevStrLenAddr = PMalloc(tvioHeight*sizeof(long));
@@ -717,10 +718,17 @@ static void __FASTCALL__ disInit( void )
     MemOutBox("Disassembler initialization");
     exit(EXIT_FAILURE);
   }
-  def_platform = DISASM_DEFAULT;
+  def_platform = DISASM_DATA;
   if(detectedFormat->query_platform) def_platform = detectedFormat->query_platform();
-  if(def_platform != DISASM_DEFAULT) DefDisasmSel = def_platform;
-  activeDisasm = mainDisasmTable[DefDisasmSel];
+  activeDisasm = mainDisasmTable[0];
+  DefDisasmSel = DISASM_DATA;
+  for(i=0;i<sizeof(mainDisasmTable)/sizeof(REGISTRY_DISASM *);i++) {
+    if(mainDisasmTable[i]->type == def_platform) {
+	activeDisasm=mainDisasmTable[i];
+	DefDisasmSel = def_platform;
+	break;
+    }
+  }
   disAcceptActions();
   if(!initCodeGuider()) goto err;
 }

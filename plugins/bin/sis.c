@@ -68,7 +68,7 @@ static tBool  __FASTCALL__ sis_check_fmt( void )
 }
 static void __FASTCALL__ sis_init_fmt( void ) {}
 static void __FASTCALL__ sis_destroy_fmt(void) {}
-static int  __FASTCALL__ sis_platform( void) { return DISASM_DEFAULT; }
+static int  __FASTCALL__ sis_platform( void) { return DISASM_CPU_ARM; }
 
 static __filesize_t __FASTCALL__ Show_Sis3_Header( void )
 {

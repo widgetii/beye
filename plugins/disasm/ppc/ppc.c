@@ -1593,6 +1593,7 @@ static void __FASTCALL__ ppcWriteIni( hIniProfile *ini )
 
 REGISTRY_DISASM PPC_Disasm =
 {
+  DISASM_CPU_PPC,
   "AIM Power5+ ISA             [New,Experimental]",
   { "PpcHlp", "Bitnes", "Endian", NULL, NULL },
   { ppcAsmRef, ppcSelect_bitness, ppcSelect_endian, NULL, NULL },

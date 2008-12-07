@@ -245,6 +245,7 @@ static tBool __FASTCALL__ armSelect_endian( void )
 
 REGISTRY_DISASM ARM_Disasm =
 {
+  DISASM_CPU_ARM,
   "A~RMv5TE/XScale",
   { "ARMHlp", "Bitnes", "Endian", NULL, NULL },
   { armAsmRef, armSelect_bitness, armSelect_endian, NULL, NULL },

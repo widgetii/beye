@@ -31,12 +31,14 @@
 
 /** List of CPU platform. */
 
-#define DISASM_CPU_IX86          0  /**< indicates Intel-x86 disassembler */
-#define DISASM_DATA              1  /**< indicates data disassembler */
-#define DISASM_CPU_AVR           2  /**< indicates Atmel-AVR disassembler */
-#define DISASM_JAVA		 3  /**< indicates Java disassembler */
+#define DISASM_DATA		0  /**< indicates data disassembler */
+#define DISASM_CPU_IX86		1  /**< indicates Intel-x86 disassembler */
+#define DISASM_CPU_AVR		2  /**< indicates Atmel-AVR disassembler */
+#define DISASM_JAVA		3  /**< indicates Java disassembler */
+#define DISASM_CPU_ARM		4  /**< indicates ARM disassembler */
+#define DISASM_CPU_PPC		5  /**< indicates PowerPC disassembler */
                                     /* ... here may placed other constants!!! ... */
-#define DISASM_DEFAULT          -1  /**< indicates unspecified disassembler: format default */
+#define DISASM_DEFAULT		0  /**< indicates unspecified disassembler: format default */
 
 
 typedef tBool (__FASTCALL__ *DisasmAction)( void );
@@ -101,11 +103,12 @@ typedef AsmRet    (__FASTCALL__ *AsmFunc)(const char *str);
 
 typedef struct tag_REGISTRY_DISASM
 {
-  const char * name;         /**< disassembler name */
-  const char * prompt[5];    /**< prompt on Ctrl-(F1,F3-F5,F10) */
-  DisasmAction action[5];    /**< actions on Ctrl-(F1,F3-F5,F10) */
-  DisasmFunc   disasm;       /**< main function of disasm */
-  AsmFunc      asm_f;        /**< assembler (vice versa of disasm) */
+  unsigned     type;		/**< DISASM_XXX constant */
+  const char * name;		/**< disassembler name */
+  const char * prompt[5];	/**< prompt on Ctrl-(F1,F3-F5,F10) */
+  DisasmAction action[5];	/**< actions on Ctrl-(F1,F3-F5,F10) */
+  DisasmFunc   disasm;		/**< main function of disasm */
+  AsmFunc      asm_f;		/**< assembler (vice versa of disasm) */
   void         (__FASTCALL__ *ShowShortHelp)(void); /**< displays short help */
   int          (__FASTCALL__ *max_insn_len)(void); /**< Max length of 1 disasm instruction */
   ColorAttr    (__FASTCALL__ *GetInsnColor)(unsigned long clone); /**< returns color of instruction */
