@@ -1084,7 +1084,7 @@ static __filesize_t __FASTCALL__ ShowELFDynSec( void )
 }
 
 /***************************************************************************/
-/************************ RELOCATION FOR ELF386 ****************************/
+/************************ RELOCATION FOR ELF *******************************/
 /***************************************************************************/
 typedef struct tagElfRefChain
 {
@@ -1132,11 +1132,57 @@ static __filesize_t get_f_offset(__filesize_t r_offset,__filesize_t sh_link)
   return f_offset;
 }
 
+static void __elf_i386_read_erc(BGLOBAL handle2,Elf_Reloc *erc)
+{
+    switch(ELF32_R_TYPE(erc->info))
+    {
+      case R_386_GNU_8:
+      case R_386_GNU_PC8:
+               erc->addend = bioReadByte(handle2);
+               break;
+      case R_386_GNU_16:
+      case R_386_GNU_PC16:
+               erc->addend = bioReadWord(handle2);
+               break;
+      default:
+               erc->addend = bioReadDWord(handle2);
+               break;
+    }
+}
+
+static void __elf_x86_64_read_erc(BGLOBAL handle2,Elf_Reloc *erc) {
+    switch(ELF32_R_TYPE(erc->info))
+    {
+      case R_X86_64_8:
+      case R_X86_64_PC8:
+               erc->addend = bioReadByte(handle2);
+               break;
+      case R_X86_64_16:
+      case R_X86_64_PC16:
+               erc->addend = bioReadWord(handle2);
+               break;
+      case R_X86_64_32:
+      case R_X86_64_32S:
+      case R_X86_64_PC32:
+      case R_X86_64_GOT32:
+      case R_X86_64_PLT32:
+      case R_X86_64_DTPOFF32:
+      case R_X86_64_GOTTPOFF:
+      case R_X86_64_TPOFF32:
+      case R_X86_64_GOTPC32_TLSDESC:
+               erc->addend = bioReadDWord(handle2);
+               break;
+      default:
+               erc->addend = bioReadQWord(handle2);
+               break;
+    }
+}
+
 static void __NEAR__ __FASTCALL__ __elfReadRelSection(__filesize_t offset,
-            			                      __filesize_t size,
-            			                      __filesize_t sh_link,
-            			                      __filesize_t info,
-            			                      __filesize_t entsize)
+							__filesize_t size,
+							__filesize_t sh_link,
+							__filesize_t info,
+							__filesize_t entsize)
 {
   BGLOBAL handle = elfcache,handle2 = namecache;
   size_t i,nitems;
@@ -1159,32 +1205,24 @@ static void __NEAR__ __FASTCALL__ __elfReadRelSection(__filesize_t offset,
     /* Entries of type Elf32_Rel store an implicit addend in the
        location to be modified */
     bioSeek(handle2, erc.offset, SEEKF_START);
-    switch(ELF32_R_TYPE(erc.info))
+    switch(ELF_HALF(ELF_EHDR(elf,e_machine)))
     {
-      case R_386_GNU_8:
-      case R_386_GNU_PC8:
-               erc.addend = bioReadByte(handle2);
-               break;
-      case R_386_GNU_16:
-      case R_386_GNU_PC16:
-               erc.addend = bioReadWord(handle2);
-               break;
       default:
-               erc.addend = bioReadDWord(handle2);
-               break;
+      case EM_386: __elf_i386_read_erc(handle2,&erc); break;
+      case EM_X86_64: __elf_x86_64_read_erc(handle2,&erc); break;
     }
     erc.sh_idx = sh_link;
     if(!la_AddData(CurrElfChain,&erc,NULL)) break;
   }
   bioSeek(handle2,sfp,SEEKF_START);
   bioSeek(handle,fp,SEEKF_START);
-}						
+}
 
 static void __NEAR__ __FASTCALL__ __elfReadRelaSection(__filesize_t offset,
-            			                       __filesize_t size,
-            			                       __filesize_t sh_link,
-            			                       __filesize_t info,
-            			                       __filesize_t entsize)
+							__filesize_t size,
+							__filesize_t sh_link,
+							__filesize_t info,
+							__filesize_t entsize)
 {
   BGLOBAL handle = elfcache;
   size_t i,nitems;
@@ -1208,7 +1246,7 @@ static void __NEAR__ __FASTCALL__ __elfReadRelaSection(__filesize_t offset,
     if(!la_AddData(CurrElfChain,&erc,NULL)) break;
   }
   bioSeek(handle,fp,SEEKF_START);
-}						
+}
 
 static void __NEAR__ __FASTCALL__ buildElf386RelChain( void )
 {
@@ -1225,7 +1263,7 @@ static void __NEAR__ __FASTCALL__ buildElf386RelChain( void )
   twUseWin(usd);
   fp = bioTell(handle);
   if(IsSectionsPresent) /* Section headers are present */
-  {     
+  {
     bioSeek(handle,ELF_OFF(ELF_EHDR(elf,e_shoff)),SEEKF_START);
     _nitems = ELF_HALF(ELF_EHDR(elf,e_shnum));
     for(i = 0;i < _nitems;i++)
@@ -1252,7 +1290,7 @@ static void __NEAR__ __FASTCALL__ buildElf386RelChain( void )
                       break;
         default: break;
      }
-    } 
+    }
   }
   else if(ELF_HALF(ELF_EHDR(elf,e_type)) != ET_REL)
   {
@@ -1336,7 +1374,7 @@ static tBool __NEAR__ __FASTCALL__ __readRelocName(Elf_Reloc __HUGE__ *erl, char
      bioSeek(handle,ELF_OFF(ELF_SHDR(shdr,sh_offset)),SEEKF_START);
      /* Minor integrity test */
      ret = ELF_WORD(ELF_SHDR(shdr,sh_type)) == SHT_SYMTAB || ELF_WORD(ELF_SHDR(shdr,sh_type)) == SHT_DYNSYM;
-  }     
+  }
   else bioSeek(handle,erl->sh_idx,SEEKF_START);
   if(ret)
   {
@@ -1350,7 +1388,7 @@ static tBool __NEAR__ __FASTCALL__ __readRelocName(Elf_Reloc __HUGE__ *erl, char
       unsigned nitems;
       dynptr = findPHEntry(PT_DYNAMIC,&nitems);
       active_shtbl = elfVA2PA(findPHDynEntry(DT_STRTAB,dynptr,nitems));
-    }  
+    }
     bioSeek(handle,r_sym*ELF_SYM_SIZE(),SEEKF_CUR);
     bioReadBuffer(handle,&sym,sizeof(sym));
     elf386_readnametableex(ELF_WORD(ELF_SYM(sym,st_name)),buff,cbBuff);
@@ -1378,9 +1416,9 @@ static tBool __NEAR__ __FASTCALL__ __readRelocName(Elf_Reloc __HUGE__ *erl, char
   return ret;
 }
 
-static unsigned long __NEAR__ __FASTCALL__ BuildReferStrElf(char *str,
-                                                        Elf_Reloc __HUGE__ *erl,
-                                                        int flags)
+static unsigned long __NEAR__ __FASTCALL__ BuildReferStrElf_i386(char *str,
+							Elf_Reloc __HUGE__ *erl,
+							int flags)
 {
   unsigned long retval = RAPREF_DONE;
   tUInt32 r_type;
@@ -1459,6 +1497,115 @@ static unsigned long __NEAR__ __FASTCALL__ BuildReferStrElf(char *str,
     strcat(str,Get8Digit(erl->addend));
   }
   return retval;
+}
+
+static unsigned long __NEAR__ __FASTCALL__ BuildReferStrElf_x86_64(char *str,
+							Elf_Reloc __HUGE__ *erl,
+							int flags)
+{
+  unsigned long retval = RAPREF_DONE;
+  tUInt32 r_type;
+  tBool ret=False, use_addend = False;
+  char buff[300];
+  r_type = ELF32_R_TYPE(erl->info);
+  buff[0] = 0;
+  switch(r_type)
+  {
+    default:
+    case R_X86_64_NONE: /* nothing to do */
+    case R_X86_64_COPY: /* nothing to do */
+                   retval = RAPREF_NONE;
+                   break;
+    case R_X86_64_8:
+    case R_X86_64_16:
+    case R_X86_64_32:
+    case R_X86_64_64:  /* symbol + addendum */
+                   ret = __readRelocName(erl, buff, sizeof(buff));
+                   if(buff[0] && ret)
+                   {
+		     strcat(str,buff);
+		     use_addend = True;
+		   }
+                   else retval = RAPREF_NONE;
+		   break;
+    case R_X86_64_PC8:
+    case R_X86_64_PC16:
+    case R_X86_64_PC32:
+    case R_X86_64_PC64: /* symbol + addendum - this */
+                   ret = __readRelocName(erl, buff, sizeof(buff));
+                   if(buff[0] && ret)
+                   {
+		     strcat(str,buff);
+		     /* strcat(str,"-.here"); <- it's commented for readability */
+		     use_addend = True;
+		   }
+                   else retval = RAPREF_NONE;
+		   break;
+    case R_X86_64_GOT32:
+                   strcat(str,"GOT-");
+                   strcat(str,Get8Digit(erl->offset));
+		   use_addend = True;
+		   break;
+    case R_X86_64_GOT64:
+    case R_X86_64_GOTPC64:
+    case R_X86_64_GOTPLT64: /* GOT[offset] + addendum - this */
+                   strcat(str,"GOT-");
+                   strcat(str,Get16Digit(erl->offset));
+		   use_addend = True;
+		   break;
+    case R_X86_64_PLT32:
+                   strcat(str,"PLT-");
+                   strcat(str,Get8Digit(erl->offset));
+		   use_addend = True;
+		   break;
+    case R_X86_64_PLTOFF64: /* PLT[offset] + addendum - this */
+                   strcat(str,"PLT-");
+                   strcat(str,Get16Digit(erl->offset));
+		   use_addend = True;
+		   break;
+    case R_X86_64_GLOB_DAT:  /* symbol */
+    case R_X86_64_JUMP_SLOT:  /* symbol */
+                   ret = __readRelocName(erl, buff, sizeof(buff));
+                   if(buff[0] && ret) strcat(str,buff);
+		   break;
+    case R_X86_64_RELATIVE: /* BVA + addendum */
+                   strcat(str,"BVA");
+		   use_addend = True;
+		   break;
+    case R_X86_64_GOTOFF64: /* symbol + addendum - GOT */
+                   ret = __readRelocName(erl, buff, sizeof(buff));
+                   if(buff[0] && ret)
+                   {
+  		     strcat(str,buff);
+		     strcat(str,"-GOT");
+		     use_addend = True;
+		   }
+                   else retval = RAPREF_NONE;
+		   break;
+    case R_X86_64_GOTPCREL64: /* GOT + addendum - this */
+		   strcat(str,"GOT-.here");
+		   use_addend = True;
+		   break;
+  }
+  if(erl->addend && use_addend && ret &&
+     !(flags & APREF_TRY_LABEL)) /* <- it for readability */
+  {
+    strcat(str,"+");
+    strcat(str,Get8Digit(erl->addend));
+  }
+  return retval;
+}
+
+static unsigned long __NEAR__ __FASTCALL__ BuildReferStrElf(char *str,
+							Elf_Reloc __HUGE__ *erl,
+							int flags)
+{
+    switch(ELF_HALF(ELF_EHDR(elf,e_machine)))
+    {
+      default:
+      case EM_386: return BuildReferStrElf_i386(str,erl,flags);
+      case EM_X86_64: return BuildReferStrElf_x86_64(str,erl,flags);
+    }
 }
 
 #define S_INTERPRETER "Interpreter : "

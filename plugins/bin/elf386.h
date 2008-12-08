@@ -763,7 +763,6 @@ typedef struct
 #define R_68K_NUM	23
 
 /** Intel 80386 specific definitions.  */
-
 /** 386 relocs.  */
 
 #define R_386_NONE	0		/**< No reloc */
@@ -778,11 +777,51 @@ typedef struct
 #define R_386_GOTOFF	9		/**< 32 bit offset to GOT */
 #define R_386_GOTPC	10		/**< 32 bit PC relative offset to GOT */
 #define R_386_NUM	11
-#define R_386_GNU_16    20              /**< Direct 16 bit  */
-#define R_386_GNU_PC16  21              /**< PC relative 16 bit */
-#define R_386_GNU_8     22              /**< Direct 8 bit  */
-#define R_386_GNU_PC8   23              /**< PC relative 8 bit */
-#define R_386_GNU_max   24
+#define R_386_GNU_16	20		/**< Direct 16 bit  */
+#define R_386_GNU_PC16	21		/**< PC relative 16 bit */
+#define R_386_GNU_8	22		/**< Direct 8 bit  */
+#define R_386_GNU_PC8	23		/**< PC relative 8 bit */
+#define R_386_GNU_max	24
+
+/** AMD64 specific definitions */
+#define R_X86_64_NONE	0	/* No reloc */
+#define R_X86_64_64	1	/* Direct 64 bit  */
+#define R_X86_64_PC32	2	/* PC relative 32 bit signed */
+#define R_X86_64_GOT32	3	/* 32 bit GOT entry */
+#define R_X86_64_PLT32	4	/* 32 bit PLT address */
+#define R_X86_64_COPY	5	/* Copy symbol at runtime */
+#define R_X86_64_GLOB_DAT 6	/* Create GOT entry */
+#define R_X86_64_JUMP_SLOT 7	/* Create PLT entry */
+#define R_X86_64_RELATIVE 8	/* Adjust by program base */
+#define R_X86_64_GOTPCREL 9	/* 32 bit signed pc relative offset to GOT entry */
+#define R_X86_64_32	10	/* Direct 32 bit zero extended */
+#define R_X86_64_32S	11	/* Direct 32 bit sign extended */
+#define R_X86_64_16	12	/* Direct 16 bit zero extended */
+#define R_X86_64_PC16	13	/* 16 bit sign extended pc relative*/
+#define R_X86_64_8	14	/* Direct 8 bit sign extended */
+#define R_X86_64_PC8	15	/* 8 bit sign extended pc relative*/
+#define R_X86_64_DTPMOD64 16	/* ID of module containing symbol */
+#define R_X86_64_DTPOFF64 17	/* Offset in TLS block */
+#define R_X86_64_TPOFF64  18	/* Offset in initial TLS block */
+#define R_X86_64_TLSGD	19	/* PC relative offset to GD GOT block */
+#define R_X86_64_TLSLD	20	/* PC relative offset to LD GOT block */
+#define R_X86_64_DTPOFF32 21	/* Offset in TLS block */
+#define R_X86_64_GOTTPOFF 22	/* PC relative offset to IE GOT entry */
+#define R_X86_64_TPOFF32 23	/* Offset in initial TLS block */
+#define R_X86_64_PC64	24	/* PC relative 64 bit */
+#define R_X86_64_GOTOFF64 25	/* 64 bit offset to GOT */
+#define R_X86_64_GOTPC32 26	/* 32 bit signed pc relative offset to GOT */
+#define R_X86_64_GOT64	27	/* 64 bit GOT entry offset */
+#define R_X86_64_GOTPCREL64 28	/* 64 bit signed pc relative offset to GOT entry */
+#define R_X86_64_GOTPC64 29	/* 64 bit signed pc relative offset to GOT */
+#define R_X86_64_GOTPLT64 30	/* like GOT64, but indicates that PLT entry is needed */
+#define R_X86_64_PLTOFF64 31	/* 64 bit GOT relative offset to PLT entry */
+     /* 32 .. 33 */
+#define R_X86_64_GOTPC32_TLSDESC 34 /* 32 bit signed pc relative offset to TLS descriptor in the GOT.  */
+#define R_X86_64_TLSDESC_CALL 35 /* Relaxable call through TLS descriptor.  */
+#define R_X86_64_TLSDESC 36	/* 2x64-bit TLS descriptor.  */
+#define R_X86_64_GNU_VTINHERIT 250 /* GNU C++ hack  */
+#define R_X86_64_GNU_VTENTRY 251 /* GNU C++ hack  */
 
 
 /** SUN SPARC specific definitions.  */
