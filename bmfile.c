@@ -112,6 +112,11 @@ tUInt32  __FASTCALL__ BMReadDWord( void )
   return bioReadDWord(file);
 }
 
+tUInt64  __FASTCALL__ BMReadQWord( void )
+{
+  return bioReadQWord(file);
+}
+
 __filesize_t  __FASTCALL__ BMGetCurrFilePos( void )
 {
   return bioTell(file);
@@ -145,6 +150,12 @@ tUInt32  __FASTCALL__ BMReadDWordEx(__fileoff_t pos,int RELATION)
  return bioReadDWord(file);
 }
 
+tUInt64  __FASTCALL__ BMReadQWordEx(__fileoff_t pos,int RELATION)
+{
+ bioSeek(file,pos,RELATION);
+ return bioReadQWord(file);
+}
+
 tBool __FASTCALL__ BMReadBufferEx(void * buffer,unsigned len,__fileoff_t pos,int RELATION)
 {
  bioSeek(file,pos,RELATION);
@@ -164,6 +175,11 @@ tBool __FASTCALL__ BMWriteWord(tUInt16 word)
 tBool __FASTCALL__ BMWriteDWord(tUInt32 dword)
 {
   return bioWriteDWord(file,dword);
+}
+
+tBool __FASTCALL__ BMWriteQWord(tUInt64 dword)
+{
+  return bioWriteQWord(file,dword);
 }
 
 tBool __FASTCALL__ BMWriteBuff(void * buff,unsigned len)
@@ -190,6 +206,12 @@ tBool __FASTCALL__ BMWriteDWordEx(__fileoff_t pos,int RELATION,tUInt32 dword)
 {
   bioSeek(file,pos,RELATION);
   return bioWriteDWord(file,dword);
+}
+
+tBool __FASTCALL__ BMWriteQWordEx(__fileoff_t pos,int RELATION,tUInt64 dword)
+{
+  bioSeek(file,pos,RELATION);
+  return bioWriteQWord(file,dword);
 }
 
 tBool  __FASTCALL__ BMWriteBuffEx(__fileoff_t pos,int RELATION,void * buff,unsigned len)
@@ -243,6 +265,11 @@ tUInt32  __FASTCALL__ bmReadDWord( void )
   return bioReadDWord(sc_file);
 }
 
+tUInt64  __FASTCALL__ bmReadQWord( void )
+{
+  return bioReadQWord(sc_file);
+}
+
 __filesize_t  __FASTCALL__ bmGetCurrFilePos( void )
 {
   return bioTell(sc_file);
@@ -276,6 +303,12 @@ tUInt32 __FASTCALL__ bmReadDWordEx(__fileoff_t pos,int RELATION)
  return bioReadDWord(sc_file);
 }
 
+tUInt64 __FASTCALL__ bmReadQWordEx(__fileoff_t pos,int RELATION)
+{
+ bioSeek(sc_file,pos,RELATION);
+ return bioReadQWord(sc_file);
+}
+
 tBool __FASTCALL__ bmReadBufferEx(void * buffer,unsigned len,__fileoff_t pos,int RELATION)
 {
  bioSeek(sc_file,pos,RELATION);
@@ -295,6 +328,11 @@ tBool __FASTCALL__ bmWriteWord(tUInt16 word)
 tBool __FASTCALL__ bmWriteDWord(tUInt32 dword)
 {
   return bioWriteDWord(sc_file,dword);
+}
+
+tBool __FASTCALL__ bmWriteQWord(tUInt64 dword)
+{
+  return bioWriteQWord(sc_file,dword);
 }
 
 tBool __FASTCALL__ bmWriteBuff(void * buff,unsigned len)
@@ -321,6 +359,12 @@ tBool __FASTCALL__ bmWriteDWordEx(__fileoff_t pos,int RELATION,tUInt32 dword)
 {
   bioSeek(sc_file,pos,RELATION);
   return bioWriteDWord(sc_file,dword);
+}
+
+tBool __FASTCALL__ bmWriteQWordEx(__fileoff_t pos,int RELATION,tUInt64 dword)
+{
+  bioSeek(sc_file,pos,RELATION);
+  return bioWriteQWord(sc_file,dword);
 }
 
 tBool  __FASTCALL__ bmWriteBuffEx(__fileoff_t pos,int RELATION,void * buff,unsigned len)

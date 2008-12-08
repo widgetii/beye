@@ -181,6 +181,15 @@ tUInt16              __FASTCALL__ bioReadWord(BGLOBAL bioFile);
                     **/
 tUInt32              __FASTCALL__ bioReadDWord(BGLOBAL bioFile);
 
+                   /** Reads 8 bytes from stream.
+                     * @return                Readed double word
+                     * @param bioFile         handle of opened stream
+                     * @note                  Logical file position is
+                     *                        incremented after operation.
+                     * @see                   bioWriteDWord bioReadByte bioReadWord bioReadBuffer
+                    **/
+tUInt64              __FASTCALL__ bioReadQWord(BGLOBAL bioFile);
+
                    /** Reads specified number of bytes from stream.
                      * @return                True if operation was succesfully performed
                      * @param bioFile         handle of opened stream
@@ -258,6 +267,16 @@ tBool                 __FASTCALL__ bioWriteWord(BGLOBAL bioFile,tUInt16 wVal);
                      * @see                   bioReadDWord bioWriteWord bioWriteWord bioWriteBuffer
                     **/
 tBool                 __FASTCALL__ bioWriteDWord(BGLOBAL bioFile,tUInt32 dwVal);
+
+                   /** Writes 8 bytes to stream.
+                     * @return                True if operation was succesfully performed
+                     * @param bioFile         handle of opened stream
+                     * @param dwVal           Double word to be written
+                     * @note                  Logical file position is
+                     *                        incremented after operation.
+                     * @see                   bioReadDWord bioWriteWord bioWriteWord bioWriteBuffer
+                    **/
+tBool                 __FASTCALL__ bioWriteQWord(BGLOBAL bioFile,tUInt64 dwVal);
 
                    /** Writes specified number of bytes opened to stream.
                      * @return                True if operation was succesfully performed

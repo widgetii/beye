@@ -496,6 +496,19 @@ tUInt32 __FASTCALL__ bioReadDWord(BGLOBAL bioFile)
   return ret;
 }
 
+tUInt64 __FASTCALL__ bioReadQWord(BGLOBAL bioFile)
+{
+  BFILE  *obj = MK_FPTR(bioFile);
+  tUInt64 ret;
+  if(IS_CACHE_VALID(obj) || obj->is_mmf)
+  {
+    if(!__getbuff(obj,(void *)&ret,sizeof(tUInt64))) ret = -1;
+  }
+  else
+    if(__OsRead(obj->b.vfb.handle,&ret,sizeof(tUInt64)) != sizeof(tUInt64)) ret = -1;
+  return ret;
+}
+
 tBool __FASTCALL__  bioReadBuffer(BGLOBAL bioFile,void * buffer,unsigned cbBuffer)
 {
   BFILE  *obj = MK_FPTR(bioFile);
@@ -528,6 +541,14 @@ tBool __FASTCALL__  bioWriteDWord(BGLOBAL bioFile,tUInt32 dwVal)
   return IS_CACHE_VALID(obj) ?
              __putbuff(obj,(void *)&dwVal,sizeof(tUInt32)) :
              __OsWrite(obj->b.vfb.handle,&dwVal,sizeof(tUInt32)) == sizeof(tUInt32);
+}
+
+tBool __FASTCALL__  bioWriteQWord(BGLOBAL bioFile,tUInt64 dwVal)
+{
+  BFILE  *obj = MK_FPTR(bioFile);
+  return IS_CACHE_VALID(obj) ?
+             __putbuff(obj,(void *)&dwVal,sizeof(tUInt64)) :
+             __OsWrite(obj->b.vfb.handle,&dwVal,sizeof(tUInt64)) == sizeof(tUInt64);
 }
 
 tBool __FASTCALL__  bioWriteBuffer(BGLOBAL bioFile,const void * buffer,unsigned cbBuffer)
