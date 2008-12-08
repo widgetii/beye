@@ -32,19 +32,22 @@ typedef struct tagPEHEADER
   tUInt16   peCPUType;
   tUInt16   peObjects;
   tUInt32   peTimeDataStamp;
-  tUInt32   peReserv1;
-  tUInt32   peReserv2;
+  tUInt32   peCOFFSymTabOffset;
+  tUInt32   peCOFFNumOfSyms;
   tUInt16   peNTHdrSize;
   tUInt16   peFlags;
-  tUInt16   peReserv3;
+  tUInt16   peMagic; /* 0x10B - normal exe; 0x20b - PE32+; 0x107 - rom */
   tUInt8    peLMajor;
   tUInt8    peLMinor;
-  tUInt32   peReserv4;
-  tUInt32   peReserv5;
-  tUInt32   peReserv6;
+  tUInt32   peSizeOfText;
+  tUInt32   peSizeOfData;
+  tUInt32   peSizeOfBSS;
   tUInt32   peEntryPointRVA;
-  tUInt32   peReserv7;
-  tUInt32   peReserv8;
+  tUInt32   peBaseOfCode;
+}PEHEADER;
+
+typedef struct tagPE32HEADER {
+  tUInt32   peBaseOfData; /* missing in PE32+ */
   tUInt32   peImageBase;
   tUInt32   peObjectAlign;
   tUInt32   peFileAlign;
@@ -66,7 +69,31 @@ typedef struct tagPEHEADER
   tUInt32   peHeapCommitSize;
   tUInt32   peReserv10;
   tUInt32   peDirSize;
-}PEHEADER;
+}PE32HEADER;
+
+typedef struct tagPE32P_HEADER {
+  tUInt64   peImageBase;
+  tUInt32   peObjectAlign;
+  tUInt32   peFileAlign;
+  tUInt16   peOSMajor;
+  tUInt16   peOSMinor;
+  tUInt16   peUserMajor;
+  tUInt16   peUserMinor;
+  tUInt16   peSubSystMajor;
+  tUInt16   peSubSystMinor;
+  tUInt32   peReserv9;
+  tUInt32   peImageSize;
+  tUInt32   peHeaderSize;
+  tUInt32   peFileChecksum;
+  tUInt16   peSubSystem;
+  tUInt16   peDLLFlags;
+  tUInt64   peStackReserveSize;
+  tUInt64   peStackCommitSize;
+  tUInt64   peHeapReserveSize;
+  tUInt64   peHeapCommitSize;
+  tUInt32   peReserv10;
+  tUInt32   peDirSize;
+}PE32P_HEADER;
 
 typedef struct tagPERVA
 {

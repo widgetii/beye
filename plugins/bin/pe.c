@@ -41,9 +41,22 @@
 
 #define ARRAY_SIZE(x)       (sizeof(x)/sizeof(x[0]))
 
+static int is_64bit;
+
+typedef union {
+  PE32HEADER   pe32;
+  PE32P_HEADER pe32p;
+}PE32X_HEADER;
+
+#define PE32_HDR(e,FIELD) (is_64bit?(((PE32P_HEADER *)&e.pe32p)->FIELD):(((PE32HEADER *)&e.pe32)->FIELD))
+#define PE32_HDR_SIZE() (is_64bit?sizeof(PE32P_HEADER):sizeof(PE32HEADER))
+
 static PE_ADDR * peVA = NULL;
+static PE32X_HEADER pe32;
 static PEHEADER pe;
 static PERVA *peDir;
+
+#define PE_HDR_SIZE() (sizeof(PEHEADER) + PE32_HDR_SIZE())
 
 static BGLOBAL pe_cache = &bNull;
 static BGLOBAL pe_cache1 = &bNull;
@@ -75,8 +88,8 @@ static tBool __FASTCALL__ peLowMemFunc( unsigned long need_mem )
 static __filesize_t __NEAR__ __FASTCALL__ CalcPEObjectEntry(__fileoff_t offset)
 {
  __filesize_t intp;
- intp = offset / pe.peFileAlign;
- if(offset % pe.peFileAlign) offset = ( offset / intp ) * intp;
+ intp = offset / PE32_HDR(pe32,peFileAlign);
+ if(offset % PE32_HDR(pe32,peFileAlign)) offset = ( offset / intp ) * intp;
  return offset;
 }
 
@@ -181,8 +194,9 @@ static __fileoff_t overlayPE = -1L;
 
 static void __NEAR__ PaintNewHeaderPE_1( void )
 {
+  const char *fmt;
   entryPE = RVA2Phys(pe.peEntryPointRVA);
-  twPrintF("Signature                      = '%c%c'\n"
+  twPrintF("Signature                      = '%c%c' (Type: %04X)\n"
            "Required CPU Type              = %s\n"
            "Number of object entries       = %hu\n"
            "Time/Data Stamp                = %s"
@@ -200,7 +214,7 @@ static void __NEAR__ PaintNewHeaderPE_1( void )
            "    [%c] < System file >\n"
            "    [%c] Library image\n"
            "Linker version                 = %u.%02u\n"
-           ,pe.peSignature[0],pe.peSignature[1]
+           ,pe.peSignature[0],pe.peSignature[1],pe.peMagic
            ,PECPUType()
            ,pe.peObjects
            ,ctime((time_t *)&pe.peTimeDataStamp)
@@ -221,14 +235,20 @@ static void __NEAR__ PaintNewHeaderPE_1( void )
   twSetColorAttr(dialog_cset.entry);
   twPrintF("EntryPoint RVA    %s = %08lXH (Offset: %08lXH)",pe.peFlags & 0x2000 ? "[ LibEntry ]" : "[ EXEEntry ]",pe.peEntryPointRVA,entryPE); twClrEOL();
   twSetColorAttr(dialog_cset.main);
-  twPrintF("\nImage base                     = %08lXH\n"
-           "Object aligning                = %08lXH"
-           ,pe.peImageBase
-           ,pe.peObjectAlign);
+  if(is_64bit)
+    fmt = "\nImage base                   = %016lXH\n"
+          "Object aligning                = %08lXH";
+  else
+    fmt = "\nImage base                   = %08lXH\n"
+          "Object aligning                = %08lXH";
+  twPrintF(fmt
+           ,PE32_HDR(pe32,peImageBase)
+           ,PE32_HDR(pe32,peObjectAlign));
 }
 
 static void __NEAR__ PaintNewHeaderPE_2( void )
 {
+  const char *fmt;
   static const char * subSystem[] =
   {
     "Unknown",
@@ -248,10 +268,12 @@ static void __NEAR__ PaintNewHeaderPE_2( void )
     "X-Box",
   };
 
-  twPrintF("File align                     = %08lXH\n"
-           "OS version                     = %hu.%hu\n"
-           "User version                   = %hu.%hu\n"
-           "Subsystem version              = %hu.%hu\n"
+  twPrintF(
+           "Size of Text                   = %08lXH\n"
+           "Size of Data                   = %08lXH\n"
+           "Size of BSS                    = %08lXH\n"
+           "File align                     = %08lXH\n"
+           "OS/User/Subsystem version      = %hu.%hu/%hu.%hu/%hu.%hu\n"
            "Image size                     = %lu bytes\n"
            "Header size                    = %lu bytes\n"
            "File checksum                  = %08lXH\n"
@@ -261,29 +283,39 @@ static void __NEAR__ PaintNewHeaderPE_2( void )
            " [%c] Per-Process Library termination\n"
            " [%c] Per-Thread  Library initialization\n"
            " [%c] Per-Thread  Library termination\n"
+           "Number of directory entries    = %lu bytes\n"
+           ,pe.peSizeOfText
+           ,pe.peSizeOfData
+           ,pe.peSizeOfBSS
+           ,PE32_HDR(pe32,peFileAlign)
+           ,PE32_HDR(pe32,peOSMajor),PE32_HDR(pe32,peOSMinor),PE32_HDR(pe32,peUserMajor),PE32_HDR(pe32,peUserMinor),PE32_HDR(pe32,peSubSystMajor),PE32_HDR(pe32,peSubSystMinor)
+           ,PE32_HDR(pe32,peImageSize)
+           ,PE32_HDR(pe32,peHeaderSize)
+           ,PE32_HDR(pe32,peFileChecksum)
+           ,PE32_HDR(pe32,peSubSystem) < ARRAY_SIZE(subSystem) ? subSystem[PE32_HDR(pe32,peSubSystem)] : "Unknown"
+           ,PE32_HDR(pe32,peDLLFlags)
+           ,GetBool(PE32_HDR(pe32,peDLLFlags) & 0x0001)
+           ,GetBool(PE32_HDR(pe32,peDLLFlags) & 0x0002)
+           ,GetBool(PE32_HDR(pe32,peDLLFlags) & 0x0004)
+           ,GetBool(PE32_HDR(pe32,peDLLFlags) & 0x0008)
+           ,PE32_HDR(pe32,peDirSize));
+   if(is_64bit)
+    fmt=
+           "Stack reserve size             = %llu bytes\n"
+           "Stack commit size              = %llu bytes\n"
+           "Heap reserve size              = %llu bytes\n"
+           "Heap commit size               = %llu bytes";
+   else
+    fmt=
            "Stack reserve size             = %lu bytes\n"
            "Stack commit size              = %lu bytes\n"
            "Heap reserve size              = %lu bytes\n"
-           "Heap commit size               = %lu bytes\n"
-           "Number of directory entries    = %lu bytes"
-           ,pe.peFileAlign
-           ,pe.peOSMajor,pe.peOSMinor
-           ,pe.peUserMajor,pe.peUserMinor
-           ,pe.peSubSystMajor,pe.peSubSystMinor
-           ,pe.peImageSize
-           ,pe.peHeaderSize
-           ,pe.peFileChecksum
-           ,pe.peSubSystem < ARRAY_SIZE(subSystem) ? subSystem[pe.peSubSystem] : "Unknown"
-           ,pe.peDLLFlags
-           ,GetBool(pe.peDLLFlags & 0x0001)
-           ,GetBool(pe.peDLLFlags & 0x0002)
-           ,GetBool(pe.peDLLFlags & 0x0004)
-           ,GetBool(pe.peDLLFlags & 0x0008)
-           ,pe.peStackReserveSize
-           ,pe.peStackCommitSize
-           ,pe.peHeapReserveSize
-           ,pe.peHeapCommitSize
-           ,pe.peDirSize);
+           "Heap commit size               = %lu bytes";
+   twPrintF(fmt
+           ,PE32_HDR(pe32,peStackReserveSize)
+           ,PE32_HDR(pe32,peStackCommitSize)
+           ,PE32_HDR(pe32,peHeapReserveSize)
+           ,PE32_HDR(pe32,peHeapCommitSize));
   if (CalcOverlayOffset() != -1) {
     entryPE = overlayPE;
     twSetColorAttr(dialog_cset.entry);
@@ -411,7 +443,7 @@ static __fileoff_t __NEAR__ CalcOverlayOffset( void )
         int i;
 	for (i = 0; i < pe.peObjects; i++) {
 	  PE_OBJECT *o = (PE_OBJECT *)obj->data[i];
-	  __fileoff_t end = o->oPhysicalOffset + ((o->oPhysicalSize + (pe.peFileAlign - 1)) & ~(pe.peFileAlign - 1));
+	  __fileoff_t end = o->oPhysicalOffset + ((o->oPhysicalSize + (PE32_HDR(pe32,peFileAlign) - 1)) & ~(PE32_HDR(pe32,peFileAlign) - 1));
 	  if (overlayPE < end) {
 	    overlayPE = end;
 	  }
@@ -617,7 +649,7 @@ static inline void writeExportVA(__filesize_t va, BGLOBAL handle, char *buf, uns
         __peReadASCIIZName(handle, RVA2Phys(va), buf, bufsize);
     // normal export
     else
-    sprintf(buf, ".%08lX", (unsigned long)(va + pe.peImageBase));
+    sprintf(buf, ".%08lX", (unsigned long)(va + PE32_HDR(pe32,peImageBase)));
 }
 
 static tBool __FASTCALL__ PEExportReadItems(BGLOBAL handle,memArray * obj,unsigned nnames)
@@ -756,7 +788,7 @@ static tBool __FASTCALL__ PEReadRVAs(BGLOBAL handle, memArray * obj, unsigned nn
   };
   UNUSED(handle);
   UNUSED(nnames);
-  for (i=0; i<pe.peDirSize; i++)
+  for (i=0; i<PE32_HDR(pe32,peDirSize); i++)
   {
     char foo[80];
 
@@ -774,7 +806,7 @@ static tBool __FASTCALL__ PEReadRVAs(BGLOBAL handle, memArray * obj, unsigned nn
 static unsigned __FASTCALL__ PENumRVAs(BGLOBAL handle)
 {
   UNUSED(handle);
-  return pe.peDirSize;
+  return PE32_HDR(pe32,peDirSize);
 }
 
 static __filesize_t __FASTCALL__ ShowPERVAs( void )
@@ -990,7 +1022,7 @@ static __filesize_t __NEAR__ __FASTCALL__ BuildReferStrPE(char *str,RELOC_PE __H
      const char *pe_how;
      bioSeek(handle3,rpe->laddr,SEEKF_START);
      value = bioReadDWord(handle3);
-     delta = pe.peImageBase;
+     delta = PE32_HDR(pe32,peImageBase);
      point_to = 0;
      switch(rpe->import.type)
      {
@@ -1046,7 +1078,7 @@ static unsigned long __FASTCALL__ AppendPERef(char *str,__filesize_t ulShift,int
   if(peDir[PE_IMPORT].rva || peDir[PE_FIXUP].rva)
   {
     bioSeek(b_cache,
-            RVA2Phys(bmReadDWordEx(ulShift,SEEK_SET) - pe.peImageBase),
+            RVA2Phys(bmReadDWordEx(ulShift,SEEK_SET) - PE32_HDR(pe32,peImageBase)),
             SEEK_SET);
     rpe = __found_RPE(bioReadDWord(b_cache));
     if(!rpe) rpe = __found_RPE(ulShift);
@@ -1084,13 +1116,15 @@ static void __FASTCALL__ initPE( void )
    PMRegLowMemCallBack(peLowMemFunc);
 
    bmReadBufferEx(&pe,sizeof(PEHEADER),headshift,SEEKF_START);
+   is_64bit = pe.peMagic==0x20B?1:0;
+   bmReadBufferEx(&pe32,PE32_HDR_SIZE(),headshift+sizeof(PEHEADER),SEEKF_START);
 
-   if(!(peDir = PMalloc(sizeof(PERVA)*pe.peDirSize)))
+   if(!(peDir = PMalloc(sizeof(PERVA)*PE32_HDR(pe32,peDirSize))))
    {
      MemOutBox("PE initialization");
      exit(EXIT_FAILURE);
    }
-   bmReadBuffer(peDir, sizeof(PERVA)*pe.peDirSize);
+   bmReadBuffer(peDir, sizeof(PERVA)*PE32_HDR(pe32,peDirSize));
 
    if(!(peVA = PMalloc(sizeof(PE_ADDR)*pe.peObjects)))
    {
@@ -1151,7 +1185,7 @@ static tBool __FASTCALL__ peAddressResolv(char *addr,__filesize_t cfpos)
     it must be seriously optimized for speed. */
  tBool bret = True;
  tUInt32 res;
- if(cfpos >= headshift && cfpos < headshift + sizeof(PEHEADER) + pe.peDirSize*sizeof(PERVA))
+ if(cfpos >= headshift && cfpos < headshift + PE_HDR_SIZE() + PE32_HDR(pe32,peDirSize)*sizeof(PERVA))
  {
     strcpy(addr,"PEH :");
     strcpy(&addr[5],Get4Digit(cfpos - headshift));
@@ -1175,7 +1209,7 @@ static tBool __FASTCALL__ peAddressResolv(char *addr,__filesize_t cfpos)
 
 static __filesize_t __FASTCALL__ peVA2PA(__filesize_t va)
 {
-  return va >= pe.peImageBase ? RVA2Phys(va-pe.peImageBase) : 0L;
+  return va >= PE32_HDR(pe32,peImageBase) ? RVA2Phys(va-PE32_HDR(pe32,peImageBase)) : 0L;
 }
 
 static __filesize_t __FASTCALL__ pePA2VA(__filesize_t pa)
@@ -1193,7 +1227,7 @@ static __filesize_t __FASTCALL__ pePA2VA(__filesize_t pa)
     obj_pa = CalcPEObjectEntry(po.oPhysicalOffset);
     if(pa >= obj_pa && pa < obj_pa + po.oPhysicalSize)
     {
-      ret_addr = po.oRVA + (pa - obj_pa) + pe.peImageBase;
+      ret_addr = po.oRVA + (pa - obj_pa) + PE32_HDR(pe32,peImageBase);
       break;
     }
   }

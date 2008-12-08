@@ -60,13 +60,13 @@ static const char * __NEAR__ __FASTCALL__ aout_encode_machine(unsigned long info
    *id=DISASM_DATA;
    switch(N_MACHTYPE(AOUT_WORD(&info)))
    {
-     case 0: return "Old Sun-2";
-     case 1: return *id=DISASM_CPU_PPC; "M-68010";
-     case 2: return *id=DISASM_CPU_PPC; "M-68020";
-     case 3: return "Sparc";
-     case 100: return *id=DISASM_CPU_IX86; "i386";
-     case 151: return "MIPS1(R3000)";
-     case 152: return "MIPS2(R6000)";
+     case 0: *id=DISASM_CPU_SPARC; return "Old Sun-2";
+     case 1: *id=DISASM_CPU_PPC; return "M-68010";
+     case 2: *id=DISASM_CPU_PPC; return "M-68020";
+     case 3: *id=DISASM_CPU_SPARC; return "Sparc";
+     case 100: *id=DISASM_CPU_IX86; return "i386";
+     case 151: *id=DISASM_CPU_MIPS; return "MIPS1(R3000)";
+     case 152: *id=DISASM_CPU_MIPS; return "MIPS2(R6000)";
      default:  return "Unknown CPU";
    }
 }
