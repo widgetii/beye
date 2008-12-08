@@ -1169,7 +1169,7 @@ v5.0.2        ! Changes:
 		* Fixed bug #1696442 (-extraincdir and -extralibdir can only handle one extra lib.)
 		* Added endian selection in hexmode viewer
 5.7.0         ! Changes:
-XX yyy 2007     * Fixes by Daniel Borca <dborca@yahoo.com>:
+XX yyy 2008     * Fixes by Daniel Borca <dborca@yahoo.com>:
 		  * unix/vio.c use the correct alternate set for line drawing.
 		    see http://www.in-ulm.de/~mascheck/various/alternate_charset/
 		  * configure: accept linux and Linux from uname. i?86 is really ia32.
@@ -1183,10 +1183,17 @@ XX yyy 2007     * Fixes by Daniel Borca <dborca@yahoo.com>:
 		    SIGIO is hooked as event handler. I think it's harmless to just or maybe
 		    block SIGIO events until we are finished setting up the keyboard.
                 + Assembling through the nasm/yasm. Patch by <mauro.giachero@gmail.com>
-		+ New opcodes (SSSE3, SSE4.1, SSE4.2) in x86 disassembler.
+		+ New opcodes (SSSE3, SSE4.1, SSE4.2, SSE4a) in x86 disassembler.
 		+ Provide alternative insns hilighting in ix86-32 disassembler.
 		* Fixed bug of repainting in hexmode when up_arrow key pressed
 		  and filepos == 0.
+		* Fixed REX handling in x86_64 disassembler
+		* Fixed CPU information dialog
+		+ New disassemblers:
+		  + ARM32 / XScale
+		  + AIM Power5+ ISA
+		+ Added support for PE32+ file format.
+		* Many other improvements and fixes.
 []======================================================================[]
 []  Thank you for your interest.                                        []
 []  Nick Kurshev (http://my666.boom.ru/666_en.html).                    []
