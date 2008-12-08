@@ -38,6 +38,13 @@
 #define DISASM_CPU_ARM		4  /**< indicates ARM disassembler */
 #define DISASM_CPU_PPC		5  /**< indicates PowerPC disassembler */
                                     /* ... here may placed other constants!!! ... */
+#define DISASM_CPU_IA64		6  /**< indicates Itanium disassembler */
+#define DISASM_CPU_ALPHA	7  /**< indicates DEC Alpha disassembler */
+#define DISASM_CPU_MIPS		8  /**< indicates MIPS disassembler */
+#define DISASM_CPU_SPARC	9  /**< indicates SUN Sparc disassembler */
+#define DISASM_CPU_SH		10 /**< indicates Hitachi SH disassembler */
+#define DISASM_CPU_CRAY		11 /**< indicates Cray disassembler */
+                                    /* ... here may placed other constants!!! ... */
 #define DISASM_DEFAULT		0  /**< indicates unspecified disassembler: format default */
 
 

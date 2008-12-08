@@ -1133,7 +1133,8 @@ static int __FASTCALL__ bitnessPE(__filesize_t off)
 {
    if(off >= headshift)
    {
-     return (pe.peFlags & 0x0040) ? DAB_USE16 : DAB_USE32;
+     return (pe.peFlags & 0x0040) ? DAB_USE16 :
+	    (pe.peFlags & 0x0100) ? DAB_USE32 : DAB_USE64;
    }
    else return DAB_USE16;
 }
@@ -1285,7 +1286,36 @@ static unsigned __FASTCALL__ peGetObjAttr(__filesize_t pa,char *name,unsigned cb
   return ret;
 }
 
-static int __FASTCALL__ pePlatform( void ) { return DISASM_CPU_IX86; }
+static int __FASTCALL__ pePlatform( void ) {
+    unsigned id;
+    switch(pe.peCPUType) {
+	case 0x8664: /*AMD64*/
+	case 0x014C:
+	case 0x014D:
+	case 0x014E:
+	case 0x014F: id = DISASM_CPU_IX86; break;
+	case 0x01C0:
+	case 0x01C2: id = DISASM_CPU_ARM; break;
+	case 0x01F0:
+	case 0x01F1: id = DISASM_CPU_PPC; break;
+	case 0x0162:
+	case 0x0166:
+	case 0x0168:
+	case 0x0169:
+	case 0x0266:
+	case 0x0366:
+	case 0x0466: id = DISASM_CPU_MIPS; break;
+	case 0x01A2:
+	case 0x01A3:
+	case 0x01A4:
+	case 0x01A6:
+	case 0x01A8: id = DISASM_CPU_SH; break;
+	case 0x0200: id = DISASM_CPU_IA64; break;
+	case 0x0284: id = DISASM_CPU_ALPHA; break;
+	default: id = DISASM_DATA; break;
+    }
+    return id;
+}
 
 REGISTRY_BIN peTable =
 {
