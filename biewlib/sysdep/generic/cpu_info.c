@@ -22,6 +22,6 @@
 void __FillCPUInfo(char *buff,unsigned cbBuff,void (*func)(int))
 {
   (*func)(100);
-  sprintf(buff,"\n\n\n\n\n\n    CPU information is not available in this build\n");
+  sprintf(buff,"\n\n\n\n\n\n    CPU information is not available in generic build\n");
   buff[cbBuff-1] = '\0';
 }
