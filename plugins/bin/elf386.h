@@ -762,6 +762,151 @@ typedef struct
 #define R_68K_RELATIVE	22		/**< Adjust by program base */
 #define R_68K_NUM	23
 
+
+/* PowerPC related declarations */
+#define R_PPC_NONE		  0
+#define R_PPC_ADDR32		  1
+#define R_PPC_ADDR24		  2
+#define R_PPC_ADDR16		  3
+#define R_PPC_ADDR16_LO		  4
+#define R_PPC_ADDR16_HI		  5
+#define R_PPC_ADDR16_HA		  6
+#define R_PPC_ADDR14		  7
+#define R_PPC_ADDR14_BRTAKEN	  8
+#define R_PPC_ADDR14_BRNTAKEN	  9
+#define R_PPC_REL24		 10
+#define R_PPC_REL14		 11
+#define R_PPC_REL14_BRTAKEN	 12
+#define R_PPC_REL14_BRNTAKEN	 13
+#define R_PPC_GOT16		 14
+#define R_PPC_GOT16_LO		 15
+#define R_PPC_GOT16_HI		 16
+#define R_PPC_GOT16_HA		 17
+#define R_PPC_PLTREL24		 18
+#define R_PPC_COPY		 19
+#define R_PPC_GLOB_DAT		 20
+#define R_PPC_JMP_SLOT		 21
+#define R_PPC_RELATIVE		 22
+#define R_PPC_LOCAL24PC		 23
+#define R_PPC_UADDR32		 24
+#define R_PPC_UADDR16		 25
+#define R_PPC_REL32		 26
+#define R_PPC_PLT32		 27
+#define R_PPC_PLTREL32		 28
+#define R_PPC_PLT16_LO		 29
+#define R_PPC_PLT16_HI		 30
+#define R_PPC_PLT16_HA		 31
+#define R_PPC_SDAREL16		 32
+#define R_PPC_SECTOFF		 33
+#define R_PPC_SECTOFF_LO	 34
+#define R_PPC_SECTOFF_HI	 35
+#define R_PPC_SECTOFF_HA	 36
+#define R_PPC_ADDR30		 37
+
+#define R_PPC64_ADDR64		 38
+#define R_PPC64_ADDR16_HIGHER	 39
+#define R_PPC64_ADDR16_HIGHERA	 40
+#define R_PPC64_ADDR16_HIGHEST	 41
+#define R_PPC64_ADDR16_HIGHESTA  42
+#define R_PPC64_UADDR64		 43
+#define R_PPC64_REL64		 44
+#define R_PPC64_PLT64		 45
+#define R_PPC64_PLTREL64	 46
+#define R_PPC64_TOC16		 47
+#define R_PPC64_TOC16_LO	 48
+#define R_PPC64_TOC16_HI	 49
+#define R_PPC64_TOC16_HA	 50
+#define R_PPC64_TOC		 51
+#define R_PPC64_PLTGOT16	 52
+#define R_PPC64_PLTGOT16_LO	 53
+#define R_PPC64_PLTGOT16_HI	 54
+#define R_PPC64_PLTGOT16_HA	 55
+
+  /* The following relocs were added in the 64-bit PowerPC ELF ABI
+     revision 1.2. */
+#define R_PPC64_ADDR16_DS	 56
+#define R_PPC64_ADDR16_LO_DS	 57
+#define R_PPC64_GOT16_DS	 58
+#define R_PPC64_GOT16_LO_DS	 59
+#define R_PPC64_PLT16_LO_DS	 60
+#define R_PPC64_SECTOFF_DS	 61
+#define R_PPC64_SECTOFF_LO_DS	 62
+#define R_PPC64_TOC16_DS	 63
+#define R_PPC64_TOC16_LO_DS	 64
+#define R_PPC64_PLTGOT16_DS	 65
+#define R_PPC64_PLTGOT16_LO_DS	 66
+
+  /* Relocs added to support TLS.  */
+#define R_PPC_TLS		 67
+#define R_PPC_DTPMOD32		 68
+#define R_PPC_TPREL16		 69
+#define R_PPC_TPREL16_LO	 70
+#define R_PPC_TPREL16_HI	 71
+#define R_PPC_TPREL16_HA	 72
+#define R_PPC_TPREL32		 73
+#define R_PPC_DTPREL16		 74
+#define R_PPC_DTPREL16_LO	 75
+#define R_PPC_DTPREL16_HI	 76
+#define R_PPC_DTPREL16_HA	 77
+#define R_PPC_DTPREL32		 78
+#define R_PPC_GOT_TLSGD16	 79
+#define R_PPC_GOT_TLSGD16_LO	 80
+#define R_PPC_GOT_TLSGD16_HI	 81
+#define R_PPC_GOT_TLSGD16_HA	 82
+#define R_PPC_GOT_TLSLD16	 83
+#define R_PPC_GOT_TLSLD16_LO	 84
+#define R_PPC_GOT_TLSLD16_HI	 85
+#define R_PPC_GOT_TLSLD16_HA	 86
+#define R_PPC_GOT_TPREL16	 87
+#define R_PPC_GOT_TPREL16_LO	 88
+#define R_PPC_GOT_TPREL16_HI	 89
+#define R_PPC_GOT_TPREL16_HA	 90
+#define R_PPC_GOT_DTPREL16	 91
+#define R_PPC_GOT_DTPREL16_LO	 92
+#define R_PPC_GOT_DTPREL16_HI	 93
+#define R_PPC_GOT_DTPREL16_HA	 94
+
+/* The remaining relocs are from the Embedded ELF ABI and are not
+   in the SVR4 ELF ABI.  */
+#define R_PPC_EMB_NADDR32	101
+#define R_PPC_EMB_NADDR16	102
+#define R_PPC_EMB_NADDR16_LO	103
+#define R_PPC_EMB_NADDR16_HI	104
+#define R_PPC_EMB_NADDR16_HA	105
+#define R_PPC_EMB_SDAI16	106
+#define R_PPC_EMB_SDA2I16	107
+#define R_PPC_EMB_SDA2REL	108
+#define R_PPC_EMB_SDA21		109
+#define R_PPC_EMB_MRKREF	110
+#define R_PPC_EMB_RELSEC16	111
+#define R_PPC_EMB_RELST_LO	112
+#define R_PPC_EMB_RELST_HI	113
+#define R_PPC_EMB_RELST_HA	114
+#define R_PPC_EMB_BIT_FLD	115
+#define R_PPC_EMB_RELSDA	116
+
+/* Fake relocations for branch stubs only used internally by ld.  */
+#define R_PPC_RELAX32		245
+#define R_PPC_RELAX32PC		246
+#define R_PPC_RELAX32_PLT	247
+#define R_PPC_RELAX32PC_PLT	248
+
+/* These are GNU extensions used in PIC code sequences.  */
+#define R_PPC_REL16		249
+#define R_PPC_REL16_LO		250
+#define R_PPC_REL16_HI		251
+#define R_PPC_REL16_HA		252
+
+/* These are GNU extensions to enable C++ vtable garbage collection.  */
+#define R_PPC_GNU_VTINHERIT	253
+#define R_PPC_GNU_VTENTRY	254
+
+/* This is a phony reloc to handle any old fashioned TOC16 references
+   that may still be in object files.  */
+#define R_PPC_TOC16		255
+
+
+
 /** Intel 80386 specific definitions.  */
 /** 386 relocs.  */
 
@@ -1039,6 +1184,130 @@ typedef struct
 #define R_ALPHA_JMP_SLOT	26	/**< Create PLT entry */
 #define R_ALPHA_RELATIVE	27	/**< Adjust by program base */
 #define R_ALPHA_NUM		28
+
+/* ARM soecific declaratoins */
+#define R_ARM_NONE		  0
+#define R_ARM_PC24		  1   /* deprecated */
+#define R_ARM_ABS32		  2
+#define R_ARM_REL32		  3
+#define R_ARM_LDR_PC_G0		  4
+#define R_ARM_ABS16		  5
+#define R_ARM_ABS12		  6
+#define R_ARM_THM_ABS5		  7
+#define R_ARM_ABS8		  8
+#define R_ARM_SBREL32		  9
+#define R_ARM_THM_CALL		 10
+#define R_ARM_THM_PC8		 11
+#define R_ARM_BREL_ADJ		 12
+#define R_ARM_SWI24		 13   /* obsolete */
+#define R_ARM_THM_SWI8		 14   /* obsolete */
+#define R_ARM_XPC25		 15   /* obsolete */
+#define R_ARM_THM_XPC22		 16   /* obsolete */
+#define R_ARM_TLS_DTPMOD32	 17
+#define R_ARM_TLS_DTPOFF32	 18
+#define R_ARM_TLS_TPOFF32	 19
+#define R_ARM_COPY		 20   /* Copy symbol at runtime.  */
+#define R_ARM_GLOB_DAT		 21   /* Create GOT entry.  */
+#define R_ARM_JUMP_SLOT		 22   /* Create PLT entry.  */
+#define R_ARM_RELATIVE		 23   /* Adjust by program base.  */
+#define R_ARM_GOTOFF32		 24   /* 32 bit offset to GOT.  */
+#define R_ARM_BASE_PREL		 25   /* 32 bit PC relative offset to GOT.  */
+#define R_ARM_GOT_BREL		 26   /* 32 bit GOT entry.  */
+#define R_ARM_PLT32		 27   /* deprecated - 32 bit PLT address.  */
+#define R_ARM_CALL		 28
+#define R_ARM_JUMP24		 29
+#define R_ARM_THM_JUMP24	 30
+#define R_ARM_BASE_ABS		 31
+#define R_ARM_ALU_PCREL7_0	 32   /* obsolete */
+#define R_ARM_ALU_PCREL15_8	 33   /* obsolete */
+#define R_ARM_ALU_PCREL23_15	 34   /* obsolete */
+#define R_ARM_LDR_SBREL_11_0	 35   /* deprecated should have _NC suffix */
+#define R_ARM_ALU_SBREL_19_12	 36   /* deprecated should have _NC suffix */
+#define R_ARM_ALU_SBREL_27_20	 37   /* deprecated should have _CK suffix */
+#define R_ARM_TARGET1		 38
+#define R_ARM_SBREL31		 39   /* deprecated */
+#define R_ARM_V4BX		 40
+#define R_ARM_TARGET2		 41
+#define R_ARM_PREL31		 42
+#define R_ARM_MOVW_ABS_NC	 43
+#define R_ARM_MOVT_ABS		 44
+#define R_ARM_MOVW_PREL_NC	 45
+#define R_ARM_MOVT_PREL		 46
+#define R_ARM_THM_MOVW_ABS_NC	 47
+#define R_ARM_THM_MOVT_ABS	 48
+#define R_ARM_THM_MOVW_PREL_NC	 49
+#define R_ARM_THM_MOVT_PREL	 50
+#define R_ARM_THM_JUMP19	 51
+#define R_ARM_THM_JUMP6		 52
+#define R_ARM_THM_ALU_PREL_11_0 53
+#define R_ARM_THM_PC12		 54
+#define R_ARM_ABS32_NOI		 55
+#define R_ARM_REL32_NOI		 56
+#define R_ARM_ALU_PC_G0_NC	 57
+#define R_ARM_ALU_PC_G0		 58
+#define R_ARM_ALU_PC_G1_NC	 59
+#define R_ARM_ALU_PC_G1		 60
+#define R_ARM_ALU_PC_G2		 61
+#define R_ARM_LDR_PC_G1		 62
+#define R_ARM_LDR_PC_G2		 63
+#define R_ARM_LDRS_PC_G0	 64
+#define R_ARM_LDRS_PC_G1	 65
+#define R_ARM_LDRS_PC_G2	 66
+#define R_ARM_LDC_PC_G0		 67
+#define R_ARM_LDC_PC_G1		 68
+#define R_ARM_LDC_PC_G2		 69
+#define R_ARM_ALU_SB_G0_NC	 70
+#define R_ARM_ALU_SB_G0		 71
+#define R_ARM_ALU_SB_G1_NC	 72
+#define R_ARM_ALU_SB_G1		 73
+#define R_ARM_ALU_SB_G2		 74
+#define R_ARM_LDR_SB_G0		 75
+#define R_ARM_LDR_SB_G1		 76
+#define R_ARM_LDR_SB_G2		 77
+#define R_ARM_LDRS_SB_G0	 78
+#define R_ARM_LDRS_SB_G1	 79
+#define R_ARM_LDRS_SB_G2	 80
+#define R_ARM_LDC_SB_G0		 81
+#define R_ARM_LDC_SB_G1		 82
+#define R_ARM_LDC_SB_G2		 83
+#define R_ARM_MOVW_BREL_NC	 84
+#define R_ARM_MOVT_BREL		 85
+#define R_ARM_MOVW_BREL		 86
+#define R_ARM_THM_MOVW_BREL_NC	 87
+#define R_ARM_THM_MOVT_BREL	 88
+#define R_ARM_THM_MOVW_BREL	 89
+  /* 90-93 unallocated */
+#define R_ARM_PLT32_ABS		 94
+#define R_ARM_GOT_ABS		 95
+#define R_ARM_GOT_PREL		 96
+#define R_ARM_GOT_BREL12	 97
+#define R_ARM_GOTOFF12		 98
+#define R_ARM_GOTRELAX		 99
+#define R_ARM_GNU_VTENTRY	100   /* deprecated - old C++ abi */
+#define R_ARM_GNU_VTINHERIT	101   /* deprecated - old C++ abi */
+#define R_ARM_THM_JUMP11	102
+#define R_ARM_THM_JUMP8		103
+#define R_ARM_TLS_GD32		104
+#define R_ARM_TLS_LDM32		105
+#define R_ARM_TLS_LDO32		106
+#define R_ARM_TLS_IE32		107
+#define R_ARM_TLS_LE32		108
+#define R_ARM_TLS_LDO12		109
+#define R_ARM_TLS_LE12		110
+#define R_ARM_TLS_IE12GP	111
+  /* 112 - 127 private range */
+#define R_ARM_ME_TOO		128   /* obsolete */
+
+  /* Extensions?  R=read-only?  */
+#define R_ARM_RXPC25		249
+#define R_ARM_RSBREL32		250
+#define R_ARM_THM_RPC22		251
+#define R_ARM_RREL32		252
+#define R_ARM_RABS32		253
+#define R_ARM_RPC24		254
+#define R_ARM_RBASE		255
+
+
 
 #ifdef __HAVE_PRAGMA_PACK__
 #pragma pack()

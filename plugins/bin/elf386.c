@@ -1132,6 +1132,59 @@ static __filesize_t get_f_offset(__filesize_t r_offset,__filesize_t sh_link)
   return f_offset;
 }
 
+#define bioRead30(handle2) (bioReadDWord(handle2)&0x3FFFFFFFUL)
+#define bioRead25(handle2) (bioReadDWord(handle2)&0x01FFFFFFUL)
+#define bioRead24(handle2) (bioReadDWord(handle2)&0x00FFFFFFUL)
+#define bioRead22(handle2) (bioReadDWord(handle2)&0x003FFFFFUL)
+#define bioRead19(handle2) (bioReadDWord(handle2)&0x0007FFFFUL)
+#define bioRead12(handle2) (bioReadWord(handle2)&0x0FFFUL)
+
+static void __elf_arm_read_erc(BGLOBAL handle2,Elf_Reloc *erc)
+{
+    switch(ELF32_R_TYPE(erc->info))
+    {
+      case R_ARM_THM_JUMP6:
+      case R_ARM_THM_PC8:
+      case R_ARM_ABS8:
+      case R_ARM_THM_JUMP8:
+               erc->addend = bioReadByte(handle2);
+               break;
+      case R_ARM_THM_JUMP11:
+      case R_ARM_GOT_BREL12:
+      case R_ARM_GOTOFF12:
+      case R_ARM_TLS_LDO12:
+      case R_ARM_TLS_LE12:
+      case R_ARM_TLS_IE12GP:
+      case R_ARM_ABS12:
+      case R_ARM_THM_PC12:
+               erc->addend = bioRead12(handle2);
+               break;
+      case R_ARM_ABS16:
+               erc->addend = bioReadWord(handle2);
+               break;
+      case R_ARM_THM_JUMP19:
+               erc->addend = bioRead19(handle2);
+               break;
+      case R_ARM_THM_XPC22:
+      case R_ARM_THM_RPC22:
+               erc->addend = bioRead22(handle2);
+               break;
+      case R_ARM_SWI24:
+      case R_ARM_JUMP24:
+      case R_ARM_THM_JUMP24:
+      case R_ARM_RPC24:
+               erc->addend = bioRead24(handle2);
+               break;
+      case R_ARM_XPC25:
+      case R_ARM_RXPC25:
+               erc->addend = bioRead25(handle2);
+               break;
+      default:
+               erc->addend = bioReadDWord(handle2);
+               break;
+    }
+}
+
 static void __elf_i386_read_erc(BGLOBAL handle2,Elf_Reloc *erc)
 {
     switch(ELF32_R_TYPE(erc->info))
@@ -1178,6 +1231,67 @@ static void __elf_x86_64_read_erc(BGLOBAL handle2,Elf_Reloc *erc) {
     }
 }
 
+static void __elf_ppc_read_erc(BGLOBAL handle2,Elf_Reloc *erc)
+{
+    switch(ELF32_R_TYPE(erc->info))
+    {
+      case R_ARM_THM_JUMP6:
+      case R_ARM_THM_PC8:
+      case R_ARM_ABS8:
+      case R_ARM_THM_JUMP8:
+               erc->addend = bioReadByte(handle2);
+               break;
+      case R_ARM_THM_JUMP11:
+      case R_ARM_GOT_BREL12:
+      case R_ARM_GOTOFF12:
+      case R_ARM_TLS_LDO12:
+      case R_ARM_TLS_LE12:
+      case R_ARM_TLS_IE12GP:
+      case R_ARM_ABS12:
+      case R_ARM_THM_PC12:
+               erc->addend = bioRead12(handle2);
+               break;
+      default:
+               erc->addend = bioReadWord(handle2);
+               break;
+      case R_PPC_ADDR24:
+      case R_PPC_REL24:
+      case R_PPC_PLTREL24:
+      case R_PPC_LOCAL24PC:
+               erc->addend = bioRead24(handle2);
+               break;
+      case R_PPC_ADDR32:
+      case R_PPC_GLOB_DAT:
+      case R_PPC_JMP_SLOT:
+      case R_PPC_RELATIVE:
+      case R_PPC_UADDR32:
+      case R_PPC_REL32:
+      case R_PPC_PLT32:
+      case R_PPC_PLTREL32:
+      case R_PPC_ADDR30:
+      case R_PPC_DTPMOD32:
+      case R_PPC_TPREL32:
+      case R_PPC_DTPREL32:
+      case R_PPC_EMB_NADDR32:
+      case R_PPC_RELAX32:
+      case R_PPC_RELAX32PC:
+      case R_PPC_RELAX32_PLT:
+      case R_PPC_RELAX32PC_PLT:
+      case R_PPC_GNU_VTINHERIT:
+      case R_PPC_GNU_VTENTRY:
+               erc->addend = bioReadDWord(handle2);
+               break;
+      case R_PPC64_ADDR64:
+      case R_PPC64_UADDR64:
+      case R_PPC64_REL64:
+      case R_PPC64_PLT64:
+      case R_PPC64_PLTREL64:
+      case R_PPC64_TOC:
+               erc->addend = bioReadQWord(handle2);
+               break;
+    }
+}
+
 static void __NEAR__ __FASTCALL__ __elfReadRelSection(__filesize_t offset,
 							__filesize_t size,
 							__filesize_t sh_link,
@@ -1207,9 +1321,12 @@ static void __NEAR__ __FASTCALL__ __elfReadRelSection(__filesize_t offset,
     bioSeek(handle2, erc.offset, SEEKF_START);
     switch(ELF_HALF(ELF_EHDR(elf,e_machine)))
     {
-      default:
+      default: erc.addend = 0;
+      case EM_ARM: __elf_arm_read_erc(handle2,&erc); break;
       case EM_386: __elf_i386_read_erc(handle2,&erc); break;
       case EM_X86_64: __elf_x86_64_read_erc(handle2,&erc); break;
+      case EM_PPC:
+      case EM_PPC64: __elf_ppc_read_erc(handle2,&erc); break;
     }
     erc.sh_idx = sh_link;
     if(!la_AddData(CurrElfChain,&erc,NULL)) break;
@@ -1416,6 +1533,82 @@ static tBool __NEAR__ __FASTCALL__ __readRelocName(Elf_Reloc __HUGE__ *erl, char
   return ret;
 }
 
+static unsigned long __NEAR__ __FASTCALL__ BuildReferStrElf_arm(char *str,
+							Elf_Reloc __HUGE__ *erl,
+							int flags)
+{
+  unsigned long retval = RAPREF_DONE;
+  tUInt32 r_type;
+  tBool ret=False, use_addend = False;
+  char buff[300];
+  r_type = ELF32_R_TYPE(erl->info);
+  buff[0] = 0;
+  switch(r_type)
+  {
+    default:
+    case R_ARM_NONE: /* nothing to do */
+    case R_ARM_COPY: /* nothing to do */
+                   retval = RAPREF_NONE;
+                   break;
+    case R_ARM_THM_ABS5:
+    case R_ARM_ABS8:
+    case R_ARM_ABS12:
+    case R_ARM_ABS16:
+    case R_ARM_ABS32:  /* symbol + addendum */
+                   ret = __readRelocName(erl, buff, sizeof(buff));
+                   if(buff[0] && ret)
+                   {
+		     strcat(str,buff);
+		     use_addend = True;
+		   }
+                   else retval = RAPREF_NONE;
+		   break;
+    case R_ARM_THM_PC8:
+    case R_ARM_THM_PC12:
+    case R_ARM_PC24: /* symbol + addendum - this */
+                   ret = __readRelocName(erl, buff, sizeof(buff));
+                   if(buff[0] && ret)
+                   {
+		     strcat(str,buff);
+		     /* strcat(str,"-.here"); <- it's commented for readability */
+		     use_addend = True;
+		   }
+                   else retval = RAPREF_NONE;
+		   break;
+    case R_ARM_PLT32: /* PLT[offset] + addendum - this */
+                   strcat(str,"PLT-");
+                   strcat(str,Get8Digit(erl->offset));
+		   use_addend = True;
+		   break;
+    case R_ARM_GLOB_DAT:  /* symbol */
+    case R_ARM_JUMP_SLOT:  /* symbol */
+                   ret = __readRelocName(erl, buff, sizeof(buff));
+                   if(buff[0] && ret) strcat(str,buff);
+		   break;
+    case R_ARM_RELATIVE: /* BVA + addendum */
+                   strcat(str,"BVA");
+		   use_addend = True;
+		   break;
+    case R_ARM_GOTOFF32: /* symbol + addendum - GOT */
+                   ret = __readRelocName(erl, buff, sizeof(buff));
+                   if(buff[0] && ret)
+                   {
+  		     strcat(str,buff);
+		     strcat(str,"-GOT");
+		     use_addend = True;
+		   }
+                   else retval = RAPREF_NONE;
+		   break;
+  }
+  if(erl->addend && use_addend && ret &&
+     !(flags & APREF_TRY_LABEL)) /* <- it for readability */
+  {
+    strcat(str,"+");
+    strcat(str,Get8Digit(erl->addend));
+  }
+  return retval;
+}
+
 static unsigned long __NEAR__ __FASTCALL__ BuildReferStrElf_i386(char *str,
 							Elf_Reloc __HUGE__ *erl,
 							int flags)
@@ -1596,15 +1789,113 @@ static unsigned long __NEAR__ __FASTCALL__ BuildReferStrElf_x86_64(char *str,
   return retval;
 }
 
+static unsigned long __NEAR__ __FASTCALL__ BuildReferStrElf_ppc(char *str,
+							Elf_Reloc __HUGE__ *erl,
+							int flags)
+{
+  unsigned long retval = RAPREF_DONE;
+  tUInt32 r_type;
+  tBool ret=False, use_addend = False;
+  char buff[300];
+  r_type = ELF32_R_TYPE(erl->info);
+  buff[0] = 0;
+  switch(r_type)
+  {
+    default:
+    case R_PPC_NONE: /* nothing to do */
+    case R_PPC_COPY: /* nothing to do */
+                   retval = RAPREF_NONE;
+                   break;
+    case R_PPC_ADDR14:
+    case R_PPC_ADDR14_BRTAKEN:
+    case R_PPC_ADDR14_BRNTAKEN:
+    case R_PPC_ADDR16:
+    case R_PPC_ADDR16_LO:
+    case R_PPC_ADDR16_HI:
+    case R_PPC_ADDR16_HA:
+    case R_PPC_ADDR24:
+    case R_PPC_ADDR32:
+    case R_PPC_UADDR32:
+    case R_PPC64_ADDR64:
+    case R_PPC64_UADDR64: /* symbol + addendum */
+                   ret = __readRelocName(erl, buff, sizeof(buff));
+                   if(buff[0] && ret)
+                   {
+		     strcat(str,buff);
+		     use_addend = True;
+		   }
+                   else retval = RAPREF_NONE;
+		   break;
+    case R_PPC_REL14:
+    case R_PPC_REL14_BRTAKEN:
+    case R_PPC_REL14_BRNTAKEN:
+    case R_PPC_REL16:
+    case R_PPC_REL16_LO:
+    case R_PPC_REL16_HI:
+    case R_PPC_REL16_HA:
+    case R_PPC_REL24:
+    case R_PPC_REL32:
+    case R_PPC64_REL64: /* symbol + addendum - this */
+                   ret = __readRelocName(erl, buff, sizeof(buff));
+                   if(buff[0] && ret)
+                   {
+		     strcat(str,buff);
+		     /* strcat(str,"-.here"); <- it's commented for readability */
+		     use_addend = True;
+		   }
+                   else retval = RAPREF_NONE;
+		   break;
+    case R_PPC_GOT16_LO:
+    case R_PPC_GOT16_HI:
+    case R_PPC_GOT16_HA:
+		   strcat(str,"GOT-");
+		strcat(str,Get8Digit(erl->offset));
+		   use_addend = True;
+		   break;
+    case R_PPC_PLT16_LO:
+    case R_PPC_PLT16_HI:
+    case R_PPC_PLT16_HA:
+    case R_PPC_PLT32:
+                   strcat(str,"PLT-");
+                   strcat(str,Get8Digit(erl->offset));
+		   use_addend = True;
+		   break;
+    case R_PPC64_PLT64: /* PLT[offset] + addendum - this */
+                   strcat(str,"PLT-");
+                   strcat(str,Get16Digit(erl->offset));
+		   use_addend = True;
+		   break;
+    case R_PPC_GLOB_DAT:  /* symbol */
+    case R_PPC_JMP_SLOT:  /* symbol */
+                   ret = __readRelocName(erl, buff, sizeof(buff));
+                   if(buff[0] && ret) strcat(str,buff);
+		   break;
+    case R_PPC_RELATIVE: /* BVA + addendum */
+                   strcat(str,"BVA");
+		   use_addend = True;
+		   break;
+  }
+  if(erl->addend && use_addend && ret &&
+     !(flags & APREF_TRY_LABEL)) /* <- it for readability */
+  {
+    strcat(str,"+");
+    strcat(str,Get8Digit(erl->addend));
+  }
+  return retval;
+}
+
 static unsigned long __NEAR__ __FASTCALL__ BuildReferStrElf(char *str,
 							Elf_Reloc __HUGE__ *erl,
 							int flags)
 {
     switch(ELF_HALF(ELF_EHDR(elf,e_machine)))
     {
-      default:
+      default: return RAPREF_NONE;
+      case EM_ARM: return BuildReferStrElf_arm(str,erl,flags);
       case EM_386: return BuildReferStrElf_i386(str,erl,flags);
       case EM_X86_64: return BuildReferStrElf_x86_64(str,erl,flags);
+      case EM_PPC:
+      case EM_PPC64: return BuildReferStrElf_ppc(str,erl,flags);
     }
 }
 
