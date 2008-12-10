@@ -68,11 +68,10 @@ static void ppc_Encode_args(char *ostr,tUInt32 opcode,
     int use_ea=0;
     TabSpace(ostr,TAB_POS);
     for(i=0;i<6;i++) {
-	unsigned value,mask,len;
+	unsigned value,len;
 	if(!args[i].type) break;
 	len=args[i].len;
-	mask=(1<<len)-1;
-	value=PPC_GET_FLD(opcode,args[i].off,mask);
+	value=PPC_GET_BITS(opcode,args[i].off,args[i].len);
 	if((args[i].flg&PPC_LSHIFT_MASK)) value<<=(args[i].flg&PPC_LSHIFT_MASK);
 	if(!(args[i].flg&PPC_EA) && use_ea) { use_ea=0; strcat(ostr,"]"); }
 	if(i) strcat(ostr,use_ea?args[i].type=='-'?"":"+":",");
@@ -1371,6 +1370,21 @@ static const ppc_opcode ppc_table[] =
   {  "xoris",   D_FORM(27),           D_MASK, PPC_CPU, {D_RA,D_RS,D_UI,PPC_0} },
 };
 
+#if 0
+static tUInt32 __FASTCALL__ biswap_32(tUInt32 code) {
+   unsigned i;
+   tUInt32 rval=0x00;
+   for(i=0;i<32;i++) if((code&(1<<i))==(1<<i)) rval = rval | (1<<(31-i));
+   return rval;
+}
+#if __BYTE_ORDER != __LITTLE_ENDIAN
+#define bie2mie_32(a) (a)
+#define lie2mie_32(a) (biswap_32(a))
+#else
+#define bie2mie_32(a) (biswap_32(a))
+#define lie2mie_32(a) (a)
+#endif
+#endif
 static DisasmRet __FASTCALL__ ppcDisassembler(__filesize_t ulShift,
                                               MBuffer buffer,
                                               unsigned flags)
@@ -1389,7 +1403,10 @@ static DisasmRet __FASTCALL__ ppcDisassembler(__filesize_t ulShift,
     if(!((flags & __DISF_SIZEONLY) == __DISF_SIZEONLY)) {
     for(ix=0;ix<n;ix++)
     {
-	if((opcode & ppc_table[ix].mask) == ppc_table[ix].bits)
+	tUInt32 mask,bits;
+	mask=ppc_table[ix].mask;
+	bits=ppc_table[ix].bits;
+	if((opcode & mask) == bits)
 	{
 	    strcpy(dret.str,ppc_table[ix].name);
 	    ppc_Encode_args(dret.str,opcode,ulShift,ppc_table[ix].flags,ppc_table[ix].args);

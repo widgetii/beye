@@ -35,8 +35,17 @@ typedef struct s_ppc_opcode {
 #define PPC_ALTIVEC	0x00000002UL
 #define PPC_CLONE_MSK	0x0000000FUL
 
+/* Little endian versions: */
+#define PPC_GET_BITS_LE(opcode,off,len) (((opcode)>>off)&((1<<len)-1))
+#define PPC_PUT_BITS_LE(bits,off,len) (((bits)&((1<<len)-1))<<off)
+/* Big endian versions: */
+#define PPC_GET_BITS(opcode,off,len) (((opcode)>>(32-(off+len)))&((1<<len)-1))
+#define PPC_PUT_BITS(bits,off,len) (((bits)&((1<<len)-1))<<(32-(off+len)))
+
+#define MAKE_OP(op) PPC_PUT_BITS(op,0,6)
+
 #define A_FORM(op,xo,rc) \
-    (((op)&0x3F)|((xo&0x1F)<<26)|((rc&0x1)<<31))
+    (MAKE_OP(op)|PPC_PUT_BITS(xo,26,5)|PPC_PUT_BITS(rc,31,1))
 #define A_MASK A_FORM(0x3F,0x1F,1)
 
 #define A_FRT { 'f', 6, 5, 0 }
@@ -51,15 +60,14 @@ typedef struct s_ppc_opcode {
 #define A_BC  { '+',21, 5, 0 }
 
 #define B_FORM(op,aa,lk) \
-    (((op)&0x3F)|((aa&0x1)<<30)|((lk&0x1)<<31))
+    (MAKE_OP(op)|PPC_PUT_BITS(aa,30,1)|PPC_PUT_BITS(lk,31,1))
 #define B_MASK B_FORM(0x3F,1,1)
 
 #define B_BO { '+', 6, 6, 0 }
 #define B_BI { '+',11, 6, 0 }
 #define B_BD { '-',16,14, 2 }
 
-#define D_FORM(op) \
-    (((op)&0x3F))
+#define D_FORM(op) (MAKE_OP(op))
 #define D_MASK D_FORM(0x3F)
 
 #define D_RT { 'r', 6, 5, 0 }
@@ -76,7 +84,7 @@ typedef struct s_ppc_opcode {
 #define D_TO { '+', 6, 5, 0 }
 
 #define DS_FORM(op,xo) \
-    (((op)&0x3F)|((xo)&0x3)<<30)
+    (MAKE_OP(op)|PPC_PUT_BITS(xo,30,2))
 #define DS_MASK DS_FORM(0x3F,0x3)
 
 #define DS_RT { 'r', 6, 5, 0 }
@@ -88,8 +96,7 @@ typedef struct s_ppc_opcode {
 #define DS_RA_EA { 'r',11, 5, PPC_EA }
 #define DS_DS_EA { '-',16,14, PPC_EA }
 
-#define DQ_FORM(op) \
-    (((op)&0x3F))
+#define DQ_FORM(op) (MAKE_OP(op))
 #define DQ_MASK DQ_FORM(0x3F)
 
 #define DQ_RT { 'r', 6, 5, 0 }
@@ -107,7 +114,7 @@ typedef struct s_ppc_opcode {
 #define I_LI { '-', 6,24, 2 }
 
 #define M_FORM(op,rc) \
-    (((op)&0x3F)|((rc&1)<<31))
+    (MAKE_OP(op)|PPC_PUT_BITS(rc,31,1))
 #define M_MASK M_FORM(0x3F,1)
 #define M_RT  { 'r', 6, 5, 0 }
 #define M_RS  { 'r', 6, 5, 0 }
@@ -118,7 +125,7 @@ typedef struct s_ppc_opcode {
 #define M_ME  { '+',26, 5, 0 }
 
 #define MDS_FORM(op,xo,rc) \
-    (((op)&0x3F)|((xo&0xF)<<27)|((rc&1)<<31))
+    (MAKE_OP(op)|PPC_PUT_BITS(xo,27,4)|PPC_PUT_BITS(rc,31,1))
 #define MDS_MASK MDS_FORM(0x3F,0xF,1)
 #define MDS_RT  { 'r', 6, 5, 0 }
 #define MDS_RS  { 'r', 6, 5, 0 }
@@ -127,7 +134,7 @@ typedef struct s_ppc_opcode {
 #define MDS_MB  { '+',21, 6, 0 }
 
 #define MD_FORM(op,xo,rc) \
-    (((op)&0x3F)|((xo&0x7)<<27)|((rc&1)<<31))
+    (MAKE_OP(op)|PPC_PUT_BITS(xo,27,3)|PPC_PUT_BITS(rc,31,1))
 #define MD_MASK MD_FORM(0x3F,0x7,1)
 #define MD_RT  { 'r', 6, 5, 0 }
 #define MD_RS  { 'r', 6, 5, 0 }
@@ -138,12 +145,12 @@ typedef struct s_ppc_opcode {
 #define MD_SHH { '+',30, 1, 0 }
 
 #define SC_FORM(op,rc) \
-    (((op)&0x3F)|((rc&1)<<30))
+    (MAKE_OP(op)|PPC_PUT_BITS(rc,30,1))
 #define SC_MASK SC_FORM(0x3F,1)
 #define SC_LEV { '+',20, 7, 0 }
 
 #define VA_FORM(op,xo) \
-    (((op)&0x3F)|((xo&0x3F)<<26))
+    (MAKE_OP(op)|PPC_PUT_BITS(xo,26,6))
 #define VA_MASK VA_FORM(0x3F,0x3F)
 
 #define VA_VRT { 'v', 6, 5, 0 }
@@ -154,7 +161,7 @@ typedef struct s_ppc_opcode {
 #define VA_SHB { 'v',22, 4, 0 }
 
 #define VC_FORM(op,rc,xo) \
-    (((op)&0x3F)|((rc&1)<<21)|((xo&0x3FF)<<22))
+    (MAKE_OP(op)|PPC_PUT_BITS(rc,21,1)|PPC_PUT_BITS(xo,22,10))
 #define VC_MASK VC_FORM(0x3F,1,0x3FF)
 #define VC_RT  { 'r', 6, 5, 0 }
 #define VC_RS  { 'r', 6, 5, 0 }
@@ -166,7 +173,7 @@ typedef struct s_ppc_opcode {
 #define VC_VRB { 'v',16, 5, 0 }
 
 #define VX_FORM(op,xo) \
-    (((op)&0x3F)|((xo&0x7FF)<<21))
+    (MAKE_OP(op)|PPC_PUT_BITS(xo,21,11))
 #define VX_MASK VX_FORM(0x3F,0x7FF)
 
 #define VX_RT  { 'r', 6, 5, 0 }
@@ -185,7 +192,7 @@ typedef struct s_ppc_opcode {
 
 
 #define X_FORM(op,xo,rc) \
-    (((op)&0x3F)|((xo&0x3FF)<<21)|((rc&0x1)<<31))
+    (MAKE_OP(op)|PPC_PUT_BITS(xo,21,10)|PPC_PUT_BITS(rc,31,1))
 #define X_MASK X_FORM(0x3F,0x3FF,1)
 
 #define X_RT { 'r', 6, 5, 0 }
@@ -225,19 +232,18 @@ typedef struct s_ppc_opcode {
 #define X_E  { '+', 16, 1, 0 }
 
 #define XO_FORM(op,xo,oe,rc) \
-    (((op)&0x3F)|((xo&0x1FF)<<22)|((oe&0x1)<<21)|((rc&0x1)<<31))
+    (MAKE_OP(op)|PPC_PUT_BITS(xo,22,9)|PPC_PUT_BITS(oe,21,1)|PPC_PUT_BITS(rc,31,1))
 #define XO_MASK XO_FORM(0x3F,0x1FF,1,1)
 
 #define XO_SHRT_FORM(op,xo) \
-    (((op)&0x3F)|((xo&0x1FF)<<22))
+    (MAKE_OP(op)|PPC_PUT_BITS(xo,22,9))
 #define XO_SHRT_MASK XO_SHRT_FORM(0x3F,0x1FF)
 
 #define XO_RT { 'r', 6, 5, 0 }
 #define XO_RA { 'r',11, 5, 0 }
 #define XO_RB { 'r',16, 5, 0 }
 
-#define XL_FORM(op,xo,rc) \
-    (((op)&0x3F)|((xo&0x3FF)<<21)|((rc&0x1)<<31))
+#define XL_FORM(op,xo,rc) X_FORM(op,xo,rc)
 #define XL_MASK XL_FORM(0x3F,0x3FF,1)
 
 #define XL_BO { '+', 6, 5, 0 }
@@ -250,7 +256,7 @@ typedef struct s_ppc_opcode {
 #define XL_BFA {'+',11, 4, 0 }
 
 #define EVS_FORM(op,xo) \
-    (((op)&0x3F)|((xo&0xFF)<<21))
+    (MAKE_OP(op)|PPC_PUT_BITS(xo,21,8))
 #define EVS_MASK EVS_FORM(0x3F,0xFF)
 
 #define EVS_RT  { 'r', 6, 5, 0 }
@@ -258,8 +264,7 @@ typedef struct s_ppc_opcode {
 #define EVS_RB  { 'r',16, 5, 0 }
 #define EVS_BFA { '+',29, 3, 0 }
 
-#define EVX_FORM(op,xo) \
-    (((op)&0x3F)|((xo&0x7FF)<<21))
+#define EVX_FORM(op,xo) VX_FORM(op,xo)
 #define EVX_MASK EVX_FORM(0x3F,0x7FF)
 
 #define EVX_BF { '+', 6, 3, 0 }
@@ -274,7 +279,7 @@ typedef struct s_ppc_opcode {
 #define EVX_UI_EA { '+',11, 5, PPC_EA }
 
 #define XFX_FORM(op,cc,xo,rc) \
-    (((op)&0x3F)|((cc&0x1)<<11)|((xo&0x3FF)<<21)|((rc&0x1)<<31))
+    (MAKE_OP(op)|PPC_PUT_BITS(cc,11,1)|PPC_PUT_BITS(xo,21,10)|PPC_PUT_BITS(rc,31,1))
 #define XFX_MASK XFX_FORM(0x3F,1,0x3FF,1)
 
 #define XFX_DUI  { '+', 6, 5, 0 }
@@ -289,7 +294,7 @@ typedef struct s_ppc_opcode {
 #define XFX_TBR  { '+',11,10, 0 }
 
 #define Z23_FORM(op,xo,rc) \
-    (((op)&0x3F)|((xo&0xFF)<<23)|((rc&0x1)<<31))
+    (MAKE_OP(op)|PPC_PUT_BITS(xo,23,8)|PPC_PUT_BITS(rc,31,1))
 #define Z23_MASK Z23_FORM(0x3F,0xFF,1)
 
 #define Z23_FRT { 'f', 6, 5, 0 }
@@ -300,7 +305,7 @@ typedef struct s_ppc_opcode {
 #define Z23_R   { '+',15, 1, 0 }
 
 #define Z22_FORM(op,xo,rc) \
-    (((op)&0x3F)|((xo&0x1FF)<<22)|((rc&0x1)<<31))
+    (MAKE_OP(op)|PPC_PUT_BITS(xo,22,9)|PPC_PUT_BITS(rc,31,1))
 #define Z22_MASK Z22_FORM(0x3F,0x1FF,1)
 
 #define Z22_BF  { '+', 6, 3, 0 }
@@ -310,6 +315,5 @@ typedef struct s_ppc_opcode {
 #define Z22_SH  { '+',16, 6, 0 }
 #define Z22_DCM { '+',16, 6, 0 }
 
-#define PPC_GET_FLD(opcode,off,mask) (((opcode)>>off)&mask)
 
 #endif
