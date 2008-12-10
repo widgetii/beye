@@ -304,7 +304,7 @@ static tBool __FASTCALL__ txtFiUserFunc1(IniInfo * info)
 	{
 	    unsigned char ch;
 	    ch=BMReadByte();
-	    if(isspace(ch) && softmode) { i--; continue; }
+	    if(softmode) while(isspace(ch)) { ch=BMReadByte(); if(BMEOF()) { found = 0; break; }}
 	    if(ch != info->value[i])
 	    {
 		found=0;
