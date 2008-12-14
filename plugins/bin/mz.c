@@ -306,8 +306,8 @@ static tBool  __FASTCALL__ mz_check_fmt( void )
 /* Special case: this module must not use init and destroy */
 static void __FASTCALL__ mz_init_fmt( void ) {}
 static void __FASTCALL__ mz_destroy_fmt(void) {}
-
 static int  __FASTCALL__ mz_platform( void) { return DISASM_CPU_IX86; }
+static int  __FASTCALL__ mz_endian(__filesize_t off) { return DAE_LITTLE; }
 
 static tBool __FASTCALL__ mzAddressResolv(char *addr,__filesize_t cfpos)
 {
@@ -347,6 +347,7 @@ REGISTRY_BIN mzTable =
   NULL,
   mz_platform,
   NULL,
+  mz_endian,
   mzAddressResolv,
   mzVA2PA,
   mzPA2VA,

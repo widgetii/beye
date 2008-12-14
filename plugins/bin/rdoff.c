@@ -788,6 +788,7 @@ static tBool __FASTCALL__ rdoff_AddressResolv(char *addr,__filesize_t cfpos)
 }
 
 static int __FASTCALL__ rdoff_platform( void ) { return DISASM_CPU_IX86; }
+static int __FASTCALL__ rdoff_endian(__filesize_t off) { return DAE_LITTLE; }
 
 REGISTRY_BIN rdoffTable =
 {
@@ -802,6 +803,7 @@ REGISTRY_BIN rdoffTable =
   fmtSetState,
   rdoff_platform,
   rdoff_bitness,
+  rdoff_endian,
   rdoff_AddressResolv,
   rdoffVA2PA,
   rdoffPA2VA,

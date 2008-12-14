@@ -182,6 +182,7 @@ static __filesize_t __FASTCALL__ archHelp( void )
 }
 
 static int __FASTCALL__ arch_platform( void ) { return DISASM_DEFAULT; }
+static int __FASTCALL__ arch_endian(__filesize_t off) { return DAE_LITTLE; }
 
 REGISTRY_BIN archTable =
 {
@@ -194,6 +195,7 @@ REGISTRY_BIN archTable =
   NULL,
   arch_platform,
   NULL,
+  arch_endian,
   archAddrResolv,
   NULL,
   NULL,

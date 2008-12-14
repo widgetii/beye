@@ -2346,6 +2346,10 @@ static int __FASTCALL__ ELFplatform( void ) {
     return id;
 }
 
+static int __FASTCALL__ ELFendian(__filesize_t off) {
+ return is_msbf?DAE_BIG:DAE_LITTLE;
+}
+
 REGISTRY_BIN elf386Table =
 {
   "ELF (Executable and Linking Format)",
@@ -2357,6 +2361,7 @@ REGISTRY_BIN elf386Table =
   fmtSetState,
   ELFplatform,
   ELFbitness,
+  ELFendian,
   ELFAddrResolv,
   elfVA2PA,
   elfPA2VA,

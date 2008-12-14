@@ -63,6 +63,10 @@ typedef unsigned long (__FASTCALL__ *AppRefs)(char *str,__filesize_t shift,int f
 #define DAB_USE256  4
 #define DAB_AUTO    0xFFFFU /**< never must return! Only for selection */
 
+/** List of DisAssembler Endian */
+#define DAE_LITTLE	0
+#define DAE_BIG		1
+
 /** Public symbols classes */
 
 #define SC_LOCAL    0 /**< means: present as entry but not exported */
@@ -119,6 +123,9 @@ typedef struct tag_REGISTRY_BIN
 
                          /** Returns DAB_XXX. Quick version for disassembler */
   int     (__FASTCALL__ *query_bitness)(__filesize_t);
+
+                         /** Returns DAE_XXX. */
+  int     (__FASTCALL__ *query_endian)(__filesize_t);
 
                          /** For displaying offset within struct in left address column.
                            * @return         False if string is not modified.

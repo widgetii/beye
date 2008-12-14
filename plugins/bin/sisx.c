@@ -15,6 +15,7 @@
  * @since       1995
  * @note        Development, fixes and improvements
 **/
+#include <stdio.h>
 #include <stddef.h>
 
 #include "reg_form.h"
@@ -164,6 +165,8 @@ static __filesize_t __FASTCALL__ Show_SisX_Header( void )
  return fpos;
 }
 
+static int __FASTCALL__ sisx_endian(__filesize_t off) { return DAE_LITTLE; }
+
 REGISTRY_BIN sisxTable =
 {
   "SisX(EPOC) Symbian OS executable file",
@@ -177,6 +180,7 @@ REGISTRY_BIN sisxTable =
   NULL,
   sisx_platform,
   NULL,
+  sisx_endian,
   NULL,
   NULL,
   NULL,

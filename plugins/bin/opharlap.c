@@ -114,6 +114,7 @@ static __filesize_t __FASTCALL__ HelpOPharLap( void )
 }
 
 static int __FASTCALL__ OldPharLapPlatform( void ) { return DISASM_CPU_IX86; }
+static int __FASTCALL__ OldPharLapEndian(__filesize_t off) { return DAE_LITTLE; }
 
 REGISTRY_BIN OldPharLapTable =
 {
@@ -128,6 +129,7 @@ REGISTRY_BIN OldPharLapTable =
   NULL,
   OldPharLapPlatform,
   NULL,
+  OldPharLapEndian,
   OldPharLapAddrResolv,
   NULL,
   NULL,

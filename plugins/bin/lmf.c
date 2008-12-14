@@ -492,6 +492,8 @@ static __filesize_t __FASTCALL__ lmf_LMFHlp( void )
   return BMGetCurrFilePos();
 }
 
+static int __FASTCALL__ lmf_endian(__filesize_t off) { return DAE_LITTLE; }
+
 REGISTRY_BIN lmfTable=
 {
 	"lmf (QNX4 executable file)",
@@ -505,6 +507,7 @@ REGISTRY_BIN lmfTable=
 	NULL,
 	lmf_platform,
 	lmf_bitness,
+	lmf_endian,
 	lmf_AddressResolv,
 	lmf_va2pa,
 	lmf_pa2va,

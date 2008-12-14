@@ -853,6 +853,9 @@ static int __FASTCALL__ jvm_bitness(__filesize_t off)
     return DAB_USE16;
 }
 
+static int __FASTCALL__ jvm_endian(__filesize_t off) { return DAE_LITTLE; }
+
+
 static unsigned long __FASTCALL__ jvm_AppendRef(char *str,__filesize_t ulShift,int flags,int codelen,__filesize_t r_sh)
 {
  unsigned long  retrf = RAPREF_DONE;
@@ -963,6 +966,7 @@ REGISTRY_BIN jvmTable =
   fmtSetState,
   jvm_platform,
   jvm_bitness,
+  jvm_endian,
   jvm_AddressResolv,
   jvm_VA2PA,
   jvm_PA2VA,

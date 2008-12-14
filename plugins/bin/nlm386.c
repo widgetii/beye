@@ -721,6 +721,8 @@ static __filesize_t __FASTCALL__ NLMPA2VA(__filesize_t pa)
 }
 
 static int __FASTCALL__ NLMPlatform( void ) { return DISASM_CPU_IX86; }
+static int __FASTCALL__ NLMendian(__filesize_t off) { return DAE_LITTLE; }
+
 
 REGISTRY_BIN nlm386Table =
 {
@@ -733,6 +735,7 @@ REGISTRY_BIN nlm386Table =
   fmtSetState,
   NLMPlatform,
   NLMbitness,
+  NLMendian,
   NLMAddrResolv,
   NLMVA2PA,
   NLMPA2VA,

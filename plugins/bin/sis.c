@@ -141,6 +141,7 @@ static __filesize_t __FASTCALL__ Show_Sis_Header( void )
  return fpos;
 }
 
+static int __FASTCALL__ sis_endian(__filesize_t off) { return DAE_LITTLE; }
 
 REGISTRY_BIN sisTable =
 {
@@ -155,6 +156,7 @@ REGISTRY_BIN sisTable =
   NULL,
   sis_platform,
   NULL,
+  sis_endian,
   NULL,
   NULL,
   NULL,

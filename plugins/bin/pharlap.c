@@ -286,6 +286,7 @@ static __filesize_t __FASTCALL__ PharLapHelp( void )
 }
 
 static int __FASTCALL__ PharLapPlatform( void ) { return DISASM_CPU_IX86; }
+static int __FASTCALL__ PharLapEndian(__filesize_t off) { return DAE_LITTLE; }
 
 REGISTRY_BIN PharLapTable =
 {
@@ -300,6 +301,7 @@ REGISTRY_BIN PharLapTable =
   NULL,
   PharLapPlatform,
   NULL,
+  PharLapEndian,
   PharLapAddrResolv,
   NULL,
   NULL,

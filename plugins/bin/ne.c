@@ -1512,6 +1512,8 @@ static int __FASTCALL__ bitnessNE(__filesize_t pa)
   return bitness;
 }
 
+static int __FASTCALL__ endianNE(__filesize_t off) { return DAE_LITTLE; }
+
 static tBool __FASTCALL__ neAddressResolv(char *addr,__filesize_t cfpos)
 {
  /* Since this function is used in references resolving of disassembler
@@ -1560,6 +1562,7 @@ REGISTRY_BIN neTable =
   fmtSetState,
   platformNE,
   bitnessNE,
+  endianNE,
   neAddressResolv,
   neVA2PA,
   nePA2VA,

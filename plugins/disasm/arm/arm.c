@@ -39,6 +39,7 @@ static DisasmRet __FASTCALL__ armDisassembler(__filesize_t ulShift,
                                               unsigned flags)
 {
   DisasmRet ret;
+  if(detectedFormat->query_endian) armBigEndian = detectedFormat->query_endian(ulShift)==DAE_BIG?1:0;
   if(flags == __DISF_NORMAL)
   {
     memset(&ret,0,sizeof(ret));

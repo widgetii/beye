@@ -78,6 +78,8 @@ static __filesize_t __FASTCALL__ Show_BMP_Header( void )
  return fpos;
 }
 
+static int __FASTCALL__ bmp_endian(__filesize_t off) { return DAE_LITTLE; }
+
 REGISTRY_BIN bmpTable =
 {
   "BitMaP file format",
@@ -91,6 +93,7 @@ REGISTRY_BIN bmpTable =
   NULL,
   bmp_platform,
   NULL,
+  bmp_endian,
   NULL,
   NULL,
   NULL,

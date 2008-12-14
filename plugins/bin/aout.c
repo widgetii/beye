@@ -139,6 +139,11 @@ static int __FASTCALL__ aout_bitness(__filesize_t off)
    return is_64bit?DAB_USE64:DAB_USE32;
 }
 
+static int __FASTCALL__ aout_endian(__filesize_t off)
+{
+   return is_msbf?DAE_BIG:DAE_LITTLE;
+}
+
 static tBool __FASTCALL__ aout_AddrResolv(char *addr,__filesize_t fpos)
 {
  /* Since this function is used in references resolving of disassembler
@@ -180,6 +185,7 @@ REGISTRY_BIN aoutTable =
   NULL,
   aout_platform,
   aout_bitness,
+  aout_endian,
   aout_AddrResolv,
   NULL,
   NULL,

@@ -326,6 +326,7 @@ static tBool __FASTCALL__ leAddressResolv(char *addr,__filesize_t cfpos)
 }
 
 static int __FASTCALL__ lePlatform( void ) { return DISASM_CPU_IX86; }
+static int __FASTCALL__ leEndian(__filesize_t off) { return DAE_LITTLE; }
 
 REGISTRY_BIN leTable =
 {
@@ -338,6 +339,7 @@ REGISTRY_BIN leTable =
   NULL,
   lePlatform,
   NULL,
+  leEndian,
   leAddressResolv,
   NULL,
   NULL,

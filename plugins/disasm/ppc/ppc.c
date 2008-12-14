@@ -1420,6 +1420,7 @@ static DisasmRet __FASTCALL__ ppcDisassembler(__filesize_t ulShift,
     char *p;
     tUInt32 opcode;
     if(detectedFormat->query_bitness) ppcBitness = detectedFormat->query_bitness(ulShift);
+    if(detectedFormat->query_endian) ppcBigEndian = detectedFormat->query_endian(ulShift)==DAE_BIG?1:0;
     opcode=ppcBigEndian?be2me_32(*((tUInt32 *)buffer)):le2me_32(*((tUInt32 *)buffer));
     n = sizeof(ppc_table)/sizeof(ppc_opcode);
     done=0;
