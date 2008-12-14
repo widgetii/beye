@@ -39,7 +39,7 @@ static DisasmRet __FASTCALL__ armDisassembler(__filesize_t ulShift,
                                               unsigned flags)
 {
   DisasmRet ret;
-  if(!((flags & __DISF_SIZEONLY) == __DISF_SIZEONLY))
+  if(flags == __DISF_NORMAL)
   {
     memset(&ret,0,sizeof(ret));
     ret.str = outstr;

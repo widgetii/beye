@@ -64,14 +64,17 @@ static void ppc_Encode_args(char *ostr,tUInt32 opcode,
 			__fileoff_t ulShift,
 			unsigned long flags,
 			const ppc_arg *args) {
-    unsigned i;
+    __fileoff_t dig_off;
+    unsigned long dig_flg;
+    unsigned i,dig_sz;
     int use_ea=0;
     TabSpace(ostr,TAB_POS);
     for(i=0;i<6;i++) {
 	unsigned value,len;
 	if(!args[i].type) break;
+	dig_off=-1;
 	len=args[i].len;
-	value=PPC_GET_BITS(opcode,args[i].off,args[i].len);
+	value=PPC_GET_BITS(opcode,args[i].off,len);
 	if((args[i].flg&PPC_LSHIFT_MASK)) value<<=(args[i].flg&PPC_LSHIFT_MASK);
 	if(!(args[i].flg&PPC_EA) && use_ea) { use_ea=0; strcat(ostr,"]"); }
 	if(i) strcat(ostr,use_ea?args[i].type=='-'?"":"+":",");
@@ -80,14 +83,35 @@ static void ppc_Encode_args(char *ostr,tUInt32 opcode,
 	    case 'r': strcat(ostr,gprs[value&0x3F]); break;
 	    case 'f': strcat(ostr,fprs[value&0x3F]); break;
 	    case 'v': strcat(ostr,vprs[value&0x3F]); break;
-	    case '-': strcat(ostr,len<9?Get2SignDig(value):
-				  len<17?Get4SignDig(value):
-					Get8SignDig(value)); break;
-	    case '+': strcat(ostr,len<9?Get2Digit(value):
-				  len<17?Get4Digit(value):
-					Get8Digit(value)); break;
+	    case '-': dig_off = ulShift+(args[i].off+7)/8;
+			dig_sz = (len+7)/8;
+			dig_flg =	len<9?  DISARG_CHAR:
+					len<17? DISARG_SHORT:
+						DISARG_LONG;
+			break;
+	    case '+': dig_off = ulShift+(args[i].off+7)/8;
+			dig_sz = (len+7)/8;
+			dig_flg =	len<9?  DISARG_BYTE:
+					len<17? DISARG_WORD:
+						DISARG_DWORD;
+			break;
 	    default: /* internal dissasembler error */
 		break;
+	}
+	if(dig_off>0) {
+	    if(flags&PPC_BRANCH_INSN) {
+		if(len>6) {
+		    int aa = PPC_GET_BITS(opcode,30,1);
+		    unsigned long distin = (value<<2) + (aa?0:ulShift);
+		    disAppendFAddr(ostr,dig_off,value,distin,
+				DISADR_NEAR32,0,dig_sz);
+		}
+		else goto do_digs;
+	    }
+	    else {
+	        do_digs:
+		disAppendDigits(ostr,dig_off,APREF_USE_TYPE,dig_sz,&opcode,dig_flg);
+	    }
 	}
     }
     if(use_ea) strcat(ostr,"]");
@@ -126,18 +150,18 @@ static const ppc_opcode ppc_table[] =
   { "andc.",   X_FORM(31,60,1),       X_MASK, PPC_CPU, {X_RA,X_RS,X_RB,PPC_0} },
   { "andi.",   D_FORM(28),            D_MASK, PPC_CPU, {D_RA,D_RS,D_UI,PPC_0} },
   { "andis.",  D_FORM(29),            D_MASK, PPC_CPU, {D_RA,D_RS,D_UI,PPC_0} },
-  { "b",       I_FORM(18,0,0),        I_MASK, PPC_CPU, {I_LI,PPC_0} },
-  { "ba",      I_FORM(18,1,0),        I_MASK, PPC_CPU, {I_LI,PPC_0} },
-  { "bl",      I_FORM(18,0,1),        I_MASK, PPC_CPU, {I_LI,PPC_0} },
-  { "bla",     I_FORM(18,1,1),        I_MASK, PPC_CPU, {I_LI,PPC_0} },
-  { "bc",      B_FORM(16,0,0),        B_MASK, PPC_CPU, {B_BO,B_BI,B_BD,PPC_0} },
-  { "bca",     B_FORM(16,1,0),        B_MASK, PPC_CPU, {B_BO,B_BI,B_BD,PPC_0} },
-  { "bcl",     B_FORM(16,0,1),        B_MASK, PPC_CPU, {B_BO,B_BI,B_BD,PPC_0} },
-  { "bcla",    B_FORM(16,1,1),        B_MASK, PPC_CPU, {B_BO,B_BI,B_BD,PPC_0} },
-  { "bclr",    XL_FORM(18,16,0),     XL_MASK, PPC_CPU, {XL_BO,XL_BI,XL_BH,PPC_0} },
-  { "bclrl",   XL_FORM(18,16,1),     XL_MASK, PPC_CPU, {XL_BO,XL_BI,XL_BH,PPC_0} },
-  { "bcctr",   XL_FORM(18,528,0),    XL_MASK, PPC_CPU, {XL_BO,XL_BI,XL_BH,PPC_0} },
-  { "bcctrl",  XL_FORM(18,528,1),    XL_MASK, PPC_CPU, {XL_BO,XL_BI,XL_BH,PPC_0} },
+  { "b",       I_FORM(18,0,0),        I_MASK, PPC_CPU|PPC_BRANCH_INSN, {I_LI,PPC_0} },
+  { "ba",      I_FORM(18,1,0),        I_MASK, PPC_CPU|PPC_BRANCH_INSN, {I_LI,PPC_0} },
+  { "bl",      I_FORM(18,0,1),        I_MASK, PPC_CPU|PPC_BRANCH_INSN, {I_LI,PPC_0} },
+  { "bla",     I_FORM(18,1,1),        I_MASK, PPC_CPU|PPC_BRANCH_INSN, {I_LI,PPC_0} },
+  { "bc",      B_FORM(16,0,0),        B_MASK, PPC_CPU|PPC_BRANCH_INSN, {B_BO,B_BI,B_BD,PPC_0} },
+  { "bca",     B_FORM(16,1,0),        B_MASK, PPC_CPU|PPC_BRANCH_INSN, {B_BO,B_BI,B_BD,PPC_0} },
+  { "bcl",     B_FORM(16,0,1),        B_MASK, PPC_CPU|PPC_BRANCH_INSN, {B_BO,B_BI,B_BD,PPC_0} },
+  { "bcla",    B_FORM(16,1,1),        B_MASK, PPC_CPU|PPC_BRANCH_INSN, {B_BO,B_BI,B_BD,PPC_0} },
+  { "bclr",    XL_FORM(18,16,0),     XL_MASK, PPC_CPU|PPC_BRANCH_INSN, {XL_BO,XL_BI,XL_BH,PPC_0} },
+  { "bclrl",   XL_FORM(18,16,1),     XL_MASK, PPC_CPU|PPC_BRANCH_INSN, {XL_BO,XL_BI,XL_BH,PPC_0} },
+  { "bcctr",   XL_FORM(18,528,0),    XL_MASK, PPC_CPU|PPC_BRANCH_INSN, {XL_BO,XL_BI,XL_BH,PPC_0} },
+  { "bcctrl",  XL_FORM(18,528,1),    XL_MASK, PPC_CPU|PPC_BRANCH_INSN, {XL_BO,XL_BI,XL_BH,PPC_0} },
   { "brinc",   EVX_FORM(4,527),     EVX_MASK, PPC_CPU, {EVX_RT,EVX_RA,EVX_RB,PPC_0} },
   { "cbcdtd",  X_FORM(31,314,0),      X_MASK, PPC_CPU, {X_RA,X_RS,PPC_0} },
   { "cbcdtd",  X_FORM(31,314,1),      X_MASK, PPC_CPU, {X_RA,X_RS,PPC_0} },
@@ -1395,12 +1419,13 @@ static DisasmRet __FASTCALL__ ppcDisassembler(__filesize_t ulShift,
     unsigned i,ix,n,idx,val;
     char *p;
     tUInt32 opcode;
+    if(detectedFormat->query_bitness) ppcBitness = detectedFormat->query_bitness(ulShift);
     opcode=ppcBigEndian?be2me_32(*((tUInt32 *)buffer)):le2me_32(*((tUInt32 *)buffer));
     n = sizeof(ppc_table)/sizeof(ppc_opcode);
     done=0;
     dret.str = outstr;
     dret.codelen = 4;
-    if(!((flags & __DISF_SIZEONLY) == __DISF_SIZEONLY)) {
+    if(flags == __DISF_NORMAL) {
     for(ix=0;ix<n;ix++)
     {
 	tUInt32 mask,bits;

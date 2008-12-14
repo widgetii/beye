@@ -122,7 +122,7 @@ typedef struct tag_REGISTRY_DISASM
   ColorAttr    (__FASTCALL__ *GetOpcodeColor)(unsigned long clone); /**< returns color of instruction */
   ColorAttr    (__FASTCALL__ *altGetInsnColor)(unsigned long clone); /**< returns color of instruction in alternative mode */
   ColorAttr    (__FASTCALL__ *altGetOpcodeColor)(unsigned long clone); /**< returns color of instruction in alternative mode */
-  int          (__FASTCALL__ *GetDefBitness)(void);               /**< returns currently ised bitness */
+  int          (__FASTCALL__ *GetDefBitness)(void);               /**< returns currently used bitness */
   char         (__FASTCALL__ *CloneShortName)(unsigned long clone); /**< returns short clone name of instruction */
   void         (__FASTCALL__ *init)(void);     /**< initializing of plugin */
   void         (__FASTCALL__ *term)(void);     /**< terminating of plugin */
