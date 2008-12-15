@@ -578,8 +578,8 @@ REGISTRY_DISASM AVR_Disasm =
 {
   DISASM_CPU_AVR,
   "Atmel ~AVR",                          /* disassembler name */
-  { "AVRHlp", NULL, NULL, NULL, NULL },  /* prompt for Ctrl-(F1,F3,F4,F5,F10) */
-  { AVRAsmRef, NULL, NULL, NULL, NULL }, /* action for Ctrl-(F1,F3,F4,F5,F10) */
+  { "AVRHlp", NULL, NULL, NULL },        /* prompt for Ctrl-(F1,F3,F4,F5) */
+  { AVRAsmRef, NULL, NULL, NULL },       /* action for Ctrl-(F1,F3,F4,F5) */
   AVRDisassembler,                       /* main disassembler function */
   NULL,                                  /* main assembler function (???) */
   AVRHelpAsm,                            /* display short help (Shift-F1) */

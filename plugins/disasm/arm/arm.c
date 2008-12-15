@@ -248,8 +248,8 @@ REGISTRY_DISASM ARM_Disasm =
 {
   DISASM_CPU_ARM,
   "A~RMv5TE/XScale",
-  { "ARMHlp", "Bitnes", "Endian", NULL, NULL },
-  { armAsmRef, armSelect_bitness, armSelect_endian, NULL, NULL },
+  { "ARMHlp", "Bitnes", "Endian", NULL },
+  { armAsmRef, armSelect_bitness, armSelect_endian, NULL },
   armDisassembler,
   NULL,
   armHelpAsm,

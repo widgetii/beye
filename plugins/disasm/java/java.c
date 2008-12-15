@@ -639,8 +639,8 @@ REGISTRY_DISASM Java_Disasm =
 {
   DISASM_JAVA,
   "~Java",
-  { "JvmAsm", NULL, NULL, NULL, NULL },
-  { javaAsmHelp, NULL, NULL, NULL, NULL },
+  { "JvmAsm", NULL, NULL, NULL },
+  { javaAsmHelp, NULL, NULL, NULL },
   javaDisassembler,
   NULL,
   javaHelpAsm,

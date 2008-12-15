@@ -460,6 +460,11 @@ static tBool __FASTCALL__ disSelectHiLight( void )
   return False;
 }
 
+static tBool __FASTCALL__ disUserNames( void ) {
+    ErrMessageBox("Not implemented yet","User defined names support");
+    return False;
+}
+
 static tBool __FASTCALL__ disDetect( void ) { return True; }
 
 static tBool __FASTCALL__ DefAsmAction(int _lastbyte,int start)
@@ -852,8 +857,8 @@ static __filesize_t __FASTCALL__ disSearch(TWindow *pwnd, __filesize_t start,
 REGISTRY_MODE disMode =
 {
   "~Dissasembler",
-  { NULL, "Disasm", NULL, NULL, NULL, "AResol", "PanMod", "ResRef", "HiLght", NULL },
-  { NULL, disSelect_Disasm, NULL, NULL, NULL, hexAddressResolution, disSelectPanelMode, disReferenceResolving, disSelectHiLight, NULL },
+  { NULL, "Disasm", NULL, NULL, NULL, "AResol", "PanMod", "ResRef", "HiLght", "UsrNam" },
+  { NULL, disSelect_Disasm, NULL, NULL, NULL, hexAddressResolution, disSelectPanelMode, disReferenceResolving, disSelectHiLight, disUserNames },
   disDetect,
   __MF_USECODEGUIDE | __MF_DISASM,
   drawAsm,
@@ -896,8 +901,6 @@ static void __NEAR__ __FASTCALL__ disAcceptActions( void )
   disMode.action[3] = activeDisasm->action[2];
   disMode.prompt[4] = activeDisasm->prompt[3];
   disMode.action[4] = activeDisasm->action[3];
-  disMode.prompt[9] = activeDisasm->prompt[4];
-  disMode.action[9] = activeDisasm->action[4];
 }
 
 /** Common disassembler utility */

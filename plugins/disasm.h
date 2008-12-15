@@ -112,8 +112,8 @@ typedef struct tag_REGISTRY_DISASM
 {
   unsigned     type;		/**< DISASM_XXX constant */
   const char * name;		/**< disassembler name */
-  const char * prompt[5];	/**< prompt on Ctrl-(F1,F3-F5,F10) */
-  DisasmAction action[5];	/**< actions on Ctrl-(F1,F3-F5,F10) */
+  const char * prompt[4];	/**< prompt on Ctrl-(F1,F3-F5) */
+  DisasmAction action[4];	/**< actions on Ctrl-(F1,F3-F5) */
   DisasmFunc   disasm;		/**< main function of disasm */
   AsmFunc      asm_f;		/**< assembler (vice versa of disasm) */
   void         (__FASTCALL__ *ShowShortHelp)(void); /**< displays short help */

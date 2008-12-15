@@ -1671,8 +1671,8 @@ REGISTRY_DISASM PPC_Disasm =
 {
   DISASM_CPU_PPC,
   "AIM Power5+ ISA             [New,Experimental]",
-  { "PpcHlp", "Bitnes", "Endian", "Dialec", NULL },
-  { ppcAsmRef, ppcSelect_bitness, ppcSelect_endian, ppcSelectDialect, NULL },
+  { "PpcHlp", "Bitnes", "Endian", "Dialec" },
+  { ppcAsmRef, ppcSelect_bitness, ppcSelect_endian, ppcSelectDialect },
   ppcDisassembler,
   NULL,
   ppcHelpAsm,
