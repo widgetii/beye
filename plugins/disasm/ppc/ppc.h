@@ -35,6 +35,10 @@ typedef struct s_ppc_opcode {
 #define PPC_ALTIVEC	0x00000002UL
 #define PPC_CLONE_MSK	0x0000000FUL
 #define PPC_BRANCH_INSN	0x00000010UL
+#define PPC_ORDINAL	0x00000000UL
+#define PPC_VEC		0x00000100UL
+#define PPC_SPE		0x00000200UL
+#define PPC_DIALECT	0x0000FF00UL
 
 /* Little endian versions: */
 #define PPC_GET_BITS_LE(opcode,off,len) (((opcode)>>off)&((1<<len)-1))
