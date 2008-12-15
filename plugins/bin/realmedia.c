@@ -44,7 +44,6 @@ static __filesize_t __FASTCALL__ Show_RM_Header( void )
 static void __FASTCALL__ rm_init_fmt( void ) {}
 static void __FASTCALL__ rm_destroy_fmt(void) {}
 static int  __FASTCALL__ rm_platform( void) { return DISASM_DEFAULT; }
-static int  __FASTCALL__ rm_endian(__filesize_t off) { return DAE_LITTLE; }
 
 REGISTRY_BIN rmTable =
 {
@@ -59,7 +58,7 @@ REGISTRY_BIN rmTable =
   NULL,
   rm_platform,
   NULL,
-  rm_endian,
+  NULL,
   NULL,
   NULL,
   NULL,

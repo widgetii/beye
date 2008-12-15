@@ -58,7 +58,6 @@ static tBool  __FASTCALL__ mov_check_fmt( void )
 static void __FASTCALL__ mov_init_fmt( void ) {}
 static void __FASTCALL__ mov_destroy_fmt(void) {}
 static int  __FASTCALL__ mov_platform( void) { return DISASM_DEFAULT; }
-static int  __FASTCALL__ mov_endian(__filesize_t off) { return DAE_LITTLE; }
 
 static __filesize_t __FASTCALL__ Show_MOV_Header( void )
 {
@@ -80,7 +79,7 @@ REGISTRY_BIN movTable =
   NULL,
   mov_platform,
   NULL,
-  mov_endian,
+  NULL,
   NULL,
   NULL,
   NULL,

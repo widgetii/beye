@@ -24,7 +24,6 @@ static tBool  __FASTCALL__ bin_check_fmt( void ) { return True; }
 static void __FASTCALL__ bin_init_fmt( void ) {}
 static void __FASTCALL__ bin_destroy_fmt(void) {}
 static int  __FASTCALL__ bin_platform( void) { return DISASM_DEFAULT; }
-static int  __FASTCALL__ bin_endian(__filesize_t off) { return DAE_LITTLE; }
 
 REGISTRY_BIN binTable =
 {
@@ -39,7 +38,7 @@ REGISTRY_BIN binTable =
   NULL,
   bin_platform,
   NULL,
-  bin_endian,
+  NULL,
   NULL,
   NULL,
   NULL,

@@ -1205,8 +1205,6 @@ static tBool __FASTCALL__ lxAddressResolv(char *addr,__filesize_t cfpos)
 }
 
 static int __FASTCALL__ lxPlatform( void ) { return DISASM_CPU_IX86; }
-static int __FASTCALL__ lxEndian(__filesize_t off) { return DAE_LITTLE; }
-
 
 REGISTRY_BIN lxTable =
 {
@@ -1219,7 +1217,7 @@ REGISTRY_BIN lxTable =
   NULL,
   lxPlatform,
   lxBitness,
-  lxEndian,
+  NULL,
   lxAddressResolv,
   lxVA2PA,
   lxPA2VA,

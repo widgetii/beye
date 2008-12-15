@@ -337,8 +337,6 @@ static __filesize_t __FASTCALL__ Show_V_Header( void )
  return fpos;
 }
 
-static int __FASTCALL__ avi_endian(__filesize_t off) { return DAE_LITTLE; }
-
 REGISTRY_BIN aviTable =
 {
   "Audio Video Interleaved format",
@@ -352,7 +350,7 @@ REGISTRY_BIN aviTable =
   NULL,
   avi_platform,
   NULL,
-  avi_endian,
+  NULL,
   NULL,
   NULL,
   NULL,

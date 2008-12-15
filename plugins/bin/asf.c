@@ -47,7 +47,6 @@ static __filesize_t __FASTCALL__ Show_ASF_Header( void )
 static void __FASTCALL__ asf_init_fmt( void ) {}
 static void __FASTCALL__ asf_destroy_fmt(void) {}
 static int  __FASTCALL__ asf_platform( void) { return DISASM_DEFAULT; }
-static int  __FASTCALL__ asf_endian(__filesize_t off) { return DAE_LITTLE; }
 
 REGISTRY_BIN asfTable =
 {
@@ -62,7 +61,7 @@ REGISTRY_BIN asfTable =
   NULL,
   asf_platform,
   NULL,
-  asf_endian,
+  NULL,
   NULL,
   NULL,
   NULL,

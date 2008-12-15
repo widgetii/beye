@@ -518,7 +518,6 @@ static __filesize_t __FASTCALL__ Show_MP3_Header( void )
 static void __FASTCALL__ mp3_init_fmt( void ) {}
 static void __FASTCALL__ mp3_destroy_fmt(void) {}
 static int  __FASTCALL__ mp3_platform( void) { return DISASM_DEFAULT; }
-static int  __FASTCALL__ mp3_endian(__filesize_t off) { return DAE_LITTLE; }
 
 
 REGISTRY_BIN mp3Table =
@@ -534,7 +533,7 @@ REGISTRY_BIN mp3Table =
   NULL,
   mp3_platform,
   NULL,
-  mp3_endian,
+  NULL,
   NULL,
   NULL,
   NULL,

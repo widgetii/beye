@@ -249,8 +249,6 @@ static __filesize_t __FASTCALL__ Show_WAV_Header( void )
  return fpos;
 }
 
-static int __FASTCALL__ wav_endian(__filesize_t off) { return DAE_LITTLE; }
-
 REGISTRY_BIN wavTable =
 {
   "RIFF WAVE format",
@@ -264,7 +262,7 @@ REGISTRY_BIN wavTable =
   NULL,
   wav_platform,
   NULL,
-  wav_endian,
+  NULL,
   NULL,
   NULL,
   NULL,

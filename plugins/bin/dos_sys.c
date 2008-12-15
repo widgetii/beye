@@ -96,7 +96,6 @@ static tBool  __FASTCALL__ dossys_check_fmt( void )
 static void __FASTCALL__ dossys_init_fmt( void ) {}
 static void __FASTCALL__ dossys_destroy_fmt(void) {}
 static int  __FASTCALL__ dossys_platform( void) { return DISASM_CPU_IX86; }
-static int  __FASTCALL__ dossys_endian(__filesize_t off) { return DAE_LITTLE; }
 
 static tBool __FASTCALL__ dossys_AddressResolv(char *addr,__filesize_t cfpos)
 {
@@ -126,7 +125,7 @@ REGISTRY_BIN dossysTable =
   NULL,
   dossys_platform,
   NULL,
-  dossys_endian,
+  NULL,
   dossys_AddressResolv,
   NULL,
   NULL,

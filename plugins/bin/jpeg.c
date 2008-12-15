@@ -40,8 +40,6 @@ static tBool  __FASTCALL__ jpeg_check_fmt( void )
 static void __FASTCALL__ jpeg_init_fmt( void ) {}
 static void __FASTCALL__ jpeg_destroy_fmt(void) {}
 static int  __FASTCALL__ jpeg_platform( void) { return DISASM_DEFAULT; }
-static int  __FASTCALL__ jpeg_endian(__filesize_t off) { return DAE_LITTLE; }
-
 
 static __filesize_t __FASTCALL__ Show_JPEG_Header( void )
 {
@@ -62,7 +60,7 @@ REGISTRY_BIN jpegTable =
   NULL,
   jpeg_platform,
   NULL,
-  jpeg_endian,
+  NULL,
   NULL,
   NULL,
   NULL,

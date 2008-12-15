@@ -80,7 +80,6 @@ static void __FASTCALL__ rdoff2_init_fmt( void ) {}
 static void __FASTCALL__ rdoff2_destroy_fmt( void ) {}
 
 static int __FASTCALL__ rdoff2_platform( void ) { return DISASM_CPU_IX86; }
-static int __FASTCALL__ rdoff2_endian(__filesize_t off) { return DAE_LITTLE; }
 
 REGISTRY_BIN rdoff2Table =
 {
@@ -95,7 +94,7 @@ REGISTRY_BIN rdoff2Table =
   NULL,
   rdoff2_platform,
   NULL,
-  rdoff2_endian,
+  NULL,
   NULL,
   NULL,
   NULL,

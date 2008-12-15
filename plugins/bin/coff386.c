@@ -724,7 +724,6 @@ static unsigned __FASTCALL__ coff386_GetObjAttr(__filesize_t pa,char *name,unsig
 }
 
 static int __FASTCALL__ coff386_platform( void ) { return DISASM_CPU_IX86; }
-static int __FASTCALL__ coff386_endian(__filesize_t off) { return DAE_LITTLE; }
 
 REGISTRY_BIN coff386Table =
 {
@@ -739,7 +738,7 @@ REGISTRY_BIN coff386Table =
   fmtSetState,
   coff386_platform,
   coff386_bitness,
-  coff386_endian,
+  NULL,
   coff386_AddrResolv,
   coff386_VA2PA,
   coff386_PA2VA,

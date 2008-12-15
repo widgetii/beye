@@ -64,7 +64,6 @@ static tBool  __FASTCALL__ mpeg_check_fmt( void )
 static void __FASTCALL__ mpeg_init_fmt( void ) {}
 static void __FASTCALL__ mpeg_destroy_fmt(void) {}
 static int  __FASTCALL__ mpeg_platform( void) { return DISASM_DEFAULT; }
-static int  __FASTCALL__ mpeg_endian(__filesize_t off) { return DAE_LITTLE; }
 
 REGISTRY_BIN mpegTable =
 {
@@ -79,7 +78,7 @@ REGISTRY_BIN mpegTable =
   NULL,
   mpeg_platform,
   NULL,
-  mpeg_endian,
+  NULL,
   NULL,
   NULL,
   NULL,

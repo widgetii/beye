@@ -1351,8 +1351,6 @@ static int __FASTCALL__ pePlatform( void ) {
     return id;
 }
 
-static int __FASTCALL__ endianPE(__filesize_t off) { return DAE_LITTLE; }
-
 REGISTRY_BIN peTable =
 {
   "PE (Portable Executable)",
@@ -1364,7 +1362,7 @@ REGISTRY_BIN peTable =
   fmtSetState,
   pePlatform,
   bitnessPE,
-  endianPE,
+  NULL,
   peAddressResolv,
   peVA2PA,
   pePA2VA,
