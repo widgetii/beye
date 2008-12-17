@@ -26,6 +26,7 @@
 #include "bmfile.h"
 #include "bconsole.h"
 #include "tstrings.h"
+#include "plugins/disasm.h"
 
 unsigned fmtActiveState = 0;
 
@@ -59,7 +60,7 @@ tBool __FASTCALL__ fmtFindPubName(BGLOBAL fmt_cache,char *buff,unsigned cb_buff,
     (*fmt_readpub)(fmt_cache,ret,buff,cb_buff);
     return True;
   }
-  return False;
+  return udnFindName(pa,buff,cb_buff);
 }
 
 __filesize_t __FASTCALL__ fmtGetPubSym(BGLOBAL fmt_cache,char *str,unsigned cb_str,

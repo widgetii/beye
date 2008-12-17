@@ -268,8 +268,13 @@ static tBool __NEAR__ __FASTCALL__ isMZReferenced(__filesize_t shift,char len)
 }
 static unsigned long __FASTCALL__ AppendMZRef(char *str,__filesize_t ulShift,int flags,int codelen,__filesize_t r_sh)
 {
+  char stmp[256];
   unsigned long ret = RAPREF_NONE;
   if(flags & APREF_TRY_PIC) return RAPREF_NONE;
+  if(udnFindName(r_sh,stmp,sizeof(stmp))==True) {
+    strcat(str,stmp);
+    return RAPREF_DONE;
+  }
   if(isMZReferenced(ulShift,codelen))
   {
      unsigned wrd;

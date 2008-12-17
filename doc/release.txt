@@ -59,7 +59,6 @@ What's todo:
   if it possible.
 + For procedure 'Save as (disassembler mode)' usage virtual            (QUICKLY)
   addresses instead of physical ones.
-+ User defined names for labels.                                       (QUICKLY)
 + Support of ordinal entries by name.                                  (QUICKLY)
 + Expand references prediction code.                  (WHEN NEW IDEAS WILL COME)
 + Accelerating video i/o                                                (ALWAYS)
@@ -79,7 +78,6 @@ What's todo:
   (this will in 6.x series)
 + Filters for text-mode (like rtf-view)			    (IN THE NEAR FUTURE)
 + User defined structures (like dbf-view)			  (NOT URGENTLY)
-+ Support for ASF, MPEG, MOV, RM, JPEG file formats		  (NOT URGENTLY)
 
 
 Sweet dreams:                                                   (DISTANT FUTURE)

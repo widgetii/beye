@@ -2219,7 +2219,7 @@ static tBool __NEAR__ __FASTCALL__ FindPubName(char *buff,unsigned cb_buff,__fil
     buff[cb_buff-1] = 0;
     return True;
   }
-  return False;
+  return udnFindName(pa,buff,cb_buff);
 }
 
 static void __FASTCALL__ elf_ReadPubNameList(BGLOBAL handle,void (__FASTCALL__ *mem_out)(const char *))
