@@ -704,6 +704,16 @@ void __HUGE__*  __FASTCALL__ la_AddData(linearArray *obj,const void *udata,void 
   return to;
 }
 
+void __FASTCALL__ la_DeleteData(linearArray *obj,unsigned long idx) {
+    char __HUGE__ *from;
+    char __HUGE__ *to;
+    if(idx >= obj->nItems) return;
+    to = ((char __HUGE__ *)obj->data) + idx*obj->itemSize;
+    from = ((char __HUGE__ *)obj->data) + (idx+1)*obj->itemSize;
+    memmove(to,from,(obj->nItems-(idx+1))*obj->itemSize);
+    obj->nItems--;
+}
+
 void         __FASTCALL__ la_Sort(linearArray *obj,func_compare compare)
 {
   if(obj)

@@ -167,7 +167,7 @@ typedef struct tag_linearArray
 {
   unsigned long   nItems;    /**< Number of stored items */
   void __HUGE__ * data;      /**< Pointer into linear array */
-  unsigned long   nSize;     /**< Size of linear array (Can be differ from nItems) */
+  unsigned long   nSize;     /**< Size of linear array (May differ from nItems) */
   unsigned        itemSize;  /**< Size of one item in linear array */
 }linearArray;
 
@@ -175,7 +175,7 @@ typedef struct tag_linearArray
                      * @return                pointer to builded array or NULL if error
                      * @param maxitems        specifies maximal number of item that can be stored in array. 0 - indicates dynamic change of size
                      * @param size_of_item    specifies size of each array element.
-                     * @param mem_out         specifies user-defined function to be called when low-memory. Can be NULL.
+                     * @param mem_out         specifies user-defined function to be called when low-memory. May be NULL.
                      * @note                  Linear array consist from elements
                      *                        same width.
                      * @see                   la_Destroy la_IterDestroy
@@ -185,12 +185,20 @@ extern linearArray *__FASTCALL__ la_Build( unsigned long maxitems,unsigned size_
 
                    /** Adds new element to linear array
                      * @return                location of new element or NULL if no memory
-                     * @param obj             specifies linear array where will be stored new element
+                     * @param obj             specifies linear array where new element will be stored
                      * @param data            specifies new element
-                     * @param mem_out         specifies user-defined function to be called when low-memory. Can be NULL.
+                     * @param mem_out         specifies user-defined function to be called when low-memory. May be NULL.
                      * @see                   la_Build la_Find
                     **/
 extern void __HUGE__*__FASTCALL__ la_AddData(linearArray *obj,const void *data,void (__FASTCALL__ *mem_out)(const char *));
+
+                   /** Removes given element from linear array
+                     * @param obj             specifies linear array where element will be removed
+                     * @param idx             specifies index of element to be removed
+                     * @param mem_out         specifies user-defined function to be called when low-memory. May be NULL.
+                     * @see                   la_Build la_Find
+                    **/
+extern void __FASTCALL__          la_DeleteData(linearArray *obj,unsigned long idx);
 
                    /** Destroys of linear array
                      * @return                none
