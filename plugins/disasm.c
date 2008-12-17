@@ -476,6 +476,8 @@ static tCompare __FASTCALL__ udn_compare(const void __HUGE__ *e1,const void __HU
 }
 
 static linearArray *udn_list=NULL;
+static int udn_modified=0;
+static char udn_fname[4096];
 
 static tBool __FASTCALL__ udnAddItem( void ) {
     __filesize_t off;
@@ -486,13 +488,16 @@ static tBool __FASTCALL__ udnAddItem( void ) {
     {
 	if(!udn_list) udn_list=la_Build(0,sizeof(udn),NULL);
 	if(udn_list) {
-	    udn item;
+	    udn item,*prev;
 	    strcpy(item.name,ud_name);
 	    item.name[255]='\0';
 	    item.offset=off;
-	    la_AddData(udn_list,&item,NULL);
+	    prev = la_Find(udn_list,&item,udn_compare);
+	    if(prev) strcpy(prev->name,item.name);
+	    else     la_AddData(udn_list,&item,NULL);
 	    la_Sort(udn_list,udn_compare);
 	}
+	udn_modified=1;
 	return True;
     }
     return False;
@@ -526,6 +531,7 @@ static tBool __FASTCALL__ udnDeleteItem( void ) {
     if(rval!=-1) {
 	la_DeleteData(udn_list,rval);
 	la_Sort(udn_list,udn_compare);
+	udn_modified=1;
     }
   }
   return rval==-1?False:True;
@@ -547,14 +553,12 @@ tBool __FASTCALL__ udnFindName(__filesize_t pa,char *buff, unsigned cb_buff) {
     return False;
 }
 
-tBool __FASTCALL__ udnSaveList( void ) {
+tBool __FASTCALL__ __udnSaveList( void )
+{
     unsigned i;
-    char fname[4096];
     if(udn_list) {
-    if(GetStringDlg(fname," Please enter file name: "," [ENTER] - Proceed ",NAME_MSG))
-    {
 	FILE *out;
-	if((out = fopen(fname,"wt"))!=NULL) {
+	if((out = fopen(udn_fname,"wt"))!=NULL) {
 	    fprintf(out,"; This is automatically generated list of user defined names\n"
 			"; for: %s\n"
 			"; by Biew-%s\n"
@@ -565,26 +569,32 @@ tBool __FASTCALL__ udnSaveList( void ) {
 		,((udn *)udn_list->data)[i].offset
 		,((udn *)udn_list->data)[i].name);
 	    fclose(out);
+	    udn_modified=0;
 	    return True;
 	}
 	else {
 	    char stmp[256];
 	    sprintf(stmp,"Can't open file: %s\n",strerror(errno));
-	    ErrMessageBox(fname,stmp);
+	    ErrMessageBox(udn_fname,stmp);
 	}
-    }
     }
     return False;
 }
 
-tBool __FASTCALL__ udnLoadList( void ) {
-    unsigned i;
-    char fname[4096];
-    udn item;
-    if(GetStringDlg(fname," Please enter file name: "," [ENTER] - Proceed ",NAME_MSG))
+
+tBool __FASTCALL__ udnSaveList( void ) {
+    if(GetStringDlg(udn_fname," Please enter file name: "," [ENTER] - Proceed ",NAME_MSG))
     {
-	FILE *in;
-	if((in = fopen(fname,"rt"))!=NULL) {
+	return __udnSaveList();
+    }
+    return False;
+}
+
+tBool __FASTCALL__  __udnLoadList( void ) {
+    unsigned i;
+    udn item;
+    FILE *in;
+    if((in = fopen(udn_fname,"rt"))!=NULL) {
 	    char buff[4096],*brk;
 	    unsigned blen;
 	    i = 0;
@@ -619,8 +629,15 @@ tBool __FASTCALL__ udnLoadList( void ) {
 	else {
 	    char stmp[256];
 	    sprintf(stmp,"Can't open file: %s\n",strerror(errno));
-	    ErrMessageBox(fname,stmp);
-	}
+	    ErrMessageBox(udn_fname,stmp);
+    }
+    return False;
+}
+
+tBool __FASTCALL__ udnLoadList( void ) {
+    if(GetStringDlg(udn_fname," Please enter file name: "," [ENTER] - Proceed ",NAME_MSG))
+    {
+	return __udnLoadList();
     }
     return False;
 }
@@ -653,8 +670,7 @@ static tBool __FASTCALL__ disUserNames( void ) {
      int ret;
      TWindow * w;
      w = PleaseWaitWnd();
-     if(udn_funcs[i]) ret = (*udn_funcs[i])();
-     else { ErrMessageBox("Not implemented yet",NULL); ret = False; }
+     ret = (*udn_funcs[i])();
      CloseWnd(w);
      return ret;
   }
@@ -897,6 +913,8 @@ static void __FASTCALL__ disReadIni( hIniProfile *ini )
     biewReadProfileString(ini,"Biew","Browser","SubSubMode8","0",tmps,sizeof(tmps));
     disNeedRef = (int)strtoul(tmps,NULL,10);
     if(disNeedRef > NEEDREF_PREDICT) disNeedRef = 0;
+    biewReadProfileString(ini,"Biew","Browser","udn_list","",udn_fname,sizeof(udn_fname));
+    if(udn_fname[0]) __udnLoadList();
     biewReadProfileString(ini,"Biew","Browser","SubSubMode9","0",tmps,sizeof(tmps));
     HiLight = (int)strtoul(tmps,NULL,10);
     if(HiLight > 2) HiLight = 2;
@@ -910,6 +928,7 @@ static void __FASTCALL__ disInit( void )
 {
   unsigned i;
   int def_platform;
+  udn_fname[0]='\0';
   CurrStrLenBuff = PMalloc(tvioHeight);
   PrevStrLenAddr = PMalloc(tvioHeight*sizeof(long));
   dis_comments   = PMalloc(DISCOM_SIZE*sizeof(char));
@@ -944,7 +963,13 @@ static void __FASTCALL__ disTerm( void )
   PFREE(disCodeBuffer);
   PFREE(disCodeBuf2);
   PFREE(disCodeBufPredict);
-  if(udn_list) la_Destroy(udn_list);
+  if(udn_list) {
+    if(udn_modified) {
+	WarnMessageBox("User defined list was not saved",NULL);
+	udnSaveList();
+    }
+    la_Destroy(udn_list);
+  }
 }
 
 static void __FASTCALL__ disSaveIni( hIniProfile *ini )
@@ -959,6 +984,7 @@ static void __FASTCALL__ disSaveIni( hIniProfile *ini )
   biewWriteProfileString(ini,"Biew","Browser","SubSubMode8",tmps);
   sprintf(tmps,"%i",HiLight);
   biewWriteProfileString(ini,"Biew","Browser","SubSubMode9",tmps);
+  biewWriteProfileString(ini,"Biew","Browser","udn_list",udn_fname);
   if(activeDisasm->save_ini) activeDisasm->save_ini(ini);
 }
 
