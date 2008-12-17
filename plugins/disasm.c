@@ -965,7 +965,7 @@ static void __FASTCALL__ disTerm( void )
   PFREE(disCodeBufPredict);
   if(udn_list) {
     if(udn_modified) {
-	WarnMessageBox("User defined list was not saved",NULL);
+	WarnMessageBox("User defined list of names was not saved",NULL);
 	udnSaveList();
     }
     la_Destroy(udn_list);
