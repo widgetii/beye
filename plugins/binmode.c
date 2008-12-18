@@ -23,6 +23,7 @@
 #include "bconsole.h"
 #include "biewutil.h"
 #include "biewhelp.h"
+#include "bin_util.h"
 #include "bmfile.h"
 #include "reg_form.h"
 #include "editor.h"
@@ -261,8 +262,8 @@ static tBool __FASTCALL__ binDecVirtWidth( void )
 REGISTRY_MODE binMode =
 {
   "~Binary mode",
-  { NULL, "BinMod", NULL, NULL, NULL, NULL, "<<<   ", "   >>>", NULL, NULL },
-  { NULL, binSelectMode, NULL, NULL, NULL, NULL, binDecVirtWidth, binIncVirtWidth, NULL, NULL },
+  { NULL, "BinMod", NULL, NULL, NULL, NULL, "<<<   ", "   >>>", NULL, "UsrNam" },
+  { NULL, binSelectMode, NULL, NULL, NULL, NULL, binDecVirtWidth, binIncVirtWidth, NULL, udnUserNames },
   binDetect,
   __MF_NONE,
   drawBinary,

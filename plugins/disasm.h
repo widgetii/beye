@@ -227,7 +227,4 @@ extern int __FASTCALL__  disAppendDigits(char *str,__filesize_t ulShift,int flag
 extern int __FASTCALL__  disAppendFAddr(char * str,__fileoff_t ulShift,__fileoff_t distin,
                              __filesize_t r_sh,char type,
                              unsigned seg,char codelen);
-/** Reads user defined name at given offset!
-**/
-extern tBool __FASTCALL__ udnFindName(__filesize_t pa,char *buff, unsigned cb_buff);
 #endif

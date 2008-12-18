@@ -25,6 +25,7 @@
 #include "biewutil.h"
 #include "biewhelp.h"
 #include "bmfile.h"
+#include "bin_util.h"
 #include "reg_form.h"
 #include "codeguid.h"
 #include "editor.h"
@@ -437,8 +438,8 @@ static tBool __FASTCALL__ hexDecVirtWidth( void )
 REGISTRY_MODE hexMode =
 {
   "~Hexadecimal mode",
-  { NULL, "HexMod", "Endian", NULL, NULL, "AResol", "<<<   ", "   >>>", NULL, NULL },
-  { NULL, hexSelectMode, hexSelectEndian, NULL, NULL, hexAddressResolution, hexDecVirtWidth, hexIncVirtWidth, NULL, NULL },
+  { NULL, "HexMod", "Endian", NULL, NULL, "AResol", "<<<   ", "   >>>", NULL, "UsrNam" },
+  { NULL, hexSelectMode, hexSelectEndian, NULL, NULL, hexAddressResolution, hexDecVirtWidth, hexIncVirtWidth, NULL, udnUserNames },
   hexDetect,
   __MF_NONE,
   drawHex,

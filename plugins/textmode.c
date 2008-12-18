@@ -23,6 +23,7 @@
 #include "plugins/textmode.h"
 #include "colorset.h"
 #include "bmfile.h"
+#include "bin_util.h"
 #include "biewutil.h"
 #include "biewhelp.h"
 #include "bconsole.h"
@@ -1273,8 +1274,8 @@ static unsigned __FASTCALL__ txtCharSize( void ) { return activeNLS->get_symbol_
 REGISTRY_MODE textMode =
 {
   "~Text mode",
-  { NULL, "CodPag", "TxMode", "NLSSet", NULL, NULL, NULL, NULL, "HiLght", "TxType" },
-  { NULL, txtSelectCP, txtSelectMode, txtSelectNLS, NULL, NULL, NULL, NULL, txtSelectHiLight, txtShowType },
+  { NULL, "CodPag", "TxMode", "NLSSet", NULL, NULL, NULL, "TxType", "HiLght", "UsrNam" },
+  { NULL, txtSelectCP, txtSelectMode, txtSelectNLS, NULL, NULL, NULL, txtShowType, txtSelectHiLight, udnUserNames },
   txtDetect,
   __MF_TEXT,
   drawText,

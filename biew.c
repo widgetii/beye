@@ -30,6 +30,7 @@
 #include "bconsole.h"
 #include "colorset.h"
 #include "bmfile.h"
+#include "bin_util.h"
 #include "codeguid.h"
 #include "editor.h"
 #include "tstrings.h"
@@ -518,6 +519,7 @@ static void __NEAR__ __FASTCALL__ save_ini_info( void )
   strcpy(tmp,iniPreserveTime ? "yes" : "no");
   biewWriteProfileString(ini,"Biew","Setup","PreserveTimeStamp",tmp);
   if(activeMode->save_ini) activeMode->save_ini(ini);
+  udnTerm(ini);
   iniCloseFile(ini);
 }
 
@@ -562,6 +564,7 @@ int main( int argc, char *argv[] )
     return EXIT_FAILURE;
  }
  ini = load_ini_info();
+ udnInit(ini);
  skin_err = csetReadIniFile(biew_skin_name);
  initBConsole(biew_vioIniFlags,biew_twinIniFlags);
  ErrorWnd = WindowOpen(1,1,50,16,TWS_NONE | TWS_NLSOEM);

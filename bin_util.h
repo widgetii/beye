@@ -78,7 +78,16 @@ typedef tBool         (__FASTCALL__ * ReadItems)(BGLOBAL handle,memArray * names
 typedef __filesize_t  (__FASTCALL__ * CalcEntry)(unsigned,int dispmsg);
 extern  int           __FASTCALL__ fmtShowList( GetNumItems gni,ReadItems ri,const char * title,int flags,unsigned * ordinal);
 
+/** Reads user defined name at given offset!
+**/
+extern tBool __FASTCALL__ udnFindName(__filesize_t pa,char *buff, unsigned cb_buff);
 
+/** Shows menu with operations for user defined names!
+**/
+extern tBool __FASTCALL__ udnUserNames( void );
+
+extern void __FASTCALL__ udnInit( hIniProfile *ini );
+extern void __FASTCALL__ udnTerm( hIniProfile *ini );
 #ifdef __cplusplus
 }
 #endif
