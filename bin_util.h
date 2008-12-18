@@ -82,6 +82,10 @@ extern  int           __FASTCALL__ fmtShowList( GetNumItems gni,ReadItems ri,con
 **/
 extern tBool __FASTCALL__ udnFindName(__filesize_t pa,char *buff, unsigned cb_buff);
 
+/** Display select box to select user defined name and returns its offset.
+**/
+extern tBool __FASTCALL__ udnSelectName(__filesize_t *off);
+
 /** Shows menu with operations for user defined names!
 **/
 extern tBool __FASTCALL__ udnUserNames( void );

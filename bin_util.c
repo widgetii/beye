@@ -239,6 +239,19 @@ static tBool __FASTCALL__ udnDeleteItem( void ) {
 	udn_modified=1;
     }
   }
+  else ErrMessageBox("UDN list is empty!",NULL);
+  return rval==-1?False:True;
+}
+
+tBool __FASTCALL__ udnSelectName(__filesize_t *off) {
+  int rval=-1;
+  if(udn_list) {
+    rval = fmtShowList(udnGetNumItems,udnReadItems,
+                    " User defined Names (aka bookmarks) ",
+                    LB_SELECTIVE,NULL);
+    if(rval!=-1) *off = ((udn *)udn_list->data)[rval].offset;
+  }
+  else ErrMessageBox("UDN list is empty!",NULL);
   return rval==-1?False:True;
 }
 
@@ -290,7 +303,8 @@ tBool __FASTCALL__ __udnSaveList( void )
 tBool __FASTCALL__ udnSaveList( void ) {
     if(GetStringDlg(udn_fname," Please enter file name: "," [ENTER] - Proceed ",NAME_MSG))
     {
-	return __udnSaveList();
+	if(udn_list)	return __udnSaveList();
+	else		ErrMessageBox("UDN list is empty!",NULL);
     }
     return False;
 }
@@ -342,7 +356,8 @@ tBool __FASTCALL__  __udnLoadList( void ) {
 tBool __FASTCALL__ udnLoadList( void ) {
     if(GetStringDlg(udn_fname," Please enter file name: "," [ENTER] - Proceed ",NAME_MSG))
     {
-	return __udnLoadList();
+	if(udn_list)	return __udnLoadList();
+	else		ErrMessageBox("UDN list is empty!",NULL);
     }
     return False;
 }

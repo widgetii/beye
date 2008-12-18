@@ -22,6 +22,7 @@
 #include "bconsole.h"
 #include "bmfile.h"
 #include "biewhelp.h"
+#include "bin_util.h"
 #include "colorset.h"
 #include "codeguid.h"
 #include "reg_form.h"

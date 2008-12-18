@@ -1194,7 +1194,7 @@ XX yyy 2008     * Fixes by Daniel Borca <dborca@yahoo.com>:
 		  + AIM Power5+ ISA
 		+ Added support for PE32+ file format.
 		* Many other improvements and fixes.
-		+ NEW: User defined names!!!
+		+ NEW: User defined names aka bookmarks (Ctrl-F10)!!!
 []======================================================================[]
 []  Thank you for your interest.                                        []
 []  Nick Kurshev (http://my666.boom.ru/666_en.html).                    []

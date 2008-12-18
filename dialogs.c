@@ -24,6 +24,7 @@
 #include "biewhelp.h"
 #include "bconsole.h"
 #include "biewutil.h"
+#include "bin_util.h"
 #include "biewlib/kbd_code.h"
 #include "biewlib/twin.h"
 
@@ -193,7 +194,7 @@ static const char * jmptxt[] =
   "Mode  ",
   "      ",
   "      ",
-  "      ",
+  "UsrNam",
   "      ",
   "      ",
   "      ",
@@ -256,6 +257,11 @@ tBool __FASTCALL__ GetJumpDlg( __filesize_t * addr,unsigned long *flags)
       case KE_F(1):  hlpDisplay(6);
                      update = False;
                      break;
+      case KE_F(5):  if(udnSelectName(addr)) {
+			if(BMFileFlags&BMFF_USE64) sprintf(str,"%016llX",*addr);
+			else			   sprintf(str,"%08lX",(unsigned long)*addr);
+		     }
+		     break;
       case KE_F(2):  if(*flags < GJDLG_VIRTUAL) (*flags)++;
                      else                       (*flags) = 0;
                      legals = *flags == GJDLG_RELATIVE ? legalchars : &legalchars[2];
