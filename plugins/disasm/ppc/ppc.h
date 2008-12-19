@@ -40,12 +40,15 @@ typedef struct s_ppc_opcode {
 #define PPC_SPE		0x00000200UL
 #define PPC_DIALECT	0x0000FF00UL
 
-/* Little endian versions: */
-#define PPC_GET_BITS_LE(opcode,off,len) (((opcode)>>off)&((1<<len)-1))
-#define PPC_PUT_BITS_LE(bits,off,len) (((bits)&((1<<len)-1))<<off)
-/* Big endian versions: */
+#if __BYTE_ORDER != __LITTLE_ENDIAN
+/* Native endian versions: */
+#define PPC_GET_BITS(opcode,off,len) (((opcode)>>off)&((1<<len)-1))
+#define PPC_PUT_BITS(bits,off,len) (((bits)&((1<<len)-1))<<off)
+#else
+/* Reverse endian versions: */
 #define PPC_GET_BITS(opcode,off,len) (((opcode)>>(32-(off+len)))&((1<<len)-1))
 #define PPC_PUT_BITS(bits,off,len) (((bits)&((1<<len)-1))<<(32-(off+len)))
+#endif
 
 #define MAKE_OP(op) PPC_PUT_BITS(op,0,6)
 
