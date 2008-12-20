@@ -1,4 +1,4 @@
-ÚÄÄÄÄ[ BIEW Version 5.6.4 ]ÄÄÄÄÄ¿
+ÚÄÄÄÄ[ BIEW Version 5.7.0 ]ÄÄÄÄÄ¿
 ³BIEW is binary file viewer with³
 ³build-in editors for binary,   ³
 ³hexadecimal & disassembler     ³
@@ -7,8 +7,8 @@
 ³ş Highlight Athlon64/Prescott  ³
 ³  K7 Athlon/Cyrix-M2           ³
 ³  disassembler.                ³
-³ş Build-in Java, AVR           ³
-³  disassemblers                ³
+³ş Build-in Java, AVR, PPC,     ³
+³  ARM/XScale disassemblers     ³
 ³ş Text viewer with syntax      ³
 ³  highlight / russian          ³
 ³  codepage support.            ³
@@ -24,4 +24,4 @@
 ³           GNUWare             ³
 ³   Written by Nick Kurshev.    ³
 ³    Kazan.Tatarstan.Russia.    ³
-ÀÄÄÄÄÄ[ Release : 14 apr 2007 ]ÄÙ
+ÀÄÄÄÄÄ[ Release : 20 dec 2008 ]ÄÙ

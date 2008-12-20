@@ -10,8 +10,8 @@
 €≤±∞                 ‹‹  ‹‹  ‹‹   ‹‹  ‹   ‹ ‹ ‹ ‹                     ∞±≤€
 €≤±∞                ‹‹‹‹‹‹  ‹‹‹‹ ‹‹‹‹‹‹    ‹   ‹                      ∞±≤€
 €≤±∞                                                                  ∞±≤€
-€≤±∞                           Ver 5.6.4                              ∞±≤€
-€≤±∞                          14 apr 2007.                            ∞±≤€
+€≤±∞                           Ver 5.7.0                              ∞±≤€
+€≤±∞                          20 dec 2008.                            ∞±≤€
 €≤±∞                                                                  ∞±≤€
 €≤±∞    Made in Kazan.Tatarstan.Russia. Written By Nick Kurshev.      ∞±≤€
 €≤±∞                                                                  ∞±≤€
@@ -1169,7 +1169,7 @@ v5.0.2        ! Changes:
 		* Fixed bug #1696442 (-extraincdir and -extralibdir can only handle one extra lib.)
 		* Added endian selection in hexmode viewer
 5.7.0         ! Changes:
-XX yyy 2008     * Fixes by Daniel Borca <dborca@yahoo.com>:
+20 dec 2008     * Fixes by Daniel Borca <dborca@yahoo.com>:
 		  * unix/vio.c use the correct alternate set for line drawing.
 		    see http://www.in-ulm.de/~mascheck/various/alternate_charset/
 		  * configure: accept linux and Linux from uname. i?86 is really ia32.
@@ -1193,8 +1193,8 @@ XX yyy 2008     * Fixes by Daniel Borca <dborca@yahoo.com>:
 		  + ARM32 / XScale
 		  + AIM Power5+ ISA
 		+ Added support for PE32+ file format.
-		* Many other improvements and fixes.
 		+ NEW: User defined names aka bookmarks (Ctrl-F10)!!!
+		* Many other improvements and fixes.
 []======================================================================[]
 []  Thank you for your interest.                                        []
 []  Nick Kurshev (http://my666.boom.ru/666_en.html).                    []
