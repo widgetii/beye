@@ -4969,7 +4969,7 @@ AsmRet __FASTCALL__ ix86Asm(const char *code)
   fclose(asmf);
 
   //Build command line
-  i=snprintf(commandbuffer, FILENAME_MAX+1, assemblers[active_assembler].run_command, home);
+  i=sprintf(commandbuffer, assemblers[active_assembler].run_command, home);
   if ((i >= FILENAME_MAX) || (i < 0)) goto commandtoolongerror;
 
   //Run external assembler
