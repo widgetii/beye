@@ -181,28 +181,36 @@ static tCompare __FASTCALL__ udn_compare(const void __HUGE__ *e1,const void __HU
 }
 
 static linearArray *udn_list=NULL;
-static int udn_modified=0;
+static tBool udn_modified=False;
 static char udn_fname[4096];
 
 static tBool __FASTCALL__ udnAddItem( void ) {
     __filesize_t off;
+    udn item,*prev;
     char ud_name[256],prompt[256];
     off = BMGetCurrFilePos();
     sprintf(prompt," Name for %08X offset: ",off);
+    prev=NULL;
+    ud_name[0]='\0';
+    if(udn_list) {
+	item.name[255]='\0';
+	item.offset=off;
+	prev = la_Find(udn_list,&item,udn_compare);
+	if(prev) strcpy(ud_name,prev->name);
+    }
     if(GetStringDlg(ud_name,prompt," [ENTER] - Proceed ",NAME_MSG))
     {
 	if(!udn_list) udn_list=la_Build(0,sizeof(udn),NULL);
 	if(udn_list) {
-	    udn item,*prev;
-	    strcpy(item.name,ud_name);
-	    item.name[255]='\0';
-	    item.offset=off;
-	    prev = la_Find(udn_list,&item,udn_compare);
-	    if(prev) strcpy(prev->name,item.name);
-	    else     la_AddData(udn_list,&item,NULL);
+	    if(prev) strcpy(prev->name,ud_name);
+	    else {
+		strcpy(item.name,ud_name);
+		item.offset=off;
+		la_AddData(udn_list,&item,NULL);
+	    }
 	    la_Sort(udn_list,udn_compare);
 	}
-	udn_modified=1;
+	udn_modified=True;
 	return True;
     }
     return False;
@@ -236,7 +244,7 @@ static tBool __FASTCALL__ udnDeleteItem( void ) {
     if(rval!=-1) {
 	la_DeleteData(udn_list,rval);
 	la_Sort(udn_list,udn_compare);
-	udn_modified=1;
+	udn_modified=True;
     }
   }
   else ErrMessageBox("UDN list is empty!",NULL);
@@ -287,7 +295,7 @@ tBool __FASTCALL__ __udnSaveList( void )
 		,((udn *)udn_list->data)[i].offset
 		,((udn *)udn_list->data)[i].name);
 	    fclose(out);
-	    udn_modified=0;
+	    udn_modified=False;
 	    return True;
 	}
 	else {
@@ -407,7 +415,6 @@ void __FASTCALL__ udnInit( hIniProfile *ini ) {
 }
 
 void __FASTCALL__ udnTerm( hIniProfile *ini ) {
-  biewWriteProfileString(ini,"Biew","Browser","udn_list",udn_fname);
   if(udn_list) {
     if(udn_modified) {
 	WarnMessageBox("User defined list of names was not saved",NULL);
@@ -415,4 +422,5 @@ void __FASTCALL__ udnTerm( hIniProfile *ini ) {
     }
     la_Destroy(udn_list);
   }
+  biewWriteProfileString(ini,"Biew","Browser","udn_list",udn_fname);
 }
