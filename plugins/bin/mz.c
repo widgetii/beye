@@ -272,10 +272,6 @@ static unsigned long __FASTCALL__ AppendMZRef(char *str,__filesize_t ulShift,int
   char stmp[256];
   unsigned long ret = RAPREF_NONE;
   if(flags & APREF_TRY_PIC) return RAPREF_NONE;
-  if(udnFindName(r_sh,stmp,sizeof(stmp))==True) {
-    strcat(str,stmp);
-    return RAPREF_DONE;
-  }
   if(isMZReferenced(ulShift,codelen))
   {
      unsigned wrd;
@@ -287,7 +283,8 @@ static unsigned long __FASTCALL__ AppendMZRef(char *str,__filesize_t ulShift,int
   if(!DumpMode && !EditMode && (flags & APREF_TRY_LABEL) && codelen == 4)
   {
     r_sh += (((__filesize_t)mz.mzHeaderSize) << 4);
-    strcat(str,Get8Digit(r_sh));
+    if(udnFindName(r_sh,stmp,sizeof(stmp))==True) strcat(str,stmp);
+    else strcat(str,Get8Digit(r_sh));
     GidAddGoAddress(str,r_sh);
     ret = RAPREF_DONE;
   }
