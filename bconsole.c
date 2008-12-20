@@ -1002,6 +1002,7 @@ int __FASTCALL__ PageBox(unsigned width,unsigned height,const void ** __obj,unsi
 {
  TWindow * wlist;
  int start,ostart,ret;
+ if(height>tvioHeight-2) height=tvioHeight-2;
  wlist = _CreateWindowDD(0,width-1,height,True);
  ostart = start = 0;
  (*func)(wlist,__obj,(unsigned)start,nobj);
