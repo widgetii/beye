@@ -23,7 +23,9 @@
 #include <signal.h>
 #include <limits.h>
 #include <sys/stat.h>
+#ifdef HAVE_SYS_RESOURCE
 #include <sys/resource.h>
+#endif
 #include <stdlib.h>
 #include <errno.h>
 

@@ -411,6 +411,20 @@ else
     echores "no"
 fi
 
+echocheck "checking for sys/resource.h"
+cat > $TMPC << EOF
+#include <sys/resource.h>
+int main(void){return 0;}
+EOF
+_sys_resource=no
+cc_check && _sys_resource=yes
+if test "$_sys_resource" = yes ; then 
+    echores "yes"
+    _cdefos="-DHAVE_SYS_RESOURCE=1 $_cdefos"
+else
+    echores "no"
+fi
+
 if test -z "$_x11libdir" ; then
  _cdefos="$_cdefos"
 else
