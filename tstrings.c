@@ -19,11 +19,11 @@
 /**   English release for all messages */
 
 const char msgAboutText[] =
-"   File viewer with built-in Athlon64/\n"
-"   Prescott/K7-Athlon/Cyrix-M2, Java, AVR\n"
-"   disassemblers. Supports multiple executable\n"
-"   structures. Written by Nick Kurshev. Kazan.\n"
-"              Tatarstan. Russia.";
+"File viewer with built-in x86/i386/Amd64(sse4)\n"
+" Java, AVR\, ARM/XScale, PPC-64 disassemblers.\n"
+"  Supports multiple executable structures.\n"
+"      Written by Nick Kurshev. Kazan.\n"
+"            Tatarstan. Russia.";
 const char * BiewPicture[] = {
  "‹‹‹‹  ‹‹‹ ‹‹‹‹ ‹‹‹   ‹‹‹",
  " ‹  ‹  ‹  ‹  ‹  ‹     ‹",
