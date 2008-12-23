@@ -225,7 +225,7 @@ static void __NEAR__ __FASTCALL__ printHdr(FILE * fout,REGISTRY_BIN *fmt)
   time_t tim;
   cptr = cptr1 = ";"; cptr2 = "";
   time(&tim);
-  fprintf(fout,"%s\n%sDissasembler dump of \'%s\'\n"
+  fprintf(fout,"%s\n%sDisassembler dump of \'%s\'\n"
 #if (__WORDSIZE >= 32) && !defined(__QNX4__)
                "%sRange : %16llXH-%16llXH\n"
 #else

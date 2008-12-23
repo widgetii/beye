@@ -1008,7 +1008,7 @@ v5.0.2        ! Changes:
                 + Added initial support of LMF (QNX4)
                   by Andrew Golovnia <andrew_golovnia@ukr.net>.
                 + Prompts of dialogs were dropped to prompt string
-                * Fixed bug of dissasembler's dump when program created
+                * Fixed bug of disassembler's dump when program created
                   incorrect dump if several labels referenced to the same
                   physical address.
                 * Fixed hilight search when width and height of window are

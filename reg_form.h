@@ -40,7 +40,7 @@ typedef tBool         (__FASTCALL__ *ModFunc)( void );
 #define APREF_TRY_PIC     0x0008 /**< Append references in short form assuming that shift is offset in .GOT table where references are binded */
 
 /**
-   Appends dissasembler reference to string.
+   Appends disassembler reference to string.
    * @param str          string buffer for append to
    * @param shift        physical address of field, that required of binding
    * @param flags        see above
@@ -183,8 +183,8 @@ typedef struct tag_REGISTRY_BIN
                               __filesize_t *start,__filesize_t *end,int *_class,int *bitness);
 
                          /** Prepares internal buffers for work file structures.
-                           * @param start     indicates start position in the file, that is required for dissasembler
-                           * @param end       indicates end position in the file, that is required for dissasembler
+                           * @param start     indicates start position in the file, that is required for disassembler
+                           * @param end       indicates end position in the file, that is required for disassembler
                            * return           False if success, True if an error
                            *                  is occured (sample: out of memory)
                            * @note            It is called before GetPubSym and GetObjAttr
@@ -202,7 +202,7 @@ extern REGISTRY_BIN *detectedFormat;
 
 #define __MF_NONE          0x0000 /**< Indicates that no flags were defined */
 #define __MF_TEXT          0x0001 /**< Indicates that plugin is text browser */
-#define __MF_DISASM        0x0002 /**< Indicates that plugin is dissasembler */
+#define __MF_DISASM        0x0002 /**< Indicates that plugin is disassembler */
 #define __MF_USECODEGUIDE  0x0004 /**< Indicates that plugin uses code guider */
 
 #define __MAX_SYMBOL_SIZE  4 /**< Insicates maximal size of multibyte symbol. (For optimization purposes only).*/

@@ -62,7 +62,7 @@ static void avr_assert( int expression )
 {
   if (!expression)
   {
-    MemOutBox("AVR dissasembler fault");
+    MemOutBox("AVR disassembler fault");
     exit(EXIT_FAILURE);
   }
 }
@@ -542,7 +542,7 @@ static void __FASTCALL__ AVRInit( void )
 
   if (!outstr || !avr_bin_masks)
   {
-    MemOutBox("AVR dissasembler initialization");
+    MemOutBox("AVR disassembler initialization");
     exit(EXIT_FAILURE);
   }
 

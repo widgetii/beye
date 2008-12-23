@@ -4853,7 +4853,7 @@ static void __FASTCALL__ ix86Init( void )
      (!ix86_apistr) || (!ix86_modrm_ret)
      )
   {
-    MemOutBox("ix86 dissasembler initialization");
+    MemOutBox("ix86 disassembler initialization");
     exit(EXIT_FAILURE);
   }
 #ifdef HAVE_POPEN

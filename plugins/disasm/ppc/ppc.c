@@ -96,7 +96,7 @@ static void ppc_Encode_args(char *ostr,tUInt32 opcode,
 					len<17? DISARG_WORD:
 						DISARG_DWORD;
 			break;
-	    default: /* internal dissasembler error */
+	    default: /* internal disassembler error */
 		break;
 	}
 	if(dig_off>0) {

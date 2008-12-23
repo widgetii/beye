@@ -64,7 +64,7 @@ What's todo:
 + Accelerating video i/o                                                (ALWAYS)
 + Fully-featured support for LE, LX, a.out, arch,           (AS FAR AS POSSIBLE)
   *nix formats (if possible with using binutils or scripts)
-+ Dissasemblers for other platform.               (IF THEIR USERS WILL CODED IT)
++ Disassemblers for other platform.               (IF THEIR USERS WILL CODED IT)
 + OS/2 mouse-related bug fix.                               (AS FAR AS POSSIBLE)
 + Any base for hex-mode (probably it will digit mode viewer)      (NOT URGENTLY)
 + Search and replace (non-interactive)                            (NOT URGENTLY)

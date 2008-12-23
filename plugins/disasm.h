@@ -1,7 +1,7 @@
 /**
  * @namespace   biew_plugins_I
  * @file        plugins/disasm.h
- * @brief       This file contains function prototypes for dissasembler interface.
+ * @brief       This file contains function prototypes for disassembler interface.
  * @version     -
  * @remark      this source file is part of Binary vIEW project (BIEW).
  *              The Binary vIEW (BIEW) is copyright (C) 1995 Nick Kurshev.
@@ -79,7 +79,7 @@ typedef struct tagAsmRet
 
 /* New features: commentaries */
 #define DISCOM_SIZE 256       /**< Size of disassembler commentaries */
-extern char *   dis_comments; /**< Pointer to dissasembler commentaries */
+extern char *   dis_comments; /**< Pointer to disassembler commentaries */
 
 #define DISCOMSEV_NONE    0 /**< means no comments were appended */
 #define DISCOMSEV_STRING  1 /**< means comment is representation of multibyte immediate operand */

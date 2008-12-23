@@ -852,7 +852,7 @@ static __filesize_t __FASTCALL__ disSearch(TWindow *pwnd, __filesize_t start,
 
 REGISTRY_MODE disMode =
 {
-  "~Dissasembler",
+  "~Disassembler",
   { NULL, "Disasm", NULL, NULL, NULL, "AResol", "PanMod", "ResRef", "HiLght", "UsrNam" },
   { NULL, disSelect_Disasm, NULL, NULL, NULL, hexAddressResolution, disSelectPanelMode, disReferenceResolving, disSelectHiLight, udnUserNames },
   disDetect,
