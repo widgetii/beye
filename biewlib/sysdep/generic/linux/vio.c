@@ -85,6 +85,25 @@ static unsigned char frames_dumb[0x30] =
 #define _2color(x)	__Xlat__(__ansi_color, (x) & 7)
 /* #define _2color(x) (char)__ansi_color[((x) & 7)] */
 
+#define VT100_CLEARSCREEN	"\033[2J"
+#define VT100_CLEARLINE		"\033[2K"
+#define VT100_NORMALCHARS	"\033[0m"
+#define VT100_BOLDCHARS		"\033[1m"
+#define VT100_UNDERLINECHARS	"\033[1m"
+#define VT100_MODE80		"\033[?3h"
+#define VT100_MODE132		"\033[?3l"
+
+#define VT100_SET_CHARSET_UK_G0		"\033(A"
+#define VT100_SET_CHARSET_UK_G1		"\033)A"
+#define VT100_SET_CHARSET_US_G0		"\033(B"
+#define VT100_SET_CHARSET_US_G1		"\033)B"
+#define VT100_SET_CHARSET_GR_G0		"\033(0"
+#define VT100_SET_CHARSET_GR_G1		"\033)0"
+#define VT100_SET_CHARSET_ROM_G0	"\033(1"
+#define VT100_SET_CHARSET_ROM_G1	"\033)1"
+#define VT100_SET_CHARSET_SPEC_GR_G0	"\033(2"
+#define VT100_SET_CHARSET_SPEC_GR_G1	"\033)2"
+
 static struct {
     unsigned char last;
     unsigned char color[0x10];
@@ -229,8 +248,8 @@ void __FASTCALL__ __vioWriteBuff(tAbsCoord x, tAbsCoord y, const tvioBuff *buff,
 		c &= 0x7f;
 	    } else {
 		unsigned char *map = mode ?
-			    (output_G1 ? "\033)0\016" : "\033(U"):
-			    (output_G1 ? "\033(B\017" : "\033(K");
+			    (output_G1 ? VT100_SET_CHARSET_GR_G1"\016" : "\033(U"):
+			    (output_G1 ? VT100_SET_CHARSET_US_G1"\017" : "\033(K");
 
 		if (output_G1 && old_mode != mode)
 		{
@@ -348,7 +367,7 @@ void __FASTCALL__ __init_vio(unsigned long flags)
 	    free(buf);
 	}
     } else {
-	twrite("\033[0m\033[3h");
+	twrite(VT100_NORMALCHARS VT100_MODE80);
 	if (terminal->type != TERM_LINUX) {
 	    do_nls = 1;
 	    output_G1 = 1;
@@ -386,7 +405,7 @@ void __FASTCALL__ __term_vio(void)
 	if (terminal->type == TERM_XTERM) twrite("\033[?1001r\033[?1000l");
 	if (terminal->type != TERM_XTERM || transparent)
 	    twrite("\033(K");
-	twrite("\033[3l\033[0m\033[2J");
+	twrite(VT100_MODE80 VT100_NORMALCHARS VT100_CLEARSCREEN);
     }
     __vioSetCursorPos(firstX, firstY);
 
