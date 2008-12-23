@@ -49,7 +49,8 @@ void __FASTCALL__ initBConsole( unsigned long vio_flg,unsigned long twin_flg )
   twInit(vio_flg,twin_flg);
   if(tvioWidth < 80 || tvioHeight < 3)
   {
-    printm("Size of video buffer is too small: w=%u h=%u\n",tvioWidth,tvioHeight);
+    printm("Size of video buffer should be large than 79x2\n"
+           "But size of video buffer is: w=%u h=%u\n",tvioWidth,tvioHeight);
     twDestroy();
     exit(EXIT_FAILURE);
   }
