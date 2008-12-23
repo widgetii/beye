@@ -44,14 +44,35 @@ extern TWindow * ErrorWnd;
 static int KB_Buff[64];
 static unsigned char KB_freq = 0;
 
+extern TWindow * __FASTCALL__ makeErrWnd( void );
 void __FASTCALL__ initBConsole( unsigned long vio_flg,unsigned long twin_flg )
 {
   twInit(vio_flg,twin_flg);
   if(tvioWidth < 80 || tvioHeight < 3)
   {
+    if(tvioWidth>16&&tvioHeight>2) {
+	unsigned evt,x,y;
+	TWindow *win;
+	x = (tvioWidth-17)/2;
+	y = (tvioHeight-3)/2;
+	win = WindowOpen(x,y,x+16,y+2,TWS_NONE | TWS_NLSOEM);
+	if(!win) goto done;
+	twSetTitleAttr(win," Error ",TW_TMODE_CENTER,error_cset.border);
+	twCentredWin(win,NULL);
+	twSetColorAttr(error_cset.main);
+	twSetFrameAttr(win,TW_DOUBLE_FRAME,error_cset.border);
+	twGotoXY(1,1);
+	twPutS("Screensize<80x3");
+	twShowWin(win);
+	do {
+	    evt = GetEvent(NULL,NULL,ErrorWnd);
+	}while(!(evt == KE_ESCAPE || evt == KE_F(10)));
+	twDestroyWin(win);
+    }
+    done:
+    twDestroy();
     printm("Size of video buffer should be large than 79x2\n"
            "But size of video buffer is: w=%u h=%u\n",tvioWidth,tvioHeight);
-    twDestroy();
     exit(EXIT_FAILURE);
   }
 }
