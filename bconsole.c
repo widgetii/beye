@@ -44,7 +44,6 @@ extern TWindow * ErrorWnd;
 static int KB_Buff[64];
 static unsigned char KB_freq = 0;
 
-extern TWindow * __FASTCALL__ makeErrWnd( void );
 void __FASTCALL__ initBConsole( unsigned long vio_flg,unsigned long twin_flg )
 {
   twInit(vio_flg,twin_flg);
