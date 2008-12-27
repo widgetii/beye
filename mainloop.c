@@ -218,6 +218,9 @@ void MainLoop( void )
                switch(flags)
                {
                  default:
+                 case GJDLG_PERCENTS: shift=shift>100?100:shift;
+                                      nfp = BMGetFLength()*shift/100;
+                                      break;
                  case GJDLG_ABSOLUTE: nfp = shift;
                                       break;
                  case GJDLG_RELATIVE: nfp += (long)shift;

@@ -111,6 +111,7 @@ extern tBool        __FASTCALL__ GetStringDlg(char * buff,const char * title,con
 #define GJDLG_ABSOLUTE  0x00000000UL
 #define GJDLG_RELATIVE  0x00000001UL
 #define GJDLG_VIRTUAL   0x00000002UL
+#define GJDLG_PERCENTS  0x00000003UL
 
 extern tBool        __FASTCALL__ GetJumpDlg( __filesize_t * addr,unsigned long *flags);
 
