@@ -1195,6 +1195,9 @@ v5.0.2        ! Changes:
 		+ Added support for PE32+ file format.
 		+ NEW: User defined names aka bookmarks (Ctrl-F10)!!!
 		* Many other improvements and fixes.
+5.7.1         ! Changes:
+XX dec 2008     * Minor fixes and cleanups.
+                + feature request: [ 1782395 ] Make Goto (F5) accept percentages
 []======================================================================[]
 []  Thank you for your interest.                                        []
 []  Nick Kurshev (http://my666.boom.ru/666_en.html).                    []
