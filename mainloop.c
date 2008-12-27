@@ -215,7 +215,7 @@ void MainLoop( void )
 	     static unsigned long flags = GJDLG_ABSOLUTE;
              if(GetJumpDlg(&shift,&flags))
              {
-               switch(flags)
+               switch(flags&0xFF)
                {
                  default:
                  case GJDLG_PERCENTS: shift=shift>100?100:shift;
@@ -224,6 +224,8 @@ void MainLoop( void )
                  case GJDLG_ABSOLUTE: nfp = shift;
                                       break;
                  case GJDLG_RELATIVE: nfp += (long)shift;
+                                      break;
+                 case GJDLG_REL_EOF:  nfp = BMGetFLength()+(long)shift;
                                       break;
                  case GJDLG_VIRTUAL:
                                       if(detectedFormat->va2pa)

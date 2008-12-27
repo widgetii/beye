@@ -184,8 +184,9 @@ static void __NEAR__ __FASTCALL__ paintJumpDlg(TWindow *wdlg,unsigned long flags
   twSetColorAttr(dialog_cset.group.active);
   twGotoXY(4,2); twPutChar(flags == GJDLG_ABSOLUTE ? TWC_RADIO_CHAR : TWC_DEF_FILLER);
   twGotoXY(4,3); twPutChar(flags == GJDLG_RELATIVE ? TWC_RADIO_CHAR : TWC_DEF_FILLER);
-  twGotoXY(4,4); twPutChar(flags == GJDLG_VIRTUAL ? TWC_RADIO_CHAR : TWC_DEF_FILLER);
-  twGotoXY(4,5); twPutChar(flags == GJDLG_PERCENTS ? TWC_RADIO_CHAR : TWC_DEF_FILLER);
+  twGotoXY(4,4); twPutChar(flags == GJDLG_REL_EOF  ? TWC_RADIO_CHAR : TWC_DEF_FILLER);
+  twGotoXY(4,5); twPutChar(flags == GJDLG_VIRTUAL  ? TWC_RADIO_CHAR : TWC_DEF_FILLER);
+  twGotoXY(4,6); twPutChar(flags == GJDLG_PERCENTS ? TWC_RADIO_CHAR : TWC_DEF_FILLER);
   twUseWin(usd);
 }
 
@@ -221,15 +222,16 @@ tBool __FASTCALL__ GetJumpDlg( __filesize_t * addr,unsigned long *flags)
  char * legals;
  unsigned attr;
  using = twUsedWin();
- hwnd = CrtDlgWndnls(" Jump within file ",(BMFileFlags&BMFF_USE64)?34:26,5);
+ hwnd = CrtDlgWndnls(" Jump within file ",(BMFileFlags&BMFF_USE64)?34:26,6);
  twUseWin(hwnd);
  twGetWinPos(hwnd,&x1,&y1,&x2,&y2);
  twGotoXY(2,1); twPutS("Enter offset :");
  twSetColorAttr(dialog_cset.group.active);
- twGotoXY(2,2); twPutS(" ( ) - Absolute ");
- twGotoXY(2,3); twPutS(" ( ) - Relative ");
- twGotoXY(2,4); twPutS(" ( ) - Virtual  ");
- twGotoXY(2,5); twPutS(" ( ) - Percents ");
+ twGotoXY(2,2); twPutS(" ( ) - Absolute       ");
+ twGotoXY(2,3); twPutS(" ( ) - Relative       ");
+ twGotoXY(2,4); twPutS(" ( ) - Relatively EOF ");
+ twGotoXY(2,5); twPutS(" ( ) - Virtual        ");
+ twGotoXY(2,6); twPutS(" ( ) - Percents       ");
  twSetColorAttr(dialog_cset.main);
  X1 = x1;
  Y1 = y1;
@@ -264,10 +266,12 @@ tBool __FASTCALL__ GetJumpDlg( __filesize_t * addr,unsigned long *flags)
 			else			   sprintf(str,"%08lX",(unsigned long)*addr);
 		     }
 		     break;
-      case KE_F(2):  if(*flags < GJDLG_PERCENTS) (*flags)++;
-                     else                        (*flags) = 0;
-                     legals = *flags == GJDLG_RELATIVE ? legalchars : &legalchars[2];
+      case KE_F(2):  if(((*flags)&0xFF) < GJDLG_PERCENTS) (*flags)++;
+                     else                                 (*flags) = 0;
+                     legals = (*flags) == GJDLG_RELATIVE ||
+                              (*flags) == GJDLG_REL_EOF ? legalchars : &legalchars[2];
                      update = False;
+                     break;
       case KE_LEFTARROW:
       case KE_RIGHTARROW:
                      update = False;
@@ -282,10 +286,12 @@ tBool __FASTCALL__ GetJumpDlg( __filesize_t * addr,unsigned long *flags)
  {
 #if __WORDSIZE >= 32
  if(BMFileFlags&BMFF_USE64)
-    *addr = (*flags) == GJDLG_RELATIVE ? (unsigned long long int)strtoll(str,NULL,16) : strtoull(str,NULL,16);
+    *addr = (*flags) == GJDLG_RELATIVE ||
+            (*flags) == GJDLG_REL_EOF ? (unsigned long long int)strtoll(str,NULL,16) : strtoull(str,NULL,16);
  else
 #endif
-    *addr = (*flags) == GJDLG_RELATIVE ? (unsigned long)strtol(str,NULL,16) : strtoul(str,NULL,16);
+    *addr = (*flags) == GJDLG_RELATIVE ||
+            (*flags) == GJDLG_REL_EOF ? (unsigned long)strtol(str,NULL,16) : strtoul(str,NULL,16);
  }
  twUseWin(using);
  return ret;
