@@ -212,6 +212,7 @@ if test "$_target_system" = auto ; then
   if test -z "$system_name" ; then
     # OS name
     system_name=`uname -s`
+    log "uname -s :" "$system_name"
     case "$system_name" in
 	*[Ll]inux*)
 	    _target_system=linux
@@ -256,6 +257,7 @@ if test "$_target_system" = auto ; then
   if test -z "$system_name" ; then
     # OS name
     system_name=`/bin/sh --version 2>&1 | sed -n 's/^.*\([(]\)./\1/p'`
+    log "/bin/sh --version:" "$system_name"
     case "$system_name" in
 	*linux*)
             _target_system=linux
@@ -286,6 +288,7 @@ echocheck "architecture"
 if test "$_target_arch" = auto ; then
   if test -z "$host_arch" ; then
   host_arch=`( uname -p ) 2>&1`
+  log "uname -p :" "$host_arch"
   case "$host_arch" in
    i*86) host_arch=ia32
      ;;
@@ -297,8 +300,9 @@ if test "$_target_arch" = auto ; then
 
       # Maybe uname -m (machine hardware name) returns something we
       # recognize.
-
-      case "`( uname -m ) 2>&1`" in
+      arch_name=`( uname -m ) 2>&1`
+      log "uname -m :" "$arch_name"
+      case "$arch_name" in
       i*86|x86*|amd64*) host_arch=ia32 ;;
       ppc) host_arch=ppc ;;
       alpha) host_arch=alpha ;;
