@@ -65,7 +65,7 @@ void __FASTCALL__ initBConsole( unsigned long vio_flg,unsigned long twin_flg )
 	twShowWin(win);
 	do {
 	    evt = GetEvent(NULL,NULL,ErrorWnd);
-	}while(!(evt == KE_ESCAPE || evt == KE_F(10)));
+	}while(!(evt == KE_ESCAPE || evt == KE_F(10) || evt == KE_ENTER));
 	twDestroyWin(win);
     }
     done:

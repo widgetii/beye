@@ -528,6 +528,36 @@ static void __NEAR__ __FASTCALL__ save_ini_info( void )
 static FTime ftim;
 static tBool ftim_ok = False;
 
+static void __FASTCALL__ ShowUsage(void) {
+    unsigned evt,i,nln,h,y;
+    TWindow *win;
+    nln = sizeof(biewArg)/sizeof(struct tagbiewArg);
+    h = nln+4;
+    y = tvioHeight/2-h/2;
+    win = WindowOpen(2,y,tvioWidth-1,y+h,TWS_NONE | TWS_NLSOEM);
+    if(!win) goto done;
+    twSetTitleAttr(win,BIEW_VER_MSG,TW_TMODE_CENTER,error_cset.border);
+    twCentredWin(win,NULL);
+    twSetColorAttr(error_cset.main);
+    twSetFrameAttr(win,TW_DOUBLE_FRAME,error_cset.border);
+    twSetFooterAttr(win," Press [ ESC ] to quit ",TW_TMODE_RIGHT,error_cset.border);
+    twClearWin();
+    twGotoXY(1,1);
+    twPutS(" Usage: biew [OPTIONS] file...");
+    for(i = 0;i < nln;i++)
+    {
+	twGotoXY(1,4+i);
+	twPrintF("  %s     %s\n",biewArg[i].key,biewArg[i].prompt);
+    }
+    twShowWin(win);
+    do {
+	evt = GetEvent(NULL,NULL,ErrorWnd);
+    }while(!(evt == KE_ESCAPE || evt == KE_F(10) || evt == KE_ENTER));
+    twDestroyWin(win);
+    done:
+    termBConsole();
+}
+
 int main( int argc, char *argv[] )
 {
  hIniProfile *ini;
@@ -547,15 +577,19 @@ int main( int argc, char *argv[] )
 #endif
  ArgCount = argc;
  ArgVector = argv;
- if(ArgCount < 2) goto show_usage;
  __init_sys();
  __init_biew();
+ ini = load_ini_info();
+ skin_err = csetReadIniFile(biew_skin_name);
+ initBConsole(biew_vioIniFlags,biew_twinIniFlags);
+ if(ArgCount < 2) goto show_usage;
  ParseCmdLine();
  if(!ListFileCount)
  {
    /** print usage message */
     size_t i;
     show_usage:
+    ShowUsage();
     printm("\n"BIEW_VER_MSG"\n");
     printm(" Usage: biew [OPTIONS] file...\n\n");
     for(i = 0;i < sizeof(biewArg)/sizeof(struct tagbiewArg);i++)
@@ -565,10 +599,7 @@ int main( int argc, char *argv[] )
     printm("\n");
     return EXIT_FAILURE;
  }
- ini = load_ini_info();
  udnInit(ini);
- skin_err = csetReadIniFile(biew_skin_name);
- initBConsole(biew_vioIniFlags,biew_twinIniFlags);
  ErrorWnd = WindowOpen(1,1,50,16,TWS_NONE | TWS_NLSOEM);
  if(ErrorWnd) twSetTitleAttr(ErrorWnd," Error ",TW_TMODE_CENTER,error_cset.border);
  else { printm("fatal error: can't create window"); return EXIT_FAILURE; }
