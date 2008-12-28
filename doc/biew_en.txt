@@ -10,8 +10,8 @@
 €≤±∞                 ‹‹  ‹‹  ‹‹   ‹‹  ‹   ‹ ‹ ‹ ‹                     ∞±≤€
 €≤±∞                ‹‹‹‹‹‹  ‹‹‹‹ ‹‹‹‹‹‹    ‹   ‹                      ∞±≤€
 €≤±∞                                                                  ∞±≤€
-€≤±∞                           Ver 5.7.0                              ∞±≤€
-€≤±∞                          20 dec 2008.                            ∞±≤€
+€≤±∞                           Ver 5.7.1                              ∞±≤€
+€≤±∞                          28 dec 2008.                            ∞±≤€
 €≤±∞                                                                  ∞±≤€
 €≤±∞    Made in Kazan.Tatarstan.Russia. Written By Nick Kurshev.      ∞±≤€
 €≤±∞                                                                  ∞±≤€
@@ -1196,7 +1196,7 @@ v5.0.2        ! Changes:
 		+ NEW: User defined names aka bookmarks (Ctrl-F10)!!!
 		* Many other improvements and fixes.
 5.7.1         ! Changes:
-XX dec 2008     * Minor fixes and cleanups.
+28 dec 2008     * Minor fixes and cleanups.
                 + feature request: [ 1782395 ] Make Goto (F5) accept percentages
 []======================================================================[]
 []  Thank you for your interest.                                        []
