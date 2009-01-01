@@ -2,9 +2,13 @@
    This function allows to move within file on given offset.
 Offset can be:
 
-%BAbsolute%b    - Given offset is treated as absolute offset from start
-              of file.
-%BRelative%b    - Given offset is treated as relative offset from current
-              position.
-%BVirtual%b     - Given offset is treated as virtual address defined by
-              internal structure of module.
+%BAbsolute%b        - Given offset is treated as absolute offset from start
+                  of file.
+%BRelative%b        - Given offset is treated as relative offset from current
+                  position.
+%BRelatively EOF%b  - Given offset is treated as offset relatively end of
+                  the file. Only negative values shall be accepted.
+%BVirtual%b         - Given offset is treated as virtual address defined by
+                  internal structure of module.
+%BPercents%b        - Given value is treated as decimal integer offset in
+                  percents relatively begin of the file.

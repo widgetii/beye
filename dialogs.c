@@ -220,10 +220,12 @@ tBool __FASTCALL__ GetJumpDlg( __filesize_t * addr,unsigned long *flags)
  tBool ret,update;
  static char str[12] = "";
  char * legals;
+ char declegals[13];
  unsigned attr;
  using = twUsedWin();
  hwnd = CrtDlgWndnls(" Jump within file ",(BMFileFlags&BMFF_USE64)?34:26,6);
  twUseWin(hwnd);
+ memcpy(declegals,legalchars,12);
  twGetWinPos(hwnd,&x1,&y1,&x2,&y2);
  twGotoXY(2,1); twPutS("Enter offset :");
  twSetColorAttr(dialog_cset.group.active);
@@ -269,7 +271,8 @@ tBool __FASTCALL__ GetJumpDlg( __filesize_t * addr,unsigned long *flags)
       case KE_F(2):  if(((*flags)&0xFF) < GJDLG_PERCENTS) (*flags)++;
                      else                                 (*flags) = 0;
                      legals = (*flags) == GJDLG_RELATIVE ||
-                              (*flags) == GJDLG_REL_EOF ? legalchars : &legalchars[2];
+                              (*flags) == GJDLG_REL_EOF ? legalchars :
+                              (*flags) == GJDLG_PERCENTS ? declegals : &legalchars[2];
                      update = False;
                      break;
       case KE_LEFTARROW:
@@ -287,11 +290,13 @@ tBool __FASTCALL__ GetJumpDlg( __filesize_t * addr,unsigned long *flags)
 #if __WORDSIZE >= 32
  if(BMFileFlags&BMFF_USE64)
     *addr = (*flags) == GJDLG_RELATIVE ||
-            (*flags) == GJDLG_REL_EOF ? (unsigned long long int)strtoll(str,NULL,16) : strtoull(str,NULL,16);
+            (*flags) == GJDLG_REL_EOF ? (unsigned long long int)strtoll(str,NULL,GJDLG_PERCENTS?10:16):
+                                        strtoull(str,NULL,GJDLG_PERCENTS?10:16);
  else
 #endif
     *addr = (*flags) == GJDLG_RELATIVE ||
-            (*flags) == GJDLG_REL_EOF ? (unsigned long)strtol(str,NULL,16) : strtoul(str,NULL,16);
+            (*flags) == GJDLG_REL_EOF ? (unsigned long)strtol(str,NULL,GJDLG_PERCENTS?10:16):
+            strtoul(str,NULL,GJDLG_PERCENTS?10:16);
  }
  twUseWin(using);
  return ret;
