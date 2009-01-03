@@ -4820,11 +4820,19 @@ struct assembler_t
 struct assembler_t assemblers[] = {
   {
     "yasm -f bin -s -o %1$stmp1 %1$stmp0 >%1$stmp2",
-    "yasm -s --version",
+#if defined(__MSDOS__) || defined(__OS2__) || defined(__WIN32__)
+    "yasm -s --version 2>NUL",
+#else
+    "yasm -s --version 2>/dev/null",
+#endif
   },
   {
     "nasm -f bin -s -o %1$stmp1 %1$stmp0 >%1$stmp2",
-    "nasm -s -version",
+#if defined(__MSDOS__) || defined(__OS2__) || defined(__WIN32__)
+    "nasm -s -version 2>NUL",
+#else
+    "nasm -s -version 2>/dev/null",
+#endif
   },
   {
     NULL,
