@@ -290,13 +290,13 @@ tBool __FASTCALL__ GetJumpDlg( __filesize_t * addr,unsigned long *flags)
 #if __WORDSIZE >= 32
  if(BMFileFlags&BMFF_USE64)
     *addr = (*flags) == GJDLG_RELATIVE ||
-            (*flags) == GJDLG_REL_EOF ? (unsigned long long int)strtoll(str,NULL,GJDLG_PERCENTS?10:16):
-                                        strtoull(str,NULL,GJDLG_PERCENTS?10:16);
+            (*flags) == GJDLG_REL_EOF ? (unsigned long long int)strtoll(str,NULL,(*flags)==GJDLG_PERCENTS?10:16):
+                                        strtoull(str,NULL,(*flags)==GJDLG_PERCENTS?10:16);
  else
 #endif
     *addr = (*flags) == GJDLG_RELATIVE ||
-            (*flags) == GJDLG_REL_EOF ? (unsigned long)strtol(str,NULL,GJDLG_PERCENTS?10:16):
-            strtoul(str,NULL,GJDLG_PERCENTS?10:16);
+            (*flags) == GJDLG_REL_EOF ? (unsigned long)strtol(str,NULL,(*flags)==GJDLG_PERCENTS?10:16):
+            strtoul(str,NULL,(*flags)==GJDLG_PERCENTS?10:16);
  }
  twUseWin(using);
  return ret;
