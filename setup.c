@@ -110,7 +110,7 @@ static void __NEAR__ __FASTCALL__ setup_paint( TWindow *twin )
   twPrintF(" [%c] - Preserve timestamp                     "
            ,GetBool(iniPreserveTime));
   twGotoXY(32,11);
-  twPrintF(" [%c] - Enable usage of external program       "
+  twPrintF(" [%c] - Enable usage of external programs      "
            ,GetBool(iniUseExtProgs));
   twSetColorAttr(dialog_cset.main);
   twUseWin(usd);
