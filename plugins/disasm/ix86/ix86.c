@@ -4845,7 +4845,7 @@ static signed int active_assembler = -1;
 #ifndef HAVE_PCLOSE
 #define pclose(fp) fclose(fp)
 #endif
-
+extern tBool iniUseExtProgs;
 static void __FASTCALL__ ix86Init( void )
 {
   ix86_voidstr = PMalloc(1000);
@@ -4867,7 +4867,7 @@ static void __FASTCALL__ ix86Init( void )
 #ifdef HAVE_POPEN
   //Assembler initialization
   //Look for an available assembler
-  if (active_assembler == -1) //Execute this only once
+  if (active_assembler == -1 && iniUseExtProgs==True) //Execute this only once
   {
     int i;
     for (i = 0; assemblers[i].detect_command; i++)

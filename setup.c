@@ -35,6 +35,7 @@ extern unsigned long biew_kbdFlags;
 extern tBool iniSettingsAnywhere;
 extern tBool fioUseMMF;
 extern tBool iniPreserveTime;
+extern tBool iniUseExtProgs;
 
 #ifdef __QNX4__
 extern int photon,bit7;
@@ -108,6 +109,9 @@ static void __NEAR__ __FASTCALL__ setup_paint( TWindow *twin )
   twGotoXY(32,10);
   twPrintF(" [%c] - Preserve timestamp                     "
            ,GetBool(iniPreserveTime));
+  twGotoXY(32,11);
+  twPrintF(" [%c] - Enable usage of external program       "
+           ,GetBool(iniUseExtProgs));
   twSetColorAttr(dialog_cset.main);
   twUseWin(usd);
 }
@@ -122,7 +126,7 @@ static const char * setuptxt[] =
   "Plugin",
   "MMF   ",
   "Time  ",
-  "      ",
+  "ExtPrg",
   "Escape"
 };
 
@@ -207,6 +211,8 @@ void Setup(void)
      case KE_F(7):  if(__mmfIsWorkable()) fioUseMMF = fioUseMMF ? False : True;
                     break;
      case KE_F(8):  iniPreserveTime = iniPreserveTime ? False : True;
+                    break;
+     case KE_F(9):  iniUseExtProgs = iniUseExtProgs ? False : True;
                     break;
      default: continue;
    }

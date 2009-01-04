@@ -65,6 +65,7 @@ unsigned long biew_kbdFlags = 0L;
 tBool iniSettingsAnywhere = False;
 tBool fioUseMMF = False;
 tBool iniPreserveTime = False;
+tBool iniUseExtProgs = True;
 __filesize_t headshift = 0L;
 char *ini_name;
 
@@ -477,6 +478,8 @@ static hIniProfile * __NEAR__ __FASTCALL__ load_ini_info( void )
   if(!__mmfIsWorkable()) fioUseMMF = False;
   biewReadProfileString(ini,"Biew","Setup","PreserveTimeStamp","no",tmp,sizeof(tmp));
   if(stricmp(tmp,"yes") == 0) iniPreserveTime = True;
+  biewReadProfileString(ini,"Biew","Setup","UseExternalProgs","yes",tmp,sizeof(tmp));
+  if(stricmp(tmp,"yes") == 0) iniUseExtProgs = True;
   return ini;
 }
 
@@ -520,6 +523,8 @@ static void __NEAR__ __FASTCALL__ save_ini_info( void )
   biewWriteProfileString(ini,"Biew","Setup","FioUseMMF",tmp);
   strcpy(tmp,iniPreserveTime ? "yes" : "no");
   biewWriteProfileString(ini,"Biew","Setup","PreserveTimeStamp",tmp);
+  strcpy(tmp,iniUseExtProgs ? "yes" : "no");
+  biewWriteProfileString(ini,"Biew","Setup","UseExternalProgs",tmp);
   if(activeMode->save_ini) activeMode->save_ini(ini);
   udnTerm(ini);
   iniCloseFile(ini);
