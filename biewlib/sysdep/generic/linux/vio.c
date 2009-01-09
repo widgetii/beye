@@ -78,6 +78,14 @@ static unsigned char frames_vt100[0x30] =
 static unsigned char frames_dumb[0x30] =
 ": %|{+++++|+++++`++}-++++++++-+++++++++++++#%[]~";
 
+static char *screen_cp;
+static unsigned is_unicode=0;
+extern int   nls_init(const char *to,const char *from);
+extern void  nls_term(void);
+extern char *nls_get_screen_cp(void);
+extern char *nls_recode2screen_cp(const char *srcb,unsigned* len);
+
+
 #define twrite(x)	write(out_fd, (x), strlen(x))
 #define _addr(x, y)	(viomem + (x) + (y) * tvioWidth)
 #define _bg(x)		((x) >> 4)
@@ -132,9 +140,11 @@ static char *__FASTCALL__ _2ansi(unsigned char attr)
 
 inline static int __FASTCALL__ printable(unsigned char c)
 {
-    int result = !(c < 0x20 || c == 0x7f || c == 0x9b); /* 0x80< c < 0xA0 */
+    int result;
+    if(is_unicode) result = !(c < 0x20 || c == 0x7f);
+    else result = !(c < 0x20 || c == 0x7f || c == 0x9b); /* 0x80< c < 0xA0 */
 
-    if (result && terminal->type == TERM_XTERM)
+    if (result && terminal->type == TERM_XTERM && !is_unicode)
 	result = !(
 		c == 0x84 || c == 0x85 || c == 0x88 ||
 		(c >= 0x8D && c <= 0x90) ||
@@ -232,7 +242,7 @@ void __FASTCALL__ __vioWriteBuff(tAbsCoord x, tAbsCoord y, const tvioBuff *buff,
 #define cp buff->oem_pg[i]
 #define ca buff->attrs[i]
 
-	    if (cp && cp >= _PSMIN && cp <= _PSMAX) {
+	    if (cp && cp >= _PSMIN && cp <= _PSMAX && !is_unicode) {
 		c = (output_7 || no_frames) ? __Xlat__(frames_dumb,cp - _PSMIN) :
 		    (output_G1)	? __Xlat__(frames_vt100,cp - _PSMIN) : cp;
 /*
@@ -258,7 +268,7 @@ void __FASTCALL__ __vioWriteBuff(tAbsCoord x, tAbsCoord y, const tvioBuff *buff,
 		}
 		old_mode = mode;
 	    }
-	    
+
 	    if (!c) c = ' '; else if (!printable(c)) c = '.';
 
 	    if (!i || (ca != buff->attrs[i - 1])) /* [dBorca] short-circuit */
@@ -268,7 +278,16 @@ void __FASTCALL__ __vioWriteBuff(tAbsCoord x, tAbsCoord y, const tvioBuff *buff,
 		strcpy(dpb, ptr);
 		dpb += strlen(ptr);
 	    }
-	    *dpb=c; dpb++;
+	    if(is_unicode) {
+		unsigned len=1;
+		char *destb=nls_recode2screen_cp(&c,&len);
+		memcpy(dpb,destb,len);
+		free(destb);
+		dpb+=len;
+	    }
+	    else {
+		*dpb=c; dpb++;
+	    }
 	}
 	*dpb=0;
 	/* Note: twRefreshWin() may pass HUGE buffer here.
@@ -333,6 +352,13 @@ void __FASTCALL__ __init_vio(unsigned long flags)
 	tvioWidth = w.ws_col;
 	tvioHeight = w.ws_row;
     }
+#ifdef HAVE_ICONV
+    screen_cp=nls_get_screen_cp();
+    if(strncmp(screen_cp,"UTF",3)==0 && !on_console) {
+	is_unicode=1;
+    }
+#endif
+    if(nls_init(screen_cp,"866")) return;
     if (!output_7) output_7 = TESTFLAG(console_flags, __TVIO_FLG_USE_7BIT);
     if (tvioWidth <= 0) tvioWidth = 80;
     if (tvioHeight <= 0) tvioHeight = 25;
@@ -409,6 +435,7 @@ void __FASTCALL__ __term_vio(void)
     }
     __vioSetCursorPos(firstX, firstY);
 
+    nls_term();
     if (on_console) close(viohandle);
 
     free(vtmp);
