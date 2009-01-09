@@ -233,15 +233,22 @@ static int iconv_inited=0;
 
 int nls_init(const char *to_cp,const char *src_cp) {
     errno=0;
+#ifdef HAVE_ICONV
     ic=iconv_open(to_cp,src_cp);
     if(errno) {
 	printm("ICONV(%s,%s): Open with error: %s\n",to_cp,src_cp,strerror(errno));
     }
     else iconv_inited=1;
+#endif
     return errno;
 }
 
-void nls_term(void) { iconv_close(ic); iconv_inited=0; }
+void nls_term(void) {
+#ifdef HAVE_ICONV
+ iconv_close(ic);
+#endif
+ iconv_inited=0;
+}
 
 char *nls_recode2screen_cp(const char *srcb,unsigned* len)
 {

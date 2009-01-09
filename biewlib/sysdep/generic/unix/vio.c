@@ -343,7 +343,7 @@ void __FASTCALL__ __vioWriteBuff(tAbsCoord x, tAbsCoord y, const tvioBuff *buff,
 
 #define	LEN(x) (x << 4)
     unsigned char mode = 0, old_mode = -1;
-    unsigned char cache_pb[LEN(VMAX_X)*8];
+    unsigned char cache_pb[LEN(VMAX_X)];
     unsigned char *dpb,*pb = len > VMAX_X ? malloc(LEN(len)) : cache_pb;
     unsigned slen;
 
@@ -480,11 +480,13 @@ void __FASTCALL__ __init_vio(unsigned long flags)
     int i;
 #endif
 
+#ifdef HAVE_ICONV
     screen_cp=nls_get_screen_cp();
     if(strncmp(screen_cp,"UTF",3)==0) {
 	is_unicode=1;
     }
     if(nls_init(screen_cp,"866")) return;
+#endif
     console_flags = flags;
 
     if (!output_7) output_7 = TESTFLAG(console_flags, __TVIO_FLG_USE_7BIT);
