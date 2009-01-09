@@ -459,6 +459,25 @@ else
     _cdefos="-DHAVE_X11 $_cdefos"
   fi
 fi
+
+_iconv=no
+echocheck "iconv"
+	cat > $TMPC << EOF
+	#include <iconv.h>
+	int main(void) { iconv_open(0,0); return 0; }
+EOF
+cc_check && _iconv=yes
+if test "$_iconv" = no ; then
+cc_check -liconv && _iconv=yes
+if test "$_iconv" = yes ; then
+_oslibs="-liconv $_oslibs"
+fi
+fi
+if test "$_iconv" = yes ; then
+    _cdefos="-DHAVE_ICONV $_cdefos"
+fi
+echores "$_iconv"
+
 #Printout operating system
 case "$_target_system" in
     dos)

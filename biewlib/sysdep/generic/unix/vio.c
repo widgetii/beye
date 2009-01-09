@@ -206,6 +206,13 @@ chtype __FASTCALL__ _2ps(unsigned char c)
 static char *vtmp;
 static int out_fd;
 static int _color[8] = {0,4,2,6,1,5,3,7};
+static char *screen_cp;
+static unsigned is_unicode=0;
+extern int   nls_init(const char *to,const char *from);
+extern void  nls_term(void);
+extern char *nls_get_screen_cp(void);
+extern char *nls_recode2screen_cp(const char *srcb,unsigned* len);
+
 
 static unsigned char frames_vt100[0x30] =
 "aaaxuuukkuxkjjjkmvwtqnttmlvwtqnvvwwmmllnnjlaaaaa";
@@ -247,9 +254,11 @@ static unsigned char frames_dumb[0x30] =
 
 inline static int __FASTCALL__ printable(unsigned char c)
 {
-    int result = !(c < 0x20 || c == 0x7f || c == 0x9b); /* 0x80< c < 0xA0 */
+    int result;
+    if(is_unicode) result = !(c < 0x20 || c == 0x7f);
+    else    result = !(c < 0x20 || c == 0x7f || c == 0x9b); /* 0x80< c < 0xA0 */
 
-    if (result && terminal->type == TERM_XTERM)
+    if (result && terminal->type == TERM_XTERM && !is_unicode)
 	result = !(
 		c == 0x84 || c == 0x85 || c == 0x88 ||
 		(c >= 0x8D && c <= 0x90) ||
@@ -334,7 +343,7 @@ void __FASTCALL__ __vioWriteBuff(tAbsCoord x, tAbsCoord y, const tvioBuff *buff,
 
 #define	LEN(x) (x << 4)
     unsigned char mode = 0, old_mode = -1;
-    unsigned char cache_pb[LEN(VMAX_X)];
+    unsigned char cache_pb[LEN(VMAX_X)*8];
     unsigned char *dpb,*pb = len > VMAX_X ? malloc(LEN(len)) : cache_pb;
     unsigned slen;
 
@@ -367,7 +376,7 @@ void __FASTCALL__ __vioWriteBuff(tAbsCoord x, tAbsCoord y, const tvioBuff *buff,
 	ch = 0;
 #endif
 
-	if (cp && cp >= _PSMIN && cp <= _PSMAX) {
+	if (cp && cp >= _PSMIN && cp <= _PSMAX && !is_unicode) {
 #ifdef	_SLANG_
 		c = output_7 ?
 		    frames_dumb[cp - _PSMIN] :
@@ -399,8 +408,7 @@ void __FASTCALL__ __vioWriteBuff(tAbsCoord x, tAbsCoord y, const tvioBuff *buff,
 	    }
 	    old_mode = mode;
 	}
-#endif	    
-
+#endif
 	if (!c) c = ' '; else if (!printable(c)) c = '.';
 
 #ifdef	_SLANG_
@@ -425,8 +433,17 @@ void __FASTCALL__ __vioWriteBuff(tAbsCoord x, tAbsCoord y, const tvioBuff *buff,
 	    strcpy(dpb, d);
 	    dpb += strlen(d);
 	}
-	*dpb=c; dpb++;
-#endif	    
+	if(!is_unicode) {
+	    *dpb=c; dpb++;
+	}
+	else {
+	    unsigned len=1;
+	    char *destb=nls_recode2screen_cp(&c,&len);
+	    memcpy(dpb,destb,len);
+	    free(destb);
+	    dpb+=len;
+	}
+#endif
     }
 #ifdef	_SLANG_
     gotoxy(xx, yy);
@@ -463,6 +480,11 @@ void __FASTCALL__ __init_vio(unsigned long flags)
     int i;
 #endif
 
+    screen_cp=nls_get_screen_cp();
+    if(strncmp(screen_cp,"UTF",3)==0) {
+	is_unicode=1;
+    }
+    if(nls_init(screen_cp,"866")) return;
     console_flags = flags;
 
     if (!output_7) output_7 = TESTFLAG(console_flags, __TVIO_FLG_USE_7BIT);
@@ -561,6 +583,7 @@ void __FASTCALL__ __term_vio(void)
     free(vtmp);
 #endif
     free(viomem);
+    nls_term();
     initialized = 0;
 }
 

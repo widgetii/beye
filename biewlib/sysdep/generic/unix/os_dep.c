@@ -35,6 +35,7 @@ static const char rcs_id[] = "$Id$";
 #include <signal.h>
 #include <time.h>
 #include <unistd.h>
+#include <errno.h>
 #include <pwd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -201,4 +202,86 @@ void __FASTCALL__ __init_sys(void)
 
 void __FASTCALL__ __term_sys(void)
 {
+}
+
+#ifdef HAVE_ICONV
+#include <iconv.h>
+#endif
+
+static const char * langs[] = { "LANG", "LANGUAGE", "LINGUAS" };
+
+char *nls_get_screen_cp(void)
+{
+    unsigned i;
+    char *nls;
+    static char to_cp[256];
+    strcpy(to_cp,"UTF-8");
+    for(i=0;i<sizeof(langs)/sizeof(char *);i++)
+    {
+	if((nls=getenv(langs[i]))!=NULL)
+	{
+		nls=strchr(nls,'.');
+		if(nls) strcpy(to_cp,nls+1);
+		break;
+	}
+    }
+    return to_cp;
+}
+
+static iconv_t ic;
+static int iconv_inited=0;
+
+int nls_init(const char *to_cp,const char *src_cp) {
+    errno=0;
+    ic=iconv_open(to_cp,src_cp);
+    if(errno) {
+	printm("ICONV(%s,%s): Open with error: %s\n",to_cp,src_cp,strerror(errno));
+    }
+    else iconv_inited=1;
+    return errno;
+}
+
+void nls_term(void) { iconv_close(ic); iconv_inited=0; }
+
+char *nls_recode2screen_cp(const char *srcb,unsigned* len)
+{
+    char *obuff;
+#ifdef HAVE_ICONV
+    if(iconv_inited)
+    {
+	static int warned=0;
+	const char *ibuff,*ib;
+	char *ob;
+	size_t inb,outb;
+	errno=0;
+	inb=*len;
+	outb=((*len)+1)*4;
+	obuff=malloc(outb);
+	ibuff=srcb;
+	ob=obuff;
+	ib=ibuff;
+	if(iconv(ic,(char **)&ib,&inb,&ob,&outb) != (size_t)(-1))
+	{
+	    *ob='\0';
+	    *len = ((*len)+1)*4 - outb;
+	}
+	else
+	{
+	    free(obuff);
+	    if(warned<2) {
+		printm("ICONV: Can't recode: %s\n",strerror(errno));
+		warned++;
+	    }
+	    goto do_def;
+	}
+    }
+    else
+    {
+	do_def:
+	obuff=strdup(srcb);
+    }
+#else
+    obuff=strdup(srcb);
+#endif
+    return obuff;
 }
