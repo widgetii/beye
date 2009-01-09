@@ -19,7 +19,7 @@ cc_check() {
   echo >> "$TMPLOG"
   cat "$TMPC" >> "$TMPLOG"
   echo >> "$TMPLOG"
-  ( check_cmd $_cc $_extraincdir $_extralibdir "$TMPC" -o "$TMPO" "$@" ) >> "$TMPLOG" 2>&1
+  ( check_cmd $_cc $_cdefsys $_extraincdir $_extralibdir "$TMPC" -o "$TMPO" "$@" ) >> "$TMPLOG" 2>&1
   TMP="$?"
   echo >> "$TMPLOG"
   echo "ldd $TMPO" >> "$TMPLOG"
@@ -319,6 +319,30 @@ fi
 echores "$host_arch"
 echo "Detected host..."$system_name
 
+_cdefos="-DDATADIR='\"$_datadir\"'"
+_osldef=
+_oslibs=
+
+# Printout architecture
+_cdefsys=
+case "$host_arch" in
+  ia32)
+# TODO: enable >386 optimizations here
+  _cdefsys="-m32 -D__MACHINE__=ia32 -D__CPU_NAME__='\"ia32\"' -D__CPU__=386 -D__DEFAULT_DISASM=0 -DCAN_COMPILE_X86_GAS=1"
+  _osldef="-m32 $_osldef"
+  case $cc_version in
+    2.95.[3-9]|2.95.[3-9].[0-9]|3.[0-9]|3.[0-9].[0-9]|4.[0-9].[0-9])
+      _cdefsys="-D__ENABLE_FASTCALL=1 $_cdefsys"
+      ;;
+  esac
+    ;;
+
+  *)
+    echo "It seems noone has ported biew to your OS or CPU type yet."
+    echo "using $host_arch architecture"
+    ;;
+esac
+
 if test -z "$_x11incdir" ; then
 echocheck "X11 headers"
   for I in /usr/include /usr/X11R6/include /usr/X11/include /usr/openwin/include ; do
@@ -347,12 +371,9 @@ if test -z "$_x11libdir" ; then
     echores "x11lib not found"
 fi
 
-_cdefos="-DDATADIR='\"$_datadir\"'"
-_osldef=
-_oslibs=
 
 if test -z "$_debug" ; then
-_osldef="-s"
+_osldef="-s $_osldef"
 else
 _cdefos="-finline-limit-5 $_cdefos"
 fi
@@ -545,24 +566,6 @@ echores "$_curses"
 	;;
 esac
 
-# Printout architecture
-_cdefsys=
-case "$host_arch" in
-  ia32)
-# TODO: enable >386 optimizations here
-  _cdefsys="-D__MACHINE__=ia32 -D__CPU_NAME__='\"ia32\"' -D__CPU__=386 -D__DEFAULT_DISASM=0 -DCAN_COMPILE_X86_GAS=1"
-  case $cc_version in
-    2.95.[3-9]|2.95.[3-9].[0-9]|3.[0-9]|3.[0-9].[0-9]|4.[0-9].[0-9])
-      _cdefsys="-m32 -D__ENABLE_FASTCALL=1 $_cdefsys"
-      ;;
-  esac
-    ;;
-
-  *)
-    echo "It seems noone has ported biew to your OS or CPU type yet."
-    echo "using $host_arch architecture"
-    ;;
-esac
 
 # Checking for INSTALL
 if test -z $_install
