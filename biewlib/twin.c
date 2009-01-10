@@ -568,8 +568,8 @@ static void __NEAR__ __FASTCALL__ set_xy(tRelCoord x,tRelCoord y)
     height = active->wheight;
     if((active->flags & TWS_FRAMEABLE) == TWS_FRAMEABLE)
     {
-      width --;
-      height --;
+      width--;
+      height--;
       active->cur_x++;
       active->cur_y++;
     }
@@ -580,14 +580,14 @@ static void __NEAR__ __FASTCALL__ set_xy(tRelCoord x,tRelCoord y)
 
 static void __NEAR__ __FASTCALL__ paint_cursor( void )
 {
-  TWindow * top;
+  TWindow * top=NULL;
   static tAbsCoord c_x = UCHAR_MAX, c_y = UCHAR_MAX;
   int _c_type = -1;
   unsigned x,y;
   int type;
   if(cursorwin && (cursorwin->iflags & IFLG_ENABLED) == IFLG_ENABLED)
   {
-    __FIND_OVER(top,cursorwin,cursorwin->X1+cursorwin->cur_x,cursorwin->Y1+cursorwin->cur_y-1);
+    __FIND_OVER(top,cursorwin,cursorwin->cur_x,cursorwin->cur_y-1);
     if(!top && (cursorwin->iflags & IFLG_VISIBLE) == IFLG_VISIBLE && cursorwin == active)
     {
         type = twGetCursorType();
