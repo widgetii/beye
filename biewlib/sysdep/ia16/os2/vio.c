@@ -29,7 +29,7 @@ static unsigned long vio_flags;
 static unsigned char palettes[16] = { 0,1,2,3,4,5,20,7,56,57,58,59,60,61,62,63 };
 
 #include <stdio.h>
-void __FASTCALL__ __init_vio( unsigned long flg )
+void __FASTCALL__ __init_vio(const char *user_cp, unsigned long flg )
 {
   unsigned i;
   VIOINTENSITY vioi;

@@ -132,7 +132,7 @@ void __FASTCALL__ __vioWriteBuff(tAbsCoord x,tAbsCoord y,const tvioBuff *buff,un
 	term_flush();
 }
 
-void __FASTCALL__ __init_vio(unsigned long flags)
+void __FASTCALL__ __init_vio(const char *user_cp,unsigned long flags)
 {
 	struct _dev_info_entry di;
 	char *term_name;

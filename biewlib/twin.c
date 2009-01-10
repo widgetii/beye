@@ -197,10 +197,10 @@ int __FASTCALL__ twGetCursorType( void )
   return c_type;
 }
 
-void __FASTCALL__ twInit( unsigned long vio_flags, unsigned long twin_flgs )
+void __FASTCALL__ twInit(const char *user_cp, unsigned long vio_flags, unsigned long twin_flgs )
 {
   twin_flags = twin_flgs;
-  __init_vio(vio_flags);
+  __init_vio(user_cp?user_cp:"IBM866",vio_flags);
   __init_keyboard();
   if(tvioWidth > __TVIO_MAXSCREENWIDTH)
   {

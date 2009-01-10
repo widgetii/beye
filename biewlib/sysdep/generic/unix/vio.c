@@ -472,7 +472,7 @@ void __FASTCALL__ __vioWriteBuff(tAbsCoord x, tAbsCoord y, const tvioBuff *buff,
 #undef	cp
 }
 
-void __FASTCALL__ __init_vio(unsigned long flags)
+void __FASTCALL__ __init_vio(const char *user_cp,unsigned long flags)
 {
 #ifdef	_VT100_
     struct winsize w;
@@ -485,7 +485,7 @@ void __FASTCALL__ __init_vio(unsigned long flags)
     if(strncmp(screen_cp,"UTF",3)==0) {
 	is_unicode=1;
     }
-    if(nls_init(screen_cp,"866")) is_unicode=0;
+    if(nls_init(screen_cp,user_cp)) is_unicode=0;
 #endif
     console_flags = flags;
 

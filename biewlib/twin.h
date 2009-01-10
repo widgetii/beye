@@ -287,13 +287,14 @@ void __FASTCALL__ twinDrawFrameAttr(tRelCoord x1_, tRelCoord y1_, tRelCoord x2_,
 #define TWIF_FORCEMONO   0x00000001L /**< forces monochrome mode of video output @see twInit */
 
                    /** Initialization of twin library and video subsystem
+                     * @param user_cp     indicates character's codepage or IBM866 if NULL
                      * @param vio_flags   flags for _init_vio
                      * @param twin_flgs   flags of twin library (see above)
                      * @return            none
                      * @note              Call this function before any other
                      * @see               twDestroy
                     **/
-void              __FASTCALL__ twInit( unsigned long vio_flags, unsigned long twin_flgs );
+void              __FASTCALL__ twInit(const char *user_cp, unsigned long vio_flags, unsigned long twin_flgs );
 
                    /** Terminates twin library and video subsystem
                      * @return            none

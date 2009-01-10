@@ -180,7 +180,7 @@ typedef struct tag_tvioBuff
                      * @note                  You must call this function before calling any other video related functions
                      * @see                   __term_vio
                     **/
-extern void      __FASTCALL__ __init_vio( unsigned long flags );
+extern void      __FASTCALL__ __init_vio(const char *user_cp, unsigned long flags );
 
                    /** Terminates video handler.
                      * @return                none

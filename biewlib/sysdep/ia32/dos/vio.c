@@ -29,7 +29,7 @@ static unsigned viomem;
 static unsigned long vio_flags;
 static unsigned h__my_ds,h__conv_sel;
 
-void __FASTCALL__ __init_vio( unsigned long flg )
+void __FASTCALL__ __init_vio(const char *user_cp, unsigned long flg )
 {
   union REGS reg;
   unsigned char palettes[16] = { 0,1,2,3,4,5,20,7,56,57,58,59,60,61,62,63 };

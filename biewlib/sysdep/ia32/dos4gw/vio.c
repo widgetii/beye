@@ -23,7 +23,7 @@ unsigned tvioNumColors;
 static char * viomem;
 static unsigned long vio_flags;
 
-void __FASTCALL__ __init_vio( unsigned long flg )
+void __FASTCALL__ __init_vio(const char *user_cp, unsigned long flg )
 {
   union REGS reg;
   unsigned char i;

@@ -350,7 +350,7 @@ void done_libph_so(void)
 	so_handle=NULL;
 }
 
-void __FASTCALL__ __init_vio(unsigned long flags)
+void __FASTCALL__ __init_vio(const char *user_cp,unsigned long flags)
 {
 	char *tty_name;
 	char *terminal;

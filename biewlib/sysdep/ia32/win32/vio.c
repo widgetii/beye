@@ -39,7 +39,7 @@ static CONSOLE_SCREEN_BUFFER_INFO win32_init_csbinfo;
 static CONSOLE_CURSOR_INFO win32_init_cci;
 /* End of addition */
 
-void __FASTCALL__ __init_vio( unsigned long flg )
+void __FASTCALL__ __init_vio(const char *user_cp, unsigned long flg )
 {
   hOut = GetStdHandle(STD_OUTPUT_HANDLE);
   is_winnt = win32_verinfo.dwPlatformId == VER_PLATFORM_WIN32_NT;
