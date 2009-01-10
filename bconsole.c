@@ -43,10 +43,11 @@ extern TWindow * ErrorWnd;
 
 static int KB_Buff[64];
 static unsigned char KB_freq = 0;
+extern char biew_codepage[];
 
 void __FASTCALL__ initBConsole( unsigned long vio_flg,unsigned long twin_flg )
 {
-  twInit(NULL,vio_flg,twin_flg);
+  twInit(biew_codepage,vio_flg,twin_flg);
   if(tvioWidth < 80 || tvioHeight < 3)
   {
     if(tvioWidth>16&&tvioHeight>2) {

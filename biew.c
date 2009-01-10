@@ -56,6 +56,7 @@ static tBool UseIniFile=True;
 char biew_help_name[FILENAME_MAX+1] = "";
 char biew_skin_name[FILENAME_MAX+1] = "";
 char biew_syntax_name[FILENAME_MAX+1] = "";
+char biew_codepage[256] = "CP866";
 extern char last_skin_error[];
 char biew_scheme_name[256] = "Built-in";
 static char biew_ini_ver[32];
@@ -480,6 +481,7 @@ static hIniProfile * __NEAR__ __FASTCALL__ load_ini_info( void )
   if(stricmp(tmp,"yes") == 0) iniPreserveTime = True;
   biewReadProfileString(ini,"Biew","Setup","UseExternalProgs","yes",tmp,sizeof(tmp));
   if(stricmp(tmp,"yes") == 0) iniUseExtProgs = True;
+  biewReadProfileString(ini,"Biew","Setup","Codepage","CP866",biew_codepage,sizeof(biew_codepage));
   return ini;
 }
 
@@ -525,6 +527,7 @@ static void __NEAR__ __FASTCALL__ save_ini_info( void )
   biewWriteProfileString(ini,"Biew","Setup","PreserveTimeStamp",tmp);
   strcpy(tmp,iniUseExtProgs ? "yes" : "no");
   biewWriteProfileString(ini,"Biew","Setup","UseExternalProgs",tmp);
+  biewWriteProfileString(ini,"Biew","Setup","Codepage",biew_codepage);
   if(activeMode->save_ini) activeMode->save_ini(ini);
   udnTerm(ini);
   iniCloseFile(ini);
