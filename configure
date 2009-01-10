@@ -10,15 +10,48 @@ log(){
     echo "$@" >>"$TMPLOG"
 }
 
+log_file(){
+    log BEGIN $1
+    cat -n $1 >>"$TMPLOG"
+    log END $1
+}
+
+echolog(){
+    log "$@"
+    echo "$@"
+}
+
 check_cmd(){
     log "$@"
     "$@" >>"$TMPLOG" 2>&1
 }
 
+set_all(){
+    value=$1
+    shift
+    for var in $*; do
+        eval $var=$value
+    done
+}
+
+enable(){
+    set_all yes $*
+}
+
+disable(){
+    set_all no $*
+}
+
+enabled(){
+    eval test "x\$$1" = "xyes"
+}
+
+disabled(){
+    eval test "x\$$1" = "xno"
+}
+
 cc_check() {
-  echo >> "$TMPLOG"
-  cat "$TMPC" >> "$TMPLOG"
-  echo >> "$TMPLOG"
+  log_file "$TMPC"
   ( check_cmd $_cc $_cdefsys $_extraincdir $_extralibdir "$TMPC" -o "$TMPO" "$@" ) >> "$TMPLOG" 2>&1
   TMP="$?"
   echo >> "$TMPLOG"
@@ -26,6 +59,32 @@ cc_check() {
   ( ldd "$TMPO" ) >> "$TMPLOG" 2>&1
   echo >> "$TMPLOG"
   return "$TMP"
+}
+
+check_cpp(){
+    log check_cpp "$@"
+    cat >$TMPC
+    log_file $TMPC
+    check_cmd $_cc $CFLAGS $_extraincdir "$@" -E -o $TMPO $TMPC
+}
+
+check_header(){
+    log check_header "$@"
+    header=$1
+    shift
+    var=`echo $header | sed 's/[^A-Za-z0-9_]/_/g'`
+    disable $var
+    check_cpp "$@" <<EOF && enable $var
+#include <$header>
+int x;
+EOF
+}
+
+check_cc(){
+    log check_cc "$@"
+    cat >$TMPC
+    log_file $TMPC
+    check_cmd $_cc $CFLAGS $_cdefsys $_extraincdir "$@" -c -o $TMPO $TMPC
 }
 
 # Display error message, flushes tempfile, exit
@@ -92,11 +151,22 @@ Base features:
   --enable-debug[=1-3]   compile debugging information into biew [disable]
   --enable-profile       compile profiling information into biew [disable]
 
+Optional features:
+  --disable-slang        disable S-Lang programming library [autodetect]
+  --disable-curses       disable "curses" terminal control library [autodetect]
+  --disable-iconv        disable iconv library [autodetect]
+
 Use these options if autodetection fails:
   --with-extraincdir=DIR   extra headers (curses.h ...) in DIR
   --with-extralibdir=DIR   extra library files (libncurses.so, ...) in DIR
   --with-x11incdir=DIR     X headers in DIR
   --with-x11libdir=DIR     X library files in DIR
+
+Environment variables:
+  CFLAGS    C compiler flags
+  LDFLAGS   linker flags, e.g. -L<lib dir> if you have libraries in a
+            nonstandard directory <lib dir>
+  LIBS      specify additional libs (like: export LIBS=-lacml_mv)
 
 EOF
 
@@ -125,6 +195,9 @@ _x11incdir=
 _x11libdir=
 _profile=
 _debug=
+enable _curses
+enable _slang
+enable _iconv
 for ac_option do
   case "$ac_option" in
   --prefix=*)
@@ -190,6 +263,24 @@ for ac_option do
   --with-x11libdir=*)
     _x11libdir=-L`echo $ac_option | cut -d '=' -f 2`
     ;;
+  --disable-curses)
+    disable _curses
+    ;;
+  --enable-curses)
+    enable _curses
+    ;;
+  --disable-slang)
+    disable _slang
+    ;;
+  --enable-slang)
+    enable _slang
+    ;;
+  --disable-iconv)
+    disable _iconv
+    ;;
+  --enable-iconv)
+    enable _iconv
+    ;;
   esac
 done
 test -z "$_datadir" && _datadir=$_prefix"/share/biew"
@@ -205,6 +296,7 @@ TMPC="$I/biew-conf-$RANDOM-$$.c"
 TMPCPP="$I/biew-conf-$RANDOM-$$.cpp"
 TMPO="$I/biew-conf-$RANDOM-$$.o"
 TMPS="$I/biew-conf-$RANDOM-$$.S"
+TMPE="$I/biew-conf-$RANDOM-$$.exe"
 _tee="tee -a $TMPLOG"
 
 echocheck "target OS"
@@ -317,6 +409,7 @@ else
   host_arch=$_target_arch
 fi
 echores "$host_arch"
+
 echo "Detected host..."$system_name
 
 _cdefos="-DDATADIR='\"$_datadir\"'"
@@ -371,12 +464,7 @@ if test -z "$_x11libdir" ; then
     echores "x11lib not found"
 fi
 
-
-if test -z "$_debug" ; then
-_osldef="-s $_osldef"
-else
-_cdefos="-finline-limit-5 $_cdefos"
-fi
+test -z "$_debug" && _osldef="-s $_osldef" || _cdefos="-finline-limit-5 $_cdefos"
 if test "$_profile" || test "$_debug" ; then
   _cdefos="-W -Wall -O2 -fno-builtin $_debug $_profile $_cdefos"
   _osldef="$_debug $_profile $_osldef"
@@ -385,6 +473,8 @@ elif test -z "$CFLAGS" ; then
 else
     _cdefos="-DNDEBUG=1 $CFLAGS $_cdefos"
 fi
+test -n "$LDFLAGS" && _osldef="$LDFLAGS $_osldef"
+test -n "$LIBS" && _osldef="$LIBS $_osldef"
 
 cc_name=`$_cc -v 2>&1 | tail -n 1 | cut -d ' ' -f 1`
 cc_version=`$_cc -dumpversion`
@@ -392,20 +482,15 @@ if test "$_target_system" = dos ; then
 # disable cc_check call for DJGPP due bugs in bash
 _cdefos="-D__HAVE_PRAGMA_PACK__=1 $_cdefos"
 else
-echocheck "your gcc possibility"
+echocheck "pragma pack"
 cat > $TMPC << EOF
 #pragma pack(1)
 int main(void){return 0;}
 EOF
-_ppack=no
-cc_check && _ppack=yes
-if test "$_ppack" = yes ; then 
-    echores "pragma pack(yes)"
-    _cdefos="-D__HAVE_PRAGMA_PACK__=1 $_cdefos"
-else
-    echores "pragma pack(no)"
-    die "Please upgrade your compiler"
-fi
+disable _ppack
+cc_check && enable _ppack
+enabled _ppack && _cdefos="-D__HAVE_PRAGMA_PACK__=1 $_cdefos" || die "Please upgrade your compiler"
+echores "$_ppack"
 fi
 
 echocheck "checking for popen"
@@ -413,42 +498,25 @@ cat > $TMPC << EOF
 #include <stdio.h>
 int main(void){(void)popen; return 0;}
 EOF
-_popen=no
-cc_check && _popen=yes
-if test "$_popen" = yes ; then 
-    echores "yes"
-    _cdefos="-DHAVE_POPEN=1 $_cdefos"
-else
-    echores "no"
-fi
+disable _popen
+cc_check && enable _popen
+enabled _popen && _cdefos="-DHAVE_POPEN=1 $_cdefos"
+echores "$_popen"
 
 echocheck "checking for pclose"
 cat > $TMPC << EOF
 #include <stdio.h>
 int main(void){(void)pclose; return 0;}
 EOF
-_pclose=no
-cc_check && _pclose=yes
-if test "$_pclose" = yes ; then 
-    echores "yes"
-    _cdefos="-DHAVE_PCLOSE=1 $_cdefos"
-else
-    echores "no"
-fi
+disable _pclose
+cc_check && enable _pclose
+enabled _pclose && _cdefos="-DHAVE_PCLOSE=1 $_cdefos"
+echores "$_pclose"
 
 echocheck "checking for sys/resource.h"
-cat > $TMPC << EOF
-#include <sys/resource.h>
-int main(void){return 0;}
-EOF
-_sys_resource=no
-cc_check && _sys_resource=yes
-if test "$_sys_resource" = yes ; then 
-    echores "yes"
-    _cdefos="-DHAVE_SYS_RESOURCE=1 $_cdefos"
-else
-    echores "no"
-fi
+check_header sys/resource.h
+enabled sys_resource_h && _cdefos="-DHAVE_SYS_RESOURCE=1 $_cdefos"
+echores "$sys_resource_h"
 
 if test -z "$_x11libdir" ; then
  _cdefos="$_cdefos"
@@ -460,23 +528,21 @@ else
   fi
 fi
 
-_iconv=no
+if enabled _iconv; then
+disable _iconv
 echocheck "iconv"
-	cat > $TMPC << EOF
-	#include <iconv.h>
-	int main(void) { iconv_open(0,0); return 0; }
+cat > $TMPC << EOF
+#include <iconv.h>
+int main(void) { iconv_open(0,0); return 0; }
 EOF
-cc_check && _iconv=yes
-if test "$_iconv" = no ; then
-cc_check -liconv && _iconv=yes
-if test "$_iconv" = yes ; then
-_oslibs="-liconv $_oslibs"
+cc_check && enable _iconv
+if disabled _iconv; then
+cc_check -liconv && enable _iconv
+enabled _iconv && _oslibs="-liconv $_oslibs"
 fi
-fi
-if test "$_iconv" = yes ; then
-    _cdefos="-DHAVE_ICONV $_cdefos"
-fi
+enabled _iconv && _cdefos="-DHAVE_ICONV $_cdefos"
 echores "$_iconv"
+fi
 
 #Printout operating system
 case "$_target_system" in
@@ -513,73 +579,46 @@ case "$_target_system" in
 	_oslibs="-lncurses $_oslibs"
 	;;
     linux)
-        if test $_ld=gcc ; then
-            _osldef="-m32 $_osldef"
-        fi
 	_cdefos="-D__LINUX__ -D__UNIX__ -D__OS_NAME__='\"Linux\"' -D__OS__=\"linux\" -Ulinux -D_VT100_ -DHAVE_TERMINAL_OUT=1 -DPREFIX=\"$_prefix\" $_cdefos"
 echocheck "gpm.h"
-	cat > $TMPC << EOF
-	#include <gpm.h>
-	int main(void) {return 0;}
-EOF
-	_gpm=no
-	cc_check -lgpm && _gpm=yes
-	if test "$_gpm" = yes ; then
-	    _cdefos="-DHAVE_MOUSE $_cdefos"
-	    _oslibs="-lgpm $_oslibs"
-	fi
-echores "$_gpm"
+	check_header gpm.h
+	enabled gpm_h && _cdefos="-DHAVE_MOUSE $_cdefos" && _oslibs="-lgpm $_oslibs"
+echores "$gpm_h"
 	;;
     unix)
 	_cdefos="-D__UNIX__ -D__OS__=\"unix\" -Uunix -DHAVE_TERMINAL_OUT=1 $_cdefos"
 echocheck "gpm.h"
-	cat > $TMPC << EOF
-	#include <gpm.h>
-	int main(void) {return 0;}
-EOF
-	_gpm=no
-	cc_check -lgpm && _gpm=yes
-	if test "$_gpm" = yes ; then
-	    _cdefos="-DHAVE_MOUSE $_cdefos"
-	    _oslibs="-lgpm $_oslibs"
-	fi
-echores "$_gpm"
+	check_header gpm.h
+	enabled gpm_h && _cdefos="-DHAVE_MOUSE $_cdefos" && _oslibs="-lgpm $_oslibs"
+echores "$gpm_h"
+	if enabled _slang; then
 echocheck "slang.h"
-	cat > $TMPC << EOF
-	#include <slang.h>
-	int main(void) {return 0;}
-EOF
-	_slang=no
-	cc_check -lslang && _slang=yes
-	if test "$_slang" = yes ; then
-	    _cdefos="-D_SLANG_ -D__OS_NAME__='\"Unix/Slang\"' $_cdefos"
-	    _oslibs="-lslang $_oslibs"
+	check_header slang.h
+	enabled slang_h && _cdefos="-D_SLANG_ -D__OS_NAME__='\"Unix/Slang\"' $_cdefos"
+	enabled slang_h && _oslibs="-lslang $_oslibs" || disable _slang
+echores "$slang_h"
 	fi
-echores "$_slang"
-	if test "$_slang" = no; then
+	if enabled _curses -a disabled _slang; then
 echocheck "curses.h"
 	cat > $TMPC << EOF
 	#include <curses.h>
 	int main(void) {return 0;}
 EOF
 	_curseslib=
+	disable _curses
 	cc_check -lcurses && _curseslib="-lcurses"
 	if test -z "$_curseslib" ; then
 	    cc_check -lncurses && _curseslib="-lncurses"
 	fi
-	if test "$_curseslib" ; then
-	    _curses=yes
+	if test -n "$_curseslib" ; then
+	    enable _curses
 	    _cdefos="-D_CURSES_ -D__OS_NAME__='\"Unix/Curses\"' $_cdefos"
 	    _oslibs="$_curseslib $_oslibs"
-	else
-	    _curses=no
 	fi
 echores "$_curses"
-	if test "$_curses" = no ; then
-	    echo "Defaulting to VT100"
-	    _cdefos="-D_VT100_ -D__OS_NAME__='\"Unix/VT100\"' $_cdefos"
 	fi
-	fi
+	disabled _curses -a disabled _slang && _cdefos="-D_VT100_ -D__OS_NAME__='\"Unix/VT100\"' $_cdefos"
+	disabled _curses -a disabled _slang && echo "Defaulting to VT100"
 	;;
     *)
 	;;
@@ -588,7 +627,7 @@ esac
 
 # Checking for INSTALL
 if test -z $_install
-then 
+then
     _install="install"
     $_install --version 1>/dev/null 2>/dev/null || _install=""
 fi
@@ -638,8 +677,8 @@ Config files successfully generated by ./configure !
   TARGETS
     system: $_target_system
     arch: $host_arch
- 
+
 EOF
 
-$_rm -f "$TMPO" "$TMPC" "$TMPS" "$TMPCPP"
+$_rm -f "$TMPO" "$TMPC" "$TMPS" "$TMPCPP" "$TMPE"
 
