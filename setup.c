@@ -86,14 +86,17 @@ static const char * setuptxt[] =
   "Escape"
 };
 
-static unsigned default_cp = 12;
+static unsigned default_cp = 15;
 static const char * cp_list[] =
 {
-  "CP437 - original set of the IBM PC",
+  "CP437 - original IBM PC Latin US",
+  "CP708 - Arabic language",
   "CP737 - Greek language",
-  "CP775 - Estonian, Lithuanian and Latvian languages",
-  "CP850 - English DOS systems",
-  "CP852 - Central European languages",
+  "CP775 - Baltic languages",
+  "CP850 - IBM PC MSDOS Latin-1",
+  "CP851 - IBM PC Greek-1",
+  "CP852 - Central European languages (Latin-2)",
+  "CP855 - Serbian language",
   "CP857 - Turkish language",
   "CP858 - Western European languages",
   "CP860 - Portuguese language",
@@ -102,6 +105,7 @@ static const char * cp_list[] =
   "CP863 - French language",
   "CP865 - Nordic languages",
   "CP866 - Cyrillic languages",
+  "CP869 - IBM PC Greek-2",
 };
 
 static tBool __FASTCALL__ select_codepage( void )
