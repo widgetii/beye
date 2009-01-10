@@ -358,7 +358,7 @@ void __FASTCALL__ __init_vio(unsigned long flags)
 	is_unicode=1;
     }
 #endif
-    if(nls_init(screen_cp,"866")) return;
+    if(nls_init(screen_cp,"866")) is_unicode=0;
     if (!output_7) output_7 = TESTFLAG(console_flags, __TVIO_FLG_USE_7BIT);
     if (tvioWidth <= 0) tvioWidth = 80;
     if (tvioHeight <= 0) tvioHeight = 25;

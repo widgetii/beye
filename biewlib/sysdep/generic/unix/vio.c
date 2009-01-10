@@ -485,7 +485,7 @@ void __FASTCALL__ __init_vio(unsigned long flags)
     if(strncmp(screen_cp,"UTF",3)==0) {
 	is_unicode=1;
     }
-    if(nls_init(screen_cp,"866")) return;
+    if(nls_init(screen_cp,"866")) is_unicode=0;
 #endif
     console_flags = flags;
 
