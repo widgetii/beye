@@ -482,7 +482,7 @@ void __FASTCALL__ __init_vio(const char *user_cp,unsigned long flags)
 
 #ifdef HAVE_ICONV
     screen_cp=nls_get_screen_cp();
-    if(strncmp(screen_cp,"UTF",3)==0) {
+    if(strncasecmp(screen_cp,"UTF",3)==0) {
 	is_unicode=1;
     }
     if(nls_init(screen_cp,user_cp)) is_unicode=0;
