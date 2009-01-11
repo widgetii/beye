@@ -52,7 +52,7 @@ disabled(){
 
 cc_check() {
   log_file "$TMPC"
-  ( check_cmd $_cc $_cdefsys $_extraincdir $_extralibdir "$TMPC" -o "$TMPO" "$@" ) >> "$TMPLOG" 2>&1
+  ( check_cmd $_cc $_cdefsys $_cdefos $_extraincdir $_extralibdir "$TMPC" -o "$TMPO" "$@" ) >> "$TMPLOG" 2>&1
   TMP="$?"
   echo >> "$TMPLOG"
   echo "ldd $TMPO" >> "$TMPLOG"
@@ -493,57 +493,6 @@ enabled _ppack && _cdefos="-D__HAVE_PRAGMA_PACK__=1 $_cdefos" || die "Please upg
 echores "$_ppack"
 fi
 
-echocheck "checking for popen"
-cat > $TMPC << EOF
-#include <stdio.h>
-int main(void){(void)popen; return 0;}
-EOF
-disable _popen
-cc_check && enable _popen
-enabled _popen && _cdefos="-DHAVE_POPEN=1 $_cdefos"
-echores "$_popen"
-
-echocheck "checking for pclose"
-cat > $TMPC << EOF
-#include <stdio.h>
-int main(void){(void)pclose; return 0;}
-EOF
-disable _pclose
-cc_check && enable _pclose
-enabled _pclose && _cdefos="-DHAVE_PCLOSE=1 $_cdefos"
-echores "$_pclose"
-
-echocheck "checking for sys/resource.h"
-check_header sys/resource.h
-enabled sys_resource_h && _cdefos="-DHAVE_SYS_RESOURCE=1 $_cdefos"
-echores "$sys_resource_h"
-
-if test -z "$_x11libdir" ; then
- _cdefos="$_cdefos"
-else
-  if test -z "$_x11incdir" ; then
-   _cdefos="$_cdefos"
-  else
-    _cdefos="-DHAVE_X11 $_cdefos"
-  fi
-fi
-
-if enabled _iconv; then
-disable _iconv
-echocheck "iconv"
-cat > $TMPC << EOF
-#include <iconv.h>
-int main(void) { iconv_open(0,0); return 0; }
-EOF
-cc_check && enable _iconv
-if disabled _iconv; then
-cc_check -liconv && enable _iconv
-enabled _iconv && _oslibs="-liconv $_oslibs"
-fi
-enabled _iconv && _cdefos="-DHAVE_ICONV $_cdefos"
-echores "$_iconv"
-fi
-
 #Printout operating system
 case "$_target_system" in
     dos)
@@ -624,6 +573,57 @@ echores "$_curses"
 	;;
 esac
 
+
+echocheck "checking for popen"
+cat > $TMPC << EOF
+#include <stdio.h>
+int main(void){(void)popen; return 0;}
+EOF
+disable _popen
+cc_check && enable _popen
+enabled _popen && _cdefos="-DHAVE_POPEN=1 $_cdefos"
+echores "$_popen"
+
+echocheck "checking for pclose"
+cat > $TMPC << EOF
+#include <stdio.h>
+int main(void){(void)pclose; return 0;}
+EOF
+disable _pclose
+cc_check && enable _pclose
+enabled _pclose && _cdefos="-DHAVE_PCLOSE=1 $_cdefos"
+echores "$_pclose"
+
+echocheck "checking for sys/resource.h"
+check_header sys/resource.h
+enabled sys_resource_h && _cdefos="-DHAVE_SYS_RESOURCE=1 $_cdefos"
+echores "$sys_resource_h"
+
+if test -z "$_x11libdir" ; then
+ _cdefos="$_cdefos"
+else
+  if test -z "$_x11incdir" ; then
+   _cdefos="$_cdefos"
+  else
+    _cdefos="-DHAVE_X11 $_cdefos"
+  fi
+fi
+
+if enabled _iconv; then
+disable _iconv
+echocheck "iconv"
+cat > $TMPC << EOF
+#include <iconv.h>
+int main(void) { iconv_open(0,0); return 0; }
+EOF
+cc_check && enable _iconv
+if disabled _iconv; then
+cc_check -liconv && enable _iconv
+enabled _iconv && _oslibs="-liconv $_oslibs"
+fi
+enabled _iconv && _cdefos="-DHAVE_ICONV $_cdefos"
+echores "$_iconv"
+fi
 
 # Checking for INSTALL
 if test -z $_install
