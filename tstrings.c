@@ -19,11 +19,11 @@
 /**   English release for all messages */
 
 const char msgAboutText[] =
-"File viewer with built-in x86/i386/Amd64(sse4)\n"
-" Java, AVR\, ARM/XScale, PPC-64 disassemblers.\n"
-"  Supports multiple executable structures.\n"
-"      Written by Nick Kurshev. Kazan.\n"
-"            Tatarstan. Russia.";
+"  Multiplatform portable Binary file vIEWer\n"
+" with built-in x86/i386/Amd64(sse4), Java, AVR\n"
+"  ARM/XScale, PPC-64 disassemblers and editor\n"
+"for bin-hex-disas modes. Hilights opcodes and\n"
+"     supports multiple executable files.\n";
 const char * BiewPicture[] = {
  "‹‹‹‹  ‹‹‹ ‹‹‹‹ ‹‹‹   ‹‹‹",
  " ‹  ‹  ‹  ‹  ‹  ‹     ‹",
