@@ -1,6 +1,6 @@
 %define name	biew
-%define version	5.7.1
-%define versrc	571
+%define version	5.7.2
+%define versrc	572
 %define release	1
 
 %define prefix	/usr
