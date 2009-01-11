@@ -70,7 +70,7 @@ static struct tag_syntax_hl_s
    unsigned maxkwd_len;
 }syntax_hl;
 
-acontext_hl_t __HUGE__ *acontext; /* means active context*/
+acontext_hl_t __HUGE__ *acontext=NULL; /* means active context*/
 unsigned long  acontext_num;
 
 extern char biew_syntax_name[];
@@ -1265,6 +1265,7 @@ static void __FASTCALL__ txtTerm( void )
      free(syntax_hl.keyword);
   }
   PHFree(acontext);
+  acontext=NULL;
   acontext_num=0;
   memset(&syntax_hl,0,sizeof(syntax_hl));
 }
