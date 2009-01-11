@@ -1482,7 +1482,7 @@ static tBool __NEAR__ __FASTCALL__ __readRelocName(Elf_Reloc __HUGE__ *erl, char
   BGLOBAL handle = elfcache;
   __filesize_t fp;
   tBool ret = True;
-  r_sym = ELF32_R_SYM(erl->info);
+  r_sym = is_64bit?ELF64_R_SYM(erl->info):ELF32_R_SYM(erl->info);
   fp = bioTell(handle);
   if(IsSectionsPresent) /* Section headers are present */
   {
