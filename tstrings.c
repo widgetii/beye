@@ -23,7 +23,7 @@ const char msgAboutText[] =
 " with built-in x86/i386/Amd64(sse4), Java, AVR\n"
 "  ARM/XScale, PPC-64 disassemblers and editor\n"
 "for bin-hex-disas modes. Hilights opcodes and\n"
-"     supports multiple executable files.\n";
+"   supports multiple executable structures.\n";
 const char * BiewPicture[] = {
  "‹‹‹‹  ‹‹‹ ‹‹‹‹ ‹‹‹   ‹‹‹",
  " ‹  ‹  ‹  ‹  ‹  ‹     ‹",
