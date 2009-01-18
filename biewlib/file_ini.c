@@ -33,7 +33,7 @@ static FiUserFunc proc;
 static pVar FirstVar = NULL;
 FiHandler ActiveFile = 0;
 tBool ifSmarting = True;
-char *fi_Debug_Str = NULL;
+const char *fi_Debug_Str = NULL;
 
 /**************************************************************\
 *                      Low level support                       *
@@ -176,7 +176,11 @@ FiHandler __FASTCALL__ FiOpen( const char * filename)
   ret = bioOpen(filename,FO_READONLY | SO_DENYWRITE,UINT_MAX,BIO_OPT_USEMMF);
   if(ret == &bNull )
   {
+    const char *prev_debug;
+    prev_debug = fi_Debug_Str;
+    fi_Debug_Str=filename;
     FiAError(__FI_BADFILENAME,0);
+    fi_Debug_Str=prev_debug;
   }
   activeFile = (char *)PMalloc((strlen(filename) + 1));
   if(activeFile == NULL) FiAError(__FI_NOTMEM,0);
@@ -936,7 +940,7 @@ tBool __FASTCALL__ FiGetConditionStd( const char *condstr)
 tBool __FASTCALL__ FiCommandProcessorStd( const char * cmd )
 {
  char *word,*a,*v;
- char *fdeb_save;
+ const char *fdeb_save;
  STRING str;
  static tBool cond_ret = True;
  str.iptr = 0;
