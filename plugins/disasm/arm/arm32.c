@@ -65,7 +65,7 @@ XScale extension:
     EJG  - dest,1st src and 2nd source registers of XScale coprocessor
     B	 - BWH bits of XScale
     9	 - Saturation mode
-    U	 - 0 - unsigned 1 - signed
+    u	 - 0 - unsigned 1 - signed
 */
 
 static arm_opcode32 opcode_table[]=
@@ -242,26 +242,26 @@ static arm_opcode32 opcode_table[]=
   { "WAGV4", "cccc11100100JJJJEEEE00000000GGGG", ARM_V5|ARM_XSCALE },
   { "WAGV4R","cccc11100101JJJJEEEE00000000GGGG", ARM_V5|ARM_XSCALE },
   { "WCMPEQ","cccc1110BB00JJJJEEEE00000110GGGG", ARM_V5|ARM_XSCALE },
-  { "WCMPGT","cccc1110BBU1JJJJEEEE00000110GGGG", ARM_V5|ARM_XSCALE },
+  { "WCMPGT","cccc1110BBu1JJJJEEEE00000110GGGG", ARM_V5|ARM_XSCALE },
   { "WLDRB", "cccc110PU0W1ssssEEEE0000OOOOOOOO", ARM_V5|ARM_XSCALE },
   { "WLDRH", "cccc110PU1W1ssssEEEE0000OOOOOOOO", ARM_V5|ARM_XSCALE },
   { "WLDRW", "cccc110PU0W1ssssEEEE0001OOOOOOOO", ARM_V5|ARM_XSCALE },
-  { "WMAC",  "cccc111001U0JJJJEEEE00010000GGGG", ARM_V5|ARM_XSCALE },
-  { "WMACZ" ,"cccc111001U1JJJJEEEE00010000GGGG", ARM_V5|ARM_XSCALE },
-  { "WMADD" ,"cccc111010UXJJJJEEEE00010000GGGG", ARM_V5|ARM_XSCALE },
-  { "WMADD" ,"cccc111010UXJJJJEEEE00010000GGGG", ARM_V5|ARM_XSCALE },
-  { "WMSUB" ,"cccc111011UXJJJJEEEE00010000GGGG", ARM_V5|ARM_XSCALE },
-  {  "WMAX" ,"cccc1110BBU0JJJJEEEE00010110GGGG", ARM_V5|ARM_XSCALE },
+  { "WMAC",  "cccc111001u0JJJJEEEE00010000GGGG", ARM_V5|ARM_XSCALE },
+  { "WMACZ" ,"cccc111001u1JJJJEEEE00010000GGGG", ARM_V5|ARM_XSCALE },
+  { "WMADD" ,"cccc111010uXJJJJEEEE00010000GGGG", ARM_V5|ARM_XSCALE },
+  { "WMADD" ,"cccc111010uXJJJJEEEE00010000GGGG", ARM_V5|ARM_XSCALE },
+  { "WMSUB" ,"cccc111011uXJJJJEEEE00010000GGGG", ARM_V5|ARM_XSCALE },
+  {  "WMAX" ,"cccc1110BBu0JJJJEEEE00010110GGGG", ARM_V5|ARM_XSCALE },
   { "WMERGE","cccc1110+++0JJJJEEEE00001000GGGG", ARM_V5|ARM_XSCALE },
   {  "WMIA", "cccc111000XYJJJJEEEE00001010GGGG", ARM_V5|ARM_XSCALE },
   { "WMIAN", "cccc111001XYJJJJEEEE00001010GGGG", ARM_V5|ARM_XSCALE },
   { "WMIAW", "cccc111010XYJJJJEEEE00010010GGGG", ARM_V5|ARM_XSCALE },
   { "WMIAWN","cccc111011XYJJJJEEEE00010010GGGG", ARM_V5|ARM_XSCALE },
-  {  "WMIN" ,"cccc1110BBU1JJJJEEEE00010110GGGG", ARM_V5|ARM_XSCALE },
-  {  "WMUL" ,"cccc111000ULJJJJEEEE00010000GGGG", ARM_V5|ARM_XSCALE },
-  { "WMULR", "cccc111011ULJJJJEEEE00010000GGGG", ARM_V5|ARM_XSCALE },
-  {  "WMULW","cccc11101LU0JJJJEEEE00001100GGGG", ARM_V5|ARM_XSCALE },
-  { "WMULWR","cccc11101LU1JJJJEEEE00001100GGGG", ARM_V5|ARM_XSCALE },
+  {  "WMIN" ,"cccc1110BBu1JJJJEEEE00010110GGGG", ARM_V5|ARM_XSCALE },
+  {  "WMUL" ,"cccc111000uLJJJJEEEE00010000GGGG", ARM_V5|ARM_XSCALE },
+  { "WMULR", "cccc111011uLJJJJEEEE00010000GGGG", ARM_V5|ARM_XSCALE },
+  {  "WMULW","cccc11101Lu0JJJJEEEE00001100GGGG", ARM_V5|ARM_XSCALE },
+  { "WMULWR","cccc11101Lu1JJJJEEEE00001100GGGG", ARM_V5|ARM_XSCALE },
   {  "WOR" , "cccc11100000JJJJEEEE00000000GGGG", ARM_V5|ARM_XSCALE },
   { "WPACK", "cccc1110BB99JJJJEEEE00001000GGGG", ARM_V5|ARM_XSCALE },
   { "WQMIA", "cccc111010XYJJJJEEEE00001010GGGG", ARM_V5|ARM_XSCALE },
@@ -287,9 +287,9 @@ static arm_opcode32 opcode_table[]=
   {  "WSTRD","cccc110PU1W0ssssJJJJ0001OOOOOOOO", ARM_V5|ARM_XSCALE },
   {  "WSUB", "cccc1110BB99JJJJEEEE00011010GGGG", ARM_V5|ARM_XSCALE },
 {"WSUBADDHX","cccc11101101JJJJEEEE00011100GGGG", ARM_V5|ARM_XSCALE },
- {"WUNPCKEH","cccc1110BBU0JJJJEEEE00001100GGGG", ARM_V5|ARM_XSCALE },
+ {"WUNPCKEH","cccc1110BBu0JJJJEEEE00001100GGGG", ARM_V5|ARM_XSCALE },
  {"WUNPCKIH","cccc1110BB01JJJJEEEE00001100GGGG", ARM_V5|ARM_XSCALE },
- {"WUNPCKEL","cccc1110BBU0JJJJEEEE00001110GGGG", ARM_V5|ARM_XSCALE },
+ {"WUNPCKEL","cccc1110BBu0JJJJEEEE00001110GGGG", ARM_V5|ARM_XSCALE },
  {"WUNPCKIL","cccc1110BB01JJJJEEEE00001110GGGG", ARM_V5|ARM_XSCALE },
  {   "WXOR", "cccc11100001JJJJEEEE00000000GGGG", ARM_V5|ARM_XSCALE },
 };
@@ -363,8 +363,16 @@ void __FASTCALL__ arm32EncodeTail(DisasmRet *dret,__filesize_t ulShift,
     unsigned i,idx,val,prev,bracket;
     const char *msk=opcode_table[index].mask;
     char *p;
+    unsigned a_W;
     prev=0;
     bracket=0;
+    a_W=0; /* indictaes write back to source register*/
+    /* some common tests */
+    p=strchr(msk,'W');
+    if(p) {
+	READ_IMM32('W');
+	a_W = val;
+    }
     p=strchr(msk,'f');
     if(p)
     {
@@ -409,6 +417,7 @@ void __FASTCALL__ arm32EncodeTail(DisasmRet *dret,__filesize_t ulShift,
 	READ_IMM32('s');
 	if(prev) strcat(dret->str,","); prev=1;
 	strcat(dret->str,arm_reg_name[val&0xF]);
+	if(a_W) strcat(dret->str,"!");
     }
     p=strchr(msk,'m');
     if(p)
@@ -416,6 +425,14 @@ void __FASTCALL__ arm32EncodeTail(DisasmRet *dret,__filesize_t ulShift,
 	READ_IMM32('m');
 	if(prev) strcat(dret->str,","); prev=1;
 	strcat(dret->str,arm_reg_name[val&0xF]);
+    }
+    p=strchr(msk,'n');
+    if(p)
+    {
+	READ_IMM32('n');
+	if(prev) strcat(dret->str,","); prev=1;
+	strcat(dret->str,arm_reg_name[val&0xF]);
+	if(a_W) strcat(dret->str,"!");
     }
     p=strchr(msk,'Q');
     if(p)
@@ -462,7 +479,7 @@ void __FASTCALL__ arm32EncodeTail(DisasmRet *dret,__filesize_t ulShift,
     if(p)
     {
 	int prevv;
-	if(prev) strcat(dret->str,"!,{");
+	if(prev) strcat(dret->str,",{");
 	READ_IMM32('R');
 	prevv=0;
 	for(i=0;i<32;i++)
@@ -555,11 +572,11 @@ void __FASTCALL__ arm32Disassembler(DisasmRet *dret,__filesize_t ulShift,
 		READ_IMM32('9');
 		strcat(dret->str,X_sub_fields[val&3]);
 	    }
-	    p=strchr(msk,'U');
+	    p=strchr(msk,'u');
 	    if(p)
 	    {
 		const char *X_sub_fields[4] = { "S", "U" };
-		READ_IMM32('U');
+		READ_IMM32('u');
 		strcat(dret->str,X_sub_fields[val&1]);
 	    }
 	    p=strchr(msk,'c');
@@ -567,6 +584,12 @@ void __FASTCALL__ arm32Disassembler(DisasmRet *dret,__filesize_t ulShift,
 	    {
 		READ_IMM32('c');
 		strcat(dret->str,armCCnames[val&0xF]);
+	    }
+	    p=strchr(msk,'S');
+	    if(p)
+	    {
+		READ_IMM32('S');
+		if(val) strcat(dret->str,"!");
 	    }
 	    TabSpace(dret->str,TAB_POS);
 	    arm32EncodeTail(dret,ulShift,opcode,flags,ix);
