@@ -1204,6 +1204,10 @@ v5.0.2        ! Changes:
                 * Workaround for output of external assembler.
                 * Fixed generic build
                 * Fixed broken output on UTF terminals
+5.7.3
+XX yyy 2009   ! Changes:
+                * Be more informative if biew.ini was not found
+                * Fixed bug #2520144: Wrong computing of addressing mode in ARM dis.
 []======================================================================[]
 []  Thank you for your interest.                                        []
 []  Nick Kurshev (http://my666.boom.ru/666_en.html).                    []
