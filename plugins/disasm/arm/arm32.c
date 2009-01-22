@@ -447,7 +447,7 @@ void __FASTCALL__ arm32EncodeTail(DisasmRet *dret,__filesize_t ulShift,
 
     p=strchr(msk,'o');
     if(p) {
-	tUInt32 tbuff;
+	tInt32 tbuff;
 	unsigned hh=0;
 	p=strchr(msk,'H');
 	if(p)
@@ -456,9 +456,12 @@ void __FASTCALL__ arm32EncodeTail(DisasmRet *dret,__filesize_t ulShift,
 	    hh=val;
 	}
 	READ_IMM32('o');
-	tbuff=val<<2;
+	tbuff=val&0x7FFFFF;
+	if(val&0x800000) tbuff|=0xFF800000;
+	tbuff=tbuff<<2;
+	if(hh) tbuff|=0x2;
+	tbuff+=8;
 	if(prev) strcat(dret->str,",");
-	if(hh) tbuff+=2;
 	disAppendFAddr(dret->str,ulShift+1,(long)tbuff,ulShift+tbuff,
 			DISADR_NEAR32,0,3);
 	prev=1;
