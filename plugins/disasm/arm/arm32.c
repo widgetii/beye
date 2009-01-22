@@ -37,6 +37,7 @@ typedef struct tag_arm_opcode32
 /*
     c    - conditional codes
     a	 - address mode
+    A	 - miscellaneous Load and Stores
     d	 - destinition register
     D	 - hipart of destinition register
     s	 - source register
@@ -89,9 +90,9 @@ static arm_opcode32 opcode_table[]=
     { "LDR", "cccc01IPU0W1ssssddddaaaaaaaaaaaa", ARM_V1|ARM_INTEGER },
     { "LDRB","cccc01IPU1W1ssssddddaaaaaaaaaaaa", ARM_V1|ARM_INTEGER },
     {"LDRBT","cccc01I0U111ssssddddaaaaaaaaaaaa", ARM_V1|ARM_INTEGER },
-    { "LDRH","cccc000PUIW1ssssddddaaaa1011aaaa", ARM_V4|ARM_INTEGER },
-    {"LDRSB","cccc000PUIW1ssssddddaaaa1101aaaa", ARM_V4|ARM_INTEGER },
-    {"LDRSH","cccc000PUIW1ssssddddaaaa1111aaaa", ARM_V4|ARM_INTEGER },
+    { "LDRH","cccc000PUIW1ssssddddAAAA1011AAAA", ARM_V4|ARM_INTEGER },
+    {"LDRSB","cccc000PUIW1ssssddddAAAA1101AAAA", ARM_V4|ARM_INTEGER },
+    {"LDRSH","cccc000PUIW1ssssddddAAAA1111AAAA", ARM_V4|ARM_INTEGER },
     { "LDRT","cccc01I0U011ssssddddaaaaaaaaaaaa", ARM_V1|ARM_INTEGER },
     { "MLA", "cccc0000001Sddddnnnnssss1001mmmm", ARM_V2|ARM_INTEGER },
     { "MOV", "cccc00I1101S0000dddd<<<<<<<<<<<<", ARM_V1|ARM_INTEGER },
@@ -111,7 +112,7 @@ static arm_opcode32 opcode_table[]=
     { "STR", "cccc01IPU0W0ssssddddaaaaaaaaaaaa", ARM_V1|ARM_INTEGER },
     { "STRB","cccc01IPU1W0ssssddddaaaaaaaaaaaa", ARM_V1|ARM_INTEGER },
     {"STRBT","cccc01I0U110ssssddddaaaaaaaaaaaa", ARM_V1|ARM_INTEGER },
-    { "STRH","cccc000PUIW0ssssddddaaaa1011aaaa", ARM_V4|ARM_INTEGER },
+    { "STRH","cccc000PUIW0ssssddddAAAA1011AAAA", ARM_V4|ARM_INTEGER },
     { "STRT","cccc01I0U010ssssddddaaaaaaaaaaaa", ARM_V1|ARM_INTEGER },
     { "SUB", "cccc00I0010Sssssdddd<<<<<<<<<<<<", ARM_V1|ARM_INTEGER },
     { "SWI", "cccc1111++++++++++++++++++++++++", ARM_V1|ARM_INTEGER },
@@ -122,7 +123,7 @@ static arm_opcode32 opcode_table[]=
     {"UMLAL","cccc0000101SDDDDddddssss1001mmmm", ARM_V1|ARM_INTEGER },
     {"UMULL","cccc0000100SDDDDddddssss1001mmmm", ARM_V1|ARM_INTEGER },
  /* DSP */
-    { "LDRD","cccc000PUIW0ssssddddaaaa1101aaaa", ARM_V5|ARM_DSP },
+    { "LDRD","cccc000PUIW0ssssddddAAAA1101AAAA", ARM_V5|ARM_DSP },
     { "PLD", "111101I1U101ssss1111aaaaaaaaaaaa", ARM_V5|ARM_DSP },
     {"QADD", "cccc00010000ssssdddd00000101mmmm", ARM_V5|ARM_DSP },
     {"QDADD","cccc00010100ssssdddd00000101mmmm", ARM_V5|ARM_DSP },
@@ -133,7 +134,7 @@ static arm_opcode32 opcode_table[]=
     {"SMLAW","cccc00010010ddddnnnnssss1Y00mmmm", ARM_V5|ARM_DSP },
     { "SMUL","cccc00010110dddd0000ssss1YX0mmmm", ARM_V5|ARM_DSP },
     {"SMULW","cccc00010010dddd0000ssss1Y10mmmm", ARM_V5|ARM_DSP },
-    { "STRD","cccc000PUIW0nnnnddddaaaa1111aaaa", ARM_V5|ARM_DSP },
+    { "STRD","cccc000PUIW0nnnnddddAAAA1111AAAA", ARM_V5|ARM_DSP },
  /* VFP */
 //    { "CDP2","11111110ffffTTTTttttxxxxFFF0yyyy", ARM_V5|ARM_FPU },
 //    { "CDP", "cccc1110ffffTTTTttttxxxxFFF0yyyy", ARM_V2|ARM_FPU },
@@ -347,8 +348,7 @@ extern const char * arm_reg_name[];
 
 #define PARSE_IMM32(chr,smul)\
     p=strchr(msk,chr);\
-    if(p)\
-    {\
+    if(p) {\
 	READ_IMM32(chr);\
 	if(prev) strcat(dret->str,",");\
 	strcat(dret->str,"#");\
@@ -357,145 +357,96 @@ extern const char * arm_reg_name[];
 	prev=1;\
     }
 
+#define GET_ADDR_MODE(ch,has,a)\
+{\
+    p=strchr(msk,ch);\
+    if(p) {\
+	READ_IMM32(ch);\
+	has = True;\
+	a = val;\
+    }\
+}
+
+#define APPEND_ARM_REG(ch,arr)\
+{\
+    p=strchr(msk,ch);\
+    if(p) {\
+	READ_IMM32(ch);\
+	if(prev) strcat(dret->str,","); prev=1;\
+	strcat(dret->str,arr[val&0xF]);\
+    }\
+}
+
+#define APPEND_ARM_REG_WB(ch,arr,has_W,a_W,amode)\
+{\
+    p=strchr(msk,ch);\
+    if(p) {\
+	READ_IMM32(ch);\
+	if(prev) strcat(dret->str,","); prev=1;\
+	if(amode) strcat(dret->str,"[");\
+	strcat(dret->str,arm_reg_name[val&0xF]);\
+	if(has_W==True && a_W) strcat(dret->str,"!");\
+    }\
+}
+
+#define APPEND_ARM_FREG(CH,ch)\
+{\
+    p=strchr(msk,CH);\
+    if(p) {\
+	unsigned val2;\
+	READ_IMM32(CH);\
+	val2=val;\
+	if(prev) strcat(dret->str,","); prev=1;\
+	READ_IMM32(ch);\
+	strcat(dret->str,arm_freg_name[(val2&0x1F<<1)|(val&1)]);\
+    }\
+}
+
+#define APPEND_ARM_2DIG(ch)\
+{\
+    p=strchr(msk,ch);\
+    if(p) {\
+	READ_IMM32(ch);\
+	if(prev) strcat(dret->str,","); prev=1;\
+	strcat(dret->str,Get2Digit(val&0xF));\
+    }\
+}
+
 void __FASTCALL__ arm32EncodeTail(DisasmRet *dret,__filesize_t ulShift,
 					tUInt32 opcode, unsigned flags,unsigned index)
 {
     unsigned i,idx,val,prev,bracket;
     const char *msk=opcode_table[index].mask;
     char *p;
-    unsigned a_W;
+    unsigned a_I,a_P,a_U,a_N,a_W;
+    tBool has_I,has_P,has_U,has_N,has_W;
     prev=0;
     bracket=0;
-    a_W=0; /* indictaes write back to source register*/
+    a_I=a_P=a_U=a_N=a_W=0;
+    has_I=has_P=has_U=has_N=has_W=False;
     /* some common tests */
-    p=strchr(msk,'W');
-    if(p) {
-	READ_IMM32('W');
-	a_W = val;
-    }
-    p=strchr(msk,'f');
-    if(p)
-    {
-	READ_IMM32('f');
-	if(prev) strcat(dret->str,","); prev=1;
-	strcat(dret->str,Get2Digit(val&0xF));
-    }
-    p=strchr(msk,'D');
-    if(p)
-    {
-	READ_IMM32('D');
-	if(prev) strcat(dret->str,","); prev=1;
-	strcat(dret->str,arm_reg_name[val&0xF]);
-    }
-    p=strchr(msk,'d');
-    if(p)
-    {
-	READ_IMM32('d');
-	if(prev) strcat(dret->str,","); prev=1;
-	strcat(dret->str,arm_reg_name[val&0xF]);
-    }
-    p=strchr(msk,'V');
-    if(p)
-    {
-	unsigned val2;
-	READ_IMM32('V');
-	val2=val;
-	if(prev) strcat(dret->str,","); prev=1;
-	READ_IMM32('v');
-	strcat(dret->str,arm_freg_name[(val2&0x1F<<1)|(val&1)]);
-    }
-    p=strchr(msk,'E');
-    if(p)
-    {
-	READ_IMM32('E');
-	if(prev) strcat(dret->str,","); prev=1;
-	strcat(dret->str,arm_wreg_name[val&0xF]);
-    }
-    p=strchr(msk,'s');
-    if(p)
-    {
-	READ_IMM32('s');
-	if(prev) strcat(dret->str,","); prev=1;
-	strcat(dret->str,arm_reg_name[val&0xF]);
-	if(a_W) strcat(dret->str,"!");
-    }
-    p=strchr(msk,'m');
-    if(p)
-    {
-	READ_IMM32('m');
-	if(prev) strcat(dret->str,","); prev=1;
-	strcat(dret->str,arm_reg_name[val&0xF]);
-    }
-    p=strchr(msk,'n');
-    if(p)
-    {
-	READ_IMM32('n');
-	if(prev) strcat(dret->str,","); prev=1;
-	strcat(dret->str,arm_reg_name[val&0xF]);
-	if(a_W) strcat(dret->str,"!");
-    }
-    p=strchr(msk,'Q');
-    if(p)
-    {
-	READ_IMM32('Q');
-	if(prev) strcat(dret->str,","); prev=1;
-	strcat(dret->str,arm_sysfreg_name[val&0xF]);
-    }
-    p=strchr(msk,'T');
-    if(p)
-    {
-	unsigned val2;
-	READ_IMM32('T');
-	val2=val;
-	if(prev) strcat(dret->str,","); prev=1;
-	READ_IMM32('t');
-	strcat(dret->str,arm_freg_name[(val2&0x1F<<1)|(val&1)]);
-    }
-    p=strchr(msk,'J');
-    if(p)
-    {
-	READ_IMM32('J');
-	if(prev) strcat(dret->str,","); prev=1;
-	strcat(dret->str,arm_wreg_name[val&0xF]);
-    }
-    p=strchr(msk,'Z');
-    if(p)
-    {
-	unsigned val2;
-	READ_IMM32('Z');
-	val2=val;
-	if(prev) strcat(dret->str,","); prev=1;
-	READ_IMM32('z');
-	strcat(dret->str,arm_freg_name[(val2&0x1F<<1)|(val&1)]);
-    }
-    p=strchr(msk,'G');
-    if(p)
-    {
-	READ_IMM32('G');
-	if(prev) strcat(dret->str,","); prev=1;
-	strcat(dret->str,arm_wreg_name[val&0xF]);
-    }
-    p=strchr(msk,'R');
-    if(p)
-    {
-	int prevv;
-	if(prev) strcat(dret->str,",{");
-	READ_IMM32('R');
-	prevv=0;
-	for(i=0;i<32;i++)
-	{
-	    if(val&(1<<i))
-	    {
-		if(prevv) strcat(dret->str,",");
-		strcat(dret->str,arm_reg_name[i]);
-		prevv=1;
-	    }
-	}
-	if(prev) strcat(dret->str,"}");
-    }
+    GET_ADDR_MODE('I',has_I,a_I);
+    GET_ADDR_MODE('P',has_P,a_P);
+    GET_ADDR_MODE('U',has_U,a_U);
+    GET_ADDR_MODE('N',has_N,a_N);
+    GET_ADDR_MODE('W',has_W,a_W);
+
+    APPEND_ARM_2DIG('f');
+    APPEND_ARM_REG('D',arm_reg_name);
+    APPEND_ARM_REG('d',arm_reg_name);
+    APPEND_ARM_FREG('V','v');
+    APPEND_ARM_REG('E',arm_wreg_name);
+    APPEND_ARM_REG_WB('s',arm_reg_name,has_W,a_W,(strchr(msk,'a')||strchr(msk,'A')));
+    APPEND_ARM_REG('m',arm_reg_name);
+    APPEND_ARM_REG_WB('n',arm_reg_name,has_W,a_W,(strchr(msk,'a')||strchr(msk,'A')));
+    APPEND_ARM_REG('Q',arm_sysfreg_name);
+    APPEND_ARM_FREG('T','t');
+    APPEND_ARM_REG('J',arm_wreg_name);
+    APPEND_ARM_FREG('Z','z');
+    APPEND_ARM_REG('G',arm_wreg_name);
+
     p=strchr(msk,'o');
-    if(p)
-    {
+    if(p) {
 	tUInt32 tbuff;
 	unsigned hh=0;
 	p=strchr(msk,'H');
@@ -512,16 +463,125 @@ void __FASTCALL__ arm32EncodeTail(DisasmRet *dret,__filesize_t ulShift,
 			DISADR_NEAR32,0,3);
 	prev=1;
     }
+
+    /* Addressing Mode 1 - Data-processing operands */
+    p=strchr(msk,'<');
+    if(p) {
+	READ_IMM32('<');
+	if(prev) strcat(dret->str,",");
+	if(has_I == True && a_I) {
+	    strcat(dret->str,"#");
+	    strcat(dret->str,Get2Digit(val&0xFF));
+	    strcat(dret->str,",");
+	    strcat(dret->str,Get2Digit((val>>8)&0xF));
+	}
+	else {
+	    unsigned idx=(val>>4)&0x07;
+	    const char *pfx=NULL;
+	    switch(idx) {
+		default:
+		case 0:
+		case 1: pfx="LSL"; break;
+		case 2:
+		case 3: pfx="LSR"; break;
+		case 4:
+		case 5: pfx="ASR"; break;
+		case 6:
+		case 7: pfx="ROR"; break;
+	    }
+	    strcat(dret->str,arm_reg_name[val&0xF]);
+	    strcat(dret->str,",");
+	    strcat(dret->str,pfx);
+	    strcat(dret->str," #");
+	    switch(idx) {
+		case 6:
+		case 4:
+		case 2:
+		case 0:
+			strcat(dret->str,Get2Digit((val>>7)&0x1F));
+			break;
+		case 7:
+		case 5:
+		case 3:
+		case 1:
+			strcat(dret->str,arm_reg_name[(val>>8)&0xF]);
+			break;
+		default: break;
+	    }
+	}
+    }
+
+    /* Addressing Mode 2 - Load and Store Word or Unsigned Byte */
+    p=strchr(msk,'a');
+    if(p) {
+	READ_IMM32('a');
+	if(has_I == True && a_I) {
+	    unsigned idx=(val>>4)&0x07;
+	    const char *pfx=NULL;
+	    switch(idx) {
+		default:
+		case 0:
+		case 1: pfx="LSL"; break;
+		case 2:
+		case 3: pfx="LSR"; break;
+		case 4:
+		case 5: pfx="ASR"; break;
+		case 6:
+		case 7: pfx="ROR"; break;
+	    }
+	    if(prev) strcat(dret->str,has_U==True&&a_U?"+":"-");
+	    strcat(dret->str,arm_reg_name[val&0xF]);
+	    strcat(dret->str,",");
+	    strcat(dret->str,pfx);
+	    strcat(dret->str," #");
+	    strcat(dret->str,Get2Digit((val>>7)&0x1F));
+	}
+	else {
+	    strcat(dret->str,Get4SignDig(val&0xFFF));
+	}
+	strcat(dret->str,"]");
+    }
+
+    /* Addressing Mode 3 - Miscellaneous Loads and Stores */
+    p=strchr(msk,'A');
+    if(p) {
+	READ_IMM32('A');
+	if(prev) strcat(dret->str,has_U==True&&a_U?"+":"-");
+	if(has_N == True && a_N) {
+	    strcat(dret->str,Get2Digit(val&0xFF));
+	}
+	else {
+	    strcat(dret->str,arm_reg_name[val&0xF]);
+	}
+	strcat(dret->str,"]");
+    }
+
+    /* Addressing Mode 4 - Load and Store Multiple */
+    p=strchr(msk,'R');
+    if(p) {
+	int prevv;
+	if(prev) strcat(dret->str,",{");
+	READ_IMM32('R');
+	prevv=0;
+	for(i=0;i<32;i++)
+	{
+	    if(val&(1<<i))
+	    {
+		if(prevv) strcat(dret->str,",");
+		strcat(dret->str,arm_reg_name[i]);
+		prevv=1;
+	    }
+	}
+	if(prev) strcat(dret->str,"}");
+    }
+
+    /* Addressing Mode 5 - Load and Store Coprocessor */
+    /* is it really needed ? */
+
     PARSE_IMM32('+',NULL);
     PARSE_IMM32('-',NULL);
 
-    p=strchr(msk,'F');
-    if(p)
-    {
-	READ_IMM32('F');
-	if(prev) strcat(dret->str,","); prev=1;
-	strcat(dret->str,Get2Digit(val&0xF));
-    }
+    APPEND_ARM_2DIG('F');
 }
 
 void __FASTCALL__ arm32Disassembler(DisasmRet *dret,__filesize_t ulShift,
