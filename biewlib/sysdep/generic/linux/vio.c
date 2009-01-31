@@ -80,10 +80,8 @@ static unsigned char frames_dumb[0x30] =
 
 static char *screen_cp;
 static unsigned is_unicode=0;
-extern int   nls_init(const char *to,const char *from);
-extern void  nls_term(void);
-extern char *nls_get_screen_cp(void);
-extern char *nls_recode2screen_cp(const char *srcb,unsigned* len);
+
+static void *nls_handle;
 
 
 #define twrite(x)	write(out_fd, (x), strlen(x))
@@ -280,7 +278,7 @@ void __FASTCALL__ __vioWriteBuff(tAbsCoord x, tAbsCoord y, const tvioBuff *buff,
 	    }
 	    if(is_unicode) {
 		unsigned len=1;
-		char *destb=nls_recode2screen_cp(&c,&len);
+		char *destb=nls_recode2screen_cp(nls_handle,&c,&len);
 		memcpy(dpb,destb,len);
 		free(destb);
 		dpb+=len;
@@ -358,7 +356,8 @@ void __FASTCALL__ __init_vio(const char *user_cp,unsigned long flags)
 	is_unicode=1;
     }
 #endif
-    if(nls_init(screen_cp,user_cp)) is_unicode=0;
+    nls_handle=nls_init(screen_cp,user_cp);
+    if(nls_handle==NULL) is_unicode=0;
     if (!output_7) output_7 = TESTFLAG(console_flags, __TVIO_FLG_USE_7BIT);
     if (tvioWidth <= 0) tvioWidth = 80;
     if (tvioHeight <= 0) tvioHeight = 25;
@@ -435,7 +434,7 @@ void __FASTCALL__ __term_vio(void)
     }
     __vioSetCursorPos(firstX, firstY);
 
-    nls_term();
+    nls_term(nls_handle);
     if (on_console) close(viohandle);
 
     free(vtmp);

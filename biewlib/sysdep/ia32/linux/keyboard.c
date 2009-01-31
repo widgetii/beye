@@ -67,6 +67,9 @@ static tBool mouse_status = True;
 static struct termios sattr, tattr;	/**< terminal attributes */
 int in_fd;
 
+static void *nls_handle;
+static int is_unicode=0;
+
 /**
     keyboard FIFO
 */
@@ -243,8 +246,36 @@ static mevent mouse = {0, 0, 0, 0};
 
 */
 
-static void __FASTCALL__ pushEvent(unsigned event)
+static void __FASTCALL__ pushEvent(unsigned _event)
 {
+    unsigned event=_event;
+#if defined (_VT100_) && defined(HAVE_ICONV)
+    if(is_unicode) {
+	static unsigned char utf_buff[8];
+	static unsigned utf_ptr=0;
+	char *destb;
+	int err;
+	unsigned char *eptr;
+	unsigned i,len;
+	if((event&(~0xFF))==0) {
+	    utf_buff[utf_ptr]=event;
+	    len=utf_ptr+1;
+	    if((err=nls_test(nls_handle,utf_buff,&len))!=0) {
+		utf_ptr++;
+		return;
+	    }
+	    len=utf_ptr+1;
+	    destb=nls_recode2screen_cp(nls_handle,utf_buff,&len);
+	    event=0;
+	    eptr=(unsigned char *)&event;
+	    for(i=0;i<min(sizeof(unsigned),len);i++) {
+		event<<=8;
+		eptr[0]=destb[i];
+	    }
+	    utf_ptr=0;
+	}
+    }
+#endif
     if (event && keybuf.current < KBUFSIZE) {
 	if (keybuf.current)
 	    memmove(keybuf.pool, &keybuf.pool[1], keybuf.current);
@@ -375,7 +406,7 @@ void __FASTCALL__ ReadNextEvent(void)
 /*
     VT100 emulation
 */
-	    char c[SEQ_LEN];
+	    unsigned char c[SEQ_LEN];
 
 	    if (get(c[0]) < 0) return;
 	    
@@ -391,7 +422,7 @@ void __FASTCALL__ ReadNextEvent(void)
 		case KE_C_O		: key = KE_CTL_(O); break;
 		default			: key = c[0];
 	    }
-	    if (key) 
+	    if (key)
 	    {
 		if(rawkb_mode)
 		{
@@ -542,7 +573,7 @@ dummy_handler (int sig)
     /*fprintf(stderr, "warning: received early %d\n", sig);*/
 }
 
-void __FASTCALL__ __init_keyboard(void)
+void __FASTCALL__ __init_keyboard(const char *user_cp)
 {
     signal(SIGIO, dummy_handler);
     in_fd = open(ttyname(STDIN_FILENO), O_RDONLY);
@@ -572,6 +603,18 @@ void __FASTCALL__ __init_keyboard(void)
 	printm("Can't set keyboard raw mode: %s\nUsing VT100 emulation..\n", strerror(errno));
 	on_console = 0;
     }
+
+#ifdef HAVE_ICONV
+    {
+    const char *screen_cp;
+	screen_cp=nls_get_screen_cp();
+	if(strncasecmp(screen_cp,"UTF",3)==0 && !on_console) {
+	    is_unicode=1;
+	}
+	nls_handle=nls_init(user_cp,screen_cp);
+	if(nls_handle==NULL) is_unicode=0;
+    }
+#endif
 
     if (on_console) {	/* init vt switching */
 	struct vt_mode vt;
@@ -604,6 +647,9 @@ void __FASTCALL__ __init_keyboard(void)
 
 void __FASTCALL__ __term_keyboard(void)
 {
+#ifdef HAVE_ICONV
+    nls_term(nls_handle);
+#endif
     if (on_console) ioctl(in_fd, KDSKBMODE, K_XLATE);
     tcsetattr(in_fd, TCSANOW, &sattr);
     close(in_fd);

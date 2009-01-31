@@ -192,4 +192,10 @@ extern Console console;
 #define	__vioSetCursorType	console.SetCursorType
 */
 
+extern void* nls_init(const char *to,const char *from);
+extern void  nls_term(void*);
+extern char *nls_get_screen_cp(void);
+extern char *nls_recode2screen_cp(void*,const char *srcb,unsigned* len);
+extern int   nls_test(void* ic,const char *srcb,unsigned* len);
+
 #endif	/* __CONSOLE_H */

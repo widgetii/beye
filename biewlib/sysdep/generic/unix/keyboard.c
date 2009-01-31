@@ -75,6 +75,9 @@ int rawkb_method=1;
 static int in_fd;
 static struct termios sattr;
 
+static void *nls_handle;
+static int is_unicode=0;
+
 typedef struct {
     char c;
     int key;
@@ -225,8 +228,36 @@ static mevent mouse = {0, 0, 0, 0};
 static int	shift_status = 0;	/**< status of shift keys */
 static tBool	mouse_status = True;	/**< mouse state */
 
-static void __FASTCALL__ pushEvent(int event)
+static void __FASTCALL__ pushEvent(unsigned _event)
 {
+    unsigned event=_event;
+#if defined (_VT100_) && defined(HAVE_ICONV)
+    if(is_unicode) {
+	static unsigned char utf_buff[8];
+	static unsigned utf_ptr=0;
+	char *destb;
+	int err;
+	unsigned char *eptr;
+	unsigned i,len;
+	if((event&(~0xFF))==0) {
+	    utf_buff[utf_ptr]=event;
+	    len=utf_ptr+1;
+	    if((err=nls_test(nls_handle,utf_buff,&len))!=0) {
+		utf_ptr++;
+		return;
+	    }
+	    len=utf_ptr+1;
+	    destb=nls_recode2screen_cp(nls_handle,utf_buff,&len);
+	    event=0;
+	    eptr=(unsigned char *)&event;
+	    for(i=0;i<min(sizeof(unsigned),len);i++) {
+		event<<=8;
+		eptr[0]=destb[i];
+	    }
+	    utf_ptr=0;
+	}
+    }
+#endif
     if (event) {
 	if (keybuf.current < KBUFSIZE) {
 #ifdef	_SLANG_
@@ -251,7 +282,7 @@ static void __FASTCALL__ pushEvent(int event)
 
 void __FASTCALL__ ReadNextEvent(void)
 {
-    int key = 0;
+    unsigned key = 0;
 
 #define ret(x)	pushEvent(x); return;
 #define set_s(x) shift_status &= (x); shift_status ^= (x); ret(KE_SHIFTKEYS);
@@ -334,7 +365,7 @@ void __FASTCALL__ ReadNextEvent(void)
 #define get(x) read(in_fd,&(x),1)
 
     int i;
-    char c[SEQ_LEN];
+    unsigned char c[SEQ_LEN];
 
 #ifdef HAVE_MOUSE
     if (gpmhandle) {
@@ -348,7 +379,7 @@ void __FASTCALL__ ReadNextEvent(void)
 	    Gpm_Event ge;
 	    Gpm_GetEvent(&ge);
 	    if (ge.type & GPM_DOWN) {
-		if (ge.buttons & GPM_B_LEFT)	
+		if (ge.buttons & GPM_B_LEFT)
 		    mouse.buttons |= MS_LEFTPRESS;
 		if (ge.buttons & GPM_B_MIDDLE)
 		    mouse.buttons |= MS_MIDDLEPRESS;
@@ -377,7 +408,7 @@ void __FASTCALL__ ReadNextEvent(void)
 	case 0			: if(!rawkb_mode) { ret(0); } else { rawkb_mode=0; return; }
 	default			: key = c[0];
     }
-    if (key) 
+    if (key)
     {
 	if(rawkb_mode)
 	{
@@ -386,17 +417,18 @@ void __FASTCALL__ ReadNextEvent(void)
 	}
 	goto place_key;
     }
-    for (i = 1; i < SEQ_LEN - 1; i++)
-	 if(get(c[i]) < 0) break;
+    for (i = 1; i < SEQ_LEN - 1; i++) if(get(c[i]) < 0) break;
     if(rawkb_mode)
     {
 	memcpy(rawkb_buf,c,i);
 	rawkb_len=i;
     }
+
     if (i < 3) {
 	key = c[0];
 	goto place_key;
     }
+
 
 /*
     track mouse
@@ -510,7 +542,7 @@ int __FASTCALL__ __MsGetBtns(void)
 }
 
 
-void __FASTCALL__ __init_keyboard(void)
+void __FASTCALL__ __init_keyboard(const char *user_cp)
 {
 #ifdef	_CURSES_
     raw();
@@ -532,6 +564,18 @@ void __FASTCALL__ __init_keyboard(void)
 #define _MODE_ O_NONBLOCK | O_ASYNC
 #else
 #define _MODE_ O_NONBLOCK
+#endif
+
+#ifdef HAVE_ICONV
+    {
+    const char *screen_cp;
+	screen_cp=nls_get_screen_cp();
+	if(strncasecmp(screen_cp,"UTF",3)==0) {
+	    is_unicode=1;
+	}
+	nls_handle=nls_init(user_cp,screen_cp);
+	if(nls_handle==NULL) is_unicode=0;
+    }
 #endif
 
     in_fd = open(ttyname(STDIN_FILENO), O_RDONLY);
@@ -567,14 +611,18 @@ void __FASTCALL__ __init_keyboard(void)
 
 #ifdef	__ENABLE_SIGIO
     /* everything is ready, start to receive SIGIO */
-    signal(SIGIO, (void *)(int) ReadNextEvent); 
+    signal(SIGIO, (void *)(int) ReadNextEvent);
 #endif
 
 #endif	/* _VT100_ */
+
 }
 
 void __FASTCALL__ __term_keyboard(void)
 {
+#ifdef HAVE_ICONV
+    nls_term(nls_handle);
+#endif
 #ifdef	_VT100_
     tcsetattr(in_fd, TCSANOW, &sattr);
     close(in_fd);

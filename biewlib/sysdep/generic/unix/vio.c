@@ -208,11 +208,8 @@ static int out_fd;
 static int _color[8] = {0,4,2,6,1,5,3,7};
 static char *screen_cp;
 static unsigned is_unicode=0;
-extern int   nls_init(const char *to,const char *from);
-extern void  nls_term(void);
-extern char *nls_get_screen_cp(void);
-extern char *nls_recode2screen_cp(const char *srcb,unsigned* len);
 
+static void *nls_handle;
 
 static unsigned char frames_vt100[0x30] =
 "aaaxuuukkuxkjjjkmvwtqnttmlvwtqnvvwwmmllnnjlaaaaa";
@@ -438,7 +435,7 @@ void __FASTCALL__ __vioWriteBuff(tAbsCoord x, tAbsCoord y, const tvioBuff *buff,
 	}
 	else {
 	    unsigned len=1;
-	    char *destb=nls_recode2screen_cp(&c,&len);
+	    char *destb=nls_recode2screen_cp(nls_handle,&c,&len);
 	    memcpy(dpb,destb,len);
 	    free(destb);
 	    dpb+=len;
@@ -485,7 +482,8 @@ void __FASTCALL__ __init_vio(const char *user_cp,unsigned long flags)
     if(strncasecmp(screen_cp,"UTF",3)==0) {
 	is_unicode=1;
     }
-    if(nls_init(screen_cp,user_cp)) is_unicode=0;
+    nls_handle=nls_init(screen_cp,user_cp);
+    if(nls_handle==NULL) is_unicode=0;
 #endif
     console_flags = flags;
 
@@ -585,7 +583,7 @@ void __FASTCALL__ __term_vio(void)
     free(vtmp);
 #endif
     free(viomem);
-    nls_term();
+    nls_term(nls_handle);
     initialized = 0;
 }
 

@@ -47,7 +47,7 @@ extern "C" {
                      * @note                  You must call this function before calling any other keyboard related functions
                      * @see                   __term_keyboard
                     **/
-extern void      __FASTCALL__ __init_keyboard( void );
+extern void      __FASTCALL__ __init_keyboard( const char *user_cp );
 
                    /** Terminates keyboard handler.
                      * @return                none

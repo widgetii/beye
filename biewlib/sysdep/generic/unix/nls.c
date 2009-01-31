@@ -150,35 +150,30 @@ char *nls_get_screen_cp(void)
     return to_cp;
 }
 
+void* nls_init(const char *to_cp,const char *src_cp) {
 #ifdef HAVE_ICONV
-static iconv_t ic;
-#endif
-static int iconv_inited=0;
-
-int nls_init(const char *to_cp,const char *src_cp) {
-    errno=0;
-#ifdef HAVE_ICONV
+    iconv_t ic;
     ic=iconv_open(to_cp,src_cp);
     if(errno) {
 	printm("ICONV(%s,%s): Open with error: %s\n",to_cp,src_cp,strerror(errno));
     }
-    else iconv_inited=1;
+    return ic;
+#else
+    return NULL;
 #endif
-    return errno;
 }
 
-void nls_term(void) {
+void nls_term(void* ic) {
 #ifdef HAVE_ICONV
  iconv_close(ic);
 #endif
- iconv_inited=0;
 }
 
-char *nls_recode2screen_cp(const char *srcb,unsigned* len)
+char *nls_recode2screen_cp(void* ic,const char *srcb,unsigned* len)
 {
     char *obuff;
 #ifdef HAVE_ICONV
-    if(iconv_inited)
+    if(ic)
     {
 	static int warned=0;
 	const char *ibuff,*ib;
@@ -215,4 +210,31 @@ char *nls_recode2screen_cp(const char *srcb,unsigned* len)
     obuff=strdup(srcb);
 #endif
     return obuff;
+}
+
+int nls_test(void* ic,const char *srcb,unsigned* len)
+{
+#ifdef HAVE_ICONV
+    if(ic)
+    {
+	static int warned=0;
+	const char *ibuff,*ib;
+	char *obuff;
+	char *ob;
+	size_t inb,outb,rval;
+	errno=0;
+	inb=*len;
+	outb=((*len)+1)*4;
+	obuff=malloc(outb);
+	ibuff=srcb;
+	ob=obuff;
+	ib=ibuff;
+	rval=iconv(ic,(char **)&ib,&inb,&ob,&outb);
+	free(obuff);
+	if(iconv(ic,(char **)&ib,&inb,&ob,&outb) != (size_t)(-1))
+	    return 0;
+	else return errno;
+    }
+#endif
+    return 0;
 }
