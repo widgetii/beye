@@ -1208,6 +1208,7 @@ v5.0.2        ! Changes:
 XX yyy 2009   ! Changes:
                 * Be more informative if biew.ini was not found
                 * Fixed bug #2520144: Wrong computing of addressing mode in ARM dis.
+                * Fixed national input on UTF-based terminals
 []======================================================================[]
 []  Thank you for your interest.                                        []
 []  Nick Kurshev (http://my666.boom.ru/666_en.html).                    []
