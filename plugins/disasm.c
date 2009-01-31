@@ -1241,7 +1241,7 @@ int __FASTCALL__ disAppendFAddr(char * str,__fileoff_t ulShift,__fileoff_t disti
             }
        }
        else
-       if(dret.pro_clone == __INSNT_JMPRIP) /* jmp [rip+offset] */
+       if(dret.pro_clone == __INSNT_JMPRIP) /* calln *(jmp [rip+offset]) */
        {
 	__filesize_t _defval,fpos,pa;
 	unsigned long app;
@@ -1255,12 +1255,18 @@ int __FASTCALL__ disAppendFAddr(char * str,__fileoff_t ulShift,__fileoff_t disti
 		    r_sh+dret.field)+dret.codelen;
 	pa = detectedFormat->va2pa ? detectedFormat->va2pa(_defval) :
                                            _defval;
-	    app=AppendAsmRef(str,pa,APREF_TRY_LABEL,dret.codelen,0L);
-            if(app)
-            {
-              appended = RAPREF_DONE; /* terminate appending any info anyway */
-              if(!DumpMode && !EditMode) GidAddGoAddress(str,r_sh);
-            }
+	app=AppendAsmRef(str,pa,APREF_TRY_LABEL,dret.codelen,0L);
+        if(app)
+        {
+	  appended = RAPREF_DONE; /* terminate appending any info anyway */
+	  modif_to = strchr(str,' ');
+	  if(modif_to)
+	  {
+	    while(*modif_to == ' ') modif_to++;
+	    *(modif_to-1) = '*';
+	  }
+	  if(!DumpMode && !EditMode) GidAddGoAddress(str,r_sh);
+        }
        }
    }
  }
