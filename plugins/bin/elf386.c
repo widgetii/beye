@@ -636,15 +636,15 @@ static __filesize_t __FASTCALL__ ShowELFHeader( void )
   twSetColorAttr(dialog_cset.entry);
   if(is_64bit)
     twPrintF("Entry point VA             = %016llXH (offset: %016llXH)"
-           ,(unsigned long)ELF_ADDR(ELF_EHDR(elf,e_entry)),(unsigned long)entrya);
+           ,(unsigned long long)ELF_ADDR(ELF_EHDR(elf,e_entry)),(unsigned long long)entrya);
   else
     twPrintF("Entry point VA                    = %08lXH (offset: %08lXH)"
            ,(unsigned)ELF_ADDR(ELF_EHDR(elf,e_entry)),(unsigned)entrya);
   twClrEOL(); twPrintF("\n");
   twSetColorAttr(dialog_cset.main);
   if(is_64bit)
-    twPrintF("Program header table offset       = %016lXH\n"
-           "Section header table offset       = %016lXH\n"
+    twPrintF("Program header table offset       = %016llXH\n"
+           "Section header table offset       = %016llXH\n"
            ,ELF_OFF(ELF_EHDR(elf,e_phoff))
            ,ELF_OFF(ELF_EHDR(elf,e_shoff)));
   else
@@ -856,7 +856,7 @@ static tBool __FASTCALL__ __elfReadSymTab(BGLOBAL handle,memArray *obj,unsigned 
   for(i = 0;i < nsym;i++)
   {
    __filesize_t fp;
-   char stmp[80],* fmts;
+   char stmp[80];
    ElfXX_External_Sym sym;
    if(IsKbdTerminate() || bioEOF(handle)) break;
    fp = bioTell(handle);
@@ -864,11 +864,20 @@ static tBool __FASTCALL__ __elfReadSymTab(BGLOBAL handle,memArray *obj,unsigned 
    bioSeek(handle,fp+__elfSymEntSize,SEEKF_START);
    elf386_readnametableex(ELF_WORD(ELF_SYM(sym,st_name)),text,tlen);
    text[tlen-1] = 0;
-   if(is_64bit) fmts="%-29s %016lX %08lX %04hX %s %s %s";
-   else         fmts="%-37s %08lX %08lX %04hX %s %s %s";
-   sprintf(stmp,fmts
+   if(is_64bit)
+   sprintf(stmp,"%-29s %016llX %08lX %04hX %s %s %s"
                ,text
-               ,(unsigned long)ELF_XWORD(ELF_SYM(sym,st_value))
+               ,(unsigned long long)ELF_XWORD(ELF_SYM(sym,st_value))
+               ,(unsigned)ELF_XWORD(ELF_SYM(sym,st_size))
+               ,ELF_HALF(ELF_SYM(sym,st_other))
+               ,elf_SymTabType(ELF_SYM(sym,st_info[0]))
+               ,elf_SymTabBind(ELF_SYM(sym,st_info[0]))
+               ,elf_SymTabShNdx(ELF_HALF(ELF_SYM(sym,st_shndx)))
+               );
+   else
+   sprintf(stmp,"%-37s %08lX %08lX %04hX %s %s %s"
+               ,text
+               ,(unsigned)ELF_XWORD(ELF_SYM(sym,st_value))
                ,(unsigned)ELF_XWORD(ELF_SYM(sym,st_size))
                ,ELF_HALF(ELF_SYM(sym,st_other))
                ,elf_SymTabType(ELF_SYM(sym,st_info[0]))
@@ -906,7 +915,7 @@ static tBool __NEAR__ __FASTCALL__ __elfReadDynTab(BGLOBAL handle,memArray *obj,
    rlen = strlen(stmp);
    if(rlen < rborder) { memset(&stmp[rlen],' ',rborder-rlen); stmp[rborder] = 0; }
    if(is_64bit)
-    sprintf(&stmp[strlen(stmp)]," vma=%016lXH",(unsigned long)ELF_XWORD(ELF_EDYN(pdyn,d_un.d_val)));
+    sprintf(&stmp[strlen(stmp)]," vma=%016llXH",(unsigned long long)ELF_XWORD(ELF_EDYN(pdyn,d_un.d_val)));
    else
     sprintf(&stmp[strlen(stmp)]," vma=%08lXH",(unsigned long)ELF_XWORD(ELF_EDYN(pdyn,d_un.d_val)));
    if(!ma_AddString(obj,stmp,True)) break;

@@ -236,7 +236,7 @@ static void __NEAR__ PaintNewHeaderPE_1( void )
   twPrintF("EntryPoint RVA    %s = %08lXH (Offset: %08lXH)",pe.peFlags & 0x2000 ? "[ LibEntry ]" : "[ EXEEntry ]",pe.peEntryPointRVA,entryPE); twClrEOL();
   twSetColorAttr(dialog_cset.main);
   if(is_64bit)
-    fmt = "\nImage base                   = %016lXH\n"
+    fmt = "\nImage base                   = %016llXH\n"
           "Object aligning                = %08lXH";
   else
     fmt = "\nImage base                   = %08lXH\n"
