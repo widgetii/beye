@@ -262,6 +262,9 @@ static void __FASTCALL__ pushEvent(unsigned _event)
 	    len=utf_ptr+1;
 	    if((err=nls_test(nls_handle,utf_buff,&len))!=0) {
 		utf_ptr++;
+		/* on incompelete input we need to raise
+		   new loop of console reading */
+		raise(SIGIO);
 		return;
 	    }
 	    len=utf_ptr+1;
