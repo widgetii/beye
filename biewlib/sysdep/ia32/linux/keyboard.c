@@ -273,6 +273,7 @@ static void __FASTCALL__ pushEvent(unsigned _event)
 		eptr[0]=destb[i];
 	    }
 	    utf_ptr=0;
+	    free(destb);
 	}
     }
 #endif
