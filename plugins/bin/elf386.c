@@ -768,7 +768,7 @@ static tBool __FASTCALL__ __elfReadSecHdr(BGLOBAL handle,memArray *obj,unsigned 
    fp = bioTell(handle);
    bioReadBuffer(handle,&shdr,sizeof(shdr));
    elf386_readnametable(ELF_WORD(ELF_SHDR(shdr,sh_name)),tmp,sizeof(tmp));
-   bioSeek(handle,fp+ELF_OFF(ELF_EHDR(elf,e_shentsize)),SEEKF_START);
+   bioSeek(handle,fp+ELF_HALF(ELF_EHDR(elf,e_shentsize)),SEEKF_START);
    tmp[16] = 0;
    sprintf(stmp,"%-16s %-6s %c%c%c %08lX %08lX %08lX %04hX %04hX %04hX %04hX",
                 tmp,
@@ -2140,7 +2140,7 @@ static void __FASTCALL__ ELFinit( void )
    fs = bmGetFLength();
    IsSectionsPresent = ELF_HALF(ELF_EHDR(elf,e_shnum)) != 0 &&
                        ELF_OFF(ELF_EHDR(elf,e_shoff)) &&
-                       ELF_OFF(ELF_EHDR(elf,e_shoff)) < fs && 
+                       ELF_OFF(ELF_EHDR(elf,e_shoff)) < fs &&
                        ELF_OFF(ELF_EHDR(elf,e_shoff)) +
                        ELF_HALF(ELF_EHDR(elf,e_shnum))*ELF_HALF(ELF_EHDR(elf,e_shentsize)) <= fs;
    __elfReadSegments(&va_map_virt,True);
