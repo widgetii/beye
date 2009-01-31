@@ -1204,7 +1204,7 @@ int __FASTCALL__ disAppendFAddr(char * str,__fileoff_t ulShift,__fileoff_t disti
 #endif
  if(disNeedRef > NEEDREF_NONE)
  {
-   if(dret.pro_clone == __INSNT_JMPPIC) goto try_pic; /* skip defaults for PIC */
+   if(dret.pro_clone == __INSNT_JMPPIC || dret.pro_clone == __INSNT_JMPRIP) goto try_pic; /* skip defaults for PIC */
    flags = APREF_TRY_LABEL;
    if(hexAddressResolv && detectedFormat->AddressResolving) flags |= APREF_SAVE_VIRT;
    if(AppendAsmRef(str,ulShift,flags,codelen,r_sh)) appended = RAPREF_DONE;
@@ -1233,7 +1233,30 @@ int __FASTCALL__ disAppendFAddr(char * str,__fileoff_t ulShift,__fileoff_t disti
        if(dret.pro_clone == __INSNT_JMPPIC) /* jmp [ebx+offset] */
        {
             try_pic:
+            if(dret.pro_clone == __INSNT_JMPRIP) goto try_rip;
             if(AppendAsmRef(str,r_sh+dret.field,APREF_TRY_PIC,dret.codelen,r_sh))
+            {
+              appended = RAPREF_DONE; /* terminate appending any info anyway */
+              if(!DumpMode && !EditMode) GidAddGoAddress(str,r_sh);
+            }
+       }
+       else
+       if(dret.pro_clone == __INSNT_JMPRIP) /* jmp [rip+offset] */
+       {
+	__filesize_t _defval,fpos,pa;
+	unsigned long app;
+		try_rip:
+		fpos = BMGetCurrFilePos();
+		_defval = dret.codelen==8 ? BMReadQWordEx(r_sh+dret.field,SEEKF_START):
+					    BMReadDWordEx(r_sh+dret.field,SEEKF_START);
+		BMSeek(fpos,SEEKF_START);
+	_defval += (detectedFormat->pa2va ?
+		    detectedFormat->pa2va(r_sh+dret.field) :
+		    r_sh+dret.field)+dret.codelen;
+	pa = detectedFormat->va2pa ? detectedFormat->va2pa(_defval) :
+                                           _defval;
+	    app=AppendAsmRef(str,pa,APREF_TRY_LABEL,dret.codelen,0L);
+            if(app)
             {
               appended = RAPREF_DONE; /* terminate appending any info anyway */
               if(!DumpMode && !EditMode) GidAddGoAddress(str,r_sh);

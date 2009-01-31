@@ -3877,19 +3877,25 @@ static void ix86_gettype(DisasmRet *dret,ix86Param *_DisP)
    case 0x4D:
    case 0x4E:
    case 0x4F:
-		insn=parse_REX_type(insn[0],insn,&up,&has_rex);
-		goto RepeateByPrefix;
+		if(x86_Bitness == DAB_USE64) {
+		    insn=parse_REX_type(insn[0],insn,&up,&has_rex);
+		    goto RepeateByPrefix;
+		}
+		else goto MakePref;
                 break;
 #endif
    case 0x26:
    case 0x2E:
    case 0x36:
    case 0x3E:
-   case 0x64:
-   case 0x65:
+	      do_seg:
               if(has_seg) break;
               has_seg++;
               goto MakePref;
+   case 0x64:
+   case 0x65:
+		if(x86_Bitness != DAB_USE64) goto do_seg;
+		goto MakePref;
    case 0x66:
 #ifdef IX86_64
 		if(is_REX(insn[1]))
@@ -3982,7 +3988,16 @@ static void ix86_gettype(DisasmRet *dret,ix86Param *_DisP)
      }
      return; /* Return here immediatly, because we have 'goto' operator. */
    }
-   else
+#ifdef IX86_64
+     else
+     if(insn[0] == 0xFF && (insn[1]==0x15 || insn[1] == 0x25) && x86_Bitness == DAB_USE64)
+     {
+        dret->pro_clone = __INSNT_JMPRIP;
+        dret->codelen = 4;
+        dret->field = 2;
+     }
+#endif
+     else
      if(insn[0] == 0xFF &&
         (((insn[1] & 0x27) == 0x25 &&  Use32Addr) ||
         ((insn[1] & 0x27) == 0x26 && !Use32Addr)))
@@ -3998,15 +4013,6 @@ static void ix86_gettype(DisasmRet *dret,ix86Param *_DisP)
         dret->codelen = 4;
         dret->field = 2;
      }
-#ifdef IX86_64
-     else
-     if(insn[0] == 0xFF && insn[1] == 0x25 && x86_Bitness == DAB_USE64)
-     {
-        dret->pro_clone = __INSNT_JMPPIC;
-        dret->codelen = 4;
-        dret->field = 2;
-     }
-#endif
      else
      {
         /* Attempt determine leave insn */

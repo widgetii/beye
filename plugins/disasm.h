@@ -102,6 +102,7 @@ extern unsigned dis_severity; /**< severity of disassembler commentaries */
 #define __INSNT_LEAVE   0x00000002L /**< Instruction of leave class: Example: pop reg1; pop reg2; mov esp, ebp; pop ebp; retx or similar */
 #define __INSNT_JMPVVT  0x00000003L /**< Jump via virtual table */
 #define __INSNT_JMPPIC  0x00000004L /**< Jump via PIC. Like: .i386: jmp name@GOT(ebx) */
+#define __INSNT_JMPRIP  0x00000005L /**< Jump via RIP. Like: .i386: jmp [rip+name@GOT(rip)] */
 
 typedef DisasmRet (__FASTCALL__ *DisasmFunc)(__filesize_t shift,
                                              MBuffer insn_buff,
