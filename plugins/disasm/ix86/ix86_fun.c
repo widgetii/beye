@@ -130,7 +130,7 @@ static char * __NEAR__ __FASTCALL__ Get4SquareDig(unsigned char loc_off,ix86Para
   return ix86_apistr;
 }
 
-static char * __NEAR__ __FASTCALL__ Get8SquareDig(unsigned char loc_off,ix86Param *DisP,tBool as_sign,tBool is_disponly)
+static char * __NEAR__ __FASTCALL__ Get8SquareDig(unsigned char loc_off,ix86Param *DisP,tBool as_sign,tBool is_disponly,tBool as_rip)
 {
   char *ptr = ix86_apistr;
   char *rets;
@@ -140,6 +140,7 @@ static char * __NEAR__ __FASTCALL__ Get8SquareDig(unsigned char loc_off,ix86Para
   {
     type = as_sign ? DISARG_LONG : DISARG_DWORD;
     type |= is_disponly ? DISARG_DISP : DISARG_IDXDISP;
+    if(as_rip) type |= DISARG_RIP;
     rets = GetDigitsApp(loc_off,DisP,4,type);
     if(!(rets[0] == '+' || rets[0] == '-')) *ptr++ = '+';
     strcpy(ptr,rets);
@@ -430,7 +431,7 @@ char * __FASTCALL__ ix86_getModRM(tBool w,unsigned char mod,unsigned char rm,ix8
  char scale[4];
  char new_mode = mod;
  unsigned char clen,tmp;
- tBool as_sign,is_disponly;
+ tBool as_sign,is_disponly,as_rip;
  clen = 2;
  if(rm == 4 && Use32Addr) cptr = ConstrSibMod(ret1,base,_index,scale,DisP->RealCmd[2],&new_mode);
  else
@@ -458,6 +459,7 @@ char * __FASTCALL__ ix86_getModRM(tBool w,unsigned char mod,unsigned char rm,ix8
  }
  is_disponly = False;
  as_sign = True;
+ as_rip=False;
  switch(mod)
  {
        case 0:
@@ -507,6 +509,7 @@ char * __FASTCALL__ ix86_getModRM(tBool w,unsigned char mod,unsigned char rm,ix8
 		   strcat(ix86_modrm_ret,"rip");
 		   as_sign = True;
 		   is_disponly = False;
+		   as_rip=True;
 		 }
 #endif
               if(!Use32Addr)
@@ -522,7 +525,7 @@ char * __FASTCALL__ ix86_getModRM(tBool w,unsigned char mod,unsigned char rm,ix8
                 if(rm != 4) { tmp = 2; clen = 4; }
                 else        { tmp = 3; clen = 5; }
                 strcat(ix86_modrm_ret,square);
-                strcat(ix86_modrm_ret,Get8SquareDig(tmp,DisP,as_sign,is_disponly));
+                strcat(ix86_modrm_ret,Get8SquareDig(tmp,DisP,as_sign,is_disponly,as_rip));
               }
             }
             break;
@@ -989,8 +992,10 @@ void __FASTCALL__ ix86_ArgGrp2(char *str,ix86Param *DisP)
       make NEEDREF_ALL for indirect "jmp" and "call"
    */
    oldDisNeedRef = disNeedRef;
+/*
    if(code2 >= 2 && code2 <= 5 && disNeedRef != NEEDREF_NONE)
                                              disNeedRef = NEEDREF_ALL;
+*/
    TabSpace(str,TAB_POS);
    if(code2 == 0 || code2 == 1) { strcat(str,ix86_getModRM(w,mod,rm,DisP)); } /** inc dec */
    else
@@ -1031,7 +1036,7 @@ void __FASTCALL__ ix86_ArgAXMem(char *str,ix86Param *DisP)
   }
   else
 #endif
-    mem = Use32Addr ? Get8SquareDig(1,DisP,False,True) : Get4SquareDig(1,DisP,False,True);
+    mem = Use32Addr ? Get8SquareDig(1,DisP,False,True,False) : Get4SquareDig(1,DisP,False,True);
   strcpy(ix86_appstr,ix86_segpref);
   ix86_segpref[0] = 0;
   strcat(ix86_appstr,"[");

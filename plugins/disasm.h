@@ -162,6 +162,7 @@ extern void   __FASTCALL__ disSetModifier(char *str,const char *modf);
 #define DISARG_IMM      0x1000U /**< Immediate argument */
 #define DISARG_DISP     0x2000U /**< Argument is displacement only */
 #define DISARG_IDXDISP  0x4000U /**< Argument is displacement which is combined with registers */
+#define DISARG_RIP      0x8000U /**< Argument is displacement relatively current Instruction Pointer */
 /** Appends symbolic information instead digits to instruction string
     @param str       string to be appended
     @param flags     same as described in reg_form.h (APREF_* family)
@@ -169,7 +170,7 @@ extern void   __FASTCALL__ disSetModifier(char *str,const char *modf);
     @param codelen   contains length of field for binding
     @param defval    contains default value if not binding
     @param type      see above (DISARG_LONG - DISARG_DWORD family)
-    @return          see RAPREF_* conatants in biewutil.h for detail
+    @return          see RAPREF_* constants in biewutil.h for detail
     @remark
     Examples:
     *** 1 ***
@@ -206,7 +207,7 @@ extern int __FASTCALL__  disAppendDigits(char *str,__filesize_t ulShift,int flag
     @param r_sh      real shift to begin of insn (for pass to CodeGuider as return addr)
     @param type      see above (DISARG_SHORT - DISARG_FAR32 family)
     @param seg       contains segment value (optional)
-    @return          see RAPREF_* conatants in biewutil.h for detail
+    @return          see RAPREF_* constants in biewutil.h for detail
     @remark
     Examples:
     *** 1 ***

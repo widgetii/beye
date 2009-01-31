@@ -3853,7 +3853,7 @@ static void ix86_gettype(DisasmRet *dret,ix86Param *_DisP)
  if(x86_Bitness == DAB_USE64)
  {
    if(ua+ud+has_seg+has_rep+has_lock>4) goto get_type;
- } 
+ }
  else
 #endif
  if(has_lock + has_rep > 1 || has_seg > 1 || ua > 1 || ud > 1) goto get_type;

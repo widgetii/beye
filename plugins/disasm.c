@@ -957,20 +957,41 @@ int __FASTCALL__ disAppendDigits(char *str,__filesize_t ulShift,int flags,
     comments[0] = 0;
     /* @todo Remove dependencies from 4-byte size of operand */
                                          /* Only if immediate operand */
-    if(((type & DISARG_IMM) || (type & DISARG_DISP) || (type & DISARG_IDXDISP)) &&
-       dig_type == DISARG_DWORD &&       /* Only if size of reference is 4-byte */
-       disNeedRef >= NEEDREF_PREDICT)    /* Only when reference prediction is on */
+    if(((type & DISARG_IMM) || (type & DISARG_DISP) ||
+	(type & DISARG_IDXDISP) || (type & DISARG_RIP)) &&
+	disNeedRef >= NEEDREF_PREDICT)    /* Only when reference prediction is on */
     {
-      if(*(__filesize_t *)defval)         /* Do not perform operation on NULL */
+      tUInt64 _defval;
+      unsigned fld_len=1;
+      switch(dig_type)
+      {
+        default:
+        case DISARG_BYTE: _defval = *(tUInt8 *)defval;  fld_len=1; break;
+        case DISARG_CHAR: _defval = *(tInt8 *)defval;   fld_len=1; break;
+        case DISARG_WORD: _defval = *(tUInt16 *)defval; fld_len=2; break;
+        case DISARG_SHORT:_defval = *(tInt16 *)defval;  fld_len=2; break;
+        case DISARG_DWORD:_defval = *(tUInt32 *)defval; fld_len=4; break;
+        case DISARG_LONG: _defval = *(tInt32 *)defval;  fld_len=4; break;
+        case DISARG_QWORD:_defval = *(tUInt64 *)defval; fld_len=8; break;
+        case DISARG_LLONG:_defval = *(tInt64 *)defval;  fld_len=8; break;
+      }
+      if(_defval)         /* Do not perform operation on NULL */
       {
       __filesize_t pa,psym;
       unsigned _class;
-      if(!app) pa = detectedFormat->va2pa ? detectedFormat->va2pa(*(__filesize_t *)defval) :
-                                           *(__filesize_t *)defval;
+      if(type & DISARG_RIP) {
+	_defval += (detectedFormat->pa2va ?
+		    detectedFormat->pa2va(ulShift) :
+		    ulShift)+fld_len;
+     }
+      if(!app) pa = detectedFormat->va2pa ? detectedFormat->va2pa(_defval) :
+                                           _defval;
       else pa = app;
       if(pa)
       {
         /* 1. Try to determine immediate as offset to public symbol */
+	if(type & DISARG_RIP) app = AppendAsmRef(str,pa,flags,codelen,0L);
+	if(app == RAPREF_DONE) goto next_step;
         if(dis_severity < DISCOMSEV_FUNC)
         {
           strcpy(comments,".*");
@@ -1012,12 +1033,13 @@ int __FASTCALL__ disAppendDigits(char *str,__filesize_t ulShift,int flags,
       }
       }
     }
+    next_step:
     comments[0] = 0;
     if(app == RAPREF_NONE)
     {
      switch(dig_type)
      {
-      case DISARG_LLONG: 
+      case DISARG_LLONG:
 #ifdef INT64_C
 			 appstr = Get16SignDig(*(tInt64 *)defval);
 #else
