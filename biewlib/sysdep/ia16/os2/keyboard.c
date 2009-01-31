@@ -25,7 +25,7 @@
 static HKBD kbdHandle;
 static int __ms_nbtns;
 
-void __FASTCALL__ __init_keyboard( void )
+void __FASTCALL__ __init_keyboard( const char *user_cp )
 {
    KbdOpen(&kbdHandle);
    if(kbdHandle) KbdGetFocus(0,kbdHandle);

@@ -46,7 +46,7 @@ extern int _mouse_buttons;
 extern int photon,console;
 extern int ph_ig;
 
-void __FASTCALL__ __init_keyboard( void )
+void __FASTCALL__ __init_keyboard( const char *user_cp )
 {
 	__init_mouse();
 	_shift_state=0;

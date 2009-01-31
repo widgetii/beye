@@ -55,7 +55,7 @@ extern int (*p_PhQueryCursor)(unsigned short,PhCursorInfo_t*);
 
 int __FASTCALL__ getms(void);
 
-void __FASTCALL__ __init_keyboard( void )
+void __FASTCALL__ __init_keyboard( const char *user_cp )
 {
 	__init_mouse();
 	_shift_state=0;

@@ -148,7 +148,7 @@ void __FASTCALL__ win32_readNextMessage( void )
       Sleep( 1 );
 }
 
-void __FASTCALL__ __init_keyboard( void )
+void __FASTCALL__ __init_keyboard( const char *user_cp )
 {
   hIn = GetStdHandle(STD_INPUT_HANDLE);
   is_win9x = win32_verinfo.dwMajorVersion == 4 &&

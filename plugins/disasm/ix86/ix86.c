@@ -3998,6 +3998,15 @@ static void ix86_gettype(DisasmRet *dret,ix86Param *_DisP)
         dret->codelen = 4;
         dret->field = 2;
      }
+#ifdef IX86_64
+     else
+     if(insn[0] == 0xFF && insn[1] == 0x25 && x86_Bitness == DAB_USE64)
+     {
+        dret->pro_clone = __INSNT_JMPPIC;
+        dret->codelen = 4;
+        dret->field = 2;
+     }
+#endif
      else
      {
         /* Attempt determine leave insn */
