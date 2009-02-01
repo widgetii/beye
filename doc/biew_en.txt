@@ -10,8 +10,8 @@
 €≤±∞                 ‹‹  ‹‹  ‹‹   ‹‹  ‹   ‹ ‹ ‹ ‹                     ∞±≤€
 €≤±∞                ‹‹‹‹‹‹  ‹‹‹‹ ‹‹‹‹‹‹    ‹   ‹                      ∞±≤€
 €≤±∞                                                                  ∞±≤€
-€≤±∞                           Ver 5.7.2                              ∞±≤€
-€≤±∞                          11 jan 2009.                            ∞±≤€
+€≤±∞                           Ver 5.7.3                              ∞±≤€
+€≤±∞                          01 feb 2009.                            ∞±≤€
 €≤±∞                                                                  ∞±≤€
 €≤±∞    Made in Kazan.Tatarstan.Russia. Written By Nick Kurshev.      ∞±≤€
 €≤±∞                                                                  ∞±≤€
@@ -1205,8 +1205,8 @@ v5.0.2        ! Changes:
                 * Fixed generic build
                 * Fixed broken output on UTF terminals
 5.7.3
-XX yyy 2009   ! Changes:
-                * Be more informative if biew.ini was not found
+01 feb 2009   ! Changes:
+                * Fixed bug #2468422: biew doesn't work in main directory under DOS
                 * Fixed bug #2520144: Wrong computing of addressing mode in ARM dis.
                 * Fixed national input on UTF-based terminals
                 * Fixed RIP-realtive address resolving in AMD64 mode
