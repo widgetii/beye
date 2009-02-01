@@ -984,7 +984,9 @@ void __FASTCALL__ ix86_ArgGrp2(char *str,ix86Param *DisP)
    unsigned char wrd = code2 & 0x01;
    unsigned sizptr;
    unsigned oldDisNeedRef;
+   tBool prev_use64;
    DisP->codelen++;
+   prev_use64 = Use64;
    strcpy(str,ix86_Gr2Names[code2]);
    /*
       Added by "Kostya Nosov" <k-nosov@yandex.ru>:
@@ -996,6 +998,7 @@ void __FASTCALL__ ix86_ArgGrp2(char *str,ix86Param *DisP)
                                              disNeedRef = NEEDREF_ALL;
 */
    TabSpace(str,TAB_POS);
+   if(code2 >=2 && code2 <= 5) Use64=True;
    if(code2 == 0 || code2 == 1) { strcat(str,ix86_getModRM(w,mod,rm,DisP)); } /** inc dec */
    else
    {
@@ -1011,6 +1014,7 @@ void __FASTCALL__ ix86_ArgGrp2(char *str,ix86Param *DisP)
      strcat(str,ix86_getModRM(True,mod,rm,DisP));
    }
    disNeedRef = oldDisNeedRef;
+   Use64 = prev_use64;
 }
 
 void __FASTCALL__ ix86_ArgAXMem(char *str,ix86Param *DisP)

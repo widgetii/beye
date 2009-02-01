@@ -4140,7 +4140,6 @@ static DisasmRet __FASTCALL__ ix86Disassembler(__filesize_t ulShift,
 #ifdef IX86_64
  if(x86_Bitness == DAB_USE64)
  {
-   Use64 = True;
    if(ua+ud+has_seg+has_rep+has_lock>4) goto bad_prefixes;
  }
  else
