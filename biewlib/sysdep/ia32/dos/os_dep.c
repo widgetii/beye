@@ -74,7 +74,7 @@ extern char **ArgVector;
 
 char * __FASTCALL__ __get_ini_name( const char *progname )
 {
-   int len;
+   unsigned i,len;
 
    if (rbuff[0]) return rbuff; //Already computed
 
@@ -82,6 +82,8 @@ char * __FASTCALL__ __get_ini_name( const char *progname )
    len = strlen(rbuff);
    if(stricmp(&rbuff[len-4],".exe") == 0) strcpy(&rbuff[len-4],".ini");
    else                                   strcat(rbuff,".ini");
+   len = strlen(rbuff);
+   for(i=0;i<len;i++) if(rbuff[i]=='/') rbuff[i]='\\';
    return rbuff;
 }
 

@@ -98,7 +98,7 @@ typedef tBool      (__FASTCALL__ *FiUserFunc)(IniInfo * info);
 *                                 FiStringProcessor    *
 \******************************************************/
 
-extern  int    (__FASTCALL__ *FiError)(int nError,int row); /**< Default error handler */
+extern  int    (__FASTCALL__ *FiError)(int nError,int row,const char *addinfo); /**< Default error handler */
 extern  void   (__FASTCALL__ *FiFileProcessor)(const char *fname); /**< Default file processor */
 extern  tBool  (__FASTCALL__ *FiStringProcessor)(char * curr_str); /**< Default string processor */
 extern  tBool  (__FASTCALL__ *FiCommandProcessor)(const char * cmd); /**< Default command processor */
@@ -121,7 +121,7 @@ extern char          FiOpenComment;   /**< Character to be used as opening comme
                      * @param row             Specifies row at which error occured
                      * @see                   FiAErrorCL
                     **/
-void         __FASTCALL__ FiAError(int nError,int row);
+void         __FASTCALL__ FiAError(int nError,int row,const char *addinfo);
 
                    /** Creates file with error description and treated error as occured at current line.
                      * @return                none

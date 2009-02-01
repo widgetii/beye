@@ -103,18 +103,18 @@ static char * __NEAR__ __FASTCALL__ GETS(char *str,unsigned num,BGLOBAL h)
   return ret;
 }
 
-void __FASTCALL__ FiAError(int nError,int row)
+void __FASTCALL__ FiAError(int nError,int row,const char *addinfo)
 {
  int eret = 0;
- if(FiError) eret = (*FiError)(nError,row);
+ if(FiError) eret = (*FiError)(nError,row,addinfo);
  if(eret == __FI_EXITPROC) exit(255);
 }
 
-void __FASTCALL__ FiAErrorCL(int nError) { FiAError(nError,FinCurrString[FiFilePtr-1]); }
+void __FASTCALL__ FiAErrorCL(int nError) { FiAError(nError,FinCurrString[FiFilePtr-1],NULL); }
 
 static const char * list[] = {
  "No errors",
- "Can't open file (bad '#include' statement?).",
+ "Can't open file: '%s' (bad '#include' statement?).",
  "Too many open files.",
  "Memory exhausted.",
  "Open 'if' (missing '#endif').",
@@ -144,10 +144,11 @@ const char * __FASTCALL__ FiDecodeError(int nError)
  return ret;
 }
 
-static int __FASTCALL__ StdError(int ne,int row)
+static int __FASTCALL__ StdError(int ne,int row,const char *addinfo)
 {
     FILE * herr;
     const char * what;
+    char sout[4096];
     if((herr = fopen("fi_syserr.$$$","wt")) == NULL) herr = stderr;
     fprintf(herr,"About : [.Ini] file run-time support library. Written by N.Kurshev\n"
                  "Detected ");
@@ -158,7 +159,9 @@ static int __FASTCALL__ StdError(int ne,int row)
     fprintf(herr,"\n");
     if(row)  fprintf(herr,"At line : %i\n",row);
     what = FiDecodeError(ne);
-    fprintf(herr,"Message : %s\n",what);
+    if(addinfo) sprintf(sout,what,addinfo);
+    else strncpy(sout,what,sizeof(sout));
+    fprintf(herr,"Message : %s\n",sout);
     if(FiUserMessage) fprintf(herr,"User message : %s\n",FiUserMessage);
     if(fi_Debug_Str) if(*fi_Debug_Str) fprintf(herr,"Debug info: '%s'\n",fi_Debug_Str);
     fclose(herr);
@@ -166,7 +169,7 @@ static int __FASTCALL__ StdError(int ne,int row)
     return __FI_EXITPROC;
 }
 
-int (__FASTCALL__ *FiError)(int nError,int row) = StdError;
+int (__FASTCALL__ *FiError)(int nError,int row,const char *) = StdError;
 
 FiHandler __FASTCALL__ FiOpen( const char * filename)
 {
@@ -174,16 +177,9 @@ FiHandler __FASTCALL__ FiOpen( const char * filename)
   FiHandler ret;
   /* Try to load .ini file entire into memory */
   ret = bioOpen(filename,FO_READONLY | SO_DENYWRITE,UINT_MAX,BIO_OPT_USEMMF);
-  if(ret == &bNull )
-  {
-    const char *prev_debug;
-    prev_debug = fi_Debug_Str;
-    fi_Debug_Str=filename;
-    FiAError(__FI_BADFILENAME,0);
-    fi_Debug_Str=prev_debug;
-  }
+  if(ret == &bNull && filename[0]) FiAError(__FI_BADFILENAME,0,filename);
   activeFile = (char *)PMalloc((strlen(filename) + 1));
-  if(activeFile == NULL) FiAError(__FI_NOTMEM,0);
+  if(activeFile == NULL) FiAError(__FI_NOTMEM,0,NULL);
   strcpy(activeFile,filename);
   if(!FiFilePtr)
   {
@@ -195,10 +191,10 @@ FiHandler __FASTCALL__ FiOpen( const char * filename)
     FiFileNames = PRealloc(FiFileNames,sizeof(char *)*(FiFilePtr+1));
     FinCurrString = PRealloc(FinCurrString,sizeof(unsigned int)*(FiFilePtr+1));
   }
-  if(!FiFileNames || !FinCurrString) FiAError(__FI_NOTMEM,0);
+  if(!FiFileNames || !FinCurrString) FiAError(__FI_NOTMEM,0,NULL);
   FiFileNames[FiFilePtr] = activeFile;
   FinCurrString[FiFilePtr++] = 0;
-  if(FiFilePtr > __FI_MAXFILES-1) FiAError(__FI_TOOMANY,0);
+  if(FiFilePtr > __FI_MAXFILES-1) FiAError(__FI_TOOMANY,0,NULL);
   return ret;
 }
 
@@ -209,7 +205,7 @@ void __FASTCALL__ FiClose(FiHandler h)
   {
     FiFileNames = PRealloc(FiFileNames,sizeof(char *)*(FiFilePtr));
     FinCurrString = PRealloc(FinCurrString,sizeof(unsigned int)*(FiFilePtr));
-    if(!FiFileNames || !FinCurrString) FiAError(__FI_NOTMEM,0);
+    if(!FiFileNames || !FinCurrString) FiAError(__FI_NOTMEM,0,NULL);
     FiFilePtr--;
   }
   else
@@ -374,7 +370,7 @@ static char * __NEAR__ __FASTCALL__ __FiCMaxStr( void )
 {
   char * ret;
   ret = (char *)PMalloc(FI_MAXSTRLEN + 1);
-  if(ret == NULL) FiAError(__FI_NOTMEM,0);
+  if(ret == NULL) FiAError(__FI_NOTMEM,0,NULL);
   return ret;
 }
 
@@ -384,7 +380,7 @@ static char * __NEAR__ __FASTCALL__ __FiCNWord( STRING *str , const char * illeg
   unsigned int lword;
   lword = FiGetLengthNextWord(str,illegal_set);
   ret = (char *)PMalloc(lword + 1);
-  if(ret == NULL) FiAError(__FI_NOTMEM,0);
+  if(ret == NULL) FiAError(__FI_NOTMEM,0,NULL);
   if(lword) FiGetNextWord(str,illegal_set,ret);
   else      ret[0] = 0;
   return ret;
@@ -396,7 +392,7 @@ static char * __NEAR__ __FASTCALL__ __FiCNLegWord( STRING *str , const char * le
   unsigned int lword;
   lword = FiGetLengthNextLegWord(str,legal_set);
   ret = (char *)PMalloc(lword + 1);
-  if(ret == NULL) FiAError(__FI_NOTMEM,0);
+  if(ret == NULL) FiAError(__FI_NOTMEM,0,NULL);
   if(lword) FiGetNextLegWord(str,legal_set,ret);
   else      ret[0] = 0;
   return ret;
@@ -408,7 +404,7 @@ static char * __NEAR__ __FASTCALL__ __FiCBString( const char * src )
   unsigned int lbr;
   lbr = FiGetLengthBracketString(src);
   ret = (char *)PMalloc(lbr + 1);
-  if(ret == NULL) FiAError(__FI_NOTMEM,0);
+  if(ret == NULL) FiAError(__FI_NOTMEM,0,NULL);
   if(lbr) FiGetBracketString(src,ret);
   else    ret[0] = 0;
   return ret;
@@ -420,7 +416,7 @@ static char * __NEAR__ __FASTCALL__ __FiCItem( const char * src )
   unsigned int li;
   li = FiGetLengthItem(src);
   ret = (char *)PMalloc(li + 1);
-  if(ret == NULL) FiAError(__FI_NOTMEM,0);
+  if(ret == NULL) FiAError(__FI_NOTMEM,0,NULL);
   if(li) FiGetItemName(src,ret);
   else   ret[0] = 0;
   return ret;
@@ -432,7 +428,7 @@ static char * __NEAR__ __FASTCALL__ __FiCValue( const char * src )
   unsigned int lv;
   lv = FiGetLengthValue(src);
   ret = (char *)PMalloc(lv + 1);
-  if(ret == NULL) FiAError(__FI_NOTMEM,0);
+  if(ret == NULL) FiAError(__FI_NOTMEM,0,NULL);
   if(lv) FiGetValueOfItem(src,ret);
   else   ret[0] = 0;
   return ret;
@@ -444,7 +440,7 @@ static char * __NEAR__ __FASTCALL__ __FiCSection( const char * src )
   unsigned int ls;
   ls = FiGetLengthSection(src);
   ret = (char *)PMalloc(ls + 1);
-  if(ret == NULL) FiAError(__FI_NOTMEM,0);
+  if(ret == NULL) FiAError(__FI_NOTMEM,0,NULL);
   if(ls) FiGetSectionName(src,ret);
   else   ret[0] = 0;
   return ret;
@@ -456,7 +452,7 @@ static char * __NEAR__ __FASTCALL__ __FiCSubSection( const char * src )
   unsigned int lss;
   lss = FiGetLengthSubSection(src);
   ret = (char *)PMalloc(lss + 1);
-  if(ret == NULL) FiAError(__FI_NOTMEM,0);
+  if(ret == NULL) FiAError(__FI_NOTMEM,0,NULL);
   if(lss) FiGetSubSectionName(src,ret);
   else    ret[0] = 0;
   return ret;
@@ -468,7 +464,7 @@ static char * __NEAR__ __FASTCALL__ __FiCCmd( const char * src )
   unsigned int lc;
   lc = FiGetLengthCommandString(src);
   ret = (char *)PMalloc(lc + 1);
-  if(ret == NULL) FiAError(__FI_NOTMEM,0);
+  if(ret == NULL) FiAError(__FI_NOTMEM,0,NULL);
   if(lc) FiGetCommandString(src,ret);
   else   ret[0] = 0;
   return ret;
@@ -684,7 +680,7 @@ char * __FASTCALL__ FiGetNextString(FiHandler h, char * str,unsigned int size,ch
     }
     if(original) strcpy(original,str);
     FinCurrString[FiFilePtr - 1]++;
-    if((sret == NULL && !bioEOF( h )))  FiAError(__FI_BADFILENAME,0);
+    if((sret == NULL && !bioEOF( h )))  FiAError(__FI_BADFILENAME,0,str);
     sret = strchr(str,FiOpenComment);
     if(sret) *sret = 0;
     if(!FiAllWantInput)
@@ -732,15 +728,15 @@ pVar __FASTCALL__ FiConstructVar(const char *v,const char *a)
  char * str;
  pVar vv;
  vv = (pVar)PMalloc(sizeof(Var));
- if(vv == NULL) FiAError(__FI_NOTMEM,0);
+ if(vv == NULL) FiAError(__FI_NOTMEM,0,NULL);
  vv->next = NULL;
  vv->prev = NULL;
  str = (char *)PMalloc(strlen(v) + 1);
- if(str == NULL) FiAError(__FI_NOTMEM,0);
+ if(str == NULL) FiAError(__FI_NOTMEM,0,NULL);
  strcpy(str,v);
  vv->variables = str;
  str = (char *)PMalloc(strlen(a) + 1);
- if(str == NULL) FiAError(__FI_NOTMEM,0);
+ if(str == NULL) FiAError(__FI_NOTMEM,0,NULL);
  strcpy(str,a);
  vv->associate = str;
  return vv;
@@ -855,7 +851,7 @@ void __FASTCALL__ FiAddVariables(const char * var,const char * associate)
    {
      PFREE(iter->associate);
      iter->associate = PMalloc(strlen(associate) + 1);
-     if(iter->associate == NULL) FiAError(__FI_NOTMEM,0);
+     if(iter->associate == NULL) FiAError(__FI_NOTMEM,0,NULL);
      strcpy(iter->associate,associate);
      return;
    }
@@ -1115,7 +1111,7 @@ tBool __FASTCALL__ FiCommandProcessorStd( const char * cmd )
      else { if(Condition) (*FiStringProcessor)(sstore); }
    }
    PFREE(sstore)
-   FiAError(__FI_OPENCOND,nsave);
+   FiAError(__FI_OPENCOND,nsave,NULL);
  }
  FiAErrorCL(__FI_UNRECOGN);
  Exit_CP:
