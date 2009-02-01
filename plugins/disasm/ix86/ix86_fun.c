@@ -371,9 +371,8 @@ static void __NEAR__ __FASTCALL__ getSIBRegs(char * base,char * scale,char * _in
 #endif
 	_index[0] = 0;
   }
-  else 
+  else
   {
-
 #ifdef IX86_64
      do_r12:
      if(x86_Bitness == DAB_USE64)
@@ -439,7 +438,7 @@ char * __FASTCALL__ ix86_getModRM(tBool w,unsigned char mod,unsigned char rm,ix8
 #ifdef IX86_64
    if(x86_Bitness == DAB_USE64)
    {
-      cptr = !has67_in64 ? k86_QWordRegs[REX_reg(k86_REX&1,rm)] : k86_DWordRegs[REX_reg(k86_REX&1,rm)];
+      cptr = (has67_in64==False) ? k86_QWordRegs[REX_reg(k86_REX&1,rm)] : k86_DWordRegs[REX_reg(k86_REX&1,rm)];
    }
    else
 #endif

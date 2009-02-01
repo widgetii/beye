@@ -4065,7 +4065,7 @@ static void ix86_gettype(DisasmRet *dret,ix86Param *_DisP)
 static unsigned char parse_REX(unsigned char code,ix86Param* DisP,char *up)
 {
 #ifdef IX86_64
-    if(x86_Bitness == DAB_USE64 && !has_REX) 
+    if(x86_Bitness == DAB_USE64 && !has_REX)
     {
         has_REX++;
         k86_REX = code;
@@ -4115,7 +4115,7 @@ static DisasmRet __FASTCALL__ ix86Disassembler(__filesize_t ulShift,
  has_lock = has_rep = has_seg = 0;
  up = ua = ud = 0;
  ix86_da_out[0] = 0;
- Use32Data = Use32Addr = UseMMXSet = UseXMMXSet = False;
+ has67_in64 = Use32Data = Use32Addr = UseMMXSet = UseXMMXSet = False;
 
  if(BITNESS == DAB_AUTO && detectedFormat->query_bitness) x86_Bitness = detectedFormat->query_bitness(ulShift);
  else x86_Bitness = BITNESS;
@@ -4126,22 +4126,23 @@ static DisasmRet __FASTCALL__ ix86Disassembler(__filesize_t ulShift,
 #endif
    )
  {
-    Use32Data = Use32Data ? False : True;
-    Use32Addr = Use32Addr ? False : True;
+    Use32Data = True;
+    Use32Addr = True;
  }
  Ret.str = ix86_voidstr;
  Ret.str[0] = 0;
 #ifdef IX86_64
  has_REX=0;
  k86_REX=0;
- Use64 = 0;
+ Use64 = False;
 #endif
  RepeateByPrefix:
 #ifdef IX86_64
  if(x86_Bitness == DAB_USE64)
  {
+   Use64 = True;
    if(ua+ud+has_seg+has_rep+has_lock>4) goto bad_prefixes;
- } 
+ }
  else
 #endif
  if(has_lock + has_rep > 1 || has_seg > 1 || ua > 1 || ud > 1)
@@ -4170,7 +4171,7 @@ static DisasmRet __FASTCALL__ ix86Disassembler(__filesize_t ulShift,
    case 0x4C:
    case 0x4D:
    case 0x4E:
-   case 0x4F: if(x86_Bitness == DAB_USE64 && !has_REX) 
+   case 0x4F: if(x86_Bitness == DAB_USE64 && !has_REX)
               {
                  code=parse_REX(code,&DisP,&up);
                  goto RepeateByPrefix;
@@ -4283,7 +4284,9 @@ static DisasmRet __FASTCALL__ ix86Disassembler(__filesize_t ulShift,
    case 0x67:
               ua++;
               Use32Addr = Use32Addr ? False : True;
-              DisP.pro_clone = IX86_CPU386;
+#ifdef IX86_64
+	      if(x86_Bitness == DAB_USE64) has67_in64 = has67_in64 ? False : True;
+#endif
               goto MakePref;
    case 0xF0:
               if(has_lock + has_rep) break;
@@ -4430,9 +4433,8 @@ static DisasmRet __FASTCALL__ ix86Disassembler(__filesize_t ulShift,
 #ifdef IX86_64
  if(x86_Bitness == DAB_USE64)
  {
-   has67_in64 = (Use32Addr == 0);
-   Use32Addr = 1; /* there is no way to use 16-bit addresing in 64-bit mode */
-   if(Use64) Use32Data=1; /* 66h prefix is ignored if REX prefix is present*/
+   Use32Addr = True; /* there is no way to use 16-bit addresing in 64-bit mode */
+   if(Use64) Use32Data=True; /* 66h prefix is ignored if REX prefix is present*/
    if(ix86_table[code].flags64 & K64_DEF32)
    {
      if(Use64) strcpy(Ret.str,ix86_table[code].name64);
