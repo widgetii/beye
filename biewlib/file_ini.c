@@ -177,6 +177,7 @@ FiHandler __FASTCALL__ FiOpen( const char * filename)
   FiHandler ret;
   /* Try to load .ini file entire into memory */
   ret = bioOpen(filename,FO_READONLY | SO_DENYWRITE,UINT_MAX,BIO_OPT_USEMMF);
+  /* Note! All OSes except DOS-DOS386 allows opening of empty filenames as /dev/null */
   if(ret == &bNull && filename[0]) FiAError(__FI_BADFILENAME,0,filename);
   activeFile = (char *)PMalloc((strlen(filename) + 1));
   if(activeFile == NULL) FiAError(__FI_NOTMEM,0,NULL);
