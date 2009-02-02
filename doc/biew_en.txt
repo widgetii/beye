@@ -1210,6 +1210,9 @@ v5.0.2        ! Changes:
                 * Fixed bug #2520144: Wrong computing of addressing mode in ARM dis.
                 * Fixed national input on UTF-based terminals
                 * Fixed RIP-realtive address resolving in AMD64 mode
+5.7.3.1
+02 feb 2009   ! Changes:
+                * replaced wrong patch for AMD64 disassembler
 []======================================================================[]
 []  Thank you for your interest.                                        []
 []  Nick Kurshev (http://my666.boom.ru/666_en.html).                    []
