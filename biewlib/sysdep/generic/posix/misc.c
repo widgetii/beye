@@ -3,7 +3,7 @@
  * @file        biewlib/sysdep/generic/posix/misc.c
  * @brief       Generic misc. functions
  * @version     -
- * @author      Nick Kurshev
+ * @author      Nickols_K
  * @date        2003
 **/
 #include <string.h>

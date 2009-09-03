@@ -3,7 +3,7 @@
  * @file        biewlib/sysdep/ia32/win32/misc.c
  * @brief       Misc. functions for Win32 (optional!!!)
  * @version     -
- * @author      Nick Kurshev
+ * @author      Nickols_K
  * @date        2003
 **/
 /* for cygwin - remove unnecessary includes */

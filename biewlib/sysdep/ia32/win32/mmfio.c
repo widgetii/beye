@@ -7,7 +7,7 @@
                 For detail see biewlib/sysdep/ia32/os2/mmfio.c
  * @note        Requires POSIX compatible development system
  *
- * @author      Nick Kurshev
+ * @author      Nickols_K
  * @date        02/03/2001
  * @bug         Program can be destroyed if operates with 0 size of file.
 **/

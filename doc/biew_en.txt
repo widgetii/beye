@@ -13,7 +13,7 @@
 Û²±°                           Ver 5.7.3                              °±²Û
 Û²±°                          01 feb 2009.                            °±²Û
 Û²±°                                                                  °±²Û
-Û²±°    Made in Kazan.Tatarstan.Russia. Written By Nick Kurshev.      °±²Û
+Û²±°    Made in Kazan.Tatarstan.Russia. Written By Nickols_K.         °±²Û
 Û²±°                                                                  °±²Û
 Û²±° WWW:   http://biew.sourceforge.net                               °±²Û
 Û²±° FTP:   ftp://biew.sourceforge.net/pub/biew/                      °±²Û
@@ -1215,5 +1215,5 @@ v5.0.2        ! Changes:
                 * replaced wrong patch for AMD64 disassembler
 []======================================================================[]
 []  Thank you for your interest.                                        []
-[]  Nick Kurshev (http://my666.boom.ru/666_en.html).                    []
+[]  Nickols_K (http://my666.boom.ru/666_en.html).                       []
 []======================================================================[]

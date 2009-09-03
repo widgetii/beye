@@ -4,13 +4,13 @@
  * @brief       This file contains implementation of file i/o routines for Win32s.
  * @version     -
  * @remark      this source file is part of Binary vIEW project (BIEW).
- *              The Binary vIEW (BIEW) is copyright (C) 1995 Nick Kurshev.
+ *              The Binary vIEW (BIEW) is copyright (C) 1995 Nickols_K.
  *              All rights reserved. This software is redistributable under the
  *              licence given in the file "Licence.en" ("Licence.ru" in russian
  *              translation) distributed in the BIEW archive.
  * @note        Requires POSIX compatible development system
  *
- * @author      Nick Kurshev
+ * @author      Nickols_K
  * @since       1999
  * @note        Development, fixes and improvements
  * @warning     WinNT may "die", when performs long file query in network.

@@ -1,7 +1,7 @@
 /*
   This file contains most common definitions to make MMX stuff
   easy portable between different kinds of mmx clones
-  Written By Nick Kurshev <nickols_k@mail.ru>
+  Written By Nickols_K <nickols_k@mail.ru>
 */
 
 #undef HAVE_MMX1

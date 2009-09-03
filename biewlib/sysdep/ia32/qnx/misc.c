@@ -3,7 +3,7 @@
  * @file        biewlib/sysdep/ia32/qnx/misc.c
  * @brief       Generic misc. functions for QNX4
  * @version     -
- * @author      Nick Kurshev
+ * @author      Nickols_K
  * @date        2003
  * @author      Andrew Golovnia
  * @since       2006

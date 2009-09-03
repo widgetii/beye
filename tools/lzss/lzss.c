@@ -9,7 +9,7 @@
  *
  * @author      Haruhiko Okumura
  * @since       1989
- * @author      Nick Kurshev
+ * @author      Nickols_K
  * @date        22.10.1999
  * @note        Modified for using with BIEW
 **/

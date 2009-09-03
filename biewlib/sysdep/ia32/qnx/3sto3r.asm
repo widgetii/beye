@@ -4,7 +4,7 @@
 ; * @brief       This file contains 3s->3r conversion function for photon3s.lib
 ; * @version     -
 ; * @remark      this source file is part of Binary vIEW project (BIEW).
-; *              The Binary vIEW (BIEW) is copyright (C) 1995 Nick Kurshev.
+; *              The Binary vIEW (BIEW) is copyright (C) 1995 Nickols_K.
 ; *              All rights reserved. This software is redistributable under the
 ; *              licence given in the file "Licence.en" ("Licence.ru" in russian
 ; *              translation) distributed in the BIEW archive.

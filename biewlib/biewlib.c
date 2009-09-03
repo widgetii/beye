@@ -4,13 +4,13 @@
  * @brief       This file contains implementation of extension of C library.
  * @version     -
  * @remark      this source file is part of Binary vIEW project (BIEW).
- *              The Binary vIEW (BIEW) is copyright (C) 1995 Nick Kurshev.
+ *              The Binary vIEW (BIEW) is copyright (C) 1995 Nickols_K.
  *              All rights reserved. This software is redistributable under the
  *              licence given in the file "Licence.en" ("Licence.ru" in russian
  *              translation) distributed in the BIEW archive.
  * @note        Requires POSIX compatible development system
  *
- * @author      Nick Kurshev
+ * @author      Nickols_K
  * @since       1995
  * @note        Development, fixes and improvements
  * @todo        Increase number of functions
@@ -311,7 +311,7 @@ char *ulltoa (unsigned long long int value, char *string, int radix)
    Using own code for qsort and bsearch functions is guarantee of stable work */
 
 /* Copyright (C) 1994 DJ Delorie, see COPYING.DJ for details */
-/* Modified for use with 16-bits huge arrays by Nick Kurshev */
+/* Modified for use with 16-bits huge arrays by Nickols_K */
 /*-
  * Copyright (c) 1980, 1983 The Regents of the University of California.
  * All rights reserved.

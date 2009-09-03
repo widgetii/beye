@@ -13,7 +13,7 @@
  * @author      Sergey I. Yevtushenko <evsi@naverex.kiev.ua>
  * @since       03/09/1997
  * @note        Original code implementation
- * @author      Nick Kurshev
+ * @author      Nickols_K
  * @date        23/10/2000
  * @note        Adapted for using with BIEW; expanding possibilities.
  * @bug         Program can be destroyed if operates with 0 size of file.

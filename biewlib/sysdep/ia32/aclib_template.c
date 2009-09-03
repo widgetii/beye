@@ -57,7 +57,7 @@ SFENCE instruction provides an efficient way of ensuring ordering between
 procedures that produce weakly-ordered data and procedures that consume that
 data.
 
-If you have questions please contact with me: Nick Kurshev: nickols_k@mail.ru.
+If you have questions please contact with me: nickols_k@mail.ru.
 */
 
 /* 3dnow memcpy support from kernel 2.4.2

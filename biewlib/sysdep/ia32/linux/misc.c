@@ -3,7 +3,7 @@
  * @file        biewlib/sysdep/ia32/linux/misc.c
  * @brief       Misc. functions for linux-i386 (optional!!!)
  * @version     -
- * @author      Nick Kurshev
+ * @author      Nickols_K
  * @date        2003
 **/
 #include <ctype.h>

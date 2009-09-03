@@ -9,7 +9,7 @@
  * @author      Original Copyright 1991-93 by Robert B. Stout as part of
  *              the MicroFirm Function Library (MFL)
  * @since       1991
- * @author      Nick Kurshev
+ * @author      Nickols_K
  * @date        2000
  * @note        Modified for using with BIEW, remove all floating point part.
 **/
@@ -26,7 +26,7 @@
 /*                         *   (multiplication)  Medium                 */
 /*                         /   (division)        Medium                 */
 /*                         %   (modulus)         High                   */
-/* Added by Nick Kurshev                                                */
+/* Added by Nickols_K                                                   */
 /*                         <<  (left shift)      Low                    */
 /*                         >>  (right shift)     Low                    */
 /*                         &   (bitwise and)     Low                    */
@@ -119,7 +119,7 @@ int                     evaluate(char *, tIntMax *,int *);
 **  remove all whitespace from a string
 */
 
-/** Modified for using with BIEW by Nick Kurshev (2000) */
+/** Modified for using with BIEW by Nickols_K (2000) */
 
 static char * __NEAR__ __FASTCALL__ rmallws(char *str)
 {

@@ -5,7 +5,7 @@
  *              standard C library ones.
  * @version     -
  * @remark      this source file is part of Binary vIEW project (BIEW).
- *              The Binary vIEW (BIEW) is copyright (C) 1995 Nick Kurshev.
+ *              The Binary vIEW (BIEW) is copyright (C) 1995 Nickols_K.
  *              All rights reserved. This software is redistributable under the
  *              licence given in the file "Licence.en" ("Licence.ru" in russian
  *              translation) distributed in the BIEW archive.
@@ -17,7 +17,7 @@
  *              with build-in assembler, instead rewriting of makefile with .s
  *              (or .asm) extensions for choosen development system.
  *
- * @author      Nick Kurshev
+ * @author      Nickols_K
  * @since       2001
  * @note        Development, fixes and improvements
 **/

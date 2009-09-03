@@ -1,15 +1,15 @@
 --------------------------------------------------------------------------------
 --   twintest.pr - this file is part of Binary vIEW project (BIEW)            --
 --------------------------------------------------------------------------------
---   Copyrights:           1998, 2000 Nick Kurshev                            --
+--   Copyrights:           1998, 2000 Nickols_K                               --
 --   License:              See below                                          --
---   Author and developer: Nick Kurshev                                       --
+--   Author and developer: Nickols_K                                          --
 --   Requirement:          TopSpeed v3.x or above                             --
 --   Original file name:   twintest.pr                                        --
 ------------------------ [ D e s c r i p t i o n ] -----------------------------
 --  This project-file allows you to build BIEW in TopSpeed 3.x environment.   --
 ---------------------------- [ L i c e n c e ] ---------------------------------
--- The Binary vIEW (BIEW) is copyright (C) 1995 Nick Kurshev.                 --
+-- The Binary vIEW (BIEW) is copyright (C) 1995 Nickols_K.                    --
 -- All rights reserved. This software is redistributable under the licence    --
 -- given in the file "Licence.en" ("Licence.ru" in russian translation)       --
 -- distributed in the BIEW archive.                                           --

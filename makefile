@@ -1,15 +1,15 @@
 ##############################################################################
 #   MAKEFILE - this file is part of Binary vIEW project (BIEW)               #
 ##############################################################################
-#   Copyrights:           1998, 2000 Nick Kurshev                            #
+#   Copyrights:           1998, 2000 Nickols_K                               #
 #   License:              See below                                          #
-#   Author and developer: Nick Kurshev                                       #
+#   Author and developer: Nickols_K                                          #
 #   Requirement:          GNU make                                           #
 #   Original file name:   makefile                                           #
 ####################### [ D e s c r i p t i o n ] ############################
 #  This file is script for make utility of GNU development system.           #
 ########################### [ L i c e n c e ] ################################
-# The Binary vIEW (BIEW) is copyright (C) 1995 Nick Kurshev.                 #
+# The Binary vIEW (BIEW) is copyright (C) 1995 Nickols_K.                    #
 # All rights reserved.                                                       #
 # This software is redistributable under the licence given in the file       #
 # "Licence" distributed in the BIEW archive.                                 #

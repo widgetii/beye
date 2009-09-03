@@ -1,6 +1,6 @@
 /**
    Test of .ini file library.
-   Written by Nick Kurshev 2000
+   Written by Nickols_K 2000
    Use, distribute, and modify this program freely.
    This subset version is hereby donated to the public domain
 */

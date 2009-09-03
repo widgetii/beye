@@ -3,7 +3,7 @@
  * @file        biewlib/sysdep/ia16/dos/misc.c
  * @brief       Misc. functions for DOS (optional!!!)
  * @version     -
- * @author      Nick Kurshev
+ * @author      Nickols_K
  * @date        2003
 **/
 #include <bios.h>
