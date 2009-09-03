@@ -150,7 +150,7 @@ static int __FASTCALL__ StdError(int ne,int row,const char *addinfo)
     const char * what;
     char sout[4096];
     if((herr = fopen("fi_syserr.$$$","wt")) == NULL) herr = stderr;
-    fprintf(herr,"About : [.Ini] file run-time support library. Written by N.Kurshev\n"
+    fprintf(herr,"About : [.Ini] file run-time support library. Written by Nickols_K\n"
                  "Detected ");
     if(ne != __FI_TOOMANY && FiFilePtr)
     {
