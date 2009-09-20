@@ -328,9 +328,9 @@ void __FASTCALL__ __vioReadBuff(tAbsCoord x, tAbsCoord y, tvioBuff *buff, unsign
     memcpy(buff->oem_pg, addr + (violen << 1), len);
 }
 
+    unsigned i;
 void __FASTCALL__ __vioWriteBuff(tAbsCoord x, tAbsCoord y, const tvioBuff *buff, unsigned len)
 {
-    unsigned i;
     unsigned char c;
     unsigned char *addr;
     tAbsCoord xx, yy;
@@ -425,7 +425,8 @@ void __FASTCALL__ __vioWriteBuff(tAbsCoord x, tAbsCoord y, const tvioBuff *buff,
 	addch(ch | c);
 #endif
 #ifdef	_VT100_
-	if ((ca != buff->attrs[i - 1] && i) || i == len || !i)
+	/* TODO: make sure that compiler produces right order of conditions! */
+	if ((i && ca != buff->attrs[i - 1]) || i == len || !i)
 	{
 	    unsigned char *d;
 	    d = _2ansi(ca);

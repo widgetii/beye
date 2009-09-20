@@ -153,6 +153,7 @@ char *nls_get_screen_cp(void)
 void* nls_init(const char *to_cp,const char *src_cp) {
 #ifdef HAVE_ICONV
     iconv_t ic;
+    errno=0;
     ic=iconv_open(to_cp,src_cp);
     if(errno) {
 	printm("ICONV(%s,%s): Open with error: %s\n",to_cp,src_cp,strerror(errno));
