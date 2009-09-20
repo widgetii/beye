@@ -382,9 +382,8 @@ if test "$_target_arch" = auto ; then
   host_arch=`( uname -p ) 2>&1`
   log "uname -p :" "$host_arch"
   case "$host_arch" in
-   i*86|x86|x86pc|k5|k6|k6-2|k6-3|pentium*|athlon*) host_arch=ia32
+   i*86|x86|x86pc|k5|k6|k6-2|k6-3|pentium*|athlon*) host_arch=ia32 ;;
    x86_64|amd64) host_arch=x86_64 ;;
-     ;;
    sparc|ppc|alpha|arm|mips)
      ;;
 
