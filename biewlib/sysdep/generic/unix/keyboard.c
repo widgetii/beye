@@ -59,6 +59,11 @@ unsigned rawkb_size; /* size of rawkb_buf elements 1,2 or 4*/
 unsigned rawkb_mode=0;
 int rawkb_escape;
 
+#ifdef HAVE_ICONV
+static void *nls_handle;
+static int is_unicode=0;
+#endif
+
 #ifdef	_VT100_
 
 #include <fcntl.h>
@@ -75,8 +80,6 @@ int rawkb_method=1;
 static int in_fd;
 static struct termios sattr;
 
-static void *nls_handle;
-static int is_unicode=0;
 
 typedef struct {
     char c;

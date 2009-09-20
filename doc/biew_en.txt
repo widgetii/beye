@@ -1213,6 +1213,9 @@ v5.0.2        ! Changes:
 5.7.3.1
 02 feb 2009   ! Changes:
                 * replaced wrong patch for AMD64 disassembler
+5.8.0
+XX sep 2009   ! Changes:
+                + Initial x86_64 port
 []======================================================================[]
 []  Thank you for your interest.                                        []
 []  Nickols_K (http://my666.boom.ru/666_en.html).                       []

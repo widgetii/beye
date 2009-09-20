@@ -186,6 +186,12 @@ chtype __FASTCALL__ _2ps(unsigned char c)
 
 #endif	/* _CURSES_ */
 
+#ifdef HAVE_ICONV
+static char *screen_cp;
+static unsigned is_unicode=0;
+static void *nls_handle;
+#endif
+
 #ifdef	_VT100_
 
 #include <errno.h>
@@ -206,10 +212,6 @@ chtype __FASTCALL__ _2ps(unsigned char c)
 static char *vtmp;
 static int out_fd;
 static int _color[8] = {0,4,2,6,1,5,3,7};
-static char *screen_cp;
-static unsigned is_unicode=0;
-
-static void *nls_handle;
 
 static unsigned char frames_vt100[0x30] =
 "aaaxuuukkuxkjjjkmvwtqnttmlvwtqnvvwwmmllnnjlaaaaa";

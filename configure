@@ -395,7 +395,8 @@ if test "$_target_arch" = auto ; then
       arch_name=`( uname -m ) 2>&1`
       log "uname -m :" "$arch_name"
       case "$arch_name" in
-      i*86|x86*|amd64*) host_arch=ia32 ;;
+      i*86) host_arch=ia32 ;;
+      x86*|amd64*) host_arch=x86_64 ;;
       ppc) host_arch=ppc ;;
       alpha) host_arch=alpha ;;
       sparc*) host_arch=sparc ;;
@@ -423,6 +424,17 @@ case "$host_arch" in
 # TODO: enable >386 optimizations here
   _cdefsys="-m32 -D__MACHINE__=ia32 -D__CPU_NAME__='\"ia32\"' -D__CPU__=386 -D__DEFAULT_DISASM=0 -DCAN_COMPILE_X86_GAS=1"
   _osldef="-m32 $_osldef"
+  case $cc_version in
+    2.95.[3-9]|2.95.[3-9].[0-9]|3.[0-9]|3.[0-9].[0-9]|4.[0-9].[0-9])
+      _cdefsys="-D__ENABLE_FASTCALL=1 $_cdefsys"
+      ;;
+  esac
+    ;;
+
+  x86_64)
+# TODO: enable >386 optimizations here
+  _cdefsys="-m64 -D__MACHINE__=x86_64 -D__CPU_NAME__='\"x86_64\"' -D__CPU__=K8 -D__DEFAULT_DISASM=0 -DCAN_COMPILE_X86_GAS=1"
+  _osldef="-m64 $_osldef"
   case $cc_version in
     2.95.[3-9]|2.95.[3-9].[0-9]|3.[0-9]|3.[0-9].[0-9]|4.[0-9].[0-9])
       _cdefsys="-D__ENABLE_FASTCALL=1 $_cdefsys"
