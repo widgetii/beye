@@ -152,8 +152,8 @@ Base features:
   --enable-profile       compile profiling information into biew [disable]
 
 Optional features:
-  --disable-slang        disable S-Lang programming library [autodetect]
-  --disable-curses       disable "curses" terminal control library [autodetect]
+  --enable-slang        disable S-Lang programming library [vt100]
+  --enable-curses       disable "curses" terminal control library [vt100]
   --disable-iconv        disable iconv library [autodetect]
 
 Use these options if autodetection fails:
@@ -195,9 +195,9 @@ _x11incdir=
 _x11libdir=
 _profile=
 _debug=
-enable _curses
-enable _slang
-enable _iconv
+disable _curses
+disable _slang
+enable  _iconv
 for ac_option do
   case "$ac_option" in
   --prefix=*)
