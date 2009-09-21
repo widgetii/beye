@@ -23,7 +23,7 @@
 
 #include "biewlib/biewlib.h"
 
-#if defined(__GNUC__) && !defined(_MMSYSTEM_H)
+#if defined(__GNUC__) && !defined(_MMSYSTEM_H) && __MACHINE__!=x86_64
 /****************************************************************\
 * Cygnus GNU C/C++ v0.20b does not have 'mmsystem.h' header file *
 \****************************************************************/

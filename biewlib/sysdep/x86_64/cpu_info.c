@@ -255,7 +255,8 @@ static unsigned long __NEAR__ __FASTCALL__ __OPS_nop(volatile unsigned *time_val
 }
 static unsigned long __NEAR__ __FASTCALL__ __OPS_std(volatile unsigned *counter,char *arr8byte)
 {
-  register unsigned long retval,dummy;
+  unsigned long retval;
+  register long long dummy;
    retval=0;
    while(*counter==0);
    while(*counter!=0){

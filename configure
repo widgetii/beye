@@ -52,7 +52,7 @@ disabled(){
 
 cc_check() {
   log_file "$TMPC"
-  ( check_cmd $_cc $_cdefsys $_cdefos $_extraincdir $_extralibdir "$TMPC" -o "$TMPO" "$@" ) >> "$TMPLOG" 2>&1
+  ( check_cmd $_cc $_cdefsys $_cdefos $_extraincdir $_extralibdir --verbose "$TMPC" -o "$TMPO" "$@" ) >> "$TMPLOG" 2>&1
   TMP="$?"
   echo >> "$TMPLOG"
   echo "ldd $TMPO" >> "$TMPLOG"
@@ -112,6 +112,20 @@ echores() {
 }
 #############################################################################
 
+x86() {
+case "$host_arch" in
+   i*86|x86|x86pc|k5|k6|k6-2|k6-3|pentium*|athlon*) return 0;;
+   *) return 1;;
+esac
+}
+
+x86_64() {
+case "$host_arch" in
+   x86_64|amd64) return 0;;
+   *) return 1;;
+esac
+}
+
 # Check how echo works in this /bin/sh
 case `echo -n` in
   -n)	_echo_n=	_echo_c='\c'	;;	# SysV echo
@@ -145,7 +159,7 @@ Base features:
   --rm=RM                use RM program to cleanup files [rm]
   --ln=LN                use LN program to make soft link [ln]
   --cd=CD                use CD program to change directory [cd]
-  --cd=CP                use CP program to copy files [cp]
+  --cp=CP                use CP program to copy files [cp]
   --target-system=SYSTEM target system (linux, freebsd, win32, etc)  [auto,unix]
   --target-arch=ARCH     target architecture (i386, alpha, etc)   [auto,generic]
   --enable-debug[=1-3]   compile debugging information into biew [disable]
@@ -214,6 +228,9 @@ for ac_option do
     ;;
   --ld=*)
     _ld=`echo $ac_option | cut -d '=' -f 2`
+    ;;
+  --as=*)
+    _as=`echo $ac_option | cut -d '=' -f 2`
     ;;
   --cd=*)
     _cd=`echo $ac_option | cut -d '=' -f 2`
@@ -410,6 +427,7 @@ else
   host_arch=$_target_arch
 fi
 echores "$host_arch"
+
 
 echo "Detected host..."$system_name
 
