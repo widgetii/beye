@@ -1,4 +1,4 @@
-Release notes for BIEW version 5.7.X
+Release notes for BIEW version 6.X.X
 ====================================
 
   This document contains up-to-date information for end-users and developers.

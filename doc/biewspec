@@ -1,6 +1,6 @@
 %define name	biew
-%define version	5.7.3
-%define versrc	573
+%define version	6.0.0
+%define versrc	600
 %define release	1
 
 %define prefix	/usr
@@ -35,7 +35,9 @@ Linux, Unix, QNX, BeOS, DOS, Win32, OS/2 versions are available.
 %setup -q
 
 %build
-make TARGET_CPU=i386 TARGET_OS=linux USE_MOUSE=n PREFIX=${prefix}
+./configure
+make
+make install
 
 %install
 rm -rf $RPM_BUILD_ROOT

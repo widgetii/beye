@@ -10,10 +10,10 @@
 €≤±∞                 ‹‹  ‹‹  ‹‹   ‹‹  ‹   ‹ ‹ ‹ ‹                     ∞±≤€
 €≤±∞                ‹‹‹‹‹‹  ‹‹‹‹ ‹‹‹‹‹‹    ‹   ‹                      ∞±≤€
 €≤±∞                                                                  ∞±≤€
-€≤±∞                           Ver 5.7.3                              ∞±≤€
-€≤±∞                          01 feb 2009.                            ∞±≤€
+€≤±∞                           Ver 6.0.0                              ∞±≤€
+€≤±∞                          XX yyy 2009.                            ∞±≤€
 €≤±∞                                                                  ∞±≤€
-€≤±∞    Made in Kazan.Tatarstan.Russia. Written By Nickols_K.         ∞±≤€
+€≤±∞                      Written By Nickols_K.                       ∞±≤€
 €≤±∞                                                                  ∞±≤€
 €≤±∞ WWW:   http://biew.sourceforge.net                               ∞±≤€
 €≤±∞ FTP:   ftp://biew.sourceforge.net/pub/biew/                      ∞±≤€
