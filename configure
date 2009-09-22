@@ -365,6 +365,19 @@ else
 fi
 echores "$host_arch"
 
+case "$host_arch" in
+   i*86|x86|x86pc|k5|k6|k6-2|k6-3|pentium*|athlon*)
+      host_arch=ia32
+      _bitness=32
+     ;;
+   x86_64|amd64)
+       host_arch=x86_64
+      _bitness=64
+     ;;
+   *)
+     ;;
+esac
+
 echocheck "target OS"
 if test "$_target_system" = auto ; then
   if test -z "$system_name" ; then
