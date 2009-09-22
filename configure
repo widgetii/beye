@@ -316,6 +316,55 @@ TMPS="$I/biew-conf-$RANDOM-$$.S"
 TMPE="$I/biew-conf-$RANDOM-$$.exe"
 _tee="tee -a $TMPLOG"
 
+_bitness=32
+
+echocheck "architecture"
+if test "$_target_arch" = auto ; then
+  if test -z "$host_arch" ; then
+  host_arch=`( uname -p ) 2>&1`
+  log "uname -p :" "$host_arch"
+  case "$host_arch" in
+   i*86|x86|x86pc|k5|k6|k6-2|k6-3|pentium*|athlon*)
+      host_arch=ia32
+      _bitness=32
+     ;;
+   x86_64|amd64)
+       host_arch=x86_64
+      _bitness=64
+     ;;
+   sparc|ppc|alpha|arm|mips)
+     ;;
+
+   *) # uname -p on Linux returns 'unknown' for the processor type,
+      # OpenBSD returns 'Intel Pentium/MMX ("Genuine Intel" 586-class)'
+
+      # Maybe uname -m (machine hardware name) returns something we
+      # recognize.
+      arch_name=`( uname -m ) 2>&1`
+      log "uname -m :" "$arch_name"
+      case "$arch_name" in
+      i*86|x86|x86pc|k5|k6|k6-2|k6-3|pentium*|athlon*)
+          host_arch=ia32
+          _bitness=32
+         ;;
+      x86_64|amd64)
+          host_arch=x86_64
+          _bitness=64
+         ;;
+      ppc) host_arch=ppc ;;
+      alpha) host_arch=alpha ;;
+      sparc*) host_arch=sparc ;;
+      arm*) host_arch=arm ;;
+      *) host_arch=generic ;;
+    esac
+    ;;
+  esac
+  fi
+else
+  host_arch=$_target_arch
+fi
+echores "$host_arch"
+
 echocheck "target OS"
 if test "$_target_system" = auto ; then
   if test -z "$system_name" ; then
@@ -392,41 +441,6 @@ if test "$_target_system" = auto ; then
   fi
 fi
 echores "$_target_system"
-
-echocheck "architecture"
-if test "$_target_arch" = auto ; then
-  if test -z "$host_arch" ; then
-  host_arch=`( uname -p ) 2>&1`
-  log "uname -p :" "$host_arch"
-  case "$host_arch" in
-   i*86|x86|x86pc|k5|k6|k6-2|k6-3|pentium*|athlon*) host_arch=ia32 ;;
-   x86_64|amd64) host_arch=x86_64 ;;
-   sparc|ppc|alpha|arm|mips)
-     ;;
-
-   *) # uname -p on Linux returns 'unknown' for the processor type,
-      # OpenBSD returns 'Intel Pentium/MMX ("Genuine Intel" 586-class)'
-
-      # Maybe uname -m (machine hardware name) returns something we
-      # recognize.
-      arch_name=`( uname -m ) 2>&1`
-      log "uname -m :" "$arch_name"
-      case "$arch_name" in
-      i*86|x86|x86pc|k5|k6|k6-2|k6-3|pentium*|athlon*) host_arch=ia32 ;;
-      x86_64|amd64) host_arch=x86_64 ;;
-      ppc) host_arch=ppc ;;
-      alpha) host_arch=alpha ;;
-      sparc*) host_arch=sparc ;;
-      arm*) host_arch=arm ;;
-      *) host_arch=generic ;;
-    esac
-    ;;
-  esac
-  fi
-else
-  host_arch=$_target_arch
-fi
-echores "$host_arch"
 
 
 echo "Detected host..."$system_name
@@ -526,11 +540,11 @@ fi
 #Printout operating system
 case "$_target_system" in
     dos)
-	_cdefos="-D__MSDOS__ -D__OS_NAME__='\"DOS\"' -D__OS__=\"dos\" -Udos $_cdefos"
+	_cdefos="-D__MSDOS__ -D__OS_NAME__='\"DOS$_bitness\"' -D__OS__=\"dos\" -Udos $_cdefos"
 	_osldef="--force-exe-suffix $_osldef"
 	;;
     os2)
-	_cdefos="-D__OS2__ -D__OS_NAME__='\"OS/2\"' -Zomf -D__OS__=\"os2\" -Uos2 $_cdefos"
+	_cdefos="-D__OS2__ -D__OS_NAME__='\"OS/2-$_bitness\"' -Zomf -D__OS__=\"os2\" -Uos2 $_cdefos"
 # here I want to have static link of glibc instead emx.dll
 	_osldef="-Zexe -Zsmall-conv -Zsys -Zomf -Zstack 1024 $_osldef"
 	_ar="emxomfar -p32 rc"
@@ -541,24 +555,24 @@ case "$_target_system" in
     win32)
 # I named this as win32 because of exists Win386 by Watcom.
 # here I link crtdll.dll instead cygwin1.dll (it's safe)
-	_cdefos="-D__WIN32__ -D__OS_NAME__='\"Win32\"' -mno-cygwin -D__OS__=\"win32\" -Uwin32 $_cdefos"
+	_cdefos="-D__WIN32__ -D__OS_NAME__='\"Win$_bitness\"' -mno-cygwin -D__OS__=\"win32\" -Uwin32 $_cdefos"
 	_osldef="-mno-cygwin --force-exe-suffix $_osldef"
 	_oslibs="-lwinmm $_oslibs"
 	;;
     beos)
-	_cdefos="-D__BEOS__ -D__UNIX__ -D__OS_NAME__='\"BeOS\"' -D__OS__=\"beos\" -Ubeos -D_VT100_ -DHAVE_TERMINAL_OUT=1 -DDATADIR='\"/boot/home/config/lib\"' -D__DISABLE_MMF -D__DISABLE_ASM -D__DISABLE_SIGIO -DPREFIX=\"$_prefix\" $_cdefos"
+	_cdefos="-D__BEOS__ -D__UNIX__ -D__OS_NAME__='\"BeOS$_bitness\"' -D__OS__=\"beos\" -Ubeos -D_VT100_ -DHAVE_TERMINAL_OUT=1 -DDATADIR='\"/boot/home/config/lib\"' -D__DISABLE_MMF -D__DISABLE_ASM -D__DISABLE_SIGIO -DPREFIX=\"$_prefix\" $_cdefos"
 	;;
     qnx)
-	_cdefos="-D__QNX4__ -D__UNIX__ -D__OS_NAME__='\"QNX4\"' -D__OS__=\"qnx\" -U__QNX__ -D_VT100_ -DHAVE_TERMINAL_OUT=1 -D__DISABLE_MMF -DPREFIX=\"$_prefix\" $_cdefos"
+	_cdefos="-D__QNX4__ -D__UNIX__ -D__OS_NAME__='\"QNX4-$_bitness\"' -D__OS__=\"qnx\" -U__QNX__ -D_VT100_ -DHAVE_TERMINAL_OUT=1 -D__DISABLE_MMF -DPREFIX=\"$_prefix\" $_cdefos"
 	_oslibs="-ltermlib -lunix -lphoton3r.lib $_oslibs"
 
 	;;
     qnxnto)
-	_cdefos="-D__QNX6__ -D__UNIX__ -D__OS_NAME__='\"QNX6\"' -D__OS__=\"qnxnto\" -U__QNX__ -U__NTO__ -D_VT100_ -DHAVE_TERMINAL_OUT=1 -D__DISABLE_MMF -DPREFIX=\"$_prefix\" $_cdefos"
+	_cdefos="-D__QNX6__ -D__UNIX__ -D__OS_NAME__='\"QNX6-$_bitness\"' -D__OS__=\"qnxnto\" -U__QNX__ -U__NTO__ -D_VT100_ -DHAVE_TERMINAL_OUT=1 -D__DISABLE_MMF -DPREFIX=\"$_prefix\" $_cdefos"
 	_oslibs="-lncurses $_oslibs"
 	;;
     linux)
-	_cdefos="-D__LINUX__ -D__UNIX__ -D__OS_NAME__='\"Linux\"' -D__OS__=\"linux\" -Ulinux -D_VT100_ -DHAVE_TERMINAL_OUT=1 -DPREFIX=\"$_prefix\" $_cdefos"
+	_cdefos="-D__LINUX__ -D__UNIX__ -D__OS_NAME__='\"Linux$_bitness\"' -D__OS__=\"linux\" -Ulinux -D_VT100_ -DHAVE_TERMINAL_OUT=1 -DPREFIX=\"$_prefix\" $_cdefos"
 echocheck "gpm.h"
 	check_header gpm.h
 	enabled gpm_h && _cdefos="-DHAVE_MOUSE $_cdefos" && _oslibs="-lgpm $_oslibs"
