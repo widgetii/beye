@@ -11,7 +11,7 @@
 €≤±∞                ‹‹‹‹‹‹  ‹‹‹‹ ‹‹‹‹‹‹    ‹   ‹                      ∞±≤€
 €≤±∞                                                                  ∞±≤€
 €≤±∞                           Ver 6.0.0                              ∞±≤€
-€≤±∞                          XX yyy 2009.                            ∞±≤€
+€≤±∞                          22 sep 2009.                            ∞±≤€
 €≤±∞                                                                  ∞±≤€
 €≤±∞                      Written By Nickols_K.                       ∞±≤€
 €≤±∞                                                                  ∞±≤€
@@ -1214,7 +1214,7 @@ v5.0.2        ! Changes:
 02 feb 2009   ! Changes:
                 * replaced wrong patch for AMD64 disassembler
 6.0.0
-XX sep 2009   ! Changes:
+22 sep 2009   ! Changes:
                 + Initial x86_64 port
 []======================================================================[]
 []  Thank you for your interest.                                        []
