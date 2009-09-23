@@ -216,6 +216,7 @@ Environment variables:
   LDFLAGS   linker flags, e.g. -L<lib dir> if you have libraries in a
             nonstandard directory <lib dir>
   LIBS      specifies additional libs (like: export LIBS=-lacml_mv)
+  DESTDIR   specifies base of installation
 EOF
 
   exit 0
