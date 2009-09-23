@@ -271,28 +271,28 @@ ifeq ($(INSTALL),)
 	@echo "*** of this project" 
 	@exit 1
 endif
-	$(INSTALL) -D -m 755 $(TARGET) $(PREFIX)/bin/$(TARGET)
-	$(INSTALL) -D -c -m 644 doc/biew.1 $(PREFIX)/man/man1/biew.1
-	$(INSTALL) -D -c -m 644 bin_rc/biew.hlp $(DATADIR)/biew.hlp
-	mkdir --parents $(DATADIR)/skn
-	$(INSTALL) -D -c -m 644 bin_rc/skn/*.skn $(DATADIR)/skn
-	mkdir --parents $(DATADIR)/syntax
-	$(INSTALL) -D -c -m 644 bin_rc/syntax/*.stx $(DATADIR)/syntax
-	mkdir --parents $(DATADIR)/xlt/russian
-	$(INSTALL) -D -c -m 644 bin_rc/xlt/russian/*.xlt $(DATADIR)/xlt/russian
-	$(INSTALL) -D -c -m 644 bin_rc/xlt/*.xlt bin_rc/xlt/readme $(DATADIR)/xlt
+	$(INSTALL) -D -m 755 $(TARGET) $(DESTDIR)$(PREFIX)/bin/$(TARGET)
+	$(INSTALL) -D -c -m 644 doc/biew.1 $(DESTDIR)$(PREFIX)/man/man1/biew.1
+	$(INSTALL) -D -c -m 644 bin_rc/biew.hlp $(DESTDIR)$(DATADIR)/biew.hlp
+	mkdir --parents $(DESTDIR)$(DATADIR)/skn
+	$(INSTALL) -D -c -m 644 bin_rc/skn/*.skn $(DESTDIR)$(DATADIR)/skn
+	mkdir --parents $(DESTDIR)$(DATADIR)/syntax
+	$(INSTALL) -D -c -m 644 bin_rc/syntax/*.stx $(DESTDIR)$(DATADIR)/syntax
+	mkdir --parents $(DESTDIR)$(DATADIR)/xlt/russian
+	$(INSTALL) -D -c -m 644 bin_rc/xlt/russian/*.xlt $(DESTDIR)$(DATADIR)/xlt/russian
+	$(INSTALL) -D -c -m 644 bin_rc/xlt/*.xlt bin_rc/xlt/readme $(DESTDIR)$(DATADIR)/xlt
 uninstall:
-	$(RM) $(PREFIX)/bin/$(TARGET)
-	$(RM) $(DATADIR)/skn/*
-	rmdir -p --ignore-fail-on-non-empty $(DATADIR)/skn
-	$(RM) $(DATADIR)/syntax/*
-	rmdir -p --ignore-fail-on-non-empty $(DATADIR)/syntax
-	$(RM) $(DATADIR)/xlt/russian/*
-	rmdir -p --ignore-fail-on-non-empty $(DATADIR)/xlt/russian
-	$(RM) $(DATADIR)/xlt/*
-	rmdir -p --ignore-fail-on-non-empty $(DATADIR)/xlt
-	$(RM) $(DATADIR)/*
-	rmdir -p --ignore-fail-on-non-empty $(DATADIR)
+	$(RM) $(DESTDIR)$(PREFIX)/bin/$(TARGET)
+	$(RM) $(DESTDIR)$(DATADIR)/skn/*
+	rmdir -p --ignore-fail-on-non-empty $(DESTDIR)$(DATADIR)/skn
+	$(RM) $(DESTDIR)$(DATADIR)/syntax/*
+	rmdir -p --ignore-fail-on-non-empty $(DESTDIR)$(DATADIR)/syntax
+	$(RM) $(DESTDIR)$(DATADIR)/xlt/russian/*
+	rmdir -p --ignore-fail-on-non-empty $(DESTDIR)$(DATADIR)/xlt/russian
+	$(RM) $(DESTDIR)$(DATADIR)/xlt/*
+	rmdir -p --ignore-fail-on-non-empty $(DESTDIR)$(DATADIR)/xlt
+	$(RM) $(DESTDIR)$(DATADIR)/*
+	rmdir -p --ignore-fail-on-non-empty $(DESTDIR)$(DATADIR)
 
 help:
 	$(DO_HELP)
