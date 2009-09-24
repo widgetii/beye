@@ -126,6 +126,7 @@
 #define EM_PPC64	21	/**< PowerPC 64-bit */
 #define	EM_S390		22	/**< IBM System/390 */
 				/**< 23-35 reserved */
+#define EM_ADSP		29	/**< Atmel ADSP */
 #define	EM_V800		36	/**< NEC V800 */
 #define	EM_FR20		37	/**< Fujitsu FR20 */
 #define	EM_RH32		38	/**< TRW RH-32 */
