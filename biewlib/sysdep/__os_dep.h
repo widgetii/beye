@@ -364,12 +364,18 @@ extern void      __FASTCALL__ __OsRestoreTimer(void);
 #define FILESIZE_MAX ULONG_MAX
 #endif
 
+#if __WORDSIZE >= 64
+typedef long bhandle_t;
+#else
+typedef int  bhandle_t;
+#endif
+
                    /** Closes opened stream
                      * @return                none
                      * @param handle          handle of opened stream
                      * @see                   __OsOpen
                     **/
-extern void      __FASTCALL__ __OsClose(int handle);
+extern void      __FASTCALL__ __OsClose(bhandle_t handle);
 
                    /** Changes size of opened file
                      * @return                0 if operation was succesfully performed
@@ -380,7 +386,7 @@ extern void      __FASTCALL__ __OsClose(int handle);
                      *                        end of the file are lost.
                      * @see                   __OsTruncFile
                     **/
-extern int       __FASTCALL__ __OsChSize(int handle, __fileoff_t size);
+extern int       __FASTCALL__ __OsChSize(bhandle_t handle, __fileoff_t size);
 
                    /** Creates new file and return handle of opened stream associated with file
                      * @return                handle of opened stream if successful, -1 otherwise
@@ -389,7 +395,7 @@ extern int       __FASTCALL__ __OsChSize(int handle, __fileoff_t size);
                      *                        access by user.
                      * @see                   __OsOpen __OsClose __OsDelete
                     **/
-extern int       __FASTCALL__ __OsCreate(const char *name);
+extern bhandle_t __FASTCALL__ __OsCreate(const char *name);
 
                    /** Duplicates an opened file handle by assigning the same file to a new handle.
                      * @return                handle of new opened stream if successful, -1 otherwise
@@ -397,7 +403,7 @@ extern int       __FASTCALL__ __OsCreate(const char *name);
                      * @note                  Function duplicates handle with
                      *                        same characteristics as opened handle.
                     **/
-extern int       __FASTCALL__ __OsDupHandle(int handle);
+extern bhandle_t __FASTCALL__ __OsDupHandle(bhandle_t handle);
 
                    /** Deletes the file.
                      * @return                0 if operation was succesfully performed
@@ -423,7 +429,7 @@ extern int       __FASTCALL__ __OsDelete(const char *name);
                      * @param mode            combination of FO_* and SO_* flags
                      * @see                   __OsCreate __OsClose
                     **/
-extern int       __FASTCALL__ __OsOpen(const char *name,int mode);
+extern bhandle_t __FASTCALL__ __OsOpen(const char *name,int mode);
 
                    /** Checks whether the specified file exists
                      * @return                True if specified file is exists
@@ -435,7 +441,7 @@ extern tBool  __FASTCALL__    __IsFileExists(const char *name);
                      * @return                length of file if successful; 0 - otherwise
                      * @param handle          handle of opened stream
                     **/
-extern __fileoff_t   __FASTCALL__    __FileLength(int handle);
+extern __fileoff_t   __FASTCALL__    __FileLength(bhandle_t handle);
 
 #define SEEKF_START           (int)0  /**< Defines references location of computing file offset from beginning of file */
 #define SEEKF_CUR             (int)1  /**< Defines references location of computing file offset from current position */
@@ -448,14 +454,14 @@ extern __fileoff_t   __FASTCALL__    __FileLength(int handle);
                      * @param origin          indicates reference location from which an offset will be computed
                      * @see                   __OsTell
                     **/
-extern __fileoff_t   __FASTCALL__    __OsSeek(int handle, __fileoff_t newpos, int origin);
+extern __fileoff_t   __FASTCALL__    __OsSeek(bhandle_t handle, __fileoff_t newpos, int origin);
 
                    /** Returns current file position
                      * @return                offset from beginning of file to file position in bytes
                      * @param handle          handle of opened stream
                      * @see                   __OsSeek
                     **/
-extern __fileoff_t   __FASTCALL__    __OsTell(int handle);
+extern __fileoff_t   __FASTCALL__    __OsTell(bhandle_t handle);
 
                    /** Truncates of opened file
                      * @return                0 if operation was succesfully performed
@@ -466,7 +472,7 @@ extern __fileoff_t   __FASTCALL__    __OsTell(int handle);
                      *                        and in many case it undocumented
                      * @see                   __OsChSize
                     **/
-extern int       __FASTCALL__ __OsTruncFile(int handle, __filesize_t newsize);
+extern int       __FASTCALL__ __OsTruncFile(bhandle_t handle, __filesize_t newsize);
 
                    /** Changes name of specified file or directory
                      * @return                0 if operation was succesfully performed
@@ -487,7 +493,7 @@ extern int       __FASTCALL__ __OsRename(const char *oldname,const char *newname
                      *                        on specified number of bytes.
                      * @see                   __OsWrite
                     **/
-extern int       __FASTCALL__ __OsRead(int handle,void *buff,unsigned size);
+extern int       __FASTCALL__ __OsRead(bhandle_t handle,void *buff,unsigned size);
 
                    /** Writes specified number of bytes to file
                      * @return                number actually writed bytes if successful; -1 on error
@@ -500,7 +506,7 @@ extern int       __FASTCALL__ __OsRead(int handle,void *buff,unsigned size);
                      *                        on specified number of bytes.
                      * @see                   __OsRead
                     **/
-extern int       __FASTCALL__ __OsWrite(int handle,const void *buff,unsigned size);
+extern int       __FASTCALL__ __OsWrite(bhandle_t handle,const void *buff,unsigned size);
 
 /** Structure for storing and setting file time information */
 typedef struct tagFTime

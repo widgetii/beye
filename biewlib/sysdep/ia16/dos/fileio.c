@@ -34,7 +34,7 @@ static char * __NEAR__ __FASTCALL__ fnUnix2Dos(const char *fn)
   return f_buff;
 }
 
-int __FASTCALL__ __OsCreate(const char *name)
+bhandle_t __FASTCALL__ __OsCreate(const char *name)
 {
   char *dosname;
   union REGS reg;
@@ -88,7 +88,7 @@ int __FASTCALL__ __OsRename(const char *oldname,const char *newname)
   return reg.x.ax;
 }
 
-void __FASTCALL__ __OsClose(int handle)
+void __FASTCALL__ __OsClose(bhandle_t handle)
 {
   union REGS reg;
   memset(&reg,0,sizeof(union REGS));
@@ -98,7 +98,7 @@ void __FASTCALL__ __OsClose(int handle)
   if(reg.x.flags & 0x01) errno = reg.x.ax;
 }
 
-int __FASTCALL__ __OsDupHandle(int handle)
+bhandle_t __FASTCALL__ __OsDupHandle(bhandle_t handle)
 {
   union REGS reg;
   memset(&reg,0,sizeof(union REGS));
@@ -109,7 +109,7 @@ int __FASTCALL__ __OsDupHandle(int handle)
   return reg.x.ax;
 }
 
-int __FASTCALL__ __OsOpen(const char *fname,int mode)
+bhandle_t __FASTCALL__ __OsOpen(const char *fname,int mode)
 {
   char *dosname;
   union REGS reg;
@@ -134,7 +134,7 @@ int __FASTCALL__ __OsOpen(const char *fname,int mode)
   return reg.x.ax;
 }
 
-__fileoff_t __FASTCALL__ __OsSeek(int handle,__fileoff_t offset,int origin)
+__fileoff_t __FASTCALL__ __OsSeek(bhandle_t handle,__fileoff_t offset,int origin)
 {
   __fileoff_t ret;
   union REGS reg;
@@ -154,13 +154,13 @@ __fileoff_t __FASTCALL__ __OsSeek(int handle,__fileoff_t offset,int origin)
   return ret;
 }
 
-int __FASTCALL__ __OsTruncFile( int handle, __filesize_t newsize)
+int __FASTCALL__ __OsTruncFile(bhandle_t handle, __filesize_t newsize)
 {
   __OsSeek(handle,newsize,0);
   return __OsWrite(handle,NULL,0);
 }
 
-int __FASTCALL__  __OsRead(int handle, void *buff, unsigned size)
+int __FASTCALL__  __OsRead(bhandle_t handle, void *buff, unsigned size)
 {
   union REGS reg;
   struct SREGS sreg;
@@ -180,7 +180,7 @@ int __FASTCALL__  __OsRead(int handle, void *buff, unsigned size)
   return reg.x.ax;
 }
 
-int __FASTCALL__  __OsWrite(int handle,const void *buff, unsigned size)
+int __FASTCALL__  __OsWrite(bhandle_t handle,const void *buff, unsigned size)
 {
   union REGS reg;
   struct SREGS sreg;
@@ -202,7 +202,7 @@ int __FASTCALL__  __OsWrite(int handle,const void *buff, unsigned size)
 
 #define BLKSIZE 32767
 
-int __FASTCALL__ __OsChSize(int handle, __fileoff_t size)
+int __FASTCALL__ __OsChSize(bhandle_t handle, __fileoff_t size)
 
 {
     __fileoff_t length, fillsize;
@@ -235,7 +235,7 @@ int __FASTCALL__ __OsChSize(int handle, __fileoff_t size)
     return 0;
 }
 
-__fileoff_t __FASTCALL__ __FileLength(int handle)
+__fileoff_t __FASTCALL__ __FileLength(bhandle_t handle)
 {
   __fileoff_t ret,spos;
   spos = __OsTell(handle);
@@ -244,11 +244,11 @@ __fileoff_t __FASTCALL__ __FileLength(int handle)
   return ret;
 }
 
-__fileoff_t __FASTCALL__ __OsTell(int handle) { return __OsSeek(handle,0L,SEEKF_CUR); }
+__fileoff_t __FASTCALL__ __OsTell(bhandle_t handle) { return __OsSeek(handle,0L,SEEKF_CUR); }
 
 tBool __FASTCALL__ __IsFileExists(const char *name)
 {
-   int handle = __OsOpen(name,FO_READONLY | SO_DENYNONE);
+   bhandle_t handle = __OsOpen(name,FO_READONLY | SO_DENYNONE);
    if(handle != -1) __OsClose(handle);
    return handle != -1;
 }
@@ -256,7 +256,7 @@ tBool __FASTCALL__ __IsFileExists(const char *name)
 tBool      __FASTCALL__ __OsGetFTime(const char *name,FTime *data)
 {
   tBool ret = False;
-  int handle;
+  bhandle_t handle;
   union REGS reg;
   memset(&reg,0,sizeof(union REGS));
   handle = __OsOpen(name,FO_READONLY);
@@ -291,7 +291,7 @@ tBool      __FASTCALL__ __OsGetFTime(const char *name,FTime *data)
 tBool      __FASTCALL__ __OsSetFTime(const char *name,const FTime *data)
 {
   tBool ret = False;
-  int handle;
+  bhandle_t handle;
   union REGS reg;
   memset(&reg,0,sizeof(union REGS));
   handle = __OsOpen(name,FO_READWRITE);

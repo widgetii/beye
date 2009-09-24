@@ -42,7 +42,7 @@ char **ArgVector;
 int main(int argc, char *argv[])
 {
 	char  *s;
-	int handle;
+	bhandle_t handle;
 	int retcode;
 	if (argc != 4)
 	{

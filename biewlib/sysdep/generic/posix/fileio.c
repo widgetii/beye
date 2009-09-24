@@ -31,7 +31,7 @@
 
 #include "biewlib/biewlib.h"
 
-int __FASTCALL__ __OsCreate(const char *name)
+bhandle_t __FASTCALL__ __OsCreate(const char *name)
 {
   return open(name,O_RDWR | O_CREAT | O_TRUNC, S_IREAD | S_IWRITE);
 }
@@ -46,17 +46,17 @@ int __FASTCALL__ __OsRename(const char *oldname,const char *newname)
   return rename(oldname,newname);
 }
 
-void __FASTCALL__ __OsClose(int handle)
+void __FASTCALL__ __OsClose(bhandle_t handle)
 {
   close(handle);
 }
 
-int __FASTCALL__ __OsDupHandle(int handle)
+bhandle_t __FASTCALL__ __OsDupHandle(bhandle_t handle)
 {
   return dup(handle);
 }
 
-int __FASTCALL__ __OsOpen(const char *fname,int mode)
+bhandle_t __FASTCALL__ __OsOpen(const char *fname,int mode)
 {
   int flags = O_RDONLY;
   struct stat st;
@@ -80,29 +80,29 @@ int __FASTCALL__ __OsOpen(const char *fname,int mode)
   return open(fname,flags);
 }
 
-__fileoff_t __FASTCALL__ __OsSeek(int handle,__fileoff_t offset,int origin)
+__fileoff_t __FASTCALL__ __OsSeek(bhandle_t handle,__fileoff_t offset,int origin)
 {
   return lseek(handle,offset,origin);
 }
 
-int __FASTCALL__ __OsTruncFile( int handle, __filesize_t newsize)
+int __FASTCALL__ __OsTruncFile(bhandle_t handle, __filesize_t newsize)
 {
   return ftruncate(handle,newsize);
 }
 
-int __FASTCALL__ __OsRead(int handle, void *buff, unsigned count)
+int __FASTCALL__ __OsRead(bhandle_t handle, void *buff, unsigned count)
 {
   return read(handle,buff,count);
 }
 
-int __FASTCALL__ __OsWrite(int handle,const void *buffer, unsigned count)
+int __FASTCALL__ __OsWrite(bhandle_t handle,const void *buffer, unsigned count)
 {
   return write(handle,buffer,count);
 }
 
 #define BLKSIZE 32767
 
-int __FASTCALL__ __OsChSize(int handle, __fileoff_t size)
+int __FASTCALL__ __OsChSize(bhandle_t handle, __fileoff_t size)
 {
     __fileoff_t length, fillsize;
     char *buf;
@@ -134,7 +134,7 @@ int __FASTCALL__ __OsChSize(int handle, __fileoff_t size)
     return 0;
 }
 
-__fileoff_t __FASTCALL__ __FileLength(int handle)
+__fileoff_t __FASTCALL__ __FileLength(bhandle_t handle)
 {
   struct stat statbuf;
   int stat_ret;
@@ -182,7 +182,7 @@ __fileoff_t __FASTCALL__ __FileLength(int handle)
   return retval;
 }
 
-__fileoff_t __FASTCALL__ __OsTell(int handle)
+__fileoff_t __FASTCALL__ __OsTell(bhandle_t handle)
 {
   return __OsSeek(handle,0L,SEEKF_CUR);
 }

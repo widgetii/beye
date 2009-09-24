@@ -27,10 +27,10 @@
 
 struct mmfRecord
 {
-  void * addr;
-  long   length;
-  int    fhandle;
-  int    mode;
+  void *    addr;
+  long      length;
+  bhandle_t fhandle;
+  int       mode;
 };
 
 static int __FASTCALL__ mk_prot(int mode)
@@ -61,7 +61,7 @@ static int __FASTCALL__ mk_flags(int mode)
 mmfHandle          __FASTCALL__ __mmfOpen(const char *fname,int mode)
 {
   struct mmfRecord *mret;
-  int fhandle;
+  bhandle_t fhandle;
   fhandle = __OsOpen(fname,mode);
   if(fhandle != -1)
   {

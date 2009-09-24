@@ -243,7 +243,7 @@ mmfHandle          __FASTCALL__ __mmfOpen(const char *fname,int mode)
   FILESTATUS3 fsts3ConfigInfo;
   ULONG  ulBufSize = sizeof(FILESTATUS3);
   APIRET rc    = NO_ERROR;
-  int    fhandle;
+  bhandle_t  fhandle;
   PVOID  pData = 0;
   PMMF   pMMF  = 0;
 

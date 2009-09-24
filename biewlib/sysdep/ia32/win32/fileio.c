@@ -49,7 +49,7 @@ static char * __FASTCALL__ fnUnix2Dos(const char *fn)
   return f_buff;
 }
 
-int __FASTCALL__ __OsCreate(const char *name)
+bhandle_t __FASTCALL__ __OsCreate(const char *name)
 {
   char *dosname;
   HANDLE handle;
@@ -66,7 +66,7 @@ int __FASTCALL__ __OsCreate(const char *name)
     set_errno(GetLastError());
     handle = (HANDLE)-1;
   }
-  return (int)handle;
+  return (bhandle_t)handle;
 }
 
 int __FASTCALL__ __OsDelete(const char *name)
@@ -96,12 +96,12 @@ int __FASTCALL__ __OsRename(const char *oldname,const char *newname)
   else return 0;
 }
 
-void __FASTCALL__ __OsClose(int handle)
+void __FASTCALL__ __OsClose(bhandle_t handle)
 {
   CloseHandle((HANDLE)handle);
 }
 
-int __FASTCALL__ __OsDupHandle(int handle)
+bhandle_t __FASTCALL__ __OsDupHandle(bhandle_t handle)
 {
   HANDLE hret;
   if(DuplicateHandle(GetCurrentProcess(),
@@ -115,10 +115,10 @@ int __FASTCALL__ __OsDupHandle(int handle)
     set_errno(GetLastError());
     hret = (HANDLE)-1;
   }
-  return (int)hret;
+  return (bhandle_t)hret;
 }
 
-int  __FASTCALL__ __OsOpen(const char *fname,int mode)
+bhandle_t __FASTCALL__ __OsOpen(const char *fname,int mode)
 {
   char *dosname;
   HANDLE handle;
@@ -143,16 +143,16 @@ int  __FASTCALL__ __OsOpen(const char *fname,int mode)
     set_errno(GetLastError());
     handle = (HANDLE)-1;
   }
-  return (int)handle;
+  return (bhandle_t)handle;
 }
 
-__fileoff_t __FASTCALL__ __OsSeek(int handle,__fileoff_t offset,int origin)
+__fileoff_t __FASTCALL__ __OsSeek(bhandle_t handle,__fileoff_t offset,int origin)
 {
   unsigned long hioff=offset>>32;
   return SetFilePointer((HANDLE)handle,offset,&hioff,origin);
 }
 
-int __FASTCALL__ __OsTruncFile( int handle, __filesize_t newsize)
+int __FASTCALL__ __OsTruncFile(bhandle_t handle, __filesize_t newsize)
 {
   int ret = 0;
   __OsSeek(handle,newsize,SEEKF_START);
@@ -164,7 +164,7 @@ int __FASTCALL__ __OsTruncFile( int handle, __filesize_t newsize)
   return ret;
 }
 
-int __FASTCALL__  __OsRead(int handle, void *buff, unsigned size)
+int __FASTCALL__  __OsRead(bhandle_t handle, void *buff, unsigned size)
 {
   DWORD ret = size;
   if(ReadFile((HANDLE)handle,buff,size,&ret,NULL) == 0)
@@ -175,7 +175,7 @@ int __FASTCALL__  __OsRead(int handle, void *buff, unsigned size)
   return ret;
 }
 
-int __FASTCALL__  __OsWrite(int handle,const void *buff, unsigned size)
+int __FASTCALL__  __OsWrite(bhandle_t handle,const void *buff, unsigned size)
 {
   DWORD ret = size;
   if(WriteFile((HANDLE)handle,buff,size,&ret,NULL) == 0)
@@ -186,12 +186,12 @@ int __FASTCALL__  __OsWrite(int handle,const void *buff, unsigned size)
   return ret;
 }
 
-int __FASTCALL__ __OsChSize(int handle, __fileoff_t size)
+int __FASTCALL__ __OsChSize(bhandle_t handle, __fileoff_t size)
 {
   return __OsTruncFile(handle,size);
 }
 
-__fileoff_t __FASTCALL__ __FileLength(int handle)
+__fileoff_t __FASTCALL__ __FileLength(bhandle_t handle)
 {
   DWORD ret, hisize, err;
   ret = GetFileSize((HANDLE)handle,&hisize);
@@ -203,11 +203,11 @@ __fileoff_t __FASTCALL__ __FileLength(int handle)
   return ((__fileoff_t)ret&0xFFFFFFFFUL) | (((__fileoff_t)hisize)<<32);
 }
 
-__fileoff_t __FASTCALL__ __OsTell(int handle) { return __OsSeek(handle,0L,SEEKF_CUR); }
+__fileoff_t __FASTCALL__ __OsTell(bhandle_t handle) { return __OsSeek(handle,0L,SEEKF_CUR); }
 
 tBool __FASTCALL__ __IsFileExists(const char *name)
 {
-   int handle = __OsOpen(name,FO_READONLY | SO_DENYNONE);
+   bhandle_t handle = __OsOpen(name,FO_READONLY | SO_DENYNONE);
    if(handle != -1) __OsClose(handle);
    return handle != -1;
 }
@@ -216,7 +216,7 @@ tBool      __FASTCALL__ __OsGetFTime(const char *name,FTime *data)
 {
   tBool ret = False;
   FILETIME ct,at,mt;
-  int handle;
+  bhandle_t handle;
    handle = __OsOpen(name,FO_READONLY);
    if(handle == -1) handle = __OsOpen(name,FO_READONLY | SO_DENYNONE);
    if(handle != -1)
@@ -259,7 +259,7 @@ tBool      __FASTCALL__ __OsSetFTime(const char *name,const FTime *data)
 {
   tBool ret = False;
   FILETIME at,mt;
-  int handle;
+  bhandle_t handle;
    handle = __OsOpen(name,FO_READWRITE);
    if(handle == -1) handle = __OsOpen(name,FO_READWRITE | SO_DENYNONE);
    if(handle != -1)

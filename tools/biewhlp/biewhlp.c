@@ -154,7 +154,7 @@ tBool __FASTCALL__ MyCallOut(IniInfo *ini)
         unsigned copysize;
         BIEW_HELP_ITEM bhi;
         BGLOBAL bIn;
-        int handle;
+        bhandle_t handle;
         fpos = bioTell(bOutput);
         printf("Processing: %s\n",ini->value);
         litem = strtoul(ini->item,NULL,10);
@@ -215,7 +215,7 @@ char **ArgVector;
 int main( int argc, char *argv[] )
 {
   BIEW_HELP_ITEM bhi;
-  int handle;
+  bhandle_t handle;
   unsigned long i;
   char sout[HLP_SLONG_LEN];
   if(argc < 2)

@@ -340,7 +340,7 @@ static tBool __NEAR__ __FASTCALL__ LoadInfo( void )
    MakeShortName();
    if(new_file_size != FILESIZE_MAX)
    {
-       int handle;
+       bhandle_t handle;
        if(__IsFileExists(ArgVector[1]) == False) handle = __OsCreate(ArgVector[1]);
        else
        {

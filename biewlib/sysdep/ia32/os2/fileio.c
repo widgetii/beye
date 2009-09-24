@@ -36,7 +36,7 @@ static char * __FASTCALL__ fnUnix2Dos(const char *fn)
   return f_buff;
 }
 
-void __FASTCALL__ __OsClose(int handle)
+void __FASTCALL__ __OsClose(bhandle_t handle)
 {
   unsigned long rc;
   rc = DosClose(handle);
@@ -78,7 +78,7 @@ int __FASTCALL__ __OsRename(const char *oldname,const char *newname)
   return rc;
 }
 
-int  __FASTCALL__ __OsDupHandle(int handle)
+bhandle_t __FASTCALL__ __OsDupHandle(bhandle_t handle)
 {
   unsigned long rc;
   HFILE ret;
@@ -93,7 +93,7 @@ int  __FASTCALL__ __OsDupHandle(int handle)
   return ret;
 }
 
-int __FASTCALL__ __OsChSize(int handle, __fileoff_t size)
+int __FASTCALL__ __OsChSize(bhandle_t handle, __fileoff_t size)
 {
   unsigned long rc;
   rc = DosSetFileSize(handle,size);
@@ -105,7 +105,7 @@ int __FASTCALL__ __OsChSize(int handle, __fileoff_t size)
   return rc ? -1 : 0;
 }
 
-int  __FASTCALL__ __OsCreate(const char *fname)
+bhandle_t __FASTCALL__ __OsCreate(const char *fname)
 {
    ULONG action,rc;
    char *dosname;
@@ -126,7 +126,7 @@ int  __FASTCALL__ __OsCreate(const char *fname)
    return fhandle;
 }
 
-int  __FASTCALL__ __OsOpen(const char *fname,int mode)
+bhandle_t __FASTCALL__ __OsOpen(const char *fname,int mode)
 {
    ULONG action,rc;
    char *dosname;
@@ -148,7 +148,7 @@ int  __FASTCALL__ __OsOpen(const char *fname,int mode)
    return fhandle;
 }
 
-__fileoff_t __FASTCALL__ __OsSeek( int handle, __fileoff_t offset, int origin)
+__fileoff_t __FASTCALL__ __OsSeek(bhandle_t handle, __fileoff_t offset, int origin)
 {
   unsigned long ret,rc;
   rc = DosSetFilePtr(handle,offset,origin,&ret);
@@ -161,7 +161,7 @@ __fileoff_t __FASTCALL__ __OsSeek( int handle, __fileoff_t offset, int origin)
   return ret;
 }
 
-int __FASTCALL__ __OsTruncFile( int handle, __filesize_t size)
+int __FASTCALL__ __OsTruncFile(bhandle_t handle, __filesize_t size)
 {
   unsigned long rc;
   rc = DosSetFileSize(handle,size);
@@ -173,7 +173,7 @@ int __FASTCALL__ __OsTruncFile( int handle, __filesize_t size)
   return rc;
 }
 
-int __FASTCALL__ __OsRead(int handle, void *buff,unsigned size)
+int __FASTCALL__ __OsRead(bhandle_t handle, void *buff,unsigned size)
 {
   ULONG ret;
   unsigned long rc;
@@ -186,7 +186,7 @@ int __FASTCALL__ __OsRead(int handle, void *buff,unsigned size)
   return ret;
 }
 
-int __FASTCALL__ __OsWrite(int handle,const void *buff,unsigned size)
+int __FASTCALL__ __OsWrite(bhandle_t handle,const void *buff,unsigned size)
 {
   ULONG ret;
   unsigned long rc;
@@ -199,7 +199,7 @@ int __FASTCALL__ __OsWrite(int handle,const void *buff,unsigned size)
   return ret;
 }
 
-__fileoff_t __FASTCALL__ __FileLength(int handle)
+__fileoff_t __FASTCALL__ __FileLength(bhandle_t handle)
 {
   long ret,spos;
   spos = __OsTell(handle);
@@ -208,11 +208,11 @@ __fileoff_t __FASTCALL__ __FileLength(int handle)
   return ret;
 }
 
-__fileoff_t __FASTCALL__ __OsTell(int handle) { return __OsSeek(handle,0L,SEEKF_CUR); }
+__fileoff_t __FASTCALL__ __OsTell(bhandle_t handle) { return __OsSeek(handle,0L,SEEKF_CUR); }
 
 tBool __FASTCALL__ __IsFileExists(const char *name)
 {
-   int handle = __OsOpen(name,FO_READONLY | SO_DENYNONE);
+   bhandle_t handle = __OsOpen(name,FO_READONLY | SO_DENYNONE);
    if(handle != -1) __OsClose(handle);
    return handle != -1;
 }
@@ -220,7 +220,7 @@ tBool __FASTCALL__ __IsFileExists(const char *name)
 tBool      __FASTCALL__ __OsGetFTime(const char *name,FTime *data)
 {
   tBool ret = False;
-  int handle;
+  bhandle_t handle;
   handle = __OsOpen(name,FO_READONLY);
   if(handle == -1) handle = __OsOpen(name,FO_READONLY | SO_DENYNONE);
   if(handle != -1)
@@ -260,7 +260,7 @@ tBool      __FASTCALL__ __OsGetFTime(const char *name,FTime *data)
 tBool      __FASTCALL__ __OsSetFTime(const char *name,const FTime *data)
 {
   tBool ret = False;
-  int handle;
+  bhandle_t handle;
   handle = __OsOpen(name,FO_READWRITE);
   if(handle == -1) handle = __OsOpen(name,FO_READWRITE | SO_DENYNONE);
   if(handle != -1)

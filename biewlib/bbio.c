@@ -360,7 +360,7 @@ BGLOBAL  __FASTCALL__ bioOpen(const char * fname,unsigned openmode,unsigned bSiz
    }
    if(!bFile->is_mmf)
    {
-     int handle = __OsOpen(fname,openmode);
+     bhandle_t handle = __OsOpen(fname,openmode);
      optimization = BIO_OPT_DB;
      if(handle == -1)
      {

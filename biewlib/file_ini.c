@@ -1435,7 +1435,7 @@ static int __NEAR__ __FASTCALL__ make_temp(const char *path,char *name_ptr)
 {
   char *fullname, *nptr;
   unsigned i,len;
-  int handle;
+  bhandle_t handle;
   fullname = PMalloc((strlen(path)+1)*2);
   if(!fullname) return -1;
   strcpy(fullname,path);

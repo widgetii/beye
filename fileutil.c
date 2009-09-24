@@ -305,7 +305,7 @@ static tBool FStore( void )
    if(!(flags & FSDLG_ASMMODE)) /** Write in binary mode */
    {
      BGLOBAL _bioHandle;
-     int handle;
+     bhandle_t handle;
      __filesize_t wsize,crpos,pwsize,awsize;
      unsigned rem;
      wsize = endpos - ff_startpos;
@@ -694,7 +694,7 @@ static tBool FRestore( void )
  if(GetFStoreDlg(" Restore information from file ",ff_fname,&flags,&ff_startpos,&ff_len,FILE_PRMT))
  {
    __filesize_t flen,lval;
-   int handle;
+   bhandle_t handle;
    BGLOBAL bHandle;
    char *fname;
    endpos = ff_startpos + ff_len;

@@ -69,10 +69,10 @@
 
 typedef struct
 {
-    tUInt32 ulFlags;
-    int      fhandle;
-    void *   pData;
-    tUInt32 ulSize;
+    tUInt32   ulFlags;
+    bhandle_t fhandle;
+    void *    pData;
+    tUInt32   ulSize;
 } MMFENTRY;
 
 typedef MMFENTRY* PMMF;
@@ -251,7 +251,7 @@ static int __FASTCALL__ DosReallocMMF(PMMF pMMF,unsigned long new_length)
 mmfHandle          __FASTCALL__ __mmfOpen(const char *fname,int mode)
 {
   tUInt32  flength;
-  int    fhandle;
+  bhandle_t  fhandle;
   void * pData = 0;
   PMMF   pMMF  = 0;
 
@@ -398,11 +398,11 @@ tBool             __FASTCALL__ __mmfIsWorkable( void ) { return True; }
 
 struct mmfRecord
 {
-   void *   addr;
-   long     length;
-   int      fhandle;
-   int      mode;
-   HANDLE   fmapping;
+   void *    addr;
+   long      length;
+   bhandle_t fhandle;
+   int       mode;
+   HANDLE    fmapping;
 };
 
 static int __FASTCALL__ mk_prot(int mode)
@@ -428,7 +428,7 @@ mmfHandle          __FASTCALL__ __mmfOpen(const char *fname,int mode)
 {
   struct mmfRecord *mret;
   __fileoff_t length;
-  int fhandle;
+  bhandle_t fhandle;
   fhandle = __OsOpen(fname,mode);
   if(fhandle != -1)
   {
