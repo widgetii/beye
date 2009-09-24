@@ -1216,6 +1216,12 @@ v5.0.2        ! Changes:
 6.0.0
 22 sep 2009   ! Changes:
                 + Initial x86_64 port
+6.0.1
+XX yyy 2009   ! Changes:
+                * Minor 64-bit OSes fixups
+                * Patch by Alexander Krisak (akrisak). Fixed a bug in parsing
+                  elf executables that have non standard size of Elf32_Shdr
+                  structure.
 []======================================================================[]
 []  Thank you for your interest.                                        []
 []  Nickols_K (http://my666.boom.ru/666_en.html).                       []
