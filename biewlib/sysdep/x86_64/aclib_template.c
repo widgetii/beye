@@ -104,7 +104,7 @@ static inline void * RENAME(fast_memcpy)(void * to, const void * from, size_t le
 	{
 	  register unsigned long int delta;
           /* Align destinition to cache-line size -boundary */
-          delta = ((unsigned long int)tto)&(CL_SIZE-1ULL);
+          delta = ((unsigned long long int)tto)&(CL_SIZE-1ULL);
           if(delta)
 	  {
 	    delta=CL_SIZE-delta;
@@ -124,7 +124,7 @@ static inline void * RENAME(fast_memcpy)(void * to, const void * from, size_t le
            perform reading and writing to be multiple to a number of
            processor's decoders, but it's not always possible.
         */
-	if(((unsigned long)cfrom) & 15)
+	if(((unsigned long long)cfrom) & 15)
 	/* if SRC is misaligned */
 	for(; i>0; i--)
 	{
@@ -257,7 +257,7 @@ static void * RENAME(fast_memset)(void * to, int val, size_t len)
 	if(len >= MIN_LEN)
 	{
 	  register unsigned long int delta;
-	  delta = ((unsigned long int)tto)&(XMMREG_SIZE-1);
+	  delta = ((unsigned long long int)tto)&(XMMREG_SIZE-1);
 	  if(delta)
 	  {
 	    delta=XMMREG_SIZE-delta;
@@ -294,17 +294,15 @@ static void * RENAME(fast_memset)(void * to, int val, size_t len)
 	return retval;
 }
 
-#undef HAVE_MMX
 #ifdef REGMM_SIZE
 #undef REGMM_SIZE
 #endif
-#define REGMM_SIZE 8 /* In the future it can be safety replaced with 16 for SSE2 */
+#define REGMM_SIZE 16
 static void __FASTCALL__ RENAME(InterleaveBuffers)(tUInt32 limit,
 				    void *destbuffer,
-				    const void *evenbuffer, 
+				    const void *evenbuffer,
 				    const void *oddbuffer)
 {
-#ifdef HAVE_MMX
   register char *destbuffptr;
   register const char *oddptr, *evenptr;
   register tUInt32 freq;
@@ -314,10 +312,10 @@ static void __FASTCALL__ RENAME(InterleaveBuffers)(tUInt32 limit,
   freq = 0;
   if(limit>REGMM_SIZE*4-1)
   {
-      register tUInt32 delta, nlimit, step;
+      register tUInt64 delta, nlimit, step;
       step = REGMM_SIZE*2;
       /* Try to align buffers on boundary of REGMM_SIZE */
-      delta = ((tUInt32)evenptr)&(REGMM_SIZE-1);
+      delta = ((tUInt64)evenptr)&(REGMM_SIZE-1);
       if(delta) delta=REGMM_SIZE-delta;
       nlimit=(limit-delta)/step;
       freq=delta+(nlimit*step);
@@ -331,28 +329,21 @@ static void __FASTCALL__ RENAME(InterleaveBuffers)(tUInt32 limit,
       while(nlimit)
       {
 	 /* Interleave mmx and cpu instructions */
-	 __asm __volatile("movq	(%0), %%mm0\n\t"
-	       "movq	8(%0), %%mm2\n\t"
+	 __asm __volatile("movdqa	(%0), %%xmm0\n\t"
 	       ::"r"(evenptr):"memory");
 	 evenptr+=step;
-	 __asm __volatile("movq	%%mm0, %%mm1\n\t"
-	       "movq	%%mm2, %%mm3\n\t"
-	       "punpckhbw (%0), %%mm0\n\t"	       
-	       "punpckhbw 8(%0), %%mm2\n\t"
+	 __asm __volatile("movdqa	%%xmm0, %%xmm1\n\t"
+	       "punpckhbw (%0), %%xmm0\n\t"	       
 	      ::"r"(oddptr):"memory");
 	 nlimit--;
-	 __asm __volatile("punpcklbw (%0), %%mm1\n\t"
-	       "punpcklbw 8(%0), %%mm3\n\t"
+	 __asm __volatile("punpcklbw (%0), %%xmm1\n\t"
 	       ::"r"(oddptr):"memory");
 	 oddptr+=step;
-	 __asm __volatile("movq	%%mm0, 8(%0)\n\t"
-	       "movq	%%mm1, (%0)\n\t"
-	       "movq	%%mm2, 24(%0)\n\t"
-	       "movq	%%mm3, 16(%0)"
+	 __asm __volatile("movdqu	%%xmm0, (%0)\n\t"
+	       "movdqu	%%xmm2, 16(%0)\n\t"
 	      ::"r"(destbuffptr):"memory");
 	 destbuffptr+=step*2;
       }
-      __asm __volatile("emms":::"memory");
   }
   /* If tail exists then finish it */
   while(freq<limit)
@@ -361,23 +352,12 @@ static void __FASTCALL__ RENAME(InterleaveBuffers)(tUInt32 limit,
     *destbuffptr++ = *oddptr++;
     freq++;
   }
-#else
-{
-  register size_t freq;
-  for(freq=0;freq<(size_t)limit;freq++)
-  {
-    ((char *)destbuffer)[freq+freq] = ((char *)evenbuffer)[freq];
-    ((char *)destbuffer)[freq+freq+1] = ((char *)oddbuffer)[freq];
-  }
-}
-#endif
 }
 
 static void __FASTCALL__ RENAME(CharsToShorts)(tUInt32 limit,
 					     void *destbuffer,
 					     const void *evenbuffer)
 {
-#ifdef HAVE_MMX
   register char *destbuffptr;
   register const char *evenptr;
   register tUInt32 freq;
@@ -386,10 +366,10 @@ static void __FASTCALL__ RENAME(CharsToShorts)(tUInt32 limit,
   freq = 0;
   if(limit>REGMM_SIZE*4-1)
   {
-      register tUInt32 delta, nlimit, step;
+      register tUInt64 delta, nlimit, step;
       step = REGMM_SIZE*2;
       /* Try to align buffer on boundary of REGMM_SIZE */
-      delta = ((tUInt32)evenptr)&(REGMM_SIZE-1);
+      delta = ((tUInt64)evenptr)&(REGMM_SIZE-1);
       if(delta) delta=REGMM_SIZE-delta;
       nlimit=(limit-delta)/step;
       freq=delta+(nlimit*step);
@@ -400,31 +380,25 @@ static void __FASTCALL__ RENAME(CharsToShorts)(tUInt32 limit,
 	delta--;
       }
       /* Perform MMX optimized loop */
-      __asm __volatile("pxor	%%mm7, %%mm7":::"memory");
+      __asm __volatile("pxor	%%xmm7, %%xmm7":::"memory");
       while(nlimit)
       {
 	 /* Interleave mmx and cpu instructions */
-	 __asm __volatile("movq	(%0),%%mm0\n\t"
-	       "movq	8(%0),%%mm2"
+	 __asm __volatile("movdqa	(%0),%%xmm0\n\t"
 	       ::"r"(evenptr):"memory");
 	 evenptr+=step;
-	 __asm __volatile("movq	%%mm0, %%mm1\n\t"
-	       "movq	%%mm2, %%mm3\n\t"
-	       "punpckhbw %%mm7, %%mm0\n\t"
-	       "punpckhbw %%mm7, %%mm2"
+	 __asm __volatile("movdqa	%%xmm0, %%xmm1\n\t"
+	       "punpckhbw %%xmm7, %%xmm0\n\t"
 	      :::"memory");
 	 nlimit--;
-	 __asm __volatile("punpcklbw %%mm7, %%mm1\n\t"
-	       "punpcklbw %%mm7, %%mm3"
+	 __asm __volatile(
+	       "punpcklbw %%xmm7, %%xmm1\n\t"
 	       :::"memory");
-	 __asm __volatile("movq	%%mm0, 8(%0)\n\t"
-	       "movq	%%mm1, (%0)\n\t"
-	       "movq	%%mm2, 24(%0)\n\t"
-	       "movq	%%mm3, 16(%0)"
+	 __asm __volatile("movdqu	%%xmm0, (%0)\n\t"
+	       "movdqu	%%xmm1, 16(%0)\n\t"
 	       ::"r"(destbuffptr):"memory");
 	 destbuffptr+=step*2;
       }
-      __asm __volatile("emms":::"memory");
   }
   /* If tail exists then finish it */
   while(freq<limit)
@@ -433,22 +407,11 @@ static void __FASTCALL__ RENAME(CharsToShorts)(tUInt32 limit,
     *destbuffptr++ = 0;
     freq++;
   }
-#else
-{
-  register size_t freq;
-  for(freq=0;freq<(size_t)limit;freq++)
-  {
-    ((char *)destbuffer)[freq+freq] = ((char *)evenbuffer)[freq];
-    ((char *)destbuffer)[freq+freq+1] = 0;
-  }
-}
-#endif
 }
 
 static void __FASTCALL__ RENAME(ShortsToChars)(tUInt32 limit,
 				     void * destbuffer, const void * srcbuffer)
 {
-#ifdef HAVE_MMX
   register char *destbuffptr;
   register const char *srcptr;
   register tUInt32 freq;
@@ -457,10 +420,10 @@ static void __FASTCALL__ RENAME(ShortsToChars)(tUInt32 limit,
   freq = 0;
   if(limit>REGMM_SIZE*4-1)
   {
-      tUInt32 delta, nlimit, step;
+      tUInt64 delta, nlimit, step;
       step = REGMM_SIZE*2;
       /* Try to align buffers on boundary of REGMM_SIZE */
-      delta=((tUInt32)destbuffptr)&(REGMM_SIZE-1);
+      delta=((tUInt64)destbuffptr)&(REGMM_SIZE-1);
       if(delta) delta=REGMM_SIZE-delta;
       nlimit=(limit-delta)/step;
       freq=delta+(nlimit*step);
@@ -474,20 +437,16 @@ static void __FASTCALL__ RENAME(ShortsToChars)(tUInt32 limit,
       while(nlimit)
       {
 	 /* Interleave mmx and cpu instructions */
-	 __asm __volatile("movq	(%0), %%mm0\n\t"
-	       "movq	8(%0), %%mm1\n\t"
+	 __asm __volatile("movdqu	(%0), %%xmm0\n\t"
 	       ::"r"(srcptr):"memory");
 	 nlimit--;
-	 __asm __volatile("packuswb (%0), %%mm0\n\t"
-	       "packuswb 8(%0), %%mm1"
+	 __asm __volatile("packuswb (%0), %%xmm0\n\t"
 	       ::"g"(&srcptr[REGMM_SIZE]):"memory");
 	 srcptr+=step*2;
-	 __asm __volatile("movq	%%mm0, (%0)\n\t"
-	       "movq	%%mm1, 8(%0)\n\t"
+	 __asm __volatile("movdqa	%%xmm0, (%0)\n\t"
 	       ::"r"(destbuffptr):"memory");
 	 destbuffptr+=step;
       }
-      __asm __volatile("emms":::"memory");
   }
   /* If tail exists then finish it */
   while(freq<limit)
@@ -496,13 +455,4 @@ static void __FASTCALL__ RENAME(ShortsToChars)(tUInt32 limit,
     srcptr+=2;
     freq++;
   }
-#else
-{
-  register size_t freq;
-  for(freq=0;freq<(size_t)limit;freq++)
-  {
-    ((char *)destbuffer)[freq] = ((char *)srcbuffer)[freq+freq];
-  }
-}
-#endif
 }
