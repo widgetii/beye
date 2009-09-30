@@ -1,17 +1,17 @@
  Help for modify mode 
-   In this mode you can modify any bites, but you can not insert or
-delete. This operations can be maden from %UFile utilities%u (%IShift-F10%i)
+   In this mode you can modify any bites, but you cannot insert or
+delete. This operations can be done from %UFile utilities%u (%IShift-F10%i)
 by %UChSize%u command or %UInsert/Delete%u block.
-   Also you can use simple cryptography:
+   Also you can use some simple cryptography:
    %IF3%i - InitXX (initialize cryptobyte)
-   %IF4%i - Perform Bitwise NOT operation under byte of file
-   %IF5%i - Perform Bitwise OR operation beetwen byte of file and cryptobyte.
-   %IF6%i - Perform Bitwise AND operation beetwen byte of file and cryptobyte.
-   %IF7%i - Perform Bitwise XOR operation beetwen byte of file and cryptobyte.
-   %IF8%i - Put cryptobyte instead byte of file.
+   %IF4%i - Perform Bitwise NOT operation on current byte.
+   %IF5%i - Perform Bitwise OR operation beetwen current byte and cryptobyte.
+   %IF6%i - Perform Bitwise AND operation beetwen current byte and cryptobyte.
+   %IF7%i - Perform Bitwise XOR operation beetwen current byte and cryptobyte.
+   %IF8%i - Replace current byte with cryptobyte.
    %IF9%i - Undo previous operation for current byte
    %IBackSpase%i - Undo previous operation for previous byte
    %IF10%i - Cancel all changes.
    %IF2%i - Save all changes to the file.
-All changes will displayed by red color and in title string you can view
+All changes will be displayed in red color. The title string will show the
 original value of current byte.

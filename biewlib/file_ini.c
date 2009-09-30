@@ -1618,7 +1618,7 @@ unsigned __FASTCALL__ iniReadProfileString(hIniProfile *ini,const char *section,
    return ret;
 }
 
-#define HINI_HEADER "; This file generated automatically by BIEWLIB.\n; WARNING: Any changes made by hands may be lost at following program start.\n"
+#define HINI_HEADER "; This file was generated automatically by BIEWLIB.\n; WARNING: Any changes made by hands may be lost the next time you run the program.\n"
 
 static FILE * __NEAR__ __FASTCALL__ __makeIni(hIniProfile *ini)
 {

@@ -592,11 +592,11 @@ static void CalculatorFunc(void)
   ewnd = WindowOpen(X1,Y1,X2,Y2,TWS_VISIBLE | TWS_CURSORABLE | TWS_NLSOEM);
   twSetColorAttr(dialog_cset.editor.active);
   twUseWin(wdlg);
-  twGotoXY(2,1); twPutS("Input integer expression :");
+  twGotoXY(2,1); twPutS("Input an integer expression :");
   twinDrawFrameAttr(1,3,78,7,TW_UP3D_FRAME,dialog_cset.main);
   twGotoXY(2,4); twPutS("Supported operators: + - * / ( ) % << >> & ^ | ~");
   twGotoXY(2,5); twPutS("Supported bases: 0x - hexadecimal, 0 - octal, 1b - binary, default - decimal");
-  twGotoXY(2,6); twPutS("Result has base of first operand");
+  twGotoXY(2,6); twPutS("Result has the base of the first operand");
   memset(estr,0,sizeof(estr));
   twShowWin(ewnd);
   twUseWin(ewnd);

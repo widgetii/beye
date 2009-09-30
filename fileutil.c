@@ -292,7 +292,7 @@ static tBool FStore( void )
  DumpMode = True;
  ff_startpos = BMGetCurrFilePos();
  if(!ff_len) ff_len = BMGetFLength() - ff_startpos;
- if(GetFStoreDlg(" Store information to file ",ff_fname,&flags,&ff_startpos,&ff_len,FILE_PRMT))
+ if(GetFStoreDlg(" Save information to file ",ff_fname,&flags,&ff_startpos,&ff_len,FILE_PRMT))
  {
   endpos = ff_startpos + ff_len;
   endpos = endpos > BMGetFLength() ? BMGetFLength() : endpos;
@@ -820,7 +820,7 @@ static tBool CryptBlock( void )
  if(!ff_len) ff_len = BMGetFLength() - ff_startpos;
  pass[0] = 0;
  flags = FSDLG_NOMODES;
- if(GetFStoreDlg(" (De)Crypt block of file ",pass,&flags,&ff_startpos,&ff_len,"Input password (WARNING! password will displayed):"))
+ if(GetFStoreDlg(" (De)Crypt block of file ",pass,&flags,&ff_startpos,&ff_len,"Input password (WARNING! password will be displayed):"))
  {
    __filesize_t flen,lval;
    endpos = ff_startpos + ff_len;

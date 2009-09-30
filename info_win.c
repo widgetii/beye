@@ -135,8 +135,8 @@ static const char * amenu_names[] =
 {
    "~Base",
    "~Alternative",
-   "~Format depended",
-   "~Mode depended"
+   "~Format-depended",
+   "~Mode-depended"
 };
 
 int MainActionFromMenu( void )
@@ -160,11 +160,11 @@ int MainActionFromMenu( void )
 		if(i!=-1) return KE_SHIFT_F(i+1);
 		break;
 	case 2:
-		i = SelBoxA(detectedFormat->prompt,10," Select format depended action: ",0);
+		i = SelBoxA(detectedFormat->prompt,10," Select format-depended action: ",0);
 		if(i!=-1) return KE_ALT_F(i+1);
 		break;
 	case 3:
-		i = SelBoxA(activeMode->prompt,10," Select mode depended action: ",0);
+		i = SelBoxA(activeMode->prompt,10," Select mode-depended action: ",0);
 		if(i!=-1) return KE_CTL_F(i+1);
 		break;
     }

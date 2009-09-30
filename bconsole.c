@@ -71,8 +71,8 @@ void __FASTCALL__ initBConsole( unsigned long vio_flg,unsigned long twin_flg )
     }
     done:
     twDestroy();
-    printm("Size of video buffer should be large than 79x2\n"
-           "But size of video buffer is: w=%u h=%u\n",tvioWidth,tvioHeight);
+    printm("Size of video buffer must be larger than 79x2\n"
+           "Current size of video buffer is: w=%u h=%u\n",tvioWidth,tvioHeight);
     exit(EXIT_FAILURE);
   }
 }

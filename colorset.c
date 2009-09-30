@@ -79,7 +79,7 @@ static ColorAttr __NEAR__ __FASTCALL__ getColorPairByName(const char *name, Colo
   if(!p)
   {
     *has_err = True;
-    strcpy(last_skin_error,"':' is lost");
+    strcpy(last_skin_error,"':' is missing");
     return defval;
   }
   *p = 0;

@@ -25,7 +25,7 @@ extern "C" {
 #include "biewlib/twin.h"
 #endif
 
-#define BIEW_HELP_VER "BIEW_HLP v5.6.0"
+#define BIEW_HELP_VER "BIEW_HLP v6.0.0"
 
 #define HLP_SLONG_LEN 9
 #define HLP_VER_LEN 16

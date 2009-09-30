@@ -1222,6 +1222,7 @@ XX yyy 2009   ! Changes:
                 * Patch by Alexander Krisak (akrisak). Fixed a bug in parsing
                   elf executables that have non standard size of Elf32_Shdr
                   structure.
+                * Some spelling mistakes corrected
 []======================================================================[]
 []  Thank you for your interest.                                        []
 []  Nickols_K (http://my666.boom.ru/666_en.html).                       []

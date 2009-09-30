@@ -292,7 +292,7 @@ static tBool __FASTCALL__ txtFiUserFunc1(IniInfo * info)
 	int found,softmode;
 	off = atol(info->item);
 	p = strstr(info->value,"-->");
-	if(!p) { ErrMessageBox("Missed separator in main context definition",NULL); return True; }
+	if(!p) { ErrMessageBox("Missing separator in main context definition",NULL); return True; }
 	*p=0;
 	softmode=0;
 	if(strcmp(info->subsection,"Soft")==0) softmode=1;
@@ -404,7 +404,7 @@ static tBool __FASTCALL__ txtFiUserFunc2(IniInfo * info)
        else syntax_hl.context=realloc(syntax_hl.context,sizeof(context_hl_t)*(syntax_hl.context_num+1));
        syntax_hl.context[syntax_hl.context_num].color=col;
        p=strstr(info->value,"...");
-       if(!p) { last_syntax_err="Missed separator in context definition"; return True; }
+       if(!p) { last_syntax_err="Missing separator in context definition"; return True; }
        *p=0;
        p+=3;
        unfmt_str(info->value);

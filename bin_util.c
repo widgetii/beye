@@ -239,7 +239,7 @@ static tBool __FASTCALL__ udnDeleteItem( void ) {
   int rval=-1;
   if(udn_list) {
     rval = fmtShowList(udnGetNumItems,udnReadItems,
-                    " User defined Names (aka bookmarks) ",
+                    " User-defined Names (aka bookmarks) ",
                     LB_SELECTIVE,NULL);
     if(rval!=-1) {
 	la_DeleteData(udn_list,rval);
@@ -255,7 +255,7 @@ tBool __FASTCALL__ udnSelectName(__filesize_t *off) {
   int rval=-1;
   if(udn_list) {
     rval = fmtShowList(udnGetNumItems,udnReadItems,
-                    " User defined Names (aka bookmarks) ",
+                    " User-defined Names (aka bookmarks) ",
                     LB_SELECTIVE,NULL);
     if(rval!=-1) *off = ((udn *)udn_list->data)[rval].offset;
   }
@@ -285,7 +285,7 @@ tBool __FASTCALL__ __udnSaveList( void )
     if(udn_list) {
 	FILE *out;
 	if((out = fopen(udn_fname,"wt"))!=NULL) {
-	    fprintf(out,"; This is automatically generated list of user defined names\n"
+	    fprintf(out,"; This is an automatically generated list of user-defined names\n"
 			"; for: %s\n"
 			"; by Biew-%s\n"
 			,BMName()
@@ -417,7 +417,7 @@ void __FASTCALL__ udnInit( hIniProfile *ini ) {
 void __FASTCALL__ udnTerm( hIniProfile *ini ) {
   if(udn_list) {
     if(udn_modified) {
-	WarnMessageBox("User defined list of names was not saved",NULL);
+	WarnMessageBox("User-defined list of names was not saved",NULL);
 	udnSaveList();
     }
     la_Destroy(udn_list);

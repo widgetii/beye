@@ -1,5 +1,5 @@
- Jump to 
-   This function allows to move within file on given offset.
+ Jump to
+   This function allows to move to a given offset within the file.
 Offset can be:
 
 %BAbsolute%b        - Given offset is treated as absolute offset from start

@@ -142,5 +142,5 @@ Key modifiers are mapped as:
         %ICTRL+S%i - SHIFT
 
     i.e. pressing %ICTRL+A%i in acts as holding down %UALT%u, and so on.
-    %ICTRL+Z%i resets modifiers to defaults. Modifiers are also reseted
+    %ICTRL+Z%i resets modifiers to defaults. Modifiers are also reset
     after any function key is pressed.

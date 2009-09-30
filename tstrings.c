@@ -22,8 +22,8 @@ const char msgAboutText[] =
 "  Multiplatform portable Binary file vIEWer\n"
 " with built-in x86/i386/Amd64(sse4), Java, AVR\n"
 "  ARM/XScale, PPC-64 disassemblers and editor\n"
-"for bin-hex-disas modes. Hilights opcodes and\n"
-"   supports multiple executable structures.\n";
+"for bin-hex-disas modes. Highlights opcodes\n"
+"and supports multiple executable structures.\n";
 const char * BiewPicture[] = {
  "‹‹‹‹  ‹‹‹ ‹‹‹‹ ‹‹‹   ‹‹‹",
  " ‹  ‹  ‹  ‹  ‹  ‹     ‹",
@@ -197,6 +197,6 @@ const char WRITE_FAIL[]=       " Can't write into file ";
 const char OPEN_FAIL[]=        " Can't open file ";
 const char DUP_FAIL[]=         " Can't dup file ";
 const char RESIZE_FAIL[]=      " Can't change size of file ";
-const char EXPAND_FAIL[]=      " Can't expand of file ";
+const char EXPAND_FAIL[]=      " Can't expand file ";
 const char TRUNC_FAIL[]=       " Can't truncate file ";
 const char NOTHING_EDIT[]=     " Can't edit zero file ";
