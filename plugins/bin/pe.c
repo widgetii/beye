@@ -543,15 +543,15 @@ static __filesize_t addr_shift_pe = 0L;
 static unsigned __FASTCALL__ GetImpCountPE(BGLOBAL handle)
 {
  unsigned count;
- unsigned long Hint;
+ tUInt64 Hint;
  count = 0;
  if(addr_shift_pe)
  {
    bioSeek(handle,addr_shift_pe,SEEKF_START);
    while(1)
    {
-     Hint = bioReadDWord(handle);
-     if(Hint == 0L || count > 0xFFFD || IsKbdTerminate() || bioEOF(handle)) break;
+     Hint = is_64bit ? bioReadQWord(handle):bioReadDWord(handle);
+     if(Hint == 0ULL || count > 0xFFFD || IsKbdTerminate() || bioEOF(handle)) break;
      count++;
    }
  }
@@ -561,7 +561,8 @@ static unsigned __FASTCALL__ GetImpCountPE(BGLOBAL handle)
 static tBool __FASTCALL__  __ReadImpContPE(BGLOBAL handle,memArray * obj,unsigned nnames)
 {
   unsigned i,VA;
-  unsigned long Hint;
+  tUInt64 Hint;
+  int cond;
   __filesize_t rphys;
   bioSeek(handle,addr_shift_pe,SEEKF_START);
   VA = pePA2VA(addr_shift_pe);
@@ -571,10 +572,13 @@ static tBool __FASTCALL__  __ReadImpContPE(BGLOBAL handle,memArray * obj,unsigne
     tBool is_eof;
     sprintf(stmp,".%08X: ", VA);
     VA += 4;
-    Hint = bioReadDWord(handle);
-    if(!(Hint & 0x80000000UL))
+    Hint = is_64bit?bioReadQWord(handle):bioReadDWord(handle);
+    cond=0;
+    if(is_64bit) { if(Hint & 0x8000000000000000ULL) cond = 1; }
+    else         { if(Hint & 0x0000000080000000ULL) cond = 1; }
+    if(!cond)
     {
-      rphys = RVA2Phys(Hint & 0x7FFFFFFFUL);
+      rphys = RVA2Phys(is_64bit?(Hint&0x7FFFFFFFFFFFFFFFULL):(Hint&0x7FFFFFFFUL));
       if(rphys > bmGetFLength() || bioEOF(handle))
       {
         if(!ma_AddString(obj,CORRUPT_BIN_MSG,True)) break;
@@ -589,7 +593,8 @@ static tBool __FASTCALL__  __ReadImpContPE(BGLOBAL handle,memArray * obj,unsigne
     else
     {
       char tmp[80];
-      sprintf(tmp,"< By ordinal >   @%lu",Hint & 0x7FFFFFFFUL);
+      if(is_64bit) sprintf(tmp,"< By ordinal >   @%llu",Hint & 0x7FFFFFFFFFFFFFFFULL);
+      else         sprintf(tmp,"< By ordinal >   @%lu" ,(tUInt32)(Hint & 0x7FFFFFFFUL));
       strcat(stmp,tmp);
     }
     is_eof = bioEOF(handle);
@@ -826,14 +831,14 @@ static __filesize_t __FASTCALL__ ShowPERVAs( void )
 
 typedef struct tagRELOC_PE
 {
-  unsigned long modidx;
+  tUInt64 modidx;
   union
   {
-    unsigned long funcidx; /** if modidx != -1 */
-    unsigned long type;    /** if modidx == -1 */
+    tUInt64 funcidx; /** if modidx != -1 */
+    tUInt64 type;    /** if modidx == -1 */
   }import;
-  unsigned long laddr; /** lookup addr */
-  unsigned long reserved;
+  tUInt64 laddr; /** lookup addr */
+  tUInt64 reserved;
 }RELOC_PE;
 
 static linearArray *CurrPEChain = NULL;
@@ -843,7 +848,7 @@ static tCompare __FASTCALL__ compare_pe_reloc_s(const void __HUGE__ *e1,const vo
   const RELOC_PE __HUGE__ *p1,__HUGE__ *p2;
   p1 = (const RELOC_PE __HUGE__ *)e1;
   p2 = (const RELOC_PE __HUGE__ *)e2;
-  return __CmpLong__(p1->laddr,p2->laddr);
+  return ((p1->laddr) < (p2->laddr) ? -1 : (p1->laddr) > (p2->laddr) ? 1 : 0);
 }
 
 static void __NEAR__ __FASTCALL__ BuildPERefChain( void )
@@ -896,7 +901,7 @@ static void __NEAR__ __FASTCALL__ BuildPERefChain( void )
       is_eof = False;
       while(1)
       {
-        Hint = bioReadDWord(handle);
+        Hint = is_64bit?bioReadQWord(handle):bioReadDWord(handle);
         is_eof = bioEOF(handle);
         if(!Hint || IsKbdTerminate() || is_eof) break;
         rel.modidx = i;
@@ -931,7 +936,7 @@ static void __NEAR__ __FASTCALL__ BuildPERefChain( void )
         typeoff = bioReadWord(handle);
         is_eof = bioEOF(handle);
         if(IsKbdTerminate() || is_eof) break;
-        rel.modidx = ULONG_MAX;
+        rel.modidx = UINT64_MAX;
         rel.import.type = typeoff >> 12;
         rel.laddr = physoff + (typeoff & 0x0FFF);
         if(!la_AddData(CurrPEChain,&rel,MemOutBox)) goto bye;
@@ -956,7 +961,8 @@ static __filesize_t __NEAR__ __FASTCALL__ BuildReferStrPE(char *str,RELOC_PE __H
 {
    BGLOBAL handle,handle2,handle3;
    __filesize_t phys,rva,retrf;
-   unsigned long magic,Hint;
+   unsigned long magic;
+   tUInt64 Hint;
    ImportDirPE ipe;
    char buff[400];
    handle = pe_cache;
@@ -966,7 +972,7 @@ static __filesize_t __NEAR__ __FASTCALL__ BuildReferStrPE(char *str,RELOC_PE __H
    bioSeek(handle,phys + 20L*rpe->modidx,SEEKF_START);
    rva = fioReadDWord(handle,12L,SEEKF_CUR);
    retrf = RAPREF_DONE;
-   if(rpe->modidx != 0xFFFFFFFFUL)
+   if(rpe->modidx != UINT64_MAX)
    {
      char *is_ext;
      if(flags & APREF_USE_TYPE) strcat(str," off32");
@@ -994,17 +1000,25 @@ static __filesize_t __NEAR__ __FASTCALL__ BuildReferStrPE(char *str,RELOC_PE __H
      magic = magic ? RVA2Phys(magic) : magic;
      if(magic)
      {
+       int cond;
        bioSeek(handle,magic + rpe->import.funcidx*sizeof(long),SEEKF_START);
-       Hint = bioReadDWord(handle);
-       if(Hint & 0x80000000UL)
+       Hint = is_64bit?bioReadQWord(handle):bioReadDWord(handle);
+       cond=0;
+       if(is_64bit) { if(Hint & 0x8000000000000000ULL) cond=1; }
+       else         { if(Hint & 0x80000000UL) cond=1; }
+       if(cond)
        {
+         /* TODO: is really to have ORDINAL > 0x7fffffff ? */
          char dig[15];
          sprintf(dig,"@%lu",Hint & 0x7FFFFFFFUL);
          strcat(str,dig);
        }
        else
        {
-         phys = RVA2Phys(Hint & 0x7FFFFFFFUL);
+         tUInt64 hint_off;
+         if(is_64bit) hint_off=Hint & 0x7FFFFFFFFFFFFFFFULL;
+         else         hint_off=Hint & 0x7FFFFFFFUL;
+         phys = RVA2Phys(hint_off);
          if(phys > bmGetFLength()) strcat(str,"???");
          else
          {
