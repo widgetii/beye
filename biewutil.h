@@ -97,8 +97,8 @@ extern void   About( void );
 
 extern __filesize_t __FASTCALL__ WhereAMI(__filesize_t ctrl_pos);
 
-#define RAPREF_NONE            0 /**< means reference is not appended */
-#define RAPREF_DONE    ULONG_MAX /**< means reference is appended */
+#define RAPREF_NONE            0  /**< means reference is not appended */
+#define RAPREF_DONE    UINT32_MAX /**< means reference is appended */
 
                    /** Appends disassembler reference to string.
                      * @param str          string buffer for append to

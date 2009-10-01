@@ -393,9 +393,9 @@ if test "$_target_arch" = auto ; then
 else
   host_arch=$_target_arch
 fi
-
 echores "$host_arch"
 
+echocheck "build"
 build_arch=generic
 x86     && build_arch=ia32
 x86_64  && build_arch=x86_64

@@ -1066,7 +1066,7 @@ int __FASTCALL__ disAppendDigits(char *str,__filesize_t ulShift,int flags,
                                             ,((unsigned char *)defval)[6]
                                             ,((unsigned char *)defval)[7]);
                          break;
-      case DISARG_LONG:  appstr = Get8SignDig(*(long *)defval);
+      case DISARG_LONG:  appstr = Get8SignDig(*(tInt32 *)defval);
                          if(type & DISARG_IMM &&
                             disNeedRef >= NEEDREF_PREDICT &&
                             dis_severity < DISCOMSEV_STRING &&
@@ -1080,7 +1080,7 @@ int __FASTCALL__ disAppendDigits(char *str,__filesize_t ulShift,int flags,
                                             ,((unsigned char *)defval)[2]
                                             ,((unsigned char *)defval)[3]);
                          break;
-      case DISARG_SHORT: appstr = Get4SignDig(*(short *)defval);
+      case DISARG_SHORT: appstr = Get4SignDig(*(tInt16 *)defval);
                          if(type & DISARG_IMM &&
                             disNeedRef >= NEEDREF_PREDICT &&
                             dis_severity < DISCOMSEV_STRING &&
@@ -1104,7 +1104,7 @@ int __FASTCALL__ disAppendDigits(char *str,__filesize_t ulShift,int flags,
                             isprint(*(unsigned char *)defval))
                             sprintf(comments,"'%c'",*(unsigned char *)defval);
                          break;
-      case DISARG_WORD:  appstr = Get4Digit(*(unsigned short *)defval);
+      case DISARG_WORD:  appstr = Get4Digit(*(tUInt16 *)defval);
                          if(type & DISARG_IMM &&
                             disNeedRef >= NEEDREF_PREDICT &&
                             dis_severity < DISCOMSEV_STRING &&
@@ -1115,7 +1115,7 @@ int __FASTCALL__ disAppendDigits(char *str,__filesize_t ulShift,int flags,
                                             ,((unsigned char *)defval)[1]);
                          break;
       default:
-      case DISARG_DWORD: appstr = Get8Digit(*(unsigned long *)defval);
+      case DISARG_DWORD: appstr = Get8Digit(*(tUInt32 *)defval);
                          if(type & DISARG_IMM &&
                             disNeedRef >= NEEDREF_PREDICT &&
                             dis_severity < DISCOMSEV_STRING &&

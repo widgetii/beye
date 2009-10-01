@@ -285,8 +285,8 @@ void __FASTCALL__ ix86_ArgFar(char * str,ix86Param *DisP)
   unsigned short seg = 0;
   if(!((DisP->flags & __DISF_SIZEONLY) == __DISF_SIZEONLY))
   {
-    seg = Use32Data ? *((short  *)(&DisP->RealCmd[5])) : *((short  *)(&DisP->RealCmd[3]));
-    off = Use32Data ? *((long  *)(&DisP->RealCmd[1])) : (long)(*((short  *)(&DisP->RealCmd[1])));
+    seg = Use32Data ? *((tInt16  *)(&DisP->RealCmd[5])) : *((tInt16  *)(&DisP->RealCmd[3]));
+    off = Use32Data ? *((tInt32  *)(&DisP->RealCmd[1])) : (tInt32)(*((tInt16  *)(&DisP->RealCmd[1])));
     newpos = ((long)(seg) << 4) + off; /* It is computing of x86 real-mode address */
   }
   DisP->codelen += Use32Data ? 6 : 4;
@@ -301,8 +301,8 @@ void __FASTCALL__ ix86_ArgNear(char * str,ix86Param *DisP)
   unsigned long newpos;
   unsigned modifier;
   if(!((DisP->flags & __DISF_SIZEONLY) == __DISF_SIZEONLY))
-    lshift = Use32Data ? *((long  *)(&DisP->RealCmd[1])) :
-                         (long)(*((short  *)(&DisP->RealCmd[1])));
+    lshift = Use32Data ? (long)(*((tInt32  *)(&DisP->RealCmd[1]))) :
+                         (long)(*((tInt16  *)(&DisP->RealCmd[1])));
 #if 0
 /*
 In 64-bit mode, the operand size defaults to 64 bits. The processor sign-extends
