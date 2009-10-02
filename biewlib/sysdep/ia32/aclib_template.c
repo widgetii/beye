@@ -215,65 +215,66 @@ static void * RENAME(fast_memcpy)(void * to, const void * from, size_t len)
 
 	// Pure Assembly cuz gcc is a bit unpredictable ;)
 	if(i>=BLOCK_SIZE/64)
+	{
+	unsigned dummy1,dummy2;
 		asm volatile(
-			"xorl %%eax, %%eax	\n\t"
+			"xorl %6, %6	\n\t"
 			".balign 16		\n\t"
 			"1:			\n\t"
-				"movl (%0, %%eax), %%ebx 	\n\t"
-				"movl 32(%0, %%eax), %%ebx 	\n\t"
-				"movl 64(%0, %%eax), %%ebx 	\n\t"
-				"movl 96(%0, %%eax), %%ebx 	\n\t"
-				"addl $128, %%eax		\n\t"
-				"cmpl %3, %%eax			\n\t"
+				"movl (%0, %6), %7 	\n\t"
+				"movl 32(%0, %6), %7 	\n\t"
+				"movl 64(%0, %6), %7 	\n\t"
+				"movl 96(%0, %6), %7 	\n\t"
+				"addl $128, %6		\n\t"
+				"cmpl %3, %6			\n\t"
 				" jb 1b				\n\t"
 
-			"xorl %%eax, %%eax	\n\t"
+			"xorl %6, %6	\n\t"
 
 				".balign 16		\n\t"
 				"2:			\n\t"
-				"movq (%0, %%eax), %%mm0\n"
-				"movq 8(%0, %%eax), %%mm1\n"
-				"movq 16(%0, %%eax), %%mm2\n"
-				"movq 24(%0, %%eax), %%mm3\n"
-				"movq 32(%0, %%eax), %%mm4\n"
-				"movq 40(%0, %%eax), %%mm5\n"
-				"movq 48(%0, %%eax), %%mm6\n"
-				"movq 56(%0, %%eax), %%mm7\n"
-				MOVNTQ" %%mm0, (%1, %%eax)\n"
-				MOVNTQ" %%mm1, 8(%1, %%eax)\n"
-				MOVNTQ" %%mm2, 16(%1, %%eax)\n"
-				MOVNTQ" %%mm3, 24(%1, %%eax)\n"
-				MOVNTQ" %%mm4, 32(%1, %%eax)\n"
-				MOVNTQ" %%mm5, 40(%1, %%eax)\n"
-				MOVNTQ" %%mm6, 48(%1, %%eax)\n"
-				MOVNTQ" %%mm7, 56(%1, %%eax)\n"
-				"addl $64, %%eax		\n\t"
-				"cmpl %3, %%eax		\n\t"
+				"movq (%0, %6), %%mm0\n"
+				"movq 8(%0, %6), %%mm1\n"
+				"movq 16(%0, %6), %%mm2\n"
+				"movq 24(%0, %6), %%mm3\n"
+				"movq 32(%0, %6), %%mm4\n"
+				"movq 40(%0, %6), %%mm5\n"
+				"movq 48(%0, %6), %%mm6\n"
+				"movq 56(%0, %6), %%mm7\n"
+				MOVNTQ" %%mm0, (%1, %6)\n"
+				MOVNTQ" %%mm1, 8(%1, %6)\n"
+				MOVNTQ" %%mm2, 16(%1, %6)\n"
+				MOVNTQ" %%mm3, 24(%1, %6)\n"
+				MOVNTQ" %%mm4, 32(%1, %6)\n"
+				MOVNTQ" %%mm5, 40(%1, %6)\n"
+				MOVNTQ" %%mm6, 48(%1, %6)\n"
+				MOVNTQ" %%mm7, 56(%1, %6)\n"
+				"addl $64, %6		\n\t"
+				"cmpl %3, %6		\n\t"
 				"jb 2b				\n\t"
 
 #if CONFUSION_FACTOR > 0
 	// a few percent speedup on out of order executing CPUs
-			"movl %5, %%eax		\n\t"
+			"movl %5, %6		\n\t"
 				"2:			\n\t"
-				"movl (%0), %%ebx	\n\t"
-				"movl (%0), %%ebx	\n\t"
-				"movl (%0), %%ebx	\n\t"
-				"movl (%0), %%ebx	\n\t"
-				"decl %%eax		\n\t"
+				"movl (%0), %7	\n\t"
+				"movl (%0), %7	\n\t"
+				"movl (%0), %7	\n\t"
+				"movl (%0), %7	\n\t"
+				"decl %6		\n\t"
 				" jnz 2b		\n\t"
 #endif
 
-			"xorl %%eax, %%eax	\n\t"
+			"xorl %6, %6	\n\t"
 			"addl %3, %0		\n\t"
 			"addl %3, %1		\n\t"
 			"subl %4, %2		\n\t"
 			"cmpl %4, %2		\n\t"
 			" jae 1b		\n\t"
 				: "+r" (from), "+r" (to), "+r" (i)
-				: "r" (BLOCK_SIZE), "i" (BLOCK_SIZE/64), "i" (CONFUSION_FACTOR)
-				: "%eax", "%ebx"
-		);
-
+				: "r" (BLOCK_SIZE), "i" (BLOCK_SIZE/64), "i" (CONFUSION_FACTOR),
+				  "r" (dummy1), "r"(dummy2));
+	}
 	for(; i>0; i--)
 	{
 		__asm__ __volatile__ (
