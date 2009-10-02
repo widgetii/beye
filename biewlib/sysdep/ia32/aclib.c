@@ -26,12 +26,6 @@
 #include "biewlib/sysdep/ia32/fastcopy.h"
 #include "biewlib/sysdep/ia32/stdint.h"
 #include "biewlib/sysdep/ia32/_inlines.h"
-#define BLOCK_SIZE 4096
-#define CONFUSION_FACTOR 0
-//Feel free to fine-tune the above 2, it might be possible to get some speedup with them :)
-
-//#define STATISTICS
-
 #ifdef	CAN_COMPILE_X86_GAS
 #define CAN_COMPILE_X86_ASM
 #endif
@@ -134,6 +128,7 @@ static void GetCpuCaps( void ) {}
 //MMX versions
 #undef RENAME
 #define HAVE_MMX
+#define HAVE_MMX1
 #undef HAVE_MMX2
 #undef HAVE_3DNOW
 #define RENAME(a) a ## _MMX
@@ -143,7 +138,6 @@ static void GetCpuCaps( void ) {}
 #include "biewlib/sysdep/ia32/aclib_template.c"
 #endif
 
-#if 0 /* TODO: better detection of gas possibilities */
 //MMX2 versions
 #undef RENAME
 #define HAVE_MMX
@@ -156,27 +150,13 @@ static void GetCpuCaps( void ) {}
 #include "biewlib/sysdep/ia32/aclib_template.c"
 #endif
 
-//3DNOW versions
-#undef RENAME
-#define HAVE_MMX
-#undef HAVE_MMX2
-#define HAVE_3DNOW
-#define RENAME(a) a ## _3DNow
-#ifdef __MSDOS__
-#include "biewlib/sysdep/ia32/aclib_~1.c"
-#else
-#include "biewlib/sysdep/ia32/aclib_template.c"
 #endif
-#endif
-
-#endif // CAN_COMPILE_X86_ASM
-
 static void * init_fast_memcpy(void * to, const void * from, size_t len)
 {
 #ifdef CAN_COMPILE_X86_ASM
 	/* ordered per speed fastest first */
 	if(!_mmx_inited) GetCpuCaps();
-//	if(__mmx_caps & USE_MMX2)	fast_memcpy_ptr = fast_memcpy_MMX2;
+	if(__mmx_caps & USE_MMX2)	fast_memcpy_ptr = fast_memcpy_MMX2;
 //	else if(__mmx_caps & USE_3DNOW)	fast_memcpy_ptr = fast_memcpy_3DNow;
 	else if(__mmx_caps & USE_MMX)	fast_memcpy_ptr = fast_memcpy_MMX;
 	else
@@ -191,7 +171,7 @@ static void * init_fast_memset(void * to, int filler, size_t len)
 #ifdef CAN_COMPILE_X86_ASM
 	/* ordered per speed fastest first */
 	if(!_mmx_inited) GetCpuCaps();
-//	if(__mmx_caps & USE_MMX2)	fast_memset_ptr = fast_memset_MMX2;
+	if(__mmx_caps & USE_MMX2)	fast_memset_ptr = fast_memset_MMX2;
 //	else if(__mmx_caps & USE_3DNOW)	fast_memset_ptr = fast_memset_3DNow;
 	else if(__mmx_caps & USE_MMX)	fast_memset_ptr = fast_memset_MMX;
 	else
@@ -209,7 +189,7 @@ static void __FASTCALL__ init_InterleaveBuffers(tUInt32 limit,
 #ifdef CAN_COMPILE_X86_ASM
 	/* ordered per speed fastest first */
 	if(!_mmx_inited) GetCpuCaps();
-//	if(__mmx_caps & USE_MMX2)	InterleaveBuffers_ptr = InterleaveBuffers_MMX2;
+	if(__mmx_caps & USE_MMX2)	InterleaveBuffers_ptr = InterleaveBuffers_MMX2;
 //	else if(__mmx_caps & USE_3DNOW)	InterleaveBuffers_ptr = InterleaveBuffers_3DNow;
 	else if(__mmx_caps & USE_MMX)	InterleaveBuffers_ptr = InterleaveBuffers_MMX;
 	else
@@ -230,7 +210,7 @@ static void __FASTCALL__ init_CharsToShorts(tUInt32 limit,
 #ifdef CAN_COMPILE_X86_ASM
 	/* ordered per speed fastest first */
 	if(!_mmx_inited) GetCpuCaps();
-//	if(__mmx_caps & USE_MMX2)	CharsToShorts_ptr = CharsToShorts_MMX2;
+	if(__mmx_caps & USE_MMX2)	CharsToShorts_ptr = CharsToShorts_MMX2;
 //	else if(__mmx_caps & USE_3DNOW)	CharsToShorts_ptr = CharsToShorts_3DNow;
 	else if(__mmx_caps & USE_MMX)	CharsToShorts_ptr = CharsToShorts_MMX;
 	else
@@ -250,7 +230,7 @@ static void __FASTCALL__ init_ShortsToChars(tUInt32 limit,
 #ifdef CAN_COMPILE_X86_ASM
 	/* ordered per speed fastest first */
 	if(!_mmx_inited) GetCpuCaps();
-//	if(__mmx_caps & USE_MMX2)	ShortsToChars_ptr = ShortsToChars_MMX2;
+	if(__mmx_caps & USE_MMX2)	ShortsToChars_ptr = ShortsToChars_MMX2;
 //	else if(__mmx_caps & USE_3DNOW)	ShortsToChars_ptr = ShortsToChars_3DNow;
 	else if(__mmx_caps & USE_MMX)	ShortsToChars_ptr = ShortsToChars_MMX;
 	else

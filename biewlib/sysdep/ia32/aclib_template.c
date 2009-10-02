@@ -98,19 +98,6 @@ static void * RENAME(fast_memcpy)(void * to, const void * from, size_t len)
 	void *retval;
 	size_t i;
 	retval = to;
-#ifdef STATISTICS
-	{
-		static int freq[33];
-		static int t=0;
-		int i;
-		for(i=0; len>(1<<i); i++);
-		freq[i]++;
-		t++;
-		if(1024*1024*1024 % t == 0)
-			for(i=0; i<32; i++)
-				MSG_V("freq < %8d %4d\n", 1<<i, freq[i]);
-	}
-#endif
 #ifndef HAVE_MMX1
 	/* PREFETCH has effect even for MOVSB instruction ;) */
 	__asm__ __volatile__ (
@@ -134,59 +121,9 @@ static void * RENAME(fast_memcpy)(void * to, const void * from, size_t len)
 	  }
 	  i = len >> 6; /* len/64 */
 	  len&=63;
-	/*
-	   This algorithm is top effective when the code consequently
-	   reads and writes blocks which have size of cache line.
-	   Size of cache line is processor-dependent.
-	   It will, however, be a minimum of 32 bytes on any processors.
-	   It would be better to have a number of instructions which
-	   perform reading and writing to be multiple to a number of
-	   processor's decoders, but it's not always possible.
-	*/
-#ifdef HAVE_SSE /* Only P3 (may be Cyrix3) */
-	if(((unsigned long)from) & 15)
-	/* if SRC is misaligned */
-	for(; i>0; i--)
-	{
-		__asm__ __volatile__ (
-		PREFETCH" 320(%0)\n"
-		"movups (%0), %%xmm0\n"
-		"movups 16(%0), %%xmm1\n"
-		"movups 32(%0), %%xmm2\n"
-		"movups 48(%0), %%xmm3\n"
-		"movntps %%xmm0, (%1)\n"
-		"movntps %%xmm1, 16(%1)\n"
-		"movntps %%xmm2, 32(%1)\n"
-		"movntps %%xmm3, 48(%1)\n"
-		:: "r" (from), "r" (to) : "memory");
-		((const unsigned char *)from)+=64;
-		((unsigned char *)to)+=64;
-	}
-	else
-	/*
-	   Only if SRC is aligned on 16-byte boundary.
-	   It allows to use movaps instead of movups, which required data
-	   to be aligned or a general-protection exception (#GP) is generated.
-	*/
-	for(; i>0; i--)
-	{
-		__asm__ __volatile__ (
-		PREFETCH" 320(%0)\n"
-		"movaps (%0), %%xmm0\n"
-		"movaps 16(%0), %%xmm1\n"
-		"movaps 32(%0), %%xmm2\n"
-		"movaps 48(%0), %%xmm3\n"
-		"movntps %%xmm0, (%1)\n"
-		"movntps %%xmm1, 16(%1)\n"
-		"movntps %%xmm2, 32(%1)\n"
-		"movntps %%xmm3, 48(%1)\n"
-		:: "r" (from), "r" (to) : "memory");
-		((const unsigned char *)from)+=64;
-		((unsigned char *)to)+=64;
-	}
-#else
+	if(i) {
 	// Align destination at BLOCK_SIZE boundary
-	for(; ((int)to & (BLOCK_SIZE-1)) && i>0; i--)
+	for(; i>0;i--)
 	{
 		__asm__ __volatile__ (
 #ifndef HAVE_MMX1
@@ -212,106 +149,14 @@ static void * RENAME(fast_memcpy)(void * to, const void * from, size_t len)
 		from+=64;
 		to+=64;
 	}
-
-	// Pure Assembly cuz gcc is a bit unpredictable ;)
-	if(i>=BLOCK_SIZE/64)
-	{
-	unsigned dummy1,dummy2;
-		asm volatile(
-			"xorl %6, %6	\n\t"
-			".balign 16		\n\t"
-			"1:			\n\t"
-				"movl (%0, %6), %7 	\n\t"
-				"movl 32(%0, %6), %7 	\n\t"
-				"movl 64(%0, %6), %7 	\n\t"
-				"movl 96(%0, %6), %7 	\n\t"
-				"addl $128, %6		\n\t"
-				"cmpl %3, %6			\n\t"
-				" jb 1b				\n\t"
-
-			"xorl %6, %6	\n\t"
-
-				".balign 16		\n\t"
-				"2:			\n\t"
-				"movq (%0, %6), %%mm0\n"
-				"movq 8(%0, %6), %%mm1\n"
-				"movq 16(%0, %6), %%mm2\n"
-				"movq 24(%0, %6), %%mm3\n"
-				"movq 32(%0, %6), %%mm4\n"
-				"movq 40(%0, %6), %%mm5\n"
-				"movq 48(%0, %6), %%mm6\n"
-				"movq 56(%0, %6), %%mm7\n"
-				MOVNTQ" %%mm0, (%1, %6)\n"
-				MOVNTQ" %%mm1, 8(%1, %6)\n"
-				MOVNTQ" %%mm2, 16(%1, %6)\n"
-				MOVNTQ" %%mm3, 24(%1, %6)\n"
-				MOVNTQ" %%mm4, 32(%1, %6)\n"
-				MOVNTQ" %%mm5, 40(%1, %6)\n"
-				MOVNTQ" %%mm6, 48(%1, %6)\n"
-				MOVNTQ" %%mm7, 56(%1, %6)\n"
-				"addl $64, %6		\n\t"
-				"cmpl %3, %6		\n\t"
-				"jb 2b				\n\t"
-
-#if CONFUSION_FACTOR > 0
-	// a few percent speedup on out of order executing CPUs
-			"movl %5, %6		\n\t"
-				"2:			\n\t"
-				"movl (%0), %7	\n\t"
-				"movl (%0), %7	\n\t"
-				"movl (%0), %7	\n\t"
-				"movl (%0), %7	\n\t"
-				"decl %6		\n\t"
-				" jnz 2b		\n\t"
-#endif
-
-			"xorl %6, %6	\n\t"
-			"addl %3, %0		\n\t"
-			"addl %3, %1		\n\t"
-			"subl %4, %2		\n\t"
-			"cmpl %4, %2		\n\t"
-			" jae 1b		\n\t"
-				: "+r" (from), "+r" (to), "+r" (i)
-				: "r" (BLOCK_SIZE), "i" (BLOCK_SIZE/64), "i" (CONFUSION_FACTOR),
-				  "r" (dummy1), "r"(dummy2));
 	}
-	for(; i>0; i--)
-	{
-		__asm__ __volatile__ (
-#ifndef HAVE_MMX1
-		PREFETCH" 320(%0)\n"
-#endif
-		"movq (%0), %%mm0\n"
-		"movq 8(%0), %%mm1\n"
-		"movq 16(%0), %%mm2\n"
-		"movq 24(%0), %%mm3\n"
-		"movq 32(%0), %%mm4\n"
-		"movq 40(%0), %%mm5\n"
-		"movq 48(%0), %%mm6\n"
-		"movq 56(%0), %%mm7\n"
-		MOVNTQ" %%mm0, (%1)\n"
-		MOVNTQ" %%mm1, 8(%1)\n"
-		MOVNTQ" %%mm2, 16(%1)\n"
-		MOVNTQ" %%mm3, 24(%1)\n"
-		MOVNTQ" %%mm4, 32(%1)\n"
-		MOVNTQ" %%mm5, 40(%1)\n"
-		MOVNTQ" %%mm6, 48(%1)\n"
-		MOVNTQ" %%mm7, 56(%1)\n"
-		:: "r" (from), "r" (to) : "memory");
-		from+=64;
-		to+=64;
-	}
-
-#endif /* Have SSE */
 #ifdef HAVE_MMX2
 		/* since movntq is weakly-ordered, a "sfence"
 		 * is needed to become ordered again. */
 		__asm__ __volatile__ ("sfence":::"memory");
 #endif
-#ifndef HAVE_SSE
 		/* enables to use FPU */
 		__asm__ __volatile__ (EMMS:::"memory");
-#endif
 	}
 	/*
 	 *	Now do the tail of the block
@@ -352,25 +197,6 @@ static void * RENAME(fast_memset)(void * to, int val, size_t len)
 	  len&=127;
 	  pmm_reg = mm_reg;
 	  small_memset(pmm_reg,val,sizeof(mm_reg));
-#ifdef HAVE_SSE /* Only P3 (may be Cyrix3) */
-	__asm__ __volatile__(
-		"movups (%0), %%xmm0\n"
-		:: "r"(mm_reg):"memory");
-	for(; i>0; i--)
-	{
-		__asm__ __volatile__ (
-		"movntps %%xmm0, (%0)\n"
-		"movntps %%xmm0, 16(%0)\n"
-		"movntps %%xmm0, 32(%0)\n"
-		"movntps %%xmm0, 48(%0)\n"
-		"movntps %%xmm0, 64(%0)\n"
-		"movntps %%xmm0, 80(%0)\n"
-		"movntps %%xmm0, 96(%0)\n"
-		"movntps %%xmm0, 112(%0)\n"
-		:: "r" (to) : "memory");
-		((unsigned char *)to)+=128;
-	}
-#else
 	__asm__ __volatile__(
 		"movq (%0), %%mm0\n"
 		:: "r"(mm_reg):"memory");
@@ -396,16 +222,13 @@ static void * RENAME(fast_memset)(void * to, int val, size_t len)
 		:: "r" (to) : "memory");
 		to+=128;
 	}
-#endif /* Have SSE */
 #ifdef HAVE_MMX2
 		/* since movntq is weakly-ordered, a "sfence"
 		 * is needed to become ordered again. */
 		__asm__ __volatile__ ("sfence":::"memory");
 #endif
-#ifndef HAVE_SSE		
 		/* enables to use FPU */
 		__asm__ __volatile__ (EMMS:::"memory");
-#endif		
 	}
 	/*
 	 *	Now do the tail of the block
