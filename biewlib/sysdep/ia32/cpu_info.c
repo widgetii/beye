@@ -535,190 +535,174 @@ static unsigned long __NEAR__ __FASTCALL__ __FOPS_w_wait(volatile unsigned *coun
 static unsigned long __NEAR__ __FASTCALL__ __MOPS_std(volatile unsigned *counter,char *arr)
 {
   register unsigned long retval;
-  UNUSED(arr);
-   __asm __volatile("xorl	%0, %0\n"
-"1:\n"
-      "	cmpl	$0, (%1)\n"
-      "	jz	1b\n"
-"2:\n"
-      "	cmpl	$0, (%1)\n"
-      "	jz	3f\n"
-
-".byte   0x0F, 0x77\n"            /* emmx */
-".byte   0x0F, 0x6E, 0xC0\n"      /* movd     mm0,eax */
-".byte   0x0F, 0x6B, 0xC5\n"      /* packssdw mm0,mm5 */
-".byte   0x0F, 0x63, 0xC4\n"      /* packsswb mm0,mm4 */
-".byte   0x0F, 0x67, 0xC7\n"      /* packuswb mm0,mm7 */
-".byte   0x0F, 0xFC, 0xDA\n"      /* paddb    mm3,mm2 */
-".byte   0x0F, 0xFE, 0xE9\n"      /* paddd    mm5,mm1 */
-".byte   0x0F, 0xE8, 0xE6\n"      /* psubsb   mm4,mm6 */
-".byte   0x0F, 0xD8, 0xDC\n"      /* psubusb  mm3,mm4 */
-".byte   0x0F, 0xDB, 0xCB\n"      /* pand     mm1,mm3 */
-".byte   0x0F, 0x76, 0xC0\n"      /* pcmpeqd  mm0,mm0 */
-".byte   0x0F, 0x64, 0xD2\n"      /* pcmpgtb  mm2,mm2 */
-".byte   0x0F, 0xF5, 0xFF\n"      /* pmaddwd  mm7,mm7 */
-".byte   0x0F, 0xD5, 0xF6\n"      /* pmullw   mm6,mm6 */
-".byte   0x0F, 0xEB, 0xD4\n"      /* por      mm2,mm4 */
-".byte   0x0F, 0xF3, 0xC6\n"      /* psllq    mm0,mm6 */
-".byte   0x0F, 0xE2, 0xCB\n"      /* psrad    mm1,mm3 */
-".byte   0x0F, 0xF8, 0xC9\n"      /* psubb    mm1,mm1 */
-".byte   0x0F, 0xE9, 0xD7\n"      /* psubsw   mm2,mm7 */
-".byte   0x0F, 0xD9, 0xD9\n"      /* psubusw  mm3,mm1 */
-".byte   0x0F, 0x6A, 0xC4\n"      /* punpckhdq mm0,mm4 */
-".byte   0x0F, 0x61, 0xD0\n"      /* punpcklwd mm2,mm0 */
-".byte   0x0F, 0xEF, 0xE2\n"      /* pxor     mm4,mm2 */
-".byte   0x0F, 0x6B, 0xC5\n"      /* packssdw mm0,mm5 */
-".byte   0x0F, 0x63, 0xC4\n"      /* packsswb mm0,mm4 */
-".byte   0x0F, 0x67, 0xC7\n"      /* packuswb mm0,mm7 */
-".byte   0x0F, 0xFC, 0xDA\n"      /* paddb    mm3,mm2 */
-".byte   0x0F, 0xFE, 0xE9\n"      /* paddd    mm5,mm1 */
-".byte   0x0F, 0xE8, 0xE6\n"      /* psubsb   mm4,mm6 */
-".byte   0x0F, 0xD8, 0xDC\n"      /* psubusb  mm3,mm4 */
-".byte   0x0F, 0xDB, 0xCB\n"      /* pand     mm1,mm3 */
-".byte   0x0F, 0x76, 0xC0\n"      /* pcmpeqd  mm0,mm0 */
-".byte   0x0F, 0x64, 0xD2\n"      /* pcmpgtb  mm2,mm2 */
-".byte   0x0F, 0xF5, 0xFF\n"      /* pmaddwd  mm7,mm7 */
-".byte   0x0F, 0xD5, 0xF6\n"      /* pmullw   mm6,mm6 */
-".byte   0x0F, 0xEB, 0xD4\n"      /* por      mm2,mm4 */
-".byte   0x0F, 0xF3, 0xC6\n"      /* psllq    mm0,mm6 */
-".byte   0x0F, 0xE2, 0xCB\n"      /* psrad    mm1,mm3 */
-".byte   0x0F, 0xF8, 0xC9\n"      /* psubb    mm1,mm1 */
-".byte   0x0F, 0xE9, 0xD7\n"      /* psubsw   mm2,mm7 */
-".byte   0x0F, 0xD9, 0xD9\n"      /* psubusw  mm3,mm1 */
-".byte   0x0F, 0x6A, 0xC4\n"      /* punpckhdq mm0,mm4 */
-".byte   0x0F, 0x61, 0xD0\n"      /* punpcklwd mm2,mm0 */
-".byte   0x0F, 0xEF, 0xE2\n"      /* pxor     mm4,mm2 */
-".byte   0x0F, 0x77\n"            /* emmx */
-".byte   0x0F, 0x6E, 0xC0\n"      /* movd     mm0,eax */
-".byte   0x0F, 0x6B, 0xC5\n"      /* packssdw mm0,mm5 */
-".byte   0x0F, 0x63, 0xC4\n"      /* packsswb mm0,mm4 */
-".byte   0x0F, 0x67, 0xC7\n"      /* packuswb mm0,mm7 */
-".byte   0x0F, 0xFC, 0xDA\n"      /* paddb    mm3,mm2 */
-".byte   0x0F, 0xFE, 0xE9\n"      /* paddd    mm5,mm1 */
-".byte   0x0F, 0xE8, 0xE6\n"      /* psubsb   mm4,mm6 */
-".byte   0x0F, 0xD8, 0xDC\n"      /* psubusb  mm3,mm4 */
-".byte   0x0F, 0xDB, 0xCB\n"      /* pand     mm1,mm3 */
-".byte   0x0F, 0x76, 0xC0\n"      /* pcmpeqd  mm0,mm0 */
-".byte   0x0F, 0x64, 0xD2\n"      /* pcmpgtb  mm2,mm2 */
-".byte   0x0F, 0xF5, 0xFF\n"      /* pmaddwd  mm7,mm7 */
-".byte   0x0F, 0xD5, 0xF6\n"      /* pmullw   mm6,mm6 */
-".byte   0x0F, 0xEB, 0xD4\n"      /* por      mm2,mm4 */
-".byte   0x0F, 0xF3, 0xC6\n"      /* psllq    mm0,mm6 */
-".byte   0x0F, 0xE2, 0xCB\n"      /* psrad    mm1,mm3 */
-".byte   0x0F, 0xF8, 0xC9\n"      /* psubb    mm1,mm1 */
-".byte   0x0F, 0xE9, 0xD7\n"      /* psubsw   mm2,mm7 */
-".byte   0x0F, 0xD9, 0xD9\n"      /* psubusw  mm3,mm1 */
-".byte   0x0F, 0x6A, 0xC4\n"      /* punpckhdq mm0,mm4 */
-".byte   0x0F, 0x61, 0xD0\n"      /* punpcklwd mm2,mm0 */
-".byte   0x0F, 0xEF, 0xE2\n"      /* pxor     mm4,mm2 */
-".byte   0x0F, 0x6B, 0xC5\n"      /* packssdw mm0,mm5 */
-".byte   0x0F, 0x63, 0xC4\n"      /* packsswb mm0,mm4 */
-".byte   0x0F, 0x67, 0xC7\n"      /* packuswb mm0,mm7 */
-".byte   0x0F, 0xFC, 0xDA\n"      /* paddb    mm3,mm2 */
-".byte   0x0F, 0xFE, 0xE9\n"      /* paddd    mm5,mm1 */
-".byte   0x0F, 0xE8, 0xE6\n"      /* psubsb   mm4,mm6 */
-".byte   0x0F, 0xD8, 0xDC\n"      /* psubusb  mm3,mm4 */
-".byte   0x0F, 0xDB, 0xCB\n"      /* pand     mm1,mm3 */
-".byte   0x0F, 0x76, 0xC0\n"      /* pcmpeqd  mm0,mm0 */
-".byte   0x0F, 0x64, 0xD2\n"      /* pcmpgtb  mm2,mm2 */
-".byte   0x0F, 0xF5, 0xFF\n"      /* pmaddwd  mm7,mm7 */
-".byte   0x0F, 0xD5, 0xF6\n"      /* pmullw   mm6,mm6 */
-".byte   0x0F, 0xEB, 0xD4\n"      /* por      mm2,mm4 */
-".byte   0x0F, 0xF3, 0xC6\n"      /* psllq    mm0,mm6 */
-".byte   0x0F, 0xE2, 0xCB\n"      /* psrad    mm1,mm3 */
-".byte   0x0F, 0xF8, 0xC9\n"      /* psubb    mm1,mm1 */
-".byte   0x0F, 0xE9, 0xD7\n"      /* psubsw   mm2,mm7 */
-".byte   0x0F, 0xD9, 0xD9\n"      /* psubusw  mm3,mm1 */
-".byte   0x0F, 0x6A, 0xC4\n"      /* punpckhdq mm0,mm4 */
-".byte   0x0F, 0x61, 0xD0\n"      /* punpcklwd mm2,mm0 */
-".byte   0x0F, 0xEF, 0xE2\n"      /* pxor     mm4,mm2 */
-      "	incl	%0\n"
-      "	jmp	2b\n"
-"3:"			:
-     "=a"(retval)	:
-     "S"(counter));
+   retval=0;
+   while(*counter==0);
+   while(*counter!=0){
+    __asm __volatile(
+"movd	%0,%%mm0\n"
+"packssdw %%mm0,%%mm5 \n"
+"packsswb %%mm0,%%mm4 \n"
+"packuswb %%mm0,%%mm7 \n"
+"paddb    %%mm3,%%mm2 \n"
+"paddd    %%mm5,%%mm1 \n"
+"psubsb   %%mm4,%%mm6 \n"
+"psubusb  %%mm3,%%mm4 \n"
+"pand     %%mm1,%%mm3 \n"
+"pcmpeqd  %%mm0,%%mm0 \n"
+"pcmpgtb  %%mm2,%%mm2 \n"
+"pmaddwd  %%mm7,%%mm7 \n"
+"pmullw   %%mm6,%%mm6 \n"
+"por      %%mm2,%%mm4 \n"
+"psllq    %%mm0,%%mm6 \n"
+"psrad    %%mm1,%%mm3 \n"
+"psubb    %%mm1,%%mm1 \n"
+"psubsw   %%mm2,%%mm7 \n"
+"psubusw  %%mm3,%%mm1 \n"
+"punpckhdq %%mm0,%%mm4 \n"
+"punpcklwd %%mm2,%%mm0 \n"
+"pxor     %%mm4,%%mm2 \n"
+"packssdw %%mm0,%%mm5 \n"
+"packsswb %%mm0,%%mm4 \n"
+"packuswb %%mm0,%%mm7 \n"
+"paddb    %%mm3,%%mm2 \n"
+"paddd    %%mm5,%%mm1 \n"
+"psubsb   %%mm4,%%mm6 \n"
+"psubusb  %%mm3,%%mm4 \n"
+"pand     %%mm1,%%mm3 \n"
+"pcmpeqd  %%mm0,%%mm0 \n"
+"pcmpgtb  %%mm2,%%mm2 \n"
+"pmaddwd  %%mm7,%%mm7 \n"
+"pmullw   %%mm6,%%mm6 \n"
+"por      %%mm2,%%mm4 \n"
+"psllq    %%mm0,%%mm6 \n"
+"psrad    %%mm1,%%mm3 \n"
+"psubb    %%mm1,%%mm1 \n"
+"psubsw   %%mm2,%%mm7 \n"
+"psubusw  %%mm3,%%mm1 \n"
+"punpckhdq %%mm0,%%mm4 \n"
+"punpcklwd %%mm2,%%mm0 \n"
+"pxor     %%mm4,%%mm2 \n"
+"movd     %0,%%mm0 \n"
+"packssdw %%mm0,%%mm5 \n"
+"packsswb %%mm0,%%mm4 \n"
+"packuswb %%mm0,%%mm7 \n"
+"paddb    %%mm3,%%mm2 \n"
+"paddd    %%mm5,%%mm1 \n"
+"psubsb   %%mm4,%%mm6 \n"
+"psubusb  %%mm3,%%mm4 \n"
+"pand     %%mm1,%%mm3 \n"
+"pcmpeqd  %%mm0,%%mm0 \n"
+"pcmpgtb  %%mm2,%%mm2 \n"
+"pmaddwd  %%mm7,%%mm7 \n"
+"pmullw   %%mm6,%%mm6 \n"
+"por      %%mm2,%%mm4 \n"
+"psllq    %%mm0,%%mm6 \n"
+"psrad    %%mm1,%%mm3 \n"
+"psubb    %%mm1,%%mm1 \n"
+"psubsw   %%mm2,%%mm7 \n"
+"psubusw  %%mm3,%%mm1 \n"
+"punpckhdq %%mm0,%%mm4 \n"
+"punpcklwd %%mm2,%%mm0 \n"
+"pxor     %%mm4,%%mm2 \n"
+"packssdw %%mm0,%%mm5 \n"
+"packsswb %%mm0,%%mm4 \n"
+"packuswb %%mm0,%%mm7 \n"
+"paddb    %%mm3,%%mm2 \n"
+"paddd    %%mm5,%%mm1 \n"
+"psubsb   %%mm4,%%mm6 \n"
+"psubusb  %%mm3,%%mm4 \n"
+"pand     %%mm1,%%mm3 \n"
+"pcmpeqd  %%mm0,%%mm0 \n"
+"pcmpgtb  %%mm2,%%mm2 \n"
+"pmaddwd  %%mm7,%%mm7 \n"
+"pmullw   %%mm6,%%mm6 \n"
+"por      %%mm2,%%mm4 \n"
+"psllq    %%mm0,%%mm6 \n"
+"psrad    %%mm1,%%mm3 \n"
+"psubb    %%mm1,%%mm1 \n"
+"psubsw   %%mm2,%%mm7 \n"
+"psubusw  %%mm3,%%mm1 \n"
+"punpckhdq %%mm0,%%mm4 \n"
+"punpcklwd %%mm2,%%mm0 \n"
+"pxor     %%mm4,%%mm2"
+  ::"r"(retval)
+  :"mm0", "mm1", "mm2", "mm3", "mm4", "mm5", "mm6", "mm7");
+  retval++;
+  }
   return retval;
 }
 
 static unsigned long __NEAR__ __FASTCALL__ __SSEOPS_std(volatile unsigned *counter,char *arr)
 {
   register unsigned long retval;
-   __asm __volatile("xorl	%0, %0\n"
-"1:\n"
-      "	cmpl	$0, (%1)\n"
-      "	jz	1b\n"
-"2:\n"
-      "	cmpl	$0, (%1)\n"
-      "	jz	3f\n"
-
-".byte   0x0F, 0x77\n"             /* emmx */
-".byte   0x0F, 0x28, 0x07\n"       /* movaps   xmm0,[edi] */
-".byte   0x0F, 0x16, 0x0F\n"       /* movhps   xmm1,[edi] */
-".byte   0x0F, 0x12, 0x17\n"       /* movlps   xmm2,[edi] */
-".byte   0x0F, 0x10, 0x1F\n"       /* movups   xmm3,[edi] */
-".byte   0x0F, 0x58, 0xC1\n"       /* addps    xmm0,xmm1 */
-".byte   0xF3, 0x0F, 0x58, 0xC1\n" /* addss    xmm0,xmm1 */
-".byte   0x0F, 0x2D, 0xC1\n"       /* cvtps2pi mm0,xmm1 */
-".byte   0x0F, 0x2C, 0xCA\n"       /* cvttps2pi mm1,xmm2 */
-".byte   0x0F, 0x5F, 0xC1\n"       /* maxps    xmm0,xmm1 */
-".byte   0xF3, 0x0F, 0x5F, 0xC1\n" /* maxss    xmm0,xmm1 */
-".byte   0x0F, 0x5D, 0xC1\n"       /* minps    xmm0,xmm1 */
-".byte   0xF3, 0x0F, 0x5D, 0xC1\n" /* minss    xmm0,xmm1 */
-".byte   0x0F, 0x59, 0xC1\n"       /* mulps    xmm0,xmm1 */
-".byte   0xF3, 0x0F, 0x59, 0xC1\n" /* mulss    xmm0,xmm1 */
-".byte   0x0F, 0x54, 0xC1\n"       /* andps    xmm0,xmm1 */
-".byte   0x0F, 0x56, 0xC1\n"       /* orps     xmm0,xmm1 */
-".byte   0x0F, 0x57, 0xC9\n"       /* xorps    xmm1,xmm1 */
-".byte   0x0F, 0x5E, 0xC1\n"       /* divps    xmm0,xmm1 */
-".byte   0xF3, 0x0F, 0x5E, 0xC1\n" /* divss    xmm0,xmm1 */
-".byte   0x0F, 0x53, 0xC1\n"       /* rcpps    xmm0,xmm1 */
-".byte   0xF3, 0x0F, 0x53, 0xC1\n" /* rcpss    xmm0,xmm1 */
-".byte   0x0F, 0x52, 0xC1\n"       /* rsqrtps  xmm0,xmm1 */
-".byte   0xF3, 0x0F, 0x52, 0xC1\n" /* rsqrtss  xmm0,xmm1 */
-".byte   0x0F, 0x51, 0xC1\n"       /* sqrtps   xmm0,xmm1 */
-".byte   0xF3, 0x0F, 0x51, 0xC1\n" /* sqrtss   xmm0,xmm1 */
-".byte   0x0F, 0x5C, 0xC1\n"       /* subps    xmm0,xmm1 */
-".byte   0xF3, 0x0F, 0x5C, 0xC1\n" /* subss    xmm0,xmm1 */
-".byte   0x0F, 0x2E, 0xC1\n"       /* ucomiss  xmm0,xmm1 */
-".byte   0x0F, 0x15, 0xC1\n"       /* unpckhps xmm0,xmm1 */
-".byte   0x0F, 0x14, 0xC1\n"       /* unpcklps xmm0,xmm1 */
-".byte   0x0F, 0x77\n"             /* emmx */
-".byte   0x0F, 0x28, 0x07\n"       /* movaps   xmm0,[edi] */
-".byte   0x0F, 0x16, 0x0F\n"       /* movhps   xmm1,[edi] */
-".byte   0x0F, 0x12, 0x17\n"       /* movlps   xmm2,[edi] */
-".byte   0x0F, 0x10, 0x1F\n"       /* movups   xmm3,[edi] */
-".byte   0x0F, 0x58, 0xC1\n"       /* addps    xmm0,xmm1 */
-".byte   0xF3, 0x0F, 0x58, 0xC1\n" /* addss    xmm0,xmm1 */
-".byte   0x0F, 0x2D, 0xC1\n"       /* cvtps2pi mm0,xmm1 */
-".byte   0x0F, 0x2C, 0xCA\n"       /* cvttps2pi mm1,xmm2 */
-".byte   0x0F, 0x5F, 0xC1\n"       /* maxps    xmm0,xmm1 */
-".byte   0xF3, 0x0F, 0x5F, 0xC1\n" /* maxss    xmm0,xmm1 */
-".byte   0x0F, 0x5D, 0xC1\n"       /* minps    xmm0,xmm1 */
-".byte   0xF3, 0x0F, 0x5D, 0xC1\n" /* minss    xmm0,xmm1 */
-".byte   0x0F, 0x59, 0xC1\n"       /* mulps    xmm0,xmm1 */
-".byte   0xF3, 0x0F, 0x59, 0xC1\n" /* mulss    xmm0,xmm1 */
-".byte   0x0F, 0x54, 0xC1\n"       /* andps    xmm0,xmm1 */
-".byte   0x0F, 0x56, 0xC1\n"       /* orps     xmm0,xmm1 */
-".byte   0x0F, 0x57, 0xC9\n"       /* xorps    xmm1,xmm1 */
-".byte   0x0F, 0x5E, 0xC1\n"       /* divps    xmm0,xmm1 */
-".byte   0xF3, 0x0F, 0x5E, 0xC1\n" /* divss    xmm0,xmm1 */
-".byte   0x0F, 0x53, 0xC1\n"       /* rcpps    xmm0,xmm1 */
-".byte   0xF3, 0x0F, 0x53, 0xC1\n" /* rcpss    xmm0,xmm1 */
-".byte   0x0F, 0x52, 0xC1\n"       /* rsqrtps  xmm0,xmm1 */
-".byte   0xF3, 0x0F, 0x52, 0xC1\n" /* rsqrtss  xmm0,xmm1 */
-".byte   0x0F, 0x51, 0xC1\n"       /* sqrtps   xmm0,xmm1 */
-".byte   0xF3, 0x0F, 0x51, 0xC1\n" /* sqrtss   xmm0,xmm1 */
-".byte   0x0F, 0x5C, 0xC1\n"       /* subps    xmm0,xmm1 */
-".byte   0xF3, 0x0F, 0x5C, 0xC1\n" /* subss    xmm0,xmm1 */
-".byte   0x0F, 0x2E, 0xC1\n"       /* ucomiss  xmm0,xmm1 */
-".byte   0x0F, 0x15, 0xC1\n"       /* unpckhps xmm0,xmm1 */
-".byte   0x0F, 0x14, 0xC1\n"       /* unpcklps xmm0,xmm1 */
-      "	incl	%0\n"
-      "	jmp	2b\n"
-"3:"			:
-     "=a"(retval)	:
-     "S"(counter),
-     "D"(arr));
+   retval=0;
+   while(*counter==0);
+   while(*counter!=0){
+    __asm __volatile(
+"movaps   (%0), %%xmm0 \n"
+"movhps   (%0),%%xmm1 \n"
+"movlps   (%0),%%xmm2 \n"
+"movups   (%0),%%xmm3 \n"
+"addps    %%xmm0,%%xmm1 \n"
+"addss    %%xmm0,%%xmm1 \n"
+"cvtps2pi %%xmm1,%%mm0 \n"
+"cvttps2pi %%xmm2,%%mm1 \n"
+"maxps    %%xmm0,%%xmm1 \n"
+"maxss    %%xmm0,%%xmm1 \n"
+"minps    %%xmm0,%%xmm1 \n"
+"minss    %%xmm0,%%xmm1 \n"
+"mulps    %%xmm0,%%xmm1 \n"
+"mulss    %%xmm0,%%xmm1 \n"
+"andps    %%xmm0,%%xmm1 \n"
+"orps     %%xmm0,%%xmm1 \n"
+"xorps    %%xmm1,%%xmm1 \n"
+"divps    %%xmm0,%%xmm1 \n"
+"divss    %%xmm0,%%xmm1 \n"
+"rcpps    %%xmm0,%%xmm1 \n"
+"rcpss    %%xmm0,%%xmm1 \n"
+"rsqrtps  %%xmm0,%%xmm1 \n"
+"rsqrtss  %%xmm0,%%xmm1 \n"
+"sqrtps   %%xmm0,%%xmm1 \n"
+"sqrtss   %%xmm0,%%xmm1 \n"
+"subps    %%xmm0,%%xmm1 \n"
+"subss    %%xmm0,%%xmm1 \n"
+"ucomiss  %%xmm0,%%xmm1 \n"
+"unpckhps %%xmm0,%%xmm1 \n"
+"unpcklps %%xmm0,%%xmm1 \n"
+"movaps   (%0),%%xmm0 \n"
+"movhps   (%0),%%xmm1 \n"
+"movlps   (%0),%%xmm2 \n"
+"movups   (%0),%%xmm3 \n"
+"addps    %%xmm0,%%xmm1 \n"
+"addss    %%xmm0,%%xmm1 \n"
+"cvtps2pi %%xmm1,%%mm0 \n"
+"cvttps2pi %%xmm2,%%mm1 \n"
+"maxps    %%xmm0,%%xmm1 \n"
+"maxss    %%xmm0,%%xmm1 \n"
+"minps    %%xmm0,%%xmm1 \n"
+"minss    %%xmm0,%%xmm1 \n"
+"mulps    %%xmm0,%%xmm1 \n"
+"mulss    %%xmm0,%%xmm1 \n"
+"andps    %%xmm0,%%xmm1 \n"
+"orps     %%xmm0,%%xmm1 \n"
+"xorps    %%xmm1,%%xmm1 \n"
+"divps    %%xmm0,%%xmm1 \n"
+"divss    %%xmm0,%%xmm1 \n"
+"rcpps    %%xmm0,%%xmm1 \n"
+"rcpss    %%xmm0,%%xmm1 \n"
+"rsqrtps  %%xmm0,%%xmm1 \n"
+"rsqrtss  %%xmm0,%%xmm1 \n"
+"sqrtps   %%xmm0,%%xmm1 \n"
+"sqrtss   %%xmm0,%%xmm1 \n"
+"subps    %%xmm0,%%xmm1 \n"
+"subss    %%xmm0,%%xmm1 \n"
+"ucomiss  %%xmm0,%%xmm1 \n"
+"unpckhps %%xmm0,%%xmm1 \n"
+"unpcklps %%xmm0,%%xmm1 \n"
+::"r"(arr)
+:"xmm0", "xmm1", "xmm2", "xmm3", "xmm4", "xmm5", "xmm6", "xmm7");
+  retval++;
+  }
   return retval;
 }
 
