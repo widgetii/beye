@@ -728,6 +728,16 @@ void __FASTCALL__ ix86_ArgRMDigit(char * str,ix86Param *DisP)
   char mod = (DisP->RealCmd[1] & 0xC0) >> 6;
   char rm  = (DisP->RealCmd[1] & 0x07);
   char *a1,*a2;
+  unsigned sizptr;
+     if(!w) sizptr = BYTE_PTR;
+     else
+#ifdef IX86_64
+     if(x86_Bitness == DAB_USE64)
+	sizptr = REX_w(k86_REX)?QWORD_PTR:Use32Data?DWORD_PTR:WORD_PTR;
+     else
+#endif
+	sizptr = Use32Data ? DWORD_PTR : WORD_PTR;
+  ix86_setModifier(str,ix86_sizes[sizptr]);
   DisP->codelen++;
   a1 = ix86_getModRM(w,mod,rm,DisP);
   strcat(str,a1);
