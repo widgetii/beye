@@ -61,7 +61,7 @@ typedef void * BGLOBAL;       /**< This is the data type used to represent buffe
 /** Virtual file buffer structure */
 typedef struct tagvfb
 {
- int             handle;    /**< file handle */
+ bhandle_t       handle;    /**< file handle */
  __filesize_t    FBufStart; /**< logical position of mirror the buffer onto file */
  char *          MBuffer;   /**< NULL - not buffered i/o */
  unsigned        MBufLen;   /**< length data, actually contains in buffer */
@@ -320,7 +320,7 @@ BGLOBAL               __FASTCALL__ bioDupEx(BGLOBAL bioFile,unsigned buffSize);
                      * @return                OS handle of opened stream
                      * @param bioFile         handle of opened stream
                     **/
-int                   __FASTCALL__ bioHandle(BGLOBAL bioFile);
+bhandle_t             __FASTCALL__ bioHandle(BGLOBAL bioFile);
 
                    /** Returns pointer to buffer of opened stream.
                      * @return                pointer to buffer

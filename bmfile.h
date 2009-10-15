@@ -61,7 +61,7 @@ tUInt16       __FASTCALL__ BMReadWordEx(__fileoff_t pos,int RELATION);
 tUInt32       __FASTCALL__ BMReadDWordEx(__fileoff_t pos,int RELATION);
 tUInt64       __FASTCALL__ BMReadQWordEx(__fileoff_t pos,int RELATION);
 tBool          __FASTCALL__ BMReadBufferEx(void  * buffer,unsigned len,__fileoff_t pos,int RELATION);
-int            __FASTCALL__ BMHandle( void );
+bhandle_t      __FASTCALL__ BMHandle( void );
 BGLOBAL        __FASTCALL__ BMbioHandle( void );
 char *         __FASTCALL__ BMName( void );
 
@@ -92,7 +92,7 @@ tUInt16       __FASTCALL__ bmReadWordEx(__fileoff_t pos,int RELATION);
 tUInt32       __FASTCALL__ bmReadDWordEx(__fileoff_t pos,int RELATION);
 tUInt64       __FASTCALL__ bmReadQWordEx(__fileoff_t pos,int RELATION);
 tBool          __FASTCALL__ bmReadBufferEx(void  * buffer,unsigned len,__fileoff_t pos,int RELATION);
-int            __FASTCALL__ bmHandle( void );
+bhandle_t      __FASTCALL__ bmHandle( void );
 BGLOBAL        __FASTCALL__ bmbioHandle( void );
 char *         __FASTCALL__ bmName( void );
 

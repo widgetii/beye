@@ -365,9 +365,9 @@ extern void      __FASTCALL__ __OsRestoreTimer(void);
 #endif
 
 #if __WORDSIZE >= 64
-typedef long bhandle_t;
+typedef void* bhandle_t;
 #else
-typedef int  bhandle_t;
+typedef int   bhandle_t;
 #endif
 
                    /** Closes opened stream

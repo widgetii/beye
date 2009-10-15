@@ -1431,18 +1431,18 @@ static unsigned buf_len;
 static char *buf_ptr;
 static const char *sect,* subsect,* item;
 
-static int __NEAR__ __FASTCALL__ make_temp(const char *path,char *name_ptr)
+static bhandle_t __NEAR__ __FASTCALL__ make_temp(const char *path,char *name_ptr)
 {
   char *fullname, *nptr;
   unsigned i,len;
   bhandle_t handle;
   fullname = PMalloc((strlen(path)+1)*2);
-  if(!fullname) return -1;
+  if(!fullname) return (bhandle_t)-1;
   strcpy(fullname,path);
   len = strlen(fullname);
   if(fullname[len-4] == '.') nptr = &fullname[len-4];
   else                       nptr = &fullname[len];
-  handle = -1;
+  handle = (bhandle_t)-1;
   for(i = 0;i < 100;i++)
   {
   /*
@@ -1674,7 +1674,7 @@ static tBool __NEAR__ __FASTCALL__ __directWriteProfileString(hIniProfile *ini,
    char * workstr, *wstr2;
    char *original;
    unsigned nled,prev_val_size;
-   int hsrc;
+   bhandle_t hsrc;
    tBool _ret,need_write,s_ok,ss_ok,i_ok,done,sb_ok,ssb_ok,written,Cond,if_on;
    /* test for no change of value */
    prev_val_size = strlen(_value)+2;
@@ -1702,7 +1702,7 @@ static tBool __NEAR__ __FASTCALL__ __directWriteProfileString(hIniProfile *ini,
    bioSeek(ini->handler,0L,BIO_SEEK_SET);
    ActiveFile = ini->handler;
    hsrc = make_temp(ini->fname,tmpname);
-   if(hsrc == -1) { _ret = False; goto Exit_WS; }
+   if(hsrc == (bhandle_t)-1) { _ret = False; goto Exit_WS; }
    __OsClose(hsrc);
    tmphandle = fopen(tmpname,"wt");
    if(tmphandle == NULL) { _ret = False; goto Exit_WS; }

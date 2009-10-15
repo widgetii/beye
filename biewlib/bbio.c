@@ -31,6 +31,9 @@
 #define IS_CACHE_VALID(obj) ((obj)->b.vfb.MBuffer && !((obj)->optimize & BIO_OPT_NOCACHE))
 #define IS_WRITEABLE(openmode) (((openmode) & FO_READWRITE) || ((openmode) & FO_WRITEONLY))
 
+#define NULL_HANDLE ((bhandle_t)-1)
+#define MMF_HANDLE ((bhandle_t)-2)
+
 struct tagBFILE bNull =
 {
   0L,
@@ -42,7 +45,7 @@ struct tagBFILE bNull =
   False,
   {
    {
-    -2,
+     MMF_HANDLE,
      0L,
      NULL,
      0,
@@ -64,8 +67,6 @@ struct tagBFILE bNull =
         (int)(((__filesize_t)pos < ((BFILE *)obj)->b.vfb.FBufStart ||\
                (__filesize_t)pos >= ((BFILE *)obj)->b.vfb.FBufStart +\
                ((BFILE *)obj)->b.vfb.MBufLen) && !((BFILE *)obj)->is_mmf)
-
-#define MMF_HANDLE (-2)
 
 static tBool __NEAR__ __FASTCALL__ __fill(BFILE  *obj,__fileoff_t pos)
 {
@@ -362,7 +363,7 @@ BGLOBAL  __FASTCALL__ bioOpen(const char * fname,unsigned openmode,unsigned bSiz
    {
      bhandle_t handle = __OsOpen(fname,openmode);
      optimization = BIO_OPT_DB;
-     if(handle == -1)
+     if(handle == NULL_HANDLE)
      {
        PFREE(bFile->FileName);
        PFREE(ret);
@@ -412,7 +413,7 @@ tBool  __FASTCALL__ bioClose(BGLOBAL handle)
   }
   else
   {
-    if(bFile->b.vfb.handle != -1)
+    if(bFile->b.vfb.handle != NULL_HANDLE)
     {
       if(IS_WRITEABLE(bFile->openmode)) __flush(bFile);
       if(bFile->b.vfb.handle != 2) __OsClose(bFile->b.vfb.handle);
@@ -666,7 +667,7 @@ unsigned  __FASTCALL__ bioGetOptimization(BGLOBAL bioFile)
   return obj->optimize;
 }
 
-int  __FASTCALL__ bioHandle(BGLOBAL bioFile)
+bhandle_t  __FASTCALL__ bioHandle(BGLOBAL bioFile)
 {
    BFILE *obj = MK_FPTR(bioFile);
    return obj->is_mmf ? MMF_HANDLE : obj->b.vfb.handle;
@@ -728,7 +729,7 @@ BGLOBAL __FASTCALL__ bioDupEx(BGLOBAL bioFile,unsigned buff_Size)
      bFile->b.vfb.updated  = fromFile->b.vfb.updated;
    }
    bFile->is_mmf = fromFile->is_mmf;
-   if(bFile->b.vfb.handle == -1)
+   if(bFile->b.vfb.handle == NULL_HANDLE)
    {
      PFREE(bFile->FileName);
      PFREE(ret);

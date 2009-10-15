@@ -70,7 +70,7 @@
 typedef struct
 {
     tUInt32   ulFlags;
-    bhandle_t fhandle;
+    HANDLE    fhandle;
     void *    pData;
     tUInt32   ulSize;
 } MMFENTRY;
@@ -125,7 +125,7 @@ LONG CALLBACK apiPageFaultHandler(LPEXCEPTION_POINTERS excpt)
 
         if(!(pMMF = Locate((void *)excpt->ExceptionRecord->ExceptionInformation[1])))
             return EXCEPTION_CONTINUE_SEARCH;
-        pPage = (void *)((tUInt32)excpt->ExceptionRecord->ExceptionInformation[1] & PAG_MASK);
+        pPage = (void *)((long)excpt->ExceptionRecord->ExceptionInformation[1] & PAG_MASK);
 
         /* Query affected page flags */
         if(VirtualQuery(pPage, &mbi, sizeof(MEMORY_BASIC_INFORMATION)) != 

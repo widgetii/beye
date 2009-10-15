@@ -69,7 +69,7 @@ int __FASTCALL__ BMOpen(char * fname)
   return 0;
 }
 
-int __FASTCALL__ BMHandle( void )
+bhandle_t __FASTCALL__ BMHandle( void )
 {
   return bioHandle(file);
 }
@@ -230,7 +230,7 @@ tBool __FASTCALL__ BMEOF( void )
   return bioEOF(file);
 }
 
-int __FASTCALL__ bmHandle( void )
+bhandle_t __FASTCALL__ bmHandle( void )
 {
   return bioHandle(sc_file);
 }
