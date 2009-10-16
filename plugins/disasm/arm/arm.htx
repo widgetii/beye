@@ -267,7 +267,7 @@
 ³ Many digital signal processing (DSP) algorithms operate on arrays of    ³
 ³ 16-bit data, where the 16-bit value is to be interpreted as a signed    ³
 ³ fixed-point number with 15 binary places. Such values are sometimes     ³
-³ called Q15 numbers, and represent numeric values ranging from +1 up to  ³
+³ called Q15 numbers, and represent numeric values ranging from -1 up to  ³
 ³ +1*2eâ€“15.                                                               ³
 ³                                                                         ³
 ³ %I32-bit DSP Intructions set in format of {ext.i}[opcode.S]<X>:%i           ³
