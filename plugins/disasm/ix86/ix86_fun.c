@@ -54,6 +54,19 @@ char *ix86_Katmai_buff;
 #define REX_x(rex) ((rex)&0x02)
 #define REX_b(rex) ((rex)&0x01)
 
+static inline unsigned ix86_calcModifier(unsigned w) {
+  unsigned sizptr;
+     if(!w) sizptr = BYTE_PTR;
+     else
+#ifdef IX86_64
+     if(x86_Bitness == DAB_USE64)
+	sizptr = REX_w(k86_REX)?QWORD_PTR:Use32Data?DWORD_PTR:WORD_PTR;
+     else
+#endif
+	sizptr = Use32Data ? DWORD_PTR : WORD_PTR;
+   return sizptr;
+}
+
 static const char * __FASTCALL__ k86_getREG(unsigned char reg,tBool w,tBool rex, tBool use64)
 {
 #ifdef IX86_64
@@ -640,14 +653,7 @@ void __FASTCALL__ ix86_ArgMod(char *str,ix86Param *DisP)
 {
   char mod = (DisP->RealCmd[1] >> 6) & 0x03;
   char rm = (DisP->RealCmd[1] & 0x07);
-  unsigned sizptr;
-#ifdef IX86_64
-     if(x86_Bitness == DAB_USE64)
-	      sizptr = REX_w(k86_REX)?QWORD_PTR:DWORD_PTR;
-     else
-#endif
-	sizptr = Use32Data ? DWORD_PTR : WORD_PTR;
-  ix86_setModifier(str,ix86_sizes[sizptr]);
+  ix86_setModifier(str,ix86_sizes[ix86_calcModifier(1)]);
   DisP->codelen++;
   strcat(str,ix86_getModRM(True,mod,rm,DisP));
 }
@@ -656,7 +662,7 @@ void __FASTCALL__ ix86_ArgModB(char *str,ix86Param *DisP)
 {
   char mod = (DisP->RealCmd[1] >> 6) & 0x03;
   char rm = (DisP->RealCmd[1] & 0x07);
-  ix86_setModifier(str,ix86_sizes[BYTE_PTR]);
+  if(mod<3) ix86_setModifier(str,ix86_sizes[BYTE_PTR]);
   DisP->codelen++;
   strcat(str,ix86_getModRM(False,mod,rm,DisP));
 }
@@ -728,16 +734,7 @@ void __FASTCALL__ ix86_ArgRMDigit(char * str,ix86Param *DisP)
   char mod = (DisP->RealCmd[1] & 0xC0) >> 6;
   char rm  = (DisP->RealCmd[1] & 0x07);
   char *a1,*a2;
-  unsigned sizptr;
-     if(!w) sizptr = BYTE_PTR;
-     else
-#ifdef IX86_64
-     if(x86_Bitness == DAB_USE64)
-	sizptr = REX_w(k86_REX)?QWORD_PTR:Use32Data?DWORD_PTR:WORD_PTR;
-     else
-#endif
-	sizptr = Use32Data ? DWORD_PTR : WORD_PTR;
-  ix86_setModifier(str,ix86_sizes[sizptr]);
+  ix86_setModifier(str,ix86_sizes[ix86_calcModifier(w)]);
   DisP->codelen++;
   a1 = ix86_getModRM(w,mod,rm,DisP);
   strcat(str,a1);
@@ -811,14 +808,7 @@ void __FASTCALL__ ix86_ArgAXIReg(char *str,ix86Param *DisP)
 
 void __FASTCALL__ ix86_ArgSInt(char *str,ix86Param *DisP)
 {
-  unsigned sizptr;
-#ifdef IX86_64
-     if(x86_Bitness == DAB_USE64)
-	      sizptr = REX_w(k86_REX)?QWORD_PTR:DWORD_PTR;
-     else
-#endif
-	sizptr=Use32Data?DWORD_PTR:WORD_PTR;
-  ix86_setModifier(str,ix86_sizes[sizptr]);
+  ix86_setModifier(str,ix86_sizes[ix86_calcModifier(1)]);
   if(!((DisP->flags & __DISF_SIZEONLY) == __DISF_SIZEONLY))
     disAppendDigits(str,DisP->CodeAddress + DisP->codelen,
                  APREF_USE_TYPE,1,&DisP->RealCmd[DisP->codelen],DISARG_CHAR | DISARG_IMM);
@@ -871,22 +861,12 @@ void __FASTCALL__ ix86_ArgOp2(char *str,ix86Param *DisP)
 {
    unsigned char w;
    unsigned char idx;
-   unsigned sizptr;
    w = DisP->RealCmd[0] & 0x01;
    idx = (DisP->RealCmd[1] & 0x38) >> 3;
    strcpy(str,ix86_Op1Names[idx]);
    TabSpace(str,TAB_POS);
-   if(w)
-   {
-#ifdef IX86_64
-    if(x86_Bitness == DAB_USE64)
-	      sizptr = REX_w(k86_REX)?QWORD_PTR:DWORD_PTR;
-    else
-#endif
-	sizptr=Use32Data ? DWORD_PTR : WORD_PTR;
-	ix86_setModifier(str,ix86_sizes[sizptr]);
-   }
-  ix86_ArgRmDigit(str,DisP,w ? 2 : w, w ? 1 : 0);
+   if(w) ix86_setModifier(str,ix86_sizes[ix86_calcModifier(w)]);
+   ix86_ArgRmDigit(str,DisP,w ? 2 : w, w ? 1 : 0);
 }
 
 void __FASTCALL__ ix86_ShOp2(char *str,ix86Param *DisP)
@@ -896,17 +876,10 @@ void __FASTCALL__ ix86_ShOp2(char *str,ix86Param *DisP)
    unsigned char mod = (DisP->RealCmd[1] >> 6) & 0x03;
    unsigned char rm = (DisP->RealCmd[1] & 0x07);
    unsigned char w = DisP->RealCmd[0] & 0x01;
-   unsigned sizptr;
    DisP->codelen++;
    strcpy(str,ix86_ShNames[code2]);
    TabSpace(str,TAB_POS);
-#ifdef IX86_64
-     if(x86_Bitness == DAB_USE64)
-	      sizptr = REX_w(k86_REX)?QWORD_PTR:DWORD_PTR;
-     else
-#endif
-	sizptr=w?Use32Data?DWORD_PTR:WORD_PTR:BYTE_PTR;
-   ix86_setModifier(str,ix86_sizes[sizptr]);
+   ix86_setModifier(str,ix86_sizes[ix86_calcModifier(w)]);
    a1 = ix86_getModRM(w,mod,rm,DisP);
    strcat(str,a1);
    a2 = ix86_GetDigitTile(DisP,0,0,DisP->codelen);
@@ -920,18 +893,11 @@ void __FASTCALL__ ix86_ShOp1(char *str,ix86Param *DisP)
    unsigned char mod = (DisP->RealCmd[1] >> 6) & 0x03;
    unsigned char rm = (DisP->RealCmd[1] & 0x07);
    unsigned char w = DisP->RealCmd[0] & 0x01;
-   unsigned sizptr;
    DisP->codelen++;
    a1 = ix86_getModRM(w,mod,rm,DisP);
    strcpy(str,ix86_ShNames[code2]);
    TabSpace(str,TAB_POS);
-#ifdef IX86_64
-     if(x86_Bitness == DAB_USE64)
-	      sizptr = REX_w(k86_REX)?QWORD_PTR:DWORD_PTR;
-     else
-#endif
-	sizptr=w?Use32Data?DWORD_PTR:WORD_PTR:BYTE_PTR;
-   ix86_setModifier(str,ix86_sizes[sizptr]);
+   ix86_setModifier(str,ix86_sizes[ix86_calcModifier(w)]);
    strcat(str,a1);
    ix86_CStile(str,"1");
 }
@@ -943,18 +909,11 @@ void __FASTCALL__ ix86_ShOpCL(char *str,ix86Param *DisP)
    unsigned char mod = (DisP->RealCmd[1] >> 6) & 0x03;
    unsigned char rm = (DisP->RealCmd[1] & 0x07);
    unsigned char w = DisP->RealCmd[0] & 0x01;
-   unsigned sizptr;
    DisP->codelen++;
    a1 = ix86_getModRM(w,mod,rm,DisP);
    strcpy(str,ix86_ShNames[code2]);
    TabSpace(str,TAB_POS);
-#ifdef IX86_64
-     if(x86_Bitness == DAB_USE64)
-	      sizptr = REX_w(k86_REX)?QWORD_PTR:DWORD_PTR;
-     else
-#endif
-	sizptr=w?Use32Data?DWORD_PTR:WORD_PTR:BYTE_PTR;
-   ix86_setModifier(str,ix86_sizes[sizptr]);
+   ix86_setModifier(str,ix86_sizes[ix86_calcModifier(w)]);
    strcat(str,a1);
    ix86_CStile(str,"cl");
 }
@@ -965,17 +924,10 @@ void __FASTCALL__ ix86_ArgGrp1(char *str,ix86Param *DisP)
    unsigned char mod = (DisP->RealCmd[1] >> 6) & 0x03;
    unsigned char rm = (DisP->RealCmd[1] & 0x07);
    unsigned char w = DisP->RealCmd[0] & 0x01;
-   unsigned sizptr;
    strcpy(str,ix86_Gr1Names[code2]);
    TabSpace(str,TAB_POS);
    DisP->codelen++;
-#ifdef IX86_64
-     if(x86_Bitness == DAB_USE64)
-	      sizptr = REX_w(k86_REX)?QWORD_PTR:DWORD_PTR;
-     else
-#endif
-	sizptr=w?Use32Data?DWORD_PTR:WORD_PTR:BYTE_PTR;
-   ix86_setModifier(str,ix86_sizes[sizptr]);
+   ix86_setModifier(str,ix86_sizes[ix86_calcModifier(w)]);
    if(!code2) /** test only */
    {
      strcat(str,ix86_getModRM(w,mod,rm,DisP));
@@ -1803,7 +1755,6 @@ void __FASTCALL__ ix86_ArgMovYX(char *str,ix86Param *DisP)
       const char *dst,*src;
       unsigned char mod;
       unsigned char w = DisP->RealCmd[0] & 0x01;
-      unsigned sizptr;
       tBool u32data;
       tBool brex,use64;
       brex = use64 = 0;
@@ -1815,13 +1766,7 @@ void __FASTCALL__ ix86_ArgMovYX(char *str,ix86Param *DisP)
       }
 #endif
       mod = (DisP->RealCmd[1] >> 6) & 0x03;
-#ifdef IX86_64
-     if(x86_Bitness == DAB_USE64)
-	      sizptr = REX_w(k86_REX)?QWORD_PTR:DWORD_PTR;
-     else
-#endif
-	sizptr=w?Use32Data?DWORD_PTR:WORD_PTR:BYTE_PTR;
-      ix86_setModifier(str,ix86_sizes[sizptr]);
+      /*ix86_setModifier(str,ix86_sizes[ix86_calcModifier(1)]);*/
       dst = k86_getREG((DisP->RealCmd[1] >> 3) & 0x07,True,brex,use64);
       u32data = Use32Data;
       Use32Data = False;

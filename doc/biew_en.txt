@@ -1226,6 +1226,7 @@ v5.0.2        ! Changes:
 6.0.2
 XX YYY 2009   ! Changes:
                 * Disable MMF system for Win64 as workaround
+                * Fixed sizes of some implicit operands in x86_64 disasm
 []======================================================================[]
 []  Thank you for your interest.                                        []
 []  Nickols_K (http://my666.boom.ru/666_en.html).                       []
