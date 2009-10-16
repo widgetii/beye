@@ -23,7 +23,7 @@
 ³ %IR15(PC)%i- normally used as Program Counter register                      ³
 ³                                                                         ³
 ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
-³ There also are two special regsiters:                                   ³
+³ There also are two special registers:                                   ³
 ³                                                                         ³
 ³ %ICPSR%i   - current program status register                                ³
 ³ %ISPSR%i   - saved program status register                                  ³
@@ -85,7 +85,7 @@
 ³ X - low part of extended opcode if present                              ³
 ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
 ³ Almost all ARM instructions can be conditionally executed, which means  ³
-³ that they only have their normal effect on the programmerâ€™s model state,³
+³ that they only have their normal effect on the programmer's model state,³
 ³ memory and coprocessors if the %IN%i, %IZ%i, %IC%i and %IV%i flags in the %ICPSR%i satisfy a³
 ³ condition specified in the instruction. If the flags do not satisfy this³
 ³ condition, the instruction acts as a %INOP%i: that is, execution advances to³
@@ -267,7 +267,7 @@
 ³ Many digital signal processing (DSP) algorithms operate on arrays of    ³
 ³ 16-bit data, where the 16-bit value is to be interpreted as a signed    ³
 ³ fixed-point number with 15 binary places. Such values are sometimes     ³
-³ called Q15 numbers, and represent numeric values ranging from â€“1 up to  ³
+³ called Q15 numbers, and represent numeric values ranging from +1 up to  ³
 ³ +1*2eâ€“15.                                                               ³
 ³                                                                         ³
 ³ %I32-bit DSP Intructions set in format of {ext.i}[opcode.S]<X>:%i           ³
