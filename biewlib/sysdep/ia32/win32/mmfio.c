@@ -65,14 +65,21 @@
 /* Internal structures and constants */
 
 #define PAG_SIZE    4096
+#if __WORDSIZE == 32
 #define PAG_MASK    0xFFFFF000
+typedef unsigned long ADRSIZE;
+#else
+/* Hack: MinGW64 (unlike linux64) assumes sizeof(long)==4 :( */
+#define PAG_MASK    0xFFFFFFFFFFFFF000
+typedef unsigned long long ADRSIZE;
+#endif
 
 typedef struct
 {
     tUInt32   ulFlags;
     HANDLE    fhandle;
     void *    pData;
-    tUInt32   ulSize;
+    ADRSIZE   ulSize;
 } MMFENTRY;
 
 typedef MMFENTRY* PMMF;
@@ -90,8 +97,8 @@ static PMMF __FASTCALL__ Locate(void *addr)
     {
         if(mmfTable[i].ulFlags & MMF_USEDENTRY)
         {
-            if(   (ULONG)mmfTable[i].pData <= (ULONG)addr
-               && ((ULONG)mmfTable[i].pData+mmfTable[i].ulSize) >= (ULONG)addr)
+            if(   (ADRSIZE)mmfTable[i].pData <= (ADRSIZE)addr
+               && ((ADRSIZE)mmfTable[i].pData+mmfTable[i].ulSize) >= (ADRSIZE)addr)
             {
                 return &mmfTable[i];
             }
@@ -116,13 +123,12 @@ static PMMF __FASTCALL__ LocateFree(void)
 LONG CALLBACK apiPageFaultHandler(LPEXCEPTION_POINTERS excpt)
 {
     MEMORY_BASIC_INFORMATION mbi;
-    tUInt32 ulTemp;
+    ADRSIZE ulTemp;
     if(excpt->ExceptionRecord->ExceptionCode == EXCEPTION_ACCESS_VIOLATION)
     {
         PMMF     pMMF   = 0;
         void *   pPage  = 0;
-        tUInt32 ulSize = PAG_SIZE;
-
+        ULONG ulSize = PAG_SIZE;
         if(!(pMMF = Locate((void *)excpt->ExceptionRecord->ExceptionInformation[1])))
             return EXCEPTION_CONTINUE_SEARCH;
         pPage = (void *)((long)excpt->ExceptionRecord->ExceptionInformation[1] & PAG_MASK);
@@ -155,7 +161,7 @@ LONG CALLBACK apiPageFaultHandler(LPEXCEPTION_POINTERS excpt)
                for reading it into memory */
             if(VirtualAlloc(pPage, ulSize, MEM_COMMIT, PAGE_READWRITE) != pPage)
                                            return EXCEPTION_CONTINUE_SEARCH;
-            ulTemp = (tUInt32)pPage - (tUInt32)pMMF->pData;
+            ulTemp = (ADRSIZE)pPage - (ADRSIZE)pMMF->pData;
             /* set position & read page from disk */
             if(SetFilePointer((HANDLE)pMMF->fhandle,
                               ulTemp,
@@ -164,14 +170,14 @@ LONG CALLBACK apiPageFaultHandler(LPEXCEPTION_POINTERS excpt)
                               /* Actually ignore errors here */
                               ReadFile((HANDLE)pMMF->fhandle,pPage,ulSize,(DWORD *)&ulTemp,NULL);
             /* Mark it as read-only to be sure that page is clean. */
-            if(VirtualProtect(pPage, ulSize, PAGE_READONLY,(DWORD *)&ulTemp) == 0)
+            if(VirtualProtect(pPage, ulSize, PAGE_READONLY,(ULONG *)&ulTemp) == 0)
                                               return EXCEPTION_CONTINUE_SEARCH;
         }
 
 /* if page already committed, and accessed for writing - mark them writable,
    for writting it back to the file at close. */
         if(excpt->ExceptionRecord->ExceptionInformation[0] != 0)
-            VirtualProtect(pPage, PAG_SIZE, PAGE_READWRITE,(DWORD *)&ulTemp);
+            VirtualProtect(pPage, PAG_SIZE, PAGE_READWRITE,(ULONG *)&ulTemp);
         return EXCEPTION_CONTINUE_EXECUTION;
         /* exception is fully working. Success exit. */
     }
@@ -190,10 +196,10 @@ LONG CALLBACK PageFaultHandler(LPEXCEPTION_POINTERS excpt)
   return retval;
 }
 
-static int __FASTCALL__ DosUpdateMMF(PMMF pMMF,unsigned long length)
+static int __FASTCALL__ DosUpdateMMF(PMMF pMMF,ADRSIZE length)
 {
     char *  pArea  = 0;
-    tUInt32  ulPos  = 0;
+    ADRSIZE ulPos  = 0;
     MEMORY_BASIC_INFORMATION mbi;
 
 /* locate all regions which needs update, and actually update them */
@@ -209,10 +215,10 @@ static int __FASTCALL__ DosUpdateMMF(PMMF pMMF,unsigned long length)
         {
             /* set pointer */
             errno = 0;
-            __OsSeek(pMMF->fhandle,(tUInt32)pArea - (tUInt32)pMMF->pData,SEEKF_START);
+            __OsSeek(pMMF->fhandle,(ADRSIZE)pArea - (ADRSIZE)pMMF->pData,SEEKF_START);
             if(!errno)
             {
-                tUInt32 rem = ulPos - pMMF->ulSize;
+                ADRSIZE rem = ulPos - pMMF->ulSize;
                 __OsWrite(pMMF->fhandle,pArea,rem >= PAG_SIZE ? PAG_SIZE : rem);
                 if(errno)  return errno;
                 VirtualProtect(pArea,PAG_SIZE,PAGE_READONLY,(DWORD *) &rem); /* Mark it as clean */
@@ -225,7 +231,7 @@ static int __FASTCALL__ DosUpdateMMF(PMMF pMMF,unsigned long length)
     return 0;
 }
 
-static int __FASTCALL__ DosReallocMMF(PMMF pMMF,unsigned long new_length)
+static int __FASTCALL__ DosReallocMMF(PMMF pMMF,ADRSIZE new_length)
 {
     void *  newData = 0;
     /*
@@ -250,7 +256,7 @@ static int __FASTCALL__ DosReallocMMF(PMMF pMMF,unsigned long new_length)
 
 mmfHandle          __FASTCALL__ __mmfOpen(const char *fname,int mode)
 {
-  tUInt32  flength;
+  ADRSIZE    flength;
   bhandle_t  fhandle;
   void * pData = 0;
   PMMF   pMMF  = 0;
@@ -266,7 +272,7 @@ mmfHandle          __FASTCALL__ __mmfOpen(const char *fname,int mode)
     }
 /* Open file */
 
-    if((fhandle = __OsOpen(fname,mode)) == -1) return NULL;
+    if((fhandle = __OsOpen(fname,mode)) == NULL_HANDLE) return NULL;
 
 /* Query file size */
     if((flength = GetFileSize((HANDLE)fhandle,NULL)) == 0xFFFFFFFFUL)
@@ -304,7 +310,7 @@ mmfHandle     __FASTCALL__ __mmfSync(mmfHandle mh)
   PMMF mrec = (PMMF)mh;
   long length;
   length = __FileLength(mrec->fhandle);
-  DosUpdateMMF(mrec,min((unsigned long)length,mrec->ulSize));
+  DosUpdateMMF(mrec,min((ADRSIZE)length,mrec->ulSize));
   if(DosReallocMMF(mrec,length))
   {
     VirtualFree(mrec->pData, 0L, MEM_RELEASE);
@@ -324,11 +330,11 @@ tBool              __FASTCALL__ __mmfProtect(mmfHandle mh,int flags)
 tBool              __FASTCALL__ __mmfResize(mmfHandle mh,long size)
 {
   PMMF mrec = (PMMF)mh;
-  unsigned long old_length;
+  ADRSIZE old_length;
   tBool can_continue = False;
   old_length = mrec->ulSize;
-  DosUpdateMMF(mrec,min((unsigned long)size,mrec->ulSize));
-  if(mrec->ulSize > (unsigned long)size) /* truncate */
+  DosUpdateMMF(mrec,min((ADRSIZE)size,mrec->ulSize));
+  if(mrec->ulSize > (ADRSIZE)size) /* truncate */
   {
     if(!DosReallocMMF(mrec,size)) can_continue = True;
     if(can_continue)
@@ -359,7 +365,7 @@ void               __FASTCALL__ __mmfClose(mmfHandle mh)
     VirtualFree(mrec->pData, 0L, MEM_RELEASE);
 
     mrec->ulFlags   = 0;
-    mrec->fhandle   = -1;
+    mrec->fhandle   = NULL_HANDLE;
     mrec->pData     = 0;
     mrec->ulSize    = 0;
 }
@@ -430,7 +436,7 @@ mmfHandle          __FASTCALL__ __mmfOpen(const char *fname,int mode)
   __fileoff_t length;
   bhandle_t fhandle;
   fhandle = __OsOpen(fname,mode);
-  if(fhandle != -1)
+  if(fhandle != NULL_HANDLE)
   {
     length = __FileLength(fhandle);
     if(length <= PTRDIFF_MAX)

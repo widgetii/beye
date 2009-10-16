@@ -313,8 +313,8 @@ static tBool FStore( void )
      else
      {
        handle = __OsOpen(ff_fname,FO_READWRITE | SO_DENYNONE);
-       if(handle == -1)  handle = __OsOpen(ff_fname,FO_READWRITE | SO_COMPAT);
-       if(handle == -1)
+       if(handle == NULL_HANDLE)  handle = __OsOpen(ff_fname,FO_READWRITE | SO_COMPAT);
+       if(handle == NULL_HANDLE)
        {
           use_err:
           errnoMessageBox("Can't use file",NULL,errno);
@@ -699,8 +699,8 @@ static tBool FRestore( void )
    char *fname;
    endpos = ff_startpos + ff_len;
    handle = __OsOpen(ff_fname,FO_READONLY | SO_DENYNONE);
-   if(handle == -1) handle = __OsOpen(ff_fname,FO_READONLY | SO_COMPAT);
-   if(handle == -1) goto err;
+   if(handle == NULL_HANDLE) handle = __OsOpen(ff_fname,FO_READONLY | SO_COMPAT);
+   if(handle == NULL_HANDLE) goto err;
    flen = __FileLength(handle);
    __OsClose(handle);
    lval = endpos - ff_startpos;
@@ -712,8 +712,8 @@ static tBool FRestore( void )
      unsigned remaind;
      void *tmp_buff;
      handle = __OsOpen(ff_fname,FO_READONLY | SO_DENYNONE);
-     if(handle == -1) handle = __OsOpen(ff_fname,FO_READONLY | SO_COMPAT);
-     if(handle == -1)
+     if(handle == NULL_HANDLE) handle = __OsOpen(ff_fname,FO_READONLY | SO_COMPAT);
+     if(handle == NULL_HANDLE)
      {
         err:
         errnoMessageBox(OPEN_FAIL,NULL,errno);

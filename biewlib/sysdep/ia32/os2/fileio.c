@@ -213,8 +213,8 @@ __fileoff_t __FASTCALL__ __OsTell(bhandle_t handle) { return __OsSeek(handle,0L,
 tBool __FASTCALL__ __IsFileExists(const char *name)
 {
    bhandle_t handle = __OsOpen(name,FO_READONLY | SO_DENYNONE);
-   if(handle != -1) __OsClose(handle);
-   return handle != -1;
+   if(handle != NULL_HANDLE) __OsClose(handle);
+   return handle != NULL_HANDLE;
 }
 
 tBool      __FASTCALL__ __OsGetFTime(const char *name,FTime *data)
@@ -222,8 +222,8 @@ tBool      __FASTCALL__ __OsGetFTime(const char *name,FTime *data)
   tBool ret = False;
   bhandle_t handle;
   handle = __OsOpen(name,FO_READONLY);
-  if(handle == -1) handle = __OsOpen(name,FO_READONLY | SO_DENYNONE);
-  if(handle != -1)
+  if(handle == NULL_HANDLE) handle = __OsOpen(name,FO_READONLY | SO_DENYNONE);
+  if(handle != NULL_HANDLE)
   {
     FILESTATUS3 fs;
     struct tm tm;
@@ -262,8 +262,8 @@ tBool      __FASTCALL__ __OsSetFTime(const char *name,const FTime *data)
   tBool ret = False;
   bhandle_t handle;
   handle = __OsOpen(name,FO_READWRITE);
-  if(handle == -1) handle = __OsOpen(name,FO_READWRITE | SO_DENYNONE);
-  if(handle != -1)
+  if(handle == NULL_HANDLE) handle = __OsOpen(name,FO_READWRITE | SO_DENYNONE);
+  if(handle != NULL_HANDLE)
   {
     unsigned long rc;
     FILESTATUS3 fs;

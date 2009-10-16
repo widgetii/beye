@@ -28,6 +28,28 @@
 
 #define rewind_ini(h) (bioSeek(h,0L,BIO_SEEK_SET))
 
+#if 0
+static void dump_BFILE(BFILE *h) {
+fprintf(stderr,
+	"FilePos=%llu\n"
+	"Flength=%llu\n"
+	"FileName=%s\n"
+	"openmode=%u\n"
+	"optimize=%i\n"
+	"is_mmf=%i\n"
+	"primary_mmf=%u\n"
+	"is_eof=%u\n"
+	,h->FilePos
+	,h->FLength
+	,h->FileName
+	,h->openmode
+	,h->optimize
+	,h->is_mmf
+	,h->primary_mmf
+	,h->is_eof);
+}
+#endif
+
 static unsigned char CaseSens = 2; /**< 2 - case 1 - upper 0 - lower */
 static FiUserFunc proc;
 static pVar FirstVar = NULL;
@@ -1437,12 +1459,12 @@ static bhandle_t __NEAR__ __FASTCALL__ make_temp(const char *path,char *name_ptr
   unsigned i,len;
   bhandle_t handle;
   fullname = PMalloc((strlen(path)+1)*2);
-  if(!fullname) return (bhandle_t)-1;
+  if(!fullname) return NULL_HANDLE;
   strcpy(fullname,path);
   len = strlen(fullname);
   if(fullname[len-4] == '.') nptr = &fullname[len-4];
   else                       nptr = &fullname[len];
-  handle = (bhandle_t)-1;
+  handle = NULL_HANDLE;
   for(i = 0;i < 100;i++)
   {
   /*
@@ -1452,11 +1474,11 @@ static bhandle_t __NEAR__ __FASTCALL__ make_temp(const char *path,char *name_ptr
   */
     sprintf(nptr,".t%i",i);
     handle = __OsOpen(fullname,FO_READONLY | SO_DENYNONE);
-    if(handle == -1) handle = __OsOpen(fullname,FO_READONLY | SO_COMPAT);
-    if(handle == -1)
+    if(handle == NULL_HANDLE) handle = __OsOpen(fullname,FO_READONLY | SO_COMPAT);
+    if(handle == NULL_HANDLE)
     {
       handle = __OsCreate(fullname);
-      if(handle != -1)
+      if(handle != NULL_HANDLE)
       {
         strcpy(name_ptr,fullname);
         goto bye;
@@ -1702,7 +1724,7 @@ static tBool __NEAR__ __FASTCALL__ __directWriteProfileString(hIniProfile *ini,
    bioSeek(ini->handler,0L,BIO_SEEK_SET);
    ActiveFile = ini->handler;
    hsrc = make_temp(ini->fname,tmpname);
-   if(hsrc == (bhandle_t)-1) { _ret = False; goto Exit_WS; }
+   if(hsrc == NULL_HANDLE) { _ret = False; goto Exit_WS; }
    __OsClose(hsrc);
    tmphandle = fopen(tmpname,"wt");
    if(tmphandle == NULL) { _ret = False; goto Exit_WS; }

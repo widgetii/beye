@@ -1223,6 +1223,9 @@ v5.0.2        ! Changes:
                   elf executables that have non standard size of Elf32_Shdr
                   structure.
                 * Some spelling mistakes corrected
+6.0.2
+XX YYY 2009   ! Changes:
+                * Disable MMF system for Win64 as workaround
 []======================================================================[]
 []  Thank you for your interest.                                        []
 []  Nickols_K (http://my666.boom.ru/666_en.html).                       []

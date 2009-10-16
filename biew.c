@@ -345,9 +345,9 @@ static tBool __NEAR__ __FASTCALL__ LoadInfo( void )
        else
        {
          handle = __OsOpen(ArgVector[1],FO_READWRITE | SO_DENYNONE);
-         if(handle == -1) handle = __OsOpen(ArgVector[1],FO_READWRITE | SO_COMPAT);
+         if(handle == NULL_HANDLE) handle = __OsOpen(ArgVector[1],FO_READWRITE | SO_COMPAT);
        }
-       if(handle != -1)
+       if(handle != NULL_HANDLE)
        {
            __OsChSize(handle,new_file_size);
            __OsClose(handle);

@@ -75,7 +75,7 @@ bhandle_t __FASTCALL__ __OsOpen(const char *fname,int mode)
 
 /* check for directory (KB) */
 
-  if (stat(fname,&st)) return -1;
+  if (stat(fname,&st)) return NULL_HANDLE;
   if (S_ISDIR(st.st_mode)) { errno = EISDIR; return -1; }
   return open(fname,flags);
 }

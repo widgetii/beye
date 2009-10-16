@@ -258,7 +258,7 @@ mmfHandle          __FASTCALL__ __mmfOpen(const char *fname,int mode)
     }
 /* Open file */
 
-    if((fhandle = __OsOpen(fname,mode)) == -1) return NULL;
+    if((fhandle = __OsOpen(fname,mode)) == NULL_HANDLE) return NULL;
 
 /* Query file size */
 

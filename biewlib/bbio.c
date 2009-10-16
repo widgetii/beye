@@ -31,7 +31,6 @@
 #define IS_CACHE_VALID(obj) ((obj)->b.vfb.MBuffer && !((obj)->optimize & BIO_OPT_NOCACHE))
 #define IS_WRITEABLE(openmode) (((openmode) & FO_READWRITE) || ((openmode) & FO_WRITEONLY))
 
-#define NULL_HANDLE ((bhandle_t)-1)
 #define MMF_HANDLE ((bhandle_t)-2)
 
 struct tagBFILE bNull =
@@ -456,8 +455,10 @@ tUInt8 __FASTCALL__ bioReadByte(BGLOBAL bioFile)
 {
   BFILE  *obj = MK_FPTR(bioFile);
   tUInt8 ret;
-  if(IS_CACHE_VALID(obj) && !obj->is_mmf) ret = __getc(obj);
-  else
+  if(IS_CACHE_VALID(obj) && !obj->is_mmf) {
+    ret = __getc(obj);
+  }
+  else {
     if(obj->is_mmf)
     {
       tUInt8 rval;
@@ -466,8 +467,10 @@ tUInt8 __FASTCALL__ bioReadByte(BGLOBAL bioFile)
       CHK_EOF(obj,obj->FilePos);
       ret = rval;
     }
-    else
+    else {
       if(__OsRead(obj->b.vfb.handle,&ret,sizeof(tUInt8)) != sizeof(tUInt8)) ret = -1;
+    }
+  }
   return ret;
 }
 

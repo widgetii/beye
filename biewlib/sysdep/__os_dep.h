@@ -369,6 +369,7 @@ typedef void* bhandle_t;
 #else
 typedef int   bhandle_t;
 #endif
+#define NULL_HANDLE ((bhandle_t)-1)
 
                    /** Closes opened stream
                      * @return                none
