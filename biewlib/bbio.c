@@ -31,8 +31,6 @@
 #define IS_CACHE_VALID(obj) ((obj)->b.vfb.MBuffer && !((obj)->optimize & BIO_OPT_NOCACHE))
 #define IS_WRITEABLE(openmode) (((openmode) & FO_READWRITE) || ((openmode) & FO_WRITEONLY))
 
-#define MMF_HANDLE ((bhandle_t)-2)
-
 struct tagBFILE bNull =
 {
   0L,
@@ -44,7 +42,7 @@ struct tagBFILE bNull =
   False,
   {
    {
-     MMF_HANDLE,
+     NULL_HANDLE,
      0L,
      NULL,
      0,
@@ -415,7 +413,8 @@ tBool  __FASTCALL__ bioClose(BGLOBAL handle)
     if(bFile->b.vfb.handle != NULL_HANDLE)
     {
       if(IS_WRITEABLE(bFile->openmode)) __flush(bFile);
-      if(bFile->b.vfb.handle != 2) __OsClose(bFile->b.vfb.handle);
+      /* For compatibility with DOS-32: don't try to close stderr */
+      if(bFile->b.vfb.handle != (bhandle_t)2) __OsClose(bFile->b.vfb.handle);
     }
     if(bFile->b.vfb.MBuffer) PFREE(bFile->b.vfb.MBuffer);
   }
@@ -673,7 +672,7 @@ unsigned  __FASTCALL__ bioGetOptimization(BGLOBAL bioFile)
 bhandle_t  __FASTCALL__ bioHandle(BGLOBAL bioFile)
 {
    BFILE *obj = MK_FPTR(bioFile);
-   return obj->is_mmf ? MMF_HANDLE : obj->b.vfb.handle;
+   return obj->b.vfb.handle;
 }
 
 char * __FASTCALL__ bioFileName(BGLOBAL bioFile)

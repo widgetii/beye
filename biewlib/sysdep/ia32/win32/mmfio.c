@@ -124,14 +124,19 @@ LONG CALLBACK apiPageFaultHandler(LPEXCEPTION_POINTERS excpt)
 {
     MEMORY_BASIC_INFORMATION mbi;
     ADRSIZE ulTemp;
-    if(excpt->ExceptionRecord->ExceptionCode == EXCEPTION_ACCESS_VIOLATION)
+#if __WORDSIZE > 32
+    PEXCEPTION_RECORD64 per=excpt->ExceptionRecord;
+#else
+    PEXCEPTION_RECORD per=excpt->ExceptionRecord;
+#endif
+    if(per->ExceptionCode == EXCEPTION_ACCESS_VIOLATION)
     {
         PMMF     pMMF   = 0;
         void *   pPage  = 0;
         ULONG ulSize = PAG_SIZE;
-        if(!(pMMF = Locate((void *)excpt->ExceptionRecord->ExceptionInformation[1])))
+        if(!(pMMF = Locate((void *)per->ExceptionInformation[1])))
             return EXCEPTION_CONTINUE_SEARCH;
-        pPage = (void *)((long)excpt->ExceptionRecord->ExceptionInformation[1] & PAG_MASK);
+        pPage = (void *)((ADRSIZE)per->ExceptionInformation[1] & PAG_MASK);
 
         /* Query affected page flags */
         if(VirtualQuery(pPage, &mbi, sizeof(MEMORY_BASIC_INFORMATION)) != 
@@ -149,7 +154,7 @@ LONG CALLBACK apiPageFaultHandler(LPEXCEPTION_POINTERS excpt)
 
 /* If file was open for read-only access and system is requiring write access
    we must produce page fault exception */
-        if(excpt->ExceptionRecord->ExceptionInformation[0] != 0 &&
+        if(per->ExceptionInformation[0] != 0 &&
            !(pMMF->ulFlags & FO_READWRITE))
               return EXCEPTION_CONTINUE_SEARCH;
 
@@ -176,7 +181,7 @@ LONG CALLBACK apiPageFaultHandler(LPEXCEPTION_POINTERS excpt)
 
 /* if page already committed, and accessed for writing - mark them writable,
    for writting it back to the file at close. */
-        if(excpt->ExceptionRecord->ExceptionInformation[0] != 0)
+        if(per->ExceptionInformation[0] != 0)
             VirtualProtect(pPage, PAG_SIZE, PAGE_READWRITE,(ULONG *)&ulTemp);
         return EXCEPTION_CONTINUE_EXECUTION;
         /* exception is fully working. Success exit. */
