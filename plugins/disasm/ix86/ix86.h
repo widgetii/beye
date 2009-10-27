@@ -49,9 +49,51 @@ typedef struct tagix86Param
   MBuffer       RealCmd; /**< buffer without prefixes */
   unsigned      flags; /**< refer to disasm.h header */
   unsigned char codelen;
+#define PFX_SEGMASK		0x00000007
+#define  PFX_SEG_CS		0x00000000
+#define  PFX_SEG_DS		0x00000001
+#define  PFX_SEG_ES		0x00000002
+#define  PFX_SEG_SS		0x00000003
+#define  PFX_SEG_FS		0x00000004
+#define  PFX_SEG_GS		0x00000005
+#define  PFX_SEG_US		0x00000006
+#define  PFX_SEG_XS		0x00000007
+#define PFX_LOCK		0x00000008
+#define PFX_F2_REPNE		0x00000010
+#define PFX_F3_REP		0x00000020
+#define PFX_66			0x00000040
+#define PFX_67			0x00000080
+#define PFX_OF			0x00000100 /* for VEX compatibility */
+#define PFX_REX			0x01000000
+#define PFX_VEX			0x02000000
+  unsigned long pfx;
+#define MOD_32DATA		0x00000001
+#define MOD_32ADDR		0x00000002
+#define MOD_MMX			0x00000010
+#define MOD_SSE			0x00000020
+  unsigned long mode;
+/*
+  REX is 0x4? opcodes
+  bits  meaning
+  0     rex.b (extension to the Base)
+  1     rex.x (extsnsion to the SIB indeX)
+  2     rex.r (extension to the ModRM/REG)
+  3     rex.w (extension to the operand Width)
+  7-4   0100
+  DEFAULT operand size:
+    if rex.w then 64
+    else 66_pref then 16
+    else 32
+  DEFAULT address size:
+    if 67_pref then 32
+    else 64
+    (note: address displasement always has 8, 16 or 32-bit)
+*/
+  unsigned char REX;
+  unsigned char VEX[3];
 }ix86Param;
 
-extern tBool Use32Addr,Use32Data,UseMMXSet,UseXMMXSet,Use64;
+extern tBool Use64;
 extern char * SJump[];
 typedef void (__FASTCALL__*ix86_method)(char *encode_str,ix86Param *);
 
@@ -190,9 +232,6 @@ extern const char * k86_CrxRegs[];
 extern const char * k86_DrxRegs[];
 extern const char * k86_TrxRegs[];
 extern const char * k86_XrxRegs[];
-extern unsigned char k86_REX;
-extern int has_REX;
-extern tBool has67_in64;
 #endif
 extern const char * ix86_SegRegs[];
 extern const char * ix86_CrxRegs[];
