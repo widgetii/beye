@@ -3817,19 +3817,20 @@ static void ix86_gettype(DisasmRet *dret,ix86Param *_DisP)
 {
  MBuffer insn;
  char ua,ud,up,has_lock,has_rep,has_seg;
+ tBool has_vex;
  insn = &_DisP->RealCmd[0];
  dret->pro_clone = __INSNT_ORDINAL;
- has_lock = has_rep = has_seg = 0;
+ has_vex = has_lock = has_rep = has_seg = 0;
  up = ua = ud = 0;
  RepeateByPrefix:
 #ifdef IX86_64
  if(x86_Bitness == DAB_USE64)
  {
-   if(ua+ud+has_seg+has_rep+has_lock>4) goto get_type;
+   if(ua+ud+has_seg+has_rep+has_lock+has_vex>4) goto get_type;
  }
  else
 #endif
- if(has_lock + has_rep > 1 || has_seg > 1 || ua > 1 || ud > 1) goto get_type;
+ if(has_lock + has_rep > 1 || has_seg > 1 || ua > 1 || ud > 1 || has_vex > 0) goto get_type;
  /** do prefixes loop */
  switch(insn[0])
  {
@@ -3882,6 +3883,15 @@ static void ix86_gettype(DisasmRet *dret,ix86Param *_DisP)
               if(has_lock + has_rep) break;
               has_lock++;
               goto MakePref;
+   case 0xC4:
+	      if(x86_Bitness == DAB_USE64) has_vex++;
+	      else if((insn[1]&0x80)==0x80) has_vex++;
+	      insn=&insn[1];
+   case 0xC5:
+	      if(x86_Bitness == DAB_USE64) has_vex++;
+	      else if((insn[1]&0x80)==0x80) has_vex++;
+	      insn=&insn[1];
+	      goto MakePref;
    case 0xF2:
 		_DisP->pfx|=PFX_F2_REPNE;
               if(has_rep + has_lock)  break;
@@ -3901,7 +3911,7 @@ static void ix86_gettype(DisasmRet *dret,ix86Param *_DisP)
  }
   /** First check for SSE extensions */
   if(insn[0] == 0x0F && (_DisP->pfx&(PFX_66|PFX_F2_REPNE|PFX_F3_REP))) {
-    const ix86_ExOpcodes *SSE2_ext;
+    const ix86_ExOpcodes *SSE2_ext=ix86_extable;
     if(_DisP->pfx&PFX_F2_REPNE) SSE2_ext=ix86_F20F_PentiumTable;
     else
     if(_DisP->pfx&PFX_F3_REP)   SSE2_ext=ix86_F30F_PentiumTable;
@@ -3919,8 +3929,8 @@ static void ix86_gettype(DisasmRet *dret,ix86Param *_DisP)
 #ifdef IX86_64
   if(x86_Bitness == DAB_USE64)
   {
-    _DisP->mode|= MOD_32ADDR;
-    if(_DisP->pfx&PFX_REX && ((_DisP->REX & 0x0F)>>3) != 0) _DisP->mode|=MOD_32DATA;
+    _DisP->mode|= MOD_WIDE_ADDR;
+    if(_DisP->pfx&PFX_REX && ((_DisP->REX & 0x0F)>>3) != 0) _DisP->mode|=MOD_WIDE_DATA;
   }
 #endif
    if((insn[0] & 0xF6) == 0xC2)
@@ -3950,15 +3960,15 @@ static void ix86_gettype(DisasmRet *dret,ix86Param *_DisP)
 #endif
      else
      if(insn[0] == 0xFF &&
-        (((insn[1] & 0x27) == 0x25 && (_DisP->mode&MOD_32ADDR)) ||
-        ((insn[1] & 0x27) == 0x26 && !(_DisP->mode&MOD_32ADDR))))
+        (((insn[1] & 0x27) == 0x25 && (_DisP->mode&MOD_WIDE_ADDR)) ||
+        ((insn[1] & 0x27) == 0x26 && !(_DisP->mode&MOD_WIDE_ADDR))))
      {
         dret->pro_clone = __INSNT_JMPVVT;
         dret->codelen = (insn[1] & 0x27) == 0x25 ? 4 : 2;
         dret->field = 2;
      }
      else
-     if(insn[0] == 0xFF && insn[1] == 0xA3 && (_DisP->mode&MOD_32ADDR))
+     if(insn[0] == 0xFF && insn[1] == 0xA3 && (_DisP->mode&MOD_WIDE_ADDR))
      {
         dret->pro_clone = __INSNT_JMPPIC;
         dret->codelen = 4;
@@ -3999,7 +4009,7 @@ static void ix86_gettype(DisasmRet *dret,ix86Param *_DisP)
             if(insn[i] == 0x81 && (insn[i+1] == 0xC4 || insn[i+1] == 0xEC))
             { /* sub/add esp, long_num */
               leave_cond = True;
-              i += (_DisP->mode&MOD_32DATA) ? 5 : 3;
+              i += (_DisP->mode&MOD_WIDE_DATA) ? 5 : 3;
             }
           }
           if(!leave_cond) break;
@@ -4029,6 +4039,39 @@ static unsigned char parse_REX(unsigned char code,ix86Param* DisP,char *up)
     return DisP->RealCmd[0];
 }
 
+static void parse_VEX_pp(ix86Param* DisP) {
+    if((DisP->VEX_vlp & 0x03) == 0x01) DisP->pfx|=PFX_66;
+    else
+    if((DisP->VEX_vlp & 0x03) == 0x02) DisP->pfx|=PFX_F3_REP;
+    else
+    if((DisP->VEX_vlp & 0x03) == 0x03) DisP->pfx|=PFX_F2_REPNE;
+}
+
+static void parse_VEX_C4(ix86Param* DisP) {
+  unsigned char code;
+  DisP->pfx|=PFX_VEX;
+  DisP->pfx|=PFX_REX;
+  code=DisP->RealCmd[1];
+  DisP->REX=0x40;
+  DisP->VEX_m = code&0x1F;
+  DisP->REX|=((code>>7)&0x01)<<2; /* make R */
+  DisP->REX|=((code>>6)&0x01)<<1; /* make X */
+  DisP->REX|=((code>>5)&0x01);    /* make B */
+  code=DisP->RealCmd[2];
+  DisP->REX|=((code>>7)&0x01)<<3; /* make W */
+  DisP->REX^=0x0F;                /* complenent it */
+  DisP->VEX_vlp=code&0x7F;
+  parse_VEX_pp(DisP);
+}
+
+static void parse_VEX_C5(ix86Param* DisP) {
+  unsigned char code;
+  DisP->pfx|=PFX_VEX;
+  code=DisP->RealCmd[1];
+  DisP->VEX_m = 0;
+  DisP->VEX_vlp=code&0x7F;
+  parse_VEX_pp(DisP);
+}
 
 static DisasmRet __FASTCALL__ ix86Disassembler(__filesize_t ulShift,
                                                MBuffer buffer,
@@ -4038,8 +4081,10 @@ static DisasmRet __FASTCALL__ ix86Disassembler(__filesize_t ulShift,
  DisasmRet Ret;
  ix86Param DisP;
  char ua,ud,up,has_lock,has_rep,has_seg;
+ tBool has_vex;
 
  memset(&DisP,0,sizeof(DisP));
+ memset(&Ret,0,sizeof(Ret));
 #ifdef IX86_64
  if(x86_Bitness == DAB_USE64) DisP.pro_clone=K64_ATHLON;
  else
@@ -4064,7 +4109,7 @@ static DisasmRet __FASTCALL__ ix86Disassembler(__filesize_t ulShift,
  code = buffer[0];
 
  ix86_segpref[0] = 0;
- has_lock = has_rep = has_seg = 0;
+ has_vex = has_lock = has_rep = has_seg = 0;
  up = ua = ud = 0;
  ix86_da_out[0] = 0;
 
@@ -4073,8 +4118,8 @@ static DisasmRet __FASTCALL__ ix86Disassembler(__filesize_t ulShift,
 
  if(x86_Bitness > DAB_USE16)
  {
-    DisP.mode|=MOD_32DATA;
-    DisP.mode|=MOD_32ADDR;
+    DisP.mode|=MOD_WIDE_DATA;
+    DisP.mode|=MOD_WIDE_ADDR;
  }
 
  Ret.str = ix86_voidstr;
@@ -4086,11 +4131,11 @@ static DisasmRet __FASTCALL__ ix86Disassembler(__filesize_t ulShift,
 #ifdef IX86_64
  if(x86_Bitness == DAB_USE64)
  {
-   if(ua+ud+has_seg+has_rep+has_lock>4) goto bad_prefixes;
+   if(ua+ud+has_seg+has_rep+has_lock+has_vex>4) goto bad_prefixes;
  }
  else
 #endif
- if(has_lock + has_rep > 1 || has_seg > 1 || ua > 1 || ud > 1)
+ if(has_lock + has_rep > 1 || has_seg > 1 || ua > 1 || ud > 1 || has_vex > 1)
  {
    bad_prefixes:
    DisP.codelen = 0;
@@ -4175,19 +4220,37 @@ static DisasmRet __FASTCALL__ ix86Disassembler(__filesize_t ulShift,
               goto MakePref;
    case 0x66:
 		ud++;
-		if(DisP.pfx&PFX_66) DisP.pfx &= ~PFX_66;
-		else DisP.pfx |= PFX_66;
-		if(DisP.mode&MOD_32DATA) DisP.mode &= ~MOD_32DATA;
-		else DisP.mode |= MOD_32DATA;
+		DisP.pfx |= PFX_66;
+		DisP.mode ^= MOD_WIDE_DATA;
 		DisP.pro_clone = IX86_CPU386;
 		goto MakePref;
    case 0x67:
 		ua++;
-		if(DisP.pfx&PFX_67) DisP.pfx &= ~PFX_67;
-		else DisP.pfx |= PFX_67;
-		if(DisP.mode&MOD_32ADDR) DisP.mode &= ~MOD_32ADDR;
-		else DisP.mode |= MOD_32ADDR;
+		DisP.pfx |= PFX_67;
+		DisP.mode ^= MOD_WIDE_ADDR;
 		goto MakePref;
+   case 0xC4:
+		if(x86_Bitness == DAB_USE64) has_vex++;
+		else if((DisP.RealCmd[1]&0x80)==0x80) has_vex++;
+		if(has_vex) {
+		    parse_VEX_C4(&DisP);
+		    DisP.CodeAddress+=2;
+		    up+=2;
+		    DisP.RealCmd = &DisP.RealCmd[2];
+		    goto MakePref;
+		}
+		break;
+   case 0xC5:
+		if(x86_Bitness == DAB_USE64) has_vex++;
+		else if((DisP.RealCmd[1]&0x80)==0x80) has_vex++;
+		if(has_vex) {
+		    parse_VEX_C5(&DisP);
+		    DisP.CodeAddress++;
+		    up++;
+		    DisP.RealCmd = &DisP.RealCmd[1];
+		    goto MakePref;
+		}
+		break;
    case 0xF0:
 		if(has_lock + has_rep) break;
 		has_lock++;
@@ -4227,51 +4290,35 @@ static DisasmRet __FASTCALL__ ix86Disassembler(__filesize_t ulShift,
  else
 #endif
  DisP.pro_clone = ix86_table[code].pro_clone;
+ if((DisP.pfx&PFX_VEX) && DisP.VEX_m>0 && DisP.VEX_m<4) goto fake_0F_opcode;
  if(code==0x0F && (DisP.pfx&(PFX_F2_REPNE|PFX_F3_REP|PFX_66))) {
-    const ix86_ExOpcodes *SSE2_ext;
+    const ix86_ExOpcodes *SSE2_ext=ix86_extable;
     unsigned char ecode;
+    const char *nam;
+    ix86_method mthd;
+    fake_0F_opcode:
     if(DisP.pfx&PFX_F2_REPNE) SSE2_ext=ix86_F20F_PentiumTable;
     else
     if(DisP.pfx&PFX_F3_REP)   SSE2_ext=ix86_F30F_PentiumTable;
     else
     if(DisP.pfx&PFX_66)       SSE2_ext=ix86_660F_PentiumTable;
     ecode = DisP.RealCmd[1];
-    if(
-#ifdef IX86_64
-	x86_Bitness==DAB_USE64?
-	SSE2_ext[ecode].name64:
-#endif
-	SSE2_ext[ecode].name
-    ) {
-	ix86_da_out[0]='\0';
+    if((DisP.pfx&PFX_VEX) && DisP.VEX_m==0x02) ecode = 0x38;
+    else
+    if((DisP.pfx&PFX_VEX) && DisP.VEX_m==0x03) ecode = 0x3A;
+    SSE2_ext=ix86_prepare_flags(SSE2_ext,&DisP,&ecode);
+    nam=((x86_Bitness==DAB_USE64)?SSE2_ext[ecode].name64:SSE2_ext[ecode].name);
+    if(nam) {
+	strcpy(Ret.str,nam);
+	ix86_da_out[0]='\0'; /* disable rep; lock; prefixes */
 	DisP.RealCmd = &DisP.RealCmd[1];
-	ecode = DisP.RealCmd[0];
 	DisP.codelen++;
-	SSE2_ext=ix86_prepare_flags(SSE2_ext,&DisP,&ecode);
-#ifdef IX86_64
-	if(x86_Bitness == DAB_USE64) {
-	    DisP.pro_clone = SSE2_ext[ecode].flags64;
-	    strcpy(Ret.str,SSE2_ext[ecode].name64);
-	}
-	else
-#endif
-	{
-	    DisP.pro_clone = SSE2_ext[ecode].pro_clone;
-	    strcpy(Ret.str,SSE2_ext[ecode].name);
-	}
-	if(
-#ifdef IX86_64
-		x86_Bitness==DAB_USE64?
-		SSE2_ext[ecode].method64:
-#endif
-		SSE2_ext[ecode].method
-	) {
+	if(x86_Bitness == DAB_USE64)	DisP.pro_clone = SSE2_ext[ecode].flags64;
+	else				DisP.pro_clone = SSE2_ext[ecode].pro_clone;
+	mthd=((x86_Bitness==DAB_USE64)?SSE2_ext[ecode].method64:SSE2_ext[ecode].method);
+	if(mthd) {
 		TabSpace(Ret.str,TAB_POS);
-#ifdef IX86_64
-		x86_Bitness==DAB_USE64?
-		SSE2_ext[ecode].method64(Ret.str,&DisP):
-#endif
-		SSE2_ext[ecode].method(Ret.str,&DisP);
+		mthd(Ret.str,&DisP);
 	}
 	goto ExitDisAsm;
     }
@@ -4280,17 +4327,17 @@ static DisasmRet __FASTCALL__ ix86Disassembler(__filesize_t ulShift,
 #ifdef IX86_64
  if(x86_Bitness == DAB_USE64)
  {
-   DisP.mode|=MOD_32ADDR; /* there is no way to use 16-bit addresing in 64-bit mode */
-   if(Use64) DisP.mode|=MOD_32DATA; /* 66h prefix is ignored if REX prefix is present*/
+   DisP.mode|=MOD_WIDE_ADDR; /* there is no way to use 16-bit addresing in 64-bit mode */
+   if(Use64) DisP.mode|=MOD_WIDE_DATA; /* 66h prefix is ignored if REX prefix is present*/
    if(ix86_table[code].flags64 & K64_DEF32)
    {
      if(Use64) strcpy(Ret.str,ix86_table[code].name64);
      else
-     if(!(DisP.mode&MOD_32ADDR))	strcpy(Ret.str,ix86_table[code].name16);
+     if(!(DisP.mode&MOD_WIDE_ADDR))	strcpy(Ret.str,ix86_table[code].name16);
      else				strcpy(Ret.str,ix86_table[code].name32);
    }
    else
-   if((DisP.mode&MOD_32DATA) || (ix86_table[code].flags64 & K64_NOCOMPAT))
+   if((DisP.mode&MOD_WIDE_DATA) || (ix86_table[code].flags64 & K64_NOCOMPAT))
 		strcpy(Ret.str,ix86_table[code].name64);
    else		strcpy(Ret.str,ix86_table[code].name32);
  }
