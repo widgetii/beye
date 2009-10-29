@@ -338,7 +338,7 @@ static __filesize_t __FASTCALL__ ShowMethods(void)
   {
     char str[80];
     unsigned i;
-    unsigned short acount;
+    unsigned short acount=0;
     bmSeek(jvm_header.methods_offset,BM_SEEK_SET);
     for(i=0;i<(unsigned)ret+1;i++)
     {
@@ -412,7 +412,7 @@ static __filesize_t __FASTCALL__ ShowFields(void)
   {
     char str[80];
     unsigned i;
-    unsigned short acount;
+    unsigned short acount=0;
     bmSeek(jvm_header.fields_offset,BM_SEEK_SET);
     for(i=0;i<(unsigned)ret+1;i++)
     {

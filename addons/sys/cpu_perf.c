@@ -65,7 +65,6 @@ char ** __FASTCALL__ cpuPointStrings(char __HUGE__ *data,unsigned long data_size
 
 static void ShowCPUInfo( void )
 {
-   unsigned evt;
    char *cpu_info;
    char **str_ptr;
    unsigned long data_size;

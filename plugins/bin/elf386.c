@@ -1560,6 +1560,8 @@ static unsigned long __NEAR__ __FASTCALL__ BuildReferStrElf_arm(char *str,
   tUInt32 r_type;
   tBool ret=False, use_addend = False;
   char buff[300];
+  UNUSED(codelen);
+  UNUSED(defval);
   r_type = ELF32_R_TYPE(erl->info);
   buff[0] = 0;
   switch(r_type)
@@ -1634,6 +1636,8 @@ static unsigned long __NEAR__ __FASTCALL__ BuildReferStrElf_i386(char *str,
   tUInt32 r_type;
   tBool ret=False, use_addend = False;
   char buff[300];
+  UNUSED(codelen);
+  UNUSED(defval);
   r_type = ELF32_R_TYPE(erl->info);
   buff[0] = 0;
   switch(r_type)
@@ -1715,6 +1719,8 @@ static unsigned long __NEAR__ __FASTCALL__ BuildReferStrElf_x86_64(char *str,
   tUInt32 r_type;
   tBool ret=False, use_addend = False;
   char buff[300];
+  UNUSED(codelen);
+  UNUSED(defval);
   r_type = ELF32_R_TYPE(erl->info);
   buff[0] = 0;
   switch(r_type)
@@ -1810,6 +1816,8 @@ static unsigned long __NEAR__ __FASTCALL__ BuildReferStrElf_ppc(char *str,
   tUInt32 r_type;
   tBool ret=False, use_addend = False;
   char buff[300];
+  UNUSED(codelen);
+  UNUSED(defval);
   r_type = ELF32_R_TYPE(erl->info);
   buff[0] = 0;
   switch(r_type)
@@ -2365,6 +2373,7 @@ static int __FASTCALL__ ELFplatform( void ) {
 }
 
 static int __FASTCALL__ ELFendian(__filesize_t off) {
+ UNUSED(off);
  return is_msbf?DAE_BIG:DAE_LITTLE;
 }
 

@@ -709,7 +709,7 @@ static void __FASTCALL__ disReadIni( hIniProfile *ini )
 static void __FASTCALL__ disInit( void )
 {
   unsigned i;
-  int def_platform;
+  unsigned def_platform;
   CurrStrLenBuff = PMalloc(tvioHeight);
   PrevStrLenAddr = PMalloc(tvioHeight*sizeof(long));
   dis_comments   = PMalloc(DISCOM_SIZE*sizeof(char));
@@ -1178,6 +1178,7 @@ int __FASTCALL__ disAppendFAddr(char * str,__fileoff_t ulShift,__fileoff_t disti
  int appended = RAPREF_NONE;
  int flags;
  fpos = bmGetCurrFilePos();
+ memset(&dret,0,sizeof(DisasmRet));
  /* Prepare insn type */
  if(disNeedRef > NEEDREF_NONE)
  {

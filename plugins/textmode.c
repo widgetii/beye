@@ -225,7 +225,7 @@ static void unfmt_str(unsigned char *str)
 {
    long result;
    unsigned base,i;
-   char *src,*dest,ch,temp[MAX_STRLEN];
+   unsigned char *src,*dest,ch,temp[MAX_STRLEN];
    src=dest=str;
    while(*src)
    {

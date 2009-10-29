@@ -403,7 +403,7 @@ static void __NEAR__ __FASTCALL__ BuildRelocRDOFF( void )
       rdf_r.offset = segno == 0 ? cs_start : segno == 1 ? ds_start : FILESIZE_MAX;
       off = bmReadDWord();
       if(bmEOF()) break;
-      if(rdf_r.offset < FILESIZE_MAX) rdf_r.offset += off;
+      rdf_r.offset += off;
       rdf_r.reflen = bmReadByte();
       rdf_r.segto = bmReadWord();
       if(!la_AddData(rdoffReloc,&rdf_r,MemOutBox)) break;

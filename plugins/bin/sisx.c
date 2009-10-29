@@ -82,8 +82,8 @@ static int  __FASTCALL__ sisx_platform(void) {
  struct E32ImageHeader img;
  bmReadBufferEx(&img,sizeof(img),0,BM_SEEK_SET);
  id=DISASM_DATA;
- if(img.iCpuIdentifier&0xF000==0x1000) id=DISASM_CPU_IX86;
- else if(img.iCpuIdentifier&0xF000==0x2000) id=DISASM_CPU_ARM;
+ if((img.iCpuIdentifier&0xF000)==0x1000) id=DISASM_CPU_IX86;
+ else if((img.iCpuIdentifier&0xF000)==0x2000) id=DISASM_CPU_ARM;
  return id;
 }
 
@@ -93,7 +93,7 @@ static __filesize_t __FASTCALL__ Show_SisX_Header( void )
  TWindow * hwnd;
  char *cpuname,*exetype,head[80];
  struct E32ImageHeader img;
- __filesize_t newcpos,fpos,fpos2;
+ __filesize_t fpos,fpos2;
  fpos2=fpos = BMGetCurrFilePos();
  bmReadBufferEx(&img,sizeof(img),0,BM_SEEK_SET);
  switch(img.iUid1)

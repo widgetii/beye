@@ -189,7 +189,6 @@ static int read_id3v22_tags(unsigned flags,unsigned hsize)
 #endif
 	pos=bmGetCurrFilePos();
     }
-    end:
     return 1;
 }
 
@@ -262,7 +261,6 @@ static int read_id3v23_tags(unsigned flags,unsigned hsize)
 #endif
 	pos=bmGetCurrFilePos();
     }
-    end:
     return 1;
 }
 
@@ -338,7 +336,6 @@ static int read_id3v24_tags(unsigned flags,unsigned hsize)
 #endif
 	pos=bmGetCurrFilePos();
     }
-    end:
     return 1;
 }
 
@@ -422,15 +419,13 @@ static tBool  __FASTCALL__ mp3_check_fmt( void )
 {
     unsigned i;
     unsigned long off;
-    int fmt = 0, n = 0, pos = 0, step,mp3_brate,mp3_samplerate,mp3_channels;
+    int fmt = 0,mp3_brate,mp3_samplerate,mp3_channels;
     unsigned char hdr[4];
     bmSeek(0,BM_SEEK_SET);
     bmReadBuffer(hdr,4);
     if( hdr[0] == 'I' && hdr[1] == 'D' && hdr[2] == '3' && (hdr[3] >= 2))
     {
 	int len,fmt;
-	int scale,lsf,srate;
-	long nframes,nbytes;
 	bmSeek(2,BM_SEEK_CUR);
 	bmReadBuffer(hdr,4);
 	len = (hdr[0]<<21) | (hdr[1]<<14) | (hdr[2]<<7) | hdr[3];
@@ -447,7 +442,7 @@ static tBool  __FASTCALL__ mp3_check_fmt( void )
 	if(bmEOF()) return False;
 	for(i=0;i<5;i++)
 	{
-	    if((off=mp_decode_mp3_header(hdr,&fmt,&mp3_brate,&mp3_samplerate,&mp3_channels)) < 0) return False;
+	    if((long)(off=mp_decode_mp3_header(hdr,&fmt,&mp3_brate,&mp3_samplerate,&mp3_channels)) < 0) return False;
 	    bmSeek(off,BM_SEEK_CUR);
 	    if(bmEOF()) return False;
 
@@ -460,10 +455,8 @@ static __filesize_t __FASTCALL__ Show_MP3_Header( void )
 {
  unsigned keycode;
  TWindow * hwnd;
- __filesize_t newcpos,fpos,fpos2;
- unsigned long FPageCnt;
- const char * addinfo;
- int fmt = 0, n = 0, pos = 0, step,mp3_brate,mp3_samplerate,mp3_channels;
+ __filesize_t fpos,fpos2;
+ int fmt = 0,mp3_brate,mp3_samplerate,mp3_channels;
  unsigned char hdr[4];
  int len;
  int scale,lsf,srate;

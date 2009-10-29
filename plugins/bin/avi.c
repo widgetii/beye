@@ -113,7 +113,7 @@ static int  __FASTCALL__ avi_platform( void) { return DISASM_DEFAULT; }
 
 static __filesize_t __FASTCALL__ avi_find_chunk(__filesize_t off,unsigned long id)
 {
-    unsigned long ids,size,type,fpos;
+    unsigned long ids,size,type;
     bmSeek(off,BM_SEEK_SET);
     while(!bmEOF())
     {
@@ -139,17 +139,15 @@ static __filesize_t __FASTCALL__ Show_AVI_Header( void )
  unsigned keycode;
  TWindow * hwnd;
  MainAVIHeader avih;
- __filesize_t newcpos,fpos,fpos2;
- unsigned long FPageCnt;
- const char * addinfo;
+ __filesize_t fpos,fpos2;
  fpos = BMGetCurrFilePos();
  fpos2 = avi_find_chunk(12,mmioFOURCC('a','v','i','h'));
- if(fpos2==-1) { ErrMessageBox("Main AVI Header not found",NULL); return fpos; }
+ if((__fileoff_t)fpos2==-1) { ErrMessageBox("Main AVI Header not found",NULL); return fpos; }
  bmSeek(fpos2,BM_SEEK_SET);
  bmReadDWord(); /* skip section size */
  bmReadBuffer(&avih,sizeof(MainAVIHeader));
  fpos2 = avi_find_chunk(12,mmioFOURCC('m','o','v','i'));
- if(fpos2!=-1) fpos2-=4;
+ if((__fileoff_t)fpos2!=-1) fpos2-=4;
  hwnd = CrtDlgWndnls(" AVI File Header ",43,9);
  twUseWin(hwnd);
  twGotoXY(1,1);
@@ -190,15 +188,13 @@ static __filesize_t __FASTCALL__ Show_A_Header( void )
  AVIStreamHeader strh;
  WAVEFORMATEX wavf;
  __filesize_t newcpos,fpos,fpos2;
- unsigned long FPageCnt;
- const char * addinfo;
  fpos = BMGetCurrFilePos();
  memset(&wavf,0,sizeof(wavf));
  fpos2=12;
  do
  {
     fpos2 = avi_find_chunk(fpos2,mmioFOURCC('s','t','r','h'));
-    if(fpos2==-1) { ErrMessageBox("Audio Stream Header not found",NULL); return fpos; }
+    if((__fileoff_t)fpos2==-1) { ErrMessageBox("Audio Stream Header not found",NULL); return fpos; }
     bmSeek(fpos2,BM_SEEK_SET);
     newcpos=bmReadDWord();
     bmReadBuffer(&strh,sizeof(AVIStreamHeader));
@@ -265,15 +261,13 @@ static __filesize_t __FASTCALL__ Show_V_Header( void )
  AVIStreamHeader strh;
  BITMAPINFOHEADER bmph;
  __filesize_t newcpos,fpos,fpos2;
- unsigned long FPageCnt;
- const char * addinfo;
  fpos = BMGetCurrFilePos();
  memset(&bmph,0,sizeof(BITMAPINFOHEADER));
  fpos2=12;
  do
  {
     fpos2 = avi_find_chunk(fpos2,mmioFOURCC('s','t','r','h'));
-    if(fpos2==-1) { ErrMessageBox("Video Stream Header not found",NULL); return fpos; }
+    if((__fileoff_t)fpos2==-1) { ErrMessageBox("Video Stream Header not found",NULL); return fpos; }
     bmSeek(fpos2,BM_SEEK_SET);
     newcpos=bmReadDWord(); /* skip section size */
     bmReadBuffer(&strh,sizeof(AVIStreamHeader));

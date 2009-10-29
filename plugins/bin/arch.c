@@ -37,10 +37,11 @@ ar_hdr arch;
 
 static __filesize_t __FASTCALL__ ShowARCHHeader( void )
 {
-  __filesize_t fpos,ldat;
+  __filesize_t fpos;
   unsigned evt;
   TWindow * w;
   struct tm * tm;
+  time_t ldat;
   char sout[50];
   fpos = BMGetCurrFilePos();
   w = CrtDlgWndnls(" This is COFF or a.out archive ",54,6);
@@ -51,7 +52,7 @@ static __filesize_t __FASTCALL__ ShowARCHHeader( void )
   strncpy(sout,(char *)arch.ar_date,12);
   sout[12] = 0;
   ldat = atol(sout);
-  tm = localtime((time_t *)&ldat);
+  tm = localtime(&ldat);
   strftime(sout,sizeof(sout),"%X %x",tm);
   twPrintF("Date           = %s\n",sout);
   strncpy(sout,(char *)arch.ar_uid,6);

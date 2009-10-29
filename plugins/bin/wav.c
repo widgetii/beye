@@ -188,7 +188,7 @@ static int  __FASTCALL__ wav_platform( void) { return DISASM_DEFAULT; }
 
 static __filesize_t __FASTCALL__ wav_find_chunk(__filesize_t off,unsigned long id)
 {
-    unsigned long ids,size,type,fpos;
+    unsigned long ids,size,type;
     bmSeek(off,BM_SEEK_SET);
     while(!bmEOF())
     {
@@ -214,17 +214,15 @@ static __filesize_t __FASTCALL__ Show_WAV_Header( void )
  unsigned keycode;
  TWindow * hwnd;
  WAVEFORMATEX wavf;
- __filesize_t newcpos,fpos,fpos2;
- unsigned long FPageCnt;
- const char * addinfo;
+ __filesize_t fpos,fpos2;
  fpos = BMGetCurrFilePos();
  fpos2 = wav_find_chunk(12,mmioFOURCC('f','m','t',' '));
- if(fpos2==-1) { ErrMessageBox("Main WAV Header not found",NULL); return fpos; }
+ if((__fileoff_t)fpos2==-1) { ErrMessageBox("Main WAV Header not found",NULL); return fpos; }
  bmSeek(fpos2,BM_SEEK_SET);
  bmReadDWord(); /* skip section size */
  bmReadBuffer(&wavf,sizeof(WAVEFORMATEX));
  fpos2 = wav_find_chunk(12,mmioFOURCC('d','a','t','a'));
- if(fpos2!=-1) fpos2-=4;
+ if((__fileoff_t)fpos2!=-1) fpos2-=4;
  hwnd = CrtDlgWndnls(" WAV File Header ",43,5);
  twUseWin(hwnd);
  twGotoXY(1,1);

@@ -141,6 +141,7 @@ static int __FASTCALL__ aout_bitness(__filesize_t off)
 
 static int __FASTCALL__ aout_endian(__filesize_t off)
 {
+   UNUSED(off);
    return is_msbf?DAE_BIG:DAE_LITTLE;
 }
 

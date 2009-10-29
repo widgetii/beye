@@ -217,7 +217,7 @@ static const char *nendian[] =
 
 static tBool __FASTCALL__ hexSelectEndian( void )
 {
-  size_t i,nModes;
+  size_t nModes;
   int retval;
   nModes = sizeof(nendian)/sizeof(char *);
   retval = SelBoxA(nendian,nModes," Select endian mode: ",hendian);

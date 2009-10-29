@@ -320,7 +320,7 @@ static DisasmRet __FASTCALL__ javaDisassembler(__filesize_t ulShift,
                                                unsigned flags)
 {
   DisasmRet ret;
-  unsigned mult,idx,tail,npadds;
+  unsigned mult,idx,tail,npadds=0;
   __filesize_t prev_pa,next_pa;
   unsigned long jflags;
   memset(&ret,0,sizeof(ret));

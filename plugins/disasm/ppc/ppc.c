@@ -1415,11 +1415,10 @@ static DisasmRet __FASTCALL__ ppcDisassembler(__filesize_t ulShift,
                                               unsigned flags)
 {
     DisasmRet dret;
-    tInt32 tbuff;
     int done;
-    unsigned i,ix,n,idx,val;
-    char *p;
+    unsigned ix,n;
     tUInt32 opcode;
+    memset(&dret,0,sizeof(DisasmRet));
     if(detectedFormat->query_bitness) ppcBitness = detectedFormat->query_bitness(ulShift);
     if(detectedFormat->query_endian) ppcBigEndian = detectedFormat->query_endian(ulShift)==DAE_BIG?1:0;
     opcode=ppcBigEndian?be2me_32(*((tUInt32 *)buffer)):le2me_32(*((tUInt32 *)buffer));
@@ -1625,7 +1624,6 @@ static tBool __FASTCALL__ ppcSelectDialect( void )
 
 static void      __FASTCALL__ ppcInit( void )
 {
-  unsigned i,n,j;
   outstr = PMalloc(1000);
   if(!outstr)
   {

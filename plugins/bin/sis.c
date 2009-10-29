@@ -82,7 +82,7 @@ static __filesize_t __FASTCALL__ Show_Sis_Header( void )
  TWindow * hwnd;
  char *TypeName;
  struct SisHeader sis;
- __filesize_t newcpos,fpos,fpos2;
+ __filesize_t fpos,fpos2;
  fpos2=fpos = BMGetCurrFilePos();
  bmReadBufferEx(&sis,sizeof(sis),0,BM_SEEK_SET);
  if(sis.UID1==0x10201A7A) return Show_Sis3_Header();

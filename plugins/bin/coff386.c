@@ -474,7 +474,7 @@ static __filesize_t __NEAR__ __FASTCALL__ BuildReferStrCoff386(char *str,RELOC_C
 {
   __filesize_t offset,retval,s,e;
   unsigned long val;
-  tUIntFast16 secnum;
+  tUIntFast16 secnum=0;
   tBool is_idx,val_assigned;
   int c,b;
   char name[256],pubname[256],secname[256];

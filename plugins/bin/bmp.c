@@ -43,8 +43,6 @@ static __filesize_t __FASTCALL__ Show_BMP_Header( void )
  TWindow * hwnd;
  BITMAPINFOHEADER bmph;
  __filesize_t fpos,fpos2,filesize;
- unsigned long FPageCnt;
- const char * addinfo;
  fpos = BMGetCurrFilePos();
  bmSeek(2,BM_SEEK_SET);
  filesize = bmReadDWord();

@@ -195,7 +195,9 @@ static __fileoff_t overlayPE = -1L;
 static void __NEAR__ PaintNewHeaderPE_1( void )
 {
   const char *fmt;
+  time_t tval;
   entryPE = RVA2Phys(pe.peEntryPointRVA);
+  tval = pe.peTimeDataStamp;
   twPrintF("Signature                      = '%c%c' (Type: %04X)\n"
            "Required CPU Type              = %s\n"
            "Number of object entries       = %hu\n"
@@ -217,7 +219,7 @@ static void __NEAR__ PaintNewHeaderPE_1( void )
            ,pe.peSignature[0],pe.peSignature[1],pe.peMagic
            ,PECPUType()
            ,pe.peObjects
-           ,ctime((time_t *)&pe.peTimeDataStamp)
+           ,ctime(&tval)
            ,pe.peNTHdrSize
            ,pe.peFlags
            ,GetBool(pe.peFlags & 0x0001)
@@ -748,9 +750,11 @@ static __filesize_t __FASTCALL__ ShowExpNamPE( void )
     {
       char sftime[80];
       struct tm * tm;
+      time_t tval;
       __peReadASCIIZName(bmbioHandle(),RVA2Phys(et.etNameRVA),exp_buf, sizeof(exp_buf));
       if(strlen(exp_buf) > 50) strcpy(&exp_buf[50],"...");
-      tm = localtime((time_t *)&et.etDateTime);
+      tval = et.etDateTime;
+      tm = localtime(&tval);
       strftime(sftime,sizeof(sftime),"%x",tm);
       sprintf(exp_nam," %s (ver=%hX.%hX %s) "
               ,exp_buf

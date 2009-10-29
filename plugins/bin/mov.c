@@ -32,7 +32,7 @@
 
 static __filesize_t __FASTCALL__ mov_find_chunk(__filesize_t off,unsigned long id)
 {
-    unsigned long ids,size,type,fpos;
+    unsigned long ids,size;
     bmSeek(off,BM_SEEK_SET);
     while(!bmEOF())
     {
