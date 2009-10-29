@@ -49,6 +49,7 @@ const char * ix86_WordRegs[] = { "ax", "cx", "dx", "bx", "sp", "bp", "si", "di" 
 const char * ix86_DWordRegs[]= { "eax", "ecx", "edx", "ebx", "esp", "ebp", "esi", "edi" };
 const char * ix86_MMXRegs[]  = { "mm0", "mm1", "mm2", "mm3", "mm4", "mm5", "mm6", "mm7" };
 const char * ix86_XMMXRegs[]  = { "xmm0", "xmm1", "xmm2", "xmm3", "xmm4", "xmm5", "xmm6", "xmm7" };
+const char * ix86_YMMXRegs[]  = { "ymm0", "ymm1", "ymm2", "ymm3", "ymm4", "ymm5", "ymm6", "ymm7" };
 const char * ix86_SegRegs[]  = { "es", "cs", "ss", "ds", "fs", "gs", "?s", "?s" };
 const char * ix86_CrxRegs[]  = { "cr0", "cr1", "cr2", "cr3", "cr4", "cr5", "cr6", "cr7" };
 const char * ix86_DrxRegs[]  = { "dr0", "dr1", "dr2", "dr3", "dr4", "dr5", "dr6", "dr7" };
@@ -60,6 +61,7 @@ const char * k86_WordRegs[] = { "ax",  "cx",  "dx",  "bx",  "sp",  "bp",  "si", 
 const char * k86_DWordRegs[]= { "eax", "ecx", "edx", "ebx", "esp", "ebp", "esi", "edi", "r8d", "r9d", "r10d", "r11d", "r12d", "r13d", "r14d", "r15d" };
 const char * k86_QWordRegs[]= { "rax", "rcx", "rdx", "rbx", "rsp", "rbp", "rsi", "rdi", "r8",  "r9",  "r10",  "r11",  "r12",  "r13",  "r14",  "r15" };
 const char * k86_XMMXRegs[] = { "xmm0","xmm1","xmm2","xmm3","xmm4","xmm5","xmm6","xmm7","xmm8","xmm9","xmm10","xmm11","xmm12","xmm13","xmm14","xmm15" };
+const char * k86_YMMXRegs[] = { "ymm0","ymm1","ymm2","ymm3","ymm4","ymm5","ymm6","ymm7","ymm8","ymm9","ymm10","ymm11","ymm12","ymm13","ymm14","ymm15" };
 const char * k86_CrxRegs[]  = { "cr0", "cr1", "cr2", "cr3", "cr4", "cr5", "cr6", "cr7", "cr8", "cr9", "cr10", "cr11", "cr12", "cr13", "cr14", "cr15" };
 const char * k86_DrxRegs[]  = { "dr0", "dr1", "dr2", "dr3", "dr4", "dr5", "dr6", "dr7", "dr8", "dr9", "dr10", "dr11", "dr12", "dr13", "dr14", "dr15" };
 const char * k86_TrxRegs[]  = { "tr0", "tr1", "tr2", "tr3", "tr4", "tr5", "tr6", "tr7", "tr8", "tr9", "tr10", "tr11", "tr12", "tr13", "tr14", "tr15" };
@@ -1677,10 +1679,10 @@ const ix86_ExOpcodes ix86_660F38_Table[256] =
   /*0x09*/ DECLARE_EX_INSN("psignw", "psignw",ix86_ArgXMMXnD,ix86_ArgXMMXnD, IX86_P6|IX86_SSE, K64_ATHLON|K64_SSE),
   /*0x0A*/ DECLARE_EX_INSN("psignd", "psignd",ix86_ArgXMMXnD,ix86_ArgXMMXnD, IX86_P6|IX86_SSE, K64_ATHLON|K64_SSE),
   /*0x0B*/ DECLARE_EX_INSN("pmulhrsw", "pmulhrsw",ix86_ArgXMMXnD,ix86_ArgXMMXnD, IX86_P6|IX86_SSE, K64_ATHLON|K64_SSE),
-  /*0x0C*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
-  /*0x0D*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
-  /*0x0E*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
-  /*0x0F*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
+  /*0x0C*/ DECLARE_EX_INSN("vpermilps", "vpermilps",ix86_ArgXMMXnD,ix86_ArgXMMXnD, IX86_P8|IX86_AVX, K64_AVX),
+  /*0x0D*/ DECLARE_EX_INSN("vpermilpd", "vpermilpd",ix86_ArgXMMXnD,ix86_ArgXMMXnD, IX86_P8|IX86_AVX, K64_AVX),
+  /*0x0E*/ DECLARE_EX_INSN("vtestps", "vtestps",ix86_ArgXMMXnD,ix86_ArgXMMXnD, IX86_P8|IX86_AVX, K64_AVX),
+  /*0x0F*/ DECLARE_EX_INSN("vtestpd", "vtestpd",ix86_ArgXMMXnD,ix86_ArgXMMXnD, IX86_P8|IX86_AVX, K64_AVX),
   /*0x10*/ DECLARE_EX_INSN("pblendvb", "pblendvb",ix86_ArgXMMXnD,ix86_ArgXMMXnD, IX86_P7|IX86_SSE, K64_ATHLON|K64_SSE),
   /*0x11*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
   /*0x12*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
@@ -1689,9 +1691,9 @@ const ix86_ExOpcodes ix86_660F38_Table[256] =
   /*0x15*/ DECLARE_EX_INSN("blendvpd", "blendvpd",ix86_ArgXMMXnD,ix86_ArgXMMXnD, IX86_P7|IX86_SSE, K64_ATHLON|K64_SSE),
   /*0x16*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
   /*0x17*/ DECLARE_EX_INSN("ptest", "ptest",ix86_ArgXMMXnD,ix86_ArgXMMXnD, IX86_P7|IX86_SSE, K64_ATHLON|K64_SSE),
-  /*0x18*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
-  /*0x19*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
-  /*0x1A*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
+  /*0x18*/ DECLARE_EX_INSN("vbroadcastss", "vbroadcastss", ix86_ArgMMXnD, ix86_ArgMMXnD, IX86_P8|IX86_AVX, K64_AVX),
+  /*0x19*/ DECLARE_EX_INSN("vbroadcastsd", "vbroadcastsd", ix86_ArgMMXnD, ix86_ArgMMXnD, IX86_P8|IX86_AVX, K64_AVX),
+  /*0x1A*/ DECLARE_EX_INSN("vbroadcastf128", "vbroadcastf128", ix86_ArgMMXnD, ix86_ArgMMXnD, IX86_P8|IX86_AVX, K64_AVX),
   /*0x1B*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
   /*0x1C*/ DECLARE_EX_INSN("pabsb", "pabsb",ix86_ArgXMMXnD,ix86_ArgXMMXnD, IX86_P6|IX86_SSE, K64_ATHLON|K64_SSE),
   /*0x1D*/ DECLARE_EX_INSN("pabsw", "pabsw",ix86_ArgXMMXnD,ix86_ArgXMMXnD, IX86_P6|IX86_SSE, K64_ATHLON|K64_SSE),
@@ -1709,10 +1711,10 @@ const ix86_ExOpcodes ix86_660F38_Table[256] =
   /*0x29*/ DECLARE_EX_INSN("pcmpeqq", "pcmpeqq",ix86_ArgXMMXnD,ix86_ArgXMMXnD, IX86_P7|IX86_SSE, K64_ATHLON|K64_SSE),
   /*0x2A*/ DECLARE_EX_INSN("movntdqa", "movntdqa",ix86_ArgXMMXnD,ix86_ArgXMMXnD, IX86_P7|IX86_SSE, K64_ATHLON|K64_SSE),
   /*0x2B*/ DECLARE_EX_INSN("packusdw", "packusdw",ix86_ArgXMMXnD,ix86_ArgXMMXnD, IX86_P7|IX86_SSE, K64_ATHLON|K64_SSE),
-  /*0x2C*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
-  /*0x2D*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
-  /*0x2E*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
-  /*0x2F*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
+  /*0x2C*/ DECLARE_EX_INSN("vmaskmovps", "vmaskmovps",ix86_ArgXMMXnD,ix86_ArgXMMXnD, IX86_P8|IX86_AVX, K64_AVX),
+  /*0x2D*/ DECLARE_EX_INSN("vmaskmovpd", "vmaskmovpd",ix86_ArgXMMXnD,ix86_ArgXMMXnD, IX86_P8|IX86_AVX, K64_AVX),
+  /*0x2E*/ DECLARE_EX_INSN("vmaskmovps", "vmaskmovps",ix86_ArgXMMXD,ix86_ArgXMMXD, IX86_P8|IX86_AVX, K64_AVX),
+  /*0x2F*/ DECLARE_EX_INSN("vmaskmovpd", "vmaskmovpd",ix86_ArgXMMXD,ix86_ArgXMMXD, IX86_P8|IX86_AVX, K64_AVX),
   /*0x30*/ DECLARE_EX_INSN("pmovzxbw", "pmovzxbw",ix86_ArgXMMXnD,ix86_ArgXMMXnD, IX86_P7|IX86_SSE, K64_ATHLON|K64_SSE),
   /*0x31*/ DECLARE_EX_INSN("pmovzxbd", "pmovzxbd",ix86_ArgXMMXnD,ix86_ArgXMMXnD, IX86_P7|IX86_SSE, K64_ATHLON|K64_SSE),
   /*0x32*/ DECLARE_EX_INSN("pmovzxbq", "pmovzxbq",ix86_ArgXMMXnD,ix86_ArgXMMXnD, IX86_P7|IX86_SSE, K64_ATHLON|K64_SSE),
@@ -1884,11 +1886,11 @@ const ix86_ExOpcodes ix86_660F38_Table[256] =
   /*0xD8*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
   /*0xD9*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
   /*0xDA*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
-  /*0xDB*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
-  /*0xDC*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
-  /*0xDD*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
-  /*0xDE*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
-  /*0xDF*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
+  /*0xDB*/ DECLARE_EX_INSN("aesimc", "aesimc", ix86_ArgXMMXnD,ix86_ArgXMMXnD, IX86_P8|IX86_SSE, K64_AVX),
+  /*0xDC*/ DECLARE_EX_INSN("aesenc", "aesenc", ix86_ArgXMMXnD,ix86_ArgXMMXnD, IX86_P8|IX86_SSE, K64_AVX),
+  /*0xDD*/ DECLARE_EX_INSN("aesenclast", "aesenclast", ix86_ArgXMMXnD,ix86_ArgXMMXnD, IX86_P8|IX86_SSE, K64_AVX),
+  /*0xDE*/ DECLARE_EX_INSN("aesdec", "aesdec", ix86_ArgXMMXnD,ix86_ArgXMMXnD, IX86_P8|IX86_SSE, K64_AVX),
+  /*0xDF*/ DECLARE_EX_INSN("aesdeclast", "aesdeclast", ix86_ArgXMMXnD,ix86_ArgXMMXnD, IX86_P8|IX86_SSE, K64_AVX),
   /*0xE0*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
   /*0xE1*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
   /*0xE2*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
@@ -1929,9 +1931,9 @@ const ix86_ExOpcodes ix86_660F3A_Table[256] =
   /*0x01*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
   /*0x02*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
   /*0x03*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
-  /*0x04*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
-  /*0x05*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
-  /*0x06*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
+  /*0x04*/ DECLARE_EX_INSN("vpermilps", "vpermilps",ix86_ArgXMMRMDigit,ix86_ArgXMMRMDigit, IX86_P8|IX86_AVX, K64_AVX),
+  /*0x05*/ DECLARE_EX_INSN("vpermilpd", "vpermilpd",ix86_ArgXMMRMDigit,ix86_ArgXMMRMDigit, IX86_P8|IX86_AVX, K64_AVX),
+  /*0x06*/ DECLARE_EX_INSN("vperm2f128", "vperm2f128",ix86_ArgXMMRMDigit,ix86_ArgXMMRMDigit, IX86_P8|IX86_AVX, K64_AVX),
   /*0x07*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
   /*0x08*/ DECLARE_EX_INSN("roundps", "roundps",ix86_ArgXMMRMDigit,ix86_ArgXMMRMDigit, IX86_P7|IX86_SSE, K64_ATHLON|K64_SSE),
   /*0x09*/ DECLARE_EX_INSN("roundpd", "roundpd",ix86_ArgXMMRMDigit,ix86_ArgXMMRMDigit, IX86_P7|IX86_SSE, K64_ATHLON|K64_SSE),
@@ -1949,9 +1951,9 @@ const ix86_ExOpcodes ix86_660F3A_Table[256] =
   /*0x15*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
   /*0x16*/ DECLARE_EX_INSN("pextrd", "pextrq",ix86_ArgXMMRMDigit,ix86_ArgXMMRMDigit, IX86_P7|IX86_SSE, K64_ATHLON|K64_SSE),
   /*0x17*/ DECLARE_EX_INSN("extractps", "extractps",ix86_ArgXMMRMDigit,ix86_ArgXMMRMDigit, IX86_P7|IX86_SSE, K64_ATHLON|K64_SSE),
-  /*0x18*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
+  /*0x18*/ DECLARE_EX_INSN("vinsertf128", "vinsertf128",ix86_ArgXMMRMDigit,ix86_ArgXMMRMDigit, IX86_P8|IX86_AVX, K64_AVX),
   /*0x19*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
-  /*0x1A*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
+  /*0x1A*/ DECLARE_EX_INSN("vextractf128", "vextractf128",ix86_ArgXMMRMDigit,ix86_ArgXMMRMDigit, IX86_P8|IX86_AVX, K64_AVX),
   /*0x1B*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
   /*0x1C*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
   /*0x1D*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
@@ -1993,12 +1995,12 @@ const ix86_ExOpcodes ix86_660F3A_Table[256] =
   /*0x41*/ DECLARE_EX_INSN("dppd", "dppd",ix86_ArgXMMRMDigit,ix86_ArgXMMRMDigit, IX86_P7|IX86_SSE, K64_ATHLON|K64_SSE),
   /*0x42*/ DECLARE_EX_INSN("mpsadbw", "mpsadbw",ix86_ArgXMMXnD,ix86_ArgXMMXnD, IX86_P7|IX86_SSE, K64_ATHLON|K64_SSE),
   /*0x43*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
-  /*0x44*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
+  /*0x44*/ DECLARE_EX_INSN("pclmulqdq", "pclmulqdq",ix86_ArgXMMRMDigit,ix86_ArgXMMRMDigit, IX86_P8|IX86_AVX, K64_AVX),
   /*0x45*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
   /*0x46*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
   /*0x47*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
-  /*0x48*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
-  /*0x49*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
+  /*0x48*/ DECLARE_EX_INSN("vpermil2ps", "vpermil2ps",ix86_ArgXMM_3src_digit,ix86_ArgXMM_3src_digit, IX86_P8|IX86_AVX, K64_AVX),
+  /*0x49*/ DECLARE_EX_INSN("vpermil2pd", "vpermil2pd",ix86_ArgXMM_3src_digit,ix86_ArgXMM_3src_digit, IX86_P8|IX86_AVX, K64_AVX),
   /*0x4A*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
   /*0x4B*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
   /*0x4C*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
@@ -2017,10 +2019,10 @@ const ix86_ExOpcodes ix86_660F3A_Table[256] =
   /*0x59*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
   /*0x5A*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
   /*0x5B*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
-  /*0x5C*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
-  /*0x5D*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
-  /*0x5E*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
-  /*0x5F*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
+  /*0x5C*/ DECLARE_EX_INSN("vfmaddsubps", "vfmaddsubps", ix86_ArgXMM_3src,ix86_ArgXMM_3src, IX86_P8|IX86_AVX, K64_AVX),
+  /*0x5D*/ DECLARE_EX_INSN("vfmaddsubpd", "vfmaddsubpd", ix86_ArgXMM_3src,ix86_ArgXMM_3src, IX86_P8|IX86_AVX, K64_AVX),
+  /*0x5E*/ DECLARE_EX_INSN("vfmsubaddps", "vfmsubaddps", ix86_ArgXMM_3src,ix86_ArgXMM_3src, IX86_P8|IX86_AVX, K64_AVX),
+  /*0x5F*/ DECLARE_EX_INSN("vfmsubaddpd", "vfmsubaddpd", ix86_ArgXMM_3src,ix86_ArgXMM_3src, IX86_P8|IX86_AVX, K64_AVX),
   /*0x60*/ DECLARE_EX_INSN("pcmpestrm", "pcmpestrm",ix86_ArgXMMRMDigit,ix86_ArgXMMRMDigit, IX86_P7|IX86_SSE, K64_ATHLON|K64_SSE),
   /*0x61*/ DECLARE_EX_INSN("pcmpestri", "pcmpestri",ix86_ArgXMMRMDigit,ix86_ArgXMMRMDigit, IX86_P7|IX86_SSE, K64_ATHLON|K64_SSE),
   /*0x62*/ DECLARE_EX_INSN("pcmpestrm", "pcmpestrm",ix86_ArgXMMRMDigit,ix86_ArgXMMRMDigit, IX86_P7|IX86_SSE, K64_ATHLON|K64_SSE),
@@ -2029,14 +2031,14 @@ const ix86_ExOpcodes ix86_660F3A_Table[256] =
   /*0x65*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
   /*0x66*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
   /*0x67*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
-  /*0x68*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
-  /*0x69*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
-  /*0x6A*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
-  /*0x6B*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
-  /*0x6C*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
-  /*0x6D*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
-  /*0x6E*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
-  /*0x6F*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
+  /*0x68*/ DECLARE_EX_INSN("vfmaddps", "vfmaddps", ix86_ArgXMM_3src,ix86_ArgXMM_3src, IX86_P8|IX86_AVX, K64_AVX),
+  /*0x69*/ DECLARE_EX_INSN("vfmaddpd", "vfmaddpd", ix86_ArgXMM_3src,ix86_ArgXMM_3src, IX86_P8|IX86_AVX, K64_AVX),
+  /*0x6A*/ DECLARE_EX_INSN("vfmaddss", "vfmaddss", ix86_ArgXMM_3src,ix86_ArgXMM_3src, IX86_P8|IX86_AVX, K64_AVX),
+  /*0x6B*/ DECLARE_EX_INSN("vfmaddsd", "vfmaddsd", ix86_ArgXMM_3src,ix86_ArgXMM_3src, IX86_P8|IX86_AVX, K64_AVX),
+  /*0x6C*/ DECLARE_EX_INSN("vfmsubps", "vfmsubps", ix86_ArgXMM_3src,ix86_ArgXMM_3src, IX86_P8|IX86_AVX, K64_AVX),
+  /*0x6D*/ DECLARE_EX_INSN("vfmsubpd", "vfmsubpd", ix86_ArgXMM_3src,ix86_ArgXMM_3src, IX86_P8|IX86_AVX, K64_AVX),
+  /*0x6E*/ DECLARE_EX_INSN("vfmsubss", "vfmsubss", ix86_ArgXMM_3src,ix86_ArgXMM_3src, IX86_P8|IX86_AVX, K64_AVX),
+  /*0x6F*/ DECLARE_EX_INSN("vfmsubsd", "vfmsubsd", ix86_ArgXMM_3src,ix86_ArgXMM_3src, IX86_P8|IX86_AVX, K64_AVX),
   /*0x70*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
   /*0x71*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
   /*0x72*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
@@ -2045,14 +2047,14 @@ const ix86_ExOpcodes ix86_660F3A_Table[256] =
   /*0x75*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
   /*0x76*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
   /*0x77*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
-  /*0x78*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
-  /*0x79*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
-  /*0x7A*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
-  /*0x7B*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
-  /*0x7C*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
-  /*0x7D*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
-  /*0x7E*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
-  /*0x7F*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
+  /*0x78*/ DECLARE_EX_INSN("vfnaddps", "vfnaddps", ix86_ArgXMM_3src,ix86_ArgXMM_3src, IX86_P8|IX86_AVX, K64_AVX),
+  /*0x79*/ DECLARE_EX_INSN("vfnaddpd", "vfnaddpd", ix86_ArgXMM_3src,ix86_ArgXMM_3src, IX86_P8|IX86_AVX, K64_AVX),
+  /*0x7A*/ DECLARE_EX_INSN("vfnaddss", "vfnaddss", ix86_ArgXMM_3src,ix86_ArgXMM_3src, IX86_P8|IX86_AVX, K64_AVX),
+  /*0x7B*/ DECLARE_EX_INSN("vfnaddsd", "vfnaddsd", ix86_ArgXMM_3src,ix86_ArgXMM_3src, IX86_P8|IX86_AVX, K64_AVX),
+  /*0x7C*/ DECLARE_EX_INSN("vfnsubps", "vfnsubps", ix86_ArgXMM_3src,ix86_ArgXMM_3src, IX86_P8|IX86_AVX, K64_AVX),
+  /*0x7D*/ DECLARE_EX_INSN("vfnsubpd", "vfnsubpd", ix86_ArgXMM_3src,ix86_ArgXMM_3src, IX86_P8|IX86_AVX, K64_AVX),
+  /*0x7E*/ DECLARE_EX_INSN("vfnsubss", "vfnsubss", ix86_ArgXMM_3src,ix86_ArgXMM_3src, IX86_P8|IX86_AVX, K64_AVX),
+  /*0x7F*/ DECLARE_EX_INSN("vfnsubsd", "vfnsubsd", ix86_ArgXMM_3src,ix86_ArgXMM_3src, IX86_P8|IX86_AVX, K64_AVX),
   /*0x80*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
   /*0x81*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
   /*0x82*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
@@ -2148,7 +2150,7 @@ const ix86_ExOpcodes ix86_660F3A_Table[256] =
   /*0xDC*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
   /*0xDD*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
   /*0xDE*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
-  /*0xDF*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
+  /*0xDF*/ DECLARE_EX_INSN("aeskeygenassist", "aeskeygenassist", ix86_ArgRegXMMDigit,ix86_ArgRegXMMDigit, IX86_P8|IX86_SSE, K64_AVX),
   /*0xE0*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
   /*0xE1*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
   /*0xE2*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
@@ -3794,16 +3796,7 @@ static tBool is_listed(unsigned char insn,const unsigned char *list,size_t lists
   [legacy prefix] [REX] [Opcode] ...
   legacy prefixes: 26 2E 36 3E 64 65 66 67 F0 F3 F2
 */
-static int is_REX(unsigned char code)
-{
-#ifdef IX86_64
-    if((code & 0xF0) == 0x40) return 1;
-    else
-#endif
-    return 0;
-}
-
-static MBuffer parse_REX_type(unsigned char code,MBuffer insn,char *up,ix86Param* DisP)
+static MBuffer parse_REX_type(MBuffer insn,char *up,ix86Param* DisP)
 {
     if(x86_Bitness == DAB_USE64 && !(DisP->pfx&PFX_REX)) {
 	DisP->pfx|=PFX_REX;
@@ -3852,7 +3845,7 @@ static void ix86_gettype(DisasmRet *dret,ix86Param *_DisP)
    case 0x4E:
    case 0x4F:
 		if(x86_Bitness == DAB_USE64) {
-		    insn=parse_REX_type(insn[0],insn,&up,_DisP);
+		    insn=parse_REX_type(insn,&up,_DisP);
 		    goto RepeateByPrefix;
 		}
 		else goto MakePref;
@@ -3886,7 +3879,7 @@ static void ix86_gettype(DisasmRet *dret,ix86Param *_DisP)
    case 0xC4:
 	      if(x86_Bitness == DAB_USE64) has_vex++;
 	      else if((insn[1]&0x80)==0x80) has_vex++;
-	      insn=&insn[1];
+	      insn=&insn[2];
    case 0xC5:
 	      if(x86_Bitness == DAB_USE64) has_vex++;
 	      else if((insn[1]&0x80)==0x80) has_vex++;
@@ -4849,9 +4842,10 @@ AsmRet __FASTCALL__ ix86Asm(const char *code)
   FILE *asmf, *bin, *err;
   int i,c;
   char commandbuffer[FILENAME_MAX+1];
-  char *home;
+  char *home=NULL;
 
   //Check assembler availability
+  memset(&result,0,sizeof(AsmRet));
   if (active_assembler<0) goto noassemblererror;
   if (!assemblers[active_assembler].run_command) goto noassemblererror;
 

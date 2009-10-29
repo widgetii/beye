@@ -79,7 +79,14 @@ static inline unsigned ix86_calcModifier(ix86Param* DisP,unsigned w) {
 static const char * __FASTCALL__ k86_getREG(ix86Param*DisP,unsigned char reg,tBool w,tBool rex, tBool use64)
 {
 #ifdef IX86_64
- if((DisP->mode&MOD_SSE)) return x86_Bitness==DAB_USE64?k86_XMMXRegs[REX_reg(rex,reg)]:ix86_XMMXRegs[reg];
+ if((DisP->mode&MOD_SSE)) {
+    const char **k86_xmm_regs;
+    unsigned ridx;
+    if((DisP->pfx&PFX_VEX) && (DisP->VEX_vlp&0x04))	k86_xmm_regs=k86_YMMXRegs; /* 256-bit vectors */
+    else						k86_xmm_regs=k86_XMMXRegs; /* 128-bit vectors */
+    ridx = x86_Bitness==DAB_USE64?REX_reg(rex,reg):(reg&0x07);
+    return  k86_xmm_regs[ridx];
+ }
  else
    if((DisP->mode&MOD_MMX))  return ix86_MMXRegs[reg];
    else
@@ -89,7 +96,12 @@ static const char * __FASTCALL__ k86_getREG(ix86Param*DisP,unsigned char reg,tBo
       return use64?k86_QWordRegs[REX_reg(rex,reg)]:USE_WIDE_DATA?k86_DWordRegs[REX_reg(rex,reg)]:k86_WordRegs[REX_reg(rex,reg)];
      else return USE_WIDE_DATA ? ix86_DWordRegs[reg] : ix86_WordRegs[reg];
 #else
- if((DisP->mode&MOD_SSE)) return ix86_XMMXRegs[reg];
+ if((DisP->mode&MOD_SSE)) {
+    const char **ix86_xmm_regs;
+    if((DisP->pfx&PFX_VEX) && (DisP->VEX_vlp&0x04))	ix86_xmm_regs=ix86_YMMXRegs; /* 256-bit vectors */
+    else						ix86_xmm_regs=ix86_XMMXRegs; /* 128-bit vectors */
+    return ix86_xmm_regs[reg];
+ }
  else
    if((DisP->mode&MOD_MMX))  return ix86_MMXRegs[reg];
    else
@@ -1777,7 +1789,6 @@ void __FASTCALL__ ix86_ArgMovYX(char *str,ix86Param *DisP)
 {
       const char *dst,*src;
       unsigned char mod;
-      unsigned char w = DisP->RealCmd[0] & 0x01;
       unsigned long mode=DisP->mode;
       tBool brex,use64;
       brex = use64 = 0;
@@ -2000,6 +2011,15 @@ void __FASTCALL__  ix86_ArgXMMXRegDigit(char *str,ix86Param *DisP)
    a1 = ix86_GetDigitTile(DisP,0,0,DisP->codelen-1);
    ix86_CStile(str,a1);
 }
+
+/* TODO: fix it !!! */
+void   __FASTCALL__ ix86_ArgXMM_3src(char *str,ix86Param *DisP) {
+   ix86_ArgXMMXnD(str,DisP);
+}
+void   __FASTCALL__ ix86_ArgXMM_3src_digit(char *str,ix86Param *DisP) {
+   ix86_ArgXMMRMDigit(str,DisP);
+}
+
 
 void __FASTCALL__ ix86_3dNowOpCodes( char *str,ix86Param *DisP)
 {

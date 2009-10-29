@@ -157,6 +157,7 @@ typedef void (__FASTCALL__*ix86_method)(char *encode_str,ix86Param *);
 #define IX86_FPU	0x00001000UL /* insn works with fpu registers */
 #define IX86_MMX	0x00002000UL /* insn works with mmx registers */
 #define IX86_SSE	0x00003000UL /* insn works with sse registers */
+#define IX86_AVX	0x00004000UL /* insn works with avx registers */
 
 #define IX86_CLONEMASK	0x000F0000UL
 #define IX86_INTEL	0x00000000UL
@@ -171,6 +172,7 @@ typedef void (__FASTCALL__*ix86_method)(char *encode_str,ix86Param *);
 #define IX86_UNKFPU	(IX86_UNKCPU|IX86_FPU)
 #define IX86_UNKMMX	(IX86_UNKCPU|IX86_MMX)
 #define IX86_UNKSSE	(IX86_UNKCPU|IX86_SSE)
+#define IX86_UNKAVX	(IX86_UNKCPU|IX86_AVX)
 
 #define IX86_P2		IX86_CPU686
 #define IX86_P3		IX86_CPU786
@@ -181,6 +183,7 @@ typedef void (__FASTCALL__*ix86_method)(char *encode_str,ix86Param *);
 #define IX86_P6		IX86_CPU1086
 /* Xeon5200 processor (SSE4)*/
 #define IX86_P7		IX86_CPU1186
+#define IX86_P8		IX86_CPU1286
 
 #define IX86_K6		(IX86_AMD|IX86_CPU586)
 #define IX86_3DNOW	(IX86_AMD|IX86_CPU686|IX86_MMX)
@@ -202,10 +205,11 @@ typedef void (__FASTCALL__*ix86_method)(char *encode_str,ix86Param *);
 #define K64_FPU         0x00001000UL /* insn works with fpu registers */
 #define K64_MMX         0x00002000UL /* insn works with mmx registers */
 #define K64_SSE         0x00003000UL /* insn works with sse registers */
-#define K64_NOCOMPAT	0x00004000UL /* means insns has no 16 or 32 bit forms */
-#define K64_DEF32	0x00008000UL /* means insns size depends on default data size but not address size */
-#define K64_SYSTEMMASK	0x000F0000UL
-#define K64_CPL0	0x00010000UL /* means insns requires cpl0 privilegies to be executed */
+#define K64_AVX         0x00004000UL /* insn works with avx registers */
+#define K64_NOCOMPAT	0x00010000UL /* means insns has no 16 or 32 bit forms */
+#define K64_DEF32	0x00020000UL /* means insns size depends on default data size but not address size */
+#define K64_SYSTEMMASK	0x00F00000UL
+#define K64_CPL0	0x00100000UL /* means insns requires cpl0 privilegies to be executed */
 
 /* Special features flags */
 #define TABDESC_MASK		0xFF000000UL
@@ -262,12 +266,14 @@ extern const char * ix86_WordRegs[];
 extern const char * ix86_DWordRegs[];
 extern const char * ix86_MMXRegs[];
 extern const char * ix86_XMMXRegs[];
+extern const char * ix86_YMMXRegs[];
 #ifdef IX86_64
 extern const char * k86_ByteRegs[];
 extern const char * k86_WordRegs[];
 extern const char * k86_DWordRegs[];
 extern const char * k86_QWordRegs[];
 extern const char * k86_XMMXRegs[];
+extern const char * k86_YMMXRegs[];
 extern const char * k86_CrxRegs[];
 extern const char * k86_DrxRegs[];
 extern const char * k86_TrxRegs[];
@@ -393,6 +399,9 @@ extern void   __FASTCALL__ ix86_ArgXMMXRegDigit(char *str,ix86Param *);
 extern void   __FASTCALL__ ix86_ArgMovYX(char *str,ix86Param *);
 extern void   __FASTCALL__ ix86_VMX(char *str,ix86Param *);
 extern void   __FASTCALL__ ix86_0FVMX(char *str,ix86Param *DisP);
+
+extern void   __FASTCALL__ ix86_ArgXMM_3src(char *str,ix86Param *);
+extern void   __FASTCALL__ ix86_ArgXMM_3src_digit(char *str,ix86Param *DisP);
 
 extern void   __FASTCALL__ ix86_ArgXMM1IReg(char *str,ix86Param *DisP);
 extern void   __FASTCALL__ ix86_ArgXMM1DigDig(char *str,ix86Param *DisP);
