@@ -49,6 +49,7 @@ typedef struct tagix86Param
   MBuffer       RealCmd; /**< buffer without prefixes */
   unsigned      flags; /**< refer to disasm.h header */
   unsigned char codelen;
+  unsigned long insn_flags; /**< contains copy of flags32/flags64 field from INSN_TABLE */
 #define PFX_SEGMASK		0x00000007
 #define  PFX_SEG_CS		0x00000000
 #define  PFX_SEG_DS		0x00000001
@@ -167,6 +168,11 @@ typedef void (__FASTCALL__*ix86_method)(char *encode_str,ix86Param *);
 #define IX86_SYSTEMMASK	0x00F00000UL
 #define IX86_CPL0	0x00100000UL
 
+#define IX86_VEXMASK	0x0F000000UL
+#define IX86_VEX_V	0x01000000UL /* means insns use VVVV register extension from VEX prefix*/
+
+#define IX86_FLAGS_MASK 0xFF000000UL
+
 /* Furter processors */
 #define IX86_UNKCPU	IX86_CPU1286
 #define IX86_UNKFPU	(IX86_UNKCPU|IX86_FPU)
@@ -211,9 +217,14 @@ typedef void (__FASTCALL__*ix86_method)(char *encode_str,ix86Param *);
 #define K64_SYSTEMMASK	0x00F00000UL
 #define K64_CPL0	0x00100000UL /* means insns requires cpl0 privilegies to be executed */
 
+#define K64_VEXMASK	0x0F000000UL
+#define K64_VEX_V	0x01000000UL /* means insns use VVVV register extension from VEX prefix*/
+
+#define K64_FLAGS_MASK  0x7F000000UL
+
 /* Special features flags */
-#define TABDESC_MASK		0xFF000000UL
-#define TAB_NAME_IS_TABLE	0x01000000UL
+#define TABDESC_MASK		0x80000000UL
+#define TAB_NAME_IS_TABLE	0x10000000UL
 
 typedef struct tag_ix86opcodes
 {
@@ -400,6 +411,7 @@ extern void   __FASTCALL__ ix86_ArgMovYX(char *str,ix86Param *);
 extern void   __FASTCALL__ ix86_VMX(char *str,ix86Param *);
 extern void   __FASTCALL__ ix86_0FVMX(char *str,ix86Param *DisP);
 
+extern void   __FASTCALL__ ix86_ArgXMM_2src_xmm0(char *str,ix86Param *);
 extern void   __FASTCALL__ ix86_ArgXMM_3src(char *str,ix86Param *);
 extern void   __FASTCALL__ ix86_ArgXMM_3src_digit(char *str,ix86Param *DisP);
 

@@ -612,6 +612,20 @@ static char * __NEAR__ __FASTCALL__ __getTile(ix86Param *DisP,tBool w,tBool d)
  else         modrm = ix86_getModRM(w,mod,rm,DisP);
  ix86_dtile[0] = 0;
  strcat(ix86_dtile,d ? regs : modrm);
+ /* add VEX.vvvv field as first source operand */
+ if(DisP->pfx&PFX_VEX) {
+    unsigned rg;
+    if(x86_Bitness == DAB_USE64) {
+	rg = ((DisP->VEX_vlp>>3)&0x0F)^0x0F;
+	if(DisP->insn_flags&K64_VEX_V)
+	    ix86_CStile(ix86_dtile,k86_getREG(DisP,rg,w,brex,use64));
+    }
+    else {
+	rg = ((DisP->VEX_vlp>>3)&0x07)^0x07;
+	if(DisP->insn_flags&IX86_VEX_V)
+	    ix86_CStile(ix86_dtile,k86_getREG(DisP,rg,w,brex,use64));
+    }
+ }
  ix86_CStile(ix86_dtile,d ? modrm : regs);
  return ix86_dtile;
 }
@@ -1073,24 +1087,31 @@ const ix86_ExOpcodes* __FASTCALL__ ix86_prepare_flags(const ix86_ExOpcodes *exta
     if(x86_Bitness == DAB_USE64)
     {
 	if(extable[*code].flags64&TAB_NAME_IS_TABLE)
-	{
-	    extable=(ix86_ExOpcodes*)(extable[*code].name64);
-	    DisP->RealCmd = &DisP->RealCmd[1];
-	    *code = DisP->RealCmd[0];
-	    DisP->codelen++;
-	}
+		extable=(ix86_ExOpcodes*)(extable[*code].name64);
 	else in_chain=0;
     }
     else
 #endif
     if(extable[*code].pro_clone&TAB_NAME_IS_TABLE)
-    {
 	extable=(ix86_ExOpcodes*)(extable[*code].name);
+    else in_chain = 0;
+
+    if(in_chain) {
 	DisP->RealCmd = &DisP->RealCmd[1];
 	*code = DisP->RealCmd[0];
 	DisP->codelen++;
     }
-    else in_chain=0;
+    else {
+	if(x86_Bitness == DAB_USE64) {
+		DisP->pro_clone = extable[*code].flags64&(~K64_FLAGS_MASK);
+		DisP->insn_flags = extable[*code].flags64;
+	}
+	else {
+		DisP->pro_clone = extable[*code].pro_clone&(~IX86_FLAGS_MASK);
+		DisP->insn_flags = extable[*code].pro_clone;
+	}
+	in_chain=0;
+    }
  }
  return extable;
 }
@@ -1131,7 +1152,7 @@ void  __FASTCALL__ ix86_ExOpCodes(char *str,ix86Param *DisP)
    extable[code].method(str,DisP);
  }
 #ifdef IX86_64
- if(x86_Bitness == DAB_USE64) DisP->pro_clone = extable[code].flags64;
+ if(x86_Bitness == DAB_USE64) DisP->pro_clone = extable[code].flags64&K64_CLONEMASK;
  else
 #endif
  if((DisP->pro_clone&IX86_CPUMASK) < (extable[code].pro_clone&IX86_CPUMASK))
@@ -2012,14 +2033,34 @@ void __FASTCALL__  ix86_ArgXMMXRegDigit(char *str,ix86Param *DisP)
    ix86_CStile(str,a1);
 }
 
+void   __FASTCALL__ ix86_ArgXMM_2src_xmm0(char *str,ix86Param *DisP) {
+   ix86_ArgXMMXnD(str,DisP);
+   ix86_CStile(str,"xmm0");
+}
 /* TODO: fix it !!! */
 void   __FASTCALL__ ix86_ArgXMM_3src(char *str,ix86Param *DisP) {
-   ix86_ArgXMMXnD(str,DisP);
+    unsigned is4,rg,brex,use64;
+    brex=use64=0;
+    ix86_ArgxMM(str,DisP,1,1);
+    is4=DisP->RealCmd[DisP->codelen];
+    DisP->codelen++;
+    if(x86_Bitness == DAB_USE64) {
+	brex = (K86_REX&4)>>2;
+	use64 = HAS_67_IN64?0:1;
+	rg = ((is4>>4)&0x0F)/*^0x0F*/;
+	ix86_CStile(str,k86_getREG(DisP,rg,1,brex,use64));
+    }
+    else {
+	rg = ((is4>>4)&0x07)/*^0x07*/;
+	ix86_CStile(str,k86_getREG(DisP,rg,1,brex,use64));
+    }
 }
 void   __FASTCALL__ ix86_ArgXMM_3src_digit(char *str,ix86Param *DisP) {
-   ix86_ArgXMMRMDigit(str,DisP);
+    unsigned is4;
+    ix86_ArgXMM_3src(str,DisP);
+    is4=DisP->RealCmd[DisP->codelen-1];
+    ix86_CStile(str,Get2Digit(is4&0x0F));
 }
-
 
 void __FASTCALL__ ix86_3dNowOpCodes( char *str,ix86Param *DisP)
 {
