@@ -4061,7 +4061,7 @@ static void parse_VEX_C5(ix86Param* DisP) {
   unsigned char code;
   DisP->pfx|=PFX_VEX;
   code=DisP->RealCmd[1];
-  DisP->VEX_m = 0;
+  DisP->VEX_m = 0x01; /* Fake 0Fh opcode*/
   DisP->VEX_vlp=code&0x7F;
   parse_VEX_pp(DisP);
 }
@@ -4295,17 +4295,30 @@ static DisasmRet __FASTCALL__ ix86Disassembler(__filesize_t ulShift,
     if(DisP.pfx&PFX_F3_REP)   SSE2_ext=ix86_F30F_PentiumTable;
     else
     if(DisP.pfx&PFX_66)       SSE2_ext=ix86_660F_PentiumTable;
-    ecode = DisP.RealCmd[1];
+    ecode = (DisP.pfx&PFX_VEX)?DisP.RealCmd[0]:DisP.RealCmd[1];
     if((DisP.pfx&PFX_VEX) && DisP.VEX_m==0x02) ecode = 0x38;
     else
     if((DisP.pfx&PFX_VEX) && DisP.VEX_m==0x03) ecode = 0x3A;
+
     SSE2_ext=ix86_prepare_flags(SSE2_ext,&DisP,&ecode);
+    if((DisP.pfx&PFX_VEX) && DisP.VEX_m>1) {
+	DisP.RealCmd[0]=DisP.RealCmd[-1]; DisP.codelen--;
+    }
+    if(DisP.pfx&PFX_VEX)	ecode=DisP.RealCmd[0];
+    else			ecode=DisP.RealCmd[1];
+
     nam=((x86_Bitness==DAB_USE64)?SSE2_ext[ecode].name64:SSE2_ext[ecode].name);
     if(nam) {
-	strcpy(Ret.str,nam);
+	if(DisP.pfx&PFX_VEX && nam[0]!='v') {
+	    strcpy(Ret.str,"v");
+	    strcat(Ret.str,nam);
+	}
+	else strcpy(Ret.str,nam);
 	ix86_da_out[0]='\0'; /* disable rep; lock; prefixes */
-	DisP.RealCmd = &DisP.RealCmd[1];
-	DisP.codelen++;
+	if(!(DisP.pfx&PFX_VEX)) {
+	    DisP.RealCmd = &DisP.RealCmd[1];
+	    DisP.codelen++;
+	}
 	if(x86_Bitness == DAB_USE64)	DisP.insn_flags = SSE2_ext[ecode].flags64;
 	else				DisP.insn_flags = SSE2_ext[ecode].pro_clone;
 	mthd=((x86_Bitness==DAB_USE64)?SSE2_ext[ecode].method64:SSE2_ext[ecode].method);
