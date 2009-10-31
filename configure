@@ -579,6 +579,7 @@ if test "$_profile" || test "$_debug" ; then
   _osldef="$_debug $_profile $_osldef"
 elif test -z "$CFLAGS" ; then
     _cdefos="-DNDEBUG=1 -O2 -ffast-math -fomit-frame-pointer $_cdefos"
+    x86 && _cdefos="-mmmx -msse $_cdefos"
 else
     _cdefos="-DNDEBUG=1 $CFLAGS $_cdefos"
 fi
