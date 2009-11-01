@@ -648,44 +648,16 @@ static char * __FASTCALL__ ix86_getTileWnD( ix86Param *DisP )
   return __getTile(DisP,True,False);
 }
 
-static char * __FASTCALL__ ix86_getTilenWD( ix86Param *DisP )
+void __FASTCALL__ arg_cpu_modrm(char * str,ix86Param *DisP)
 {
-  return __getTile(DisP,False,True);
-}
-
-static char * __FASTCALL__ ix86_getTilenWnD( ix86Param *DisP )
-{
-  return __getTile(DisP,False,False);
+ DisP->codelen++;
+ strcat(str,__getTile(DisP,(DisP->insn_flags&IX86_OP_BYTE)?False:True,(DisP->insn_flags&IX86_STORE)?False:True));
 }
 
 void __FASTCALL__ ix86_ArgModRM(char * str,ix86Param *DisP)
 {
  DisP->codelen++;
  strcat(str,getTile(DisP));
-}
-
-void __FASTCALL__ ix86_ArgModRMDW(char *str,ix86Param *DisP)
-{
- DisP->codelen++;
- strcat(str,ix86_getTileWD(DisP));
-}
-
-void __FASTCALL__ ix86_ArgModRMnDW(char *str,ix86Param *DisP)
-{
- DisP->codelen++;
- strcat(str,ix86_getTileWnD(DisP));
-}
-
-void __FASTCALL__ ix86_ArgModRMDnW(char *str,ix86Param *DisP)
-{
- DisP->codelen++;
- strcat(str,ix86_getTilenWD(DisP));
-}
-
-void __FASTCALL__ ix86_ArgModRMnDnW(char *str,ix86Param *DisP)
-{
- DisP->codelen++;
- strcat(str,ix86_getTilenWnD(DisP));
 }
 
 void __FASTCALL__ ix86_ArgMod(char *str,ix86Param *DisP)
@@ -1453,14 +1425,14 @@ void  __FASTCALL__ ix86_DblShift(char *str,ix86Param *DisP)
 
 /* MMX and SSE(2) opcodes */
 
-static void __NEAR__ __FASTCALL__ ix86_ArgxMM(char *str,ix86Param *DisP,tBool direct,tBool as_xmmx)
+static void __NEAR__ __FASTCALL__ ix86_bridge_simd_cpu(char *str,ix86Param *DisP,tBool direct,tBool as_xmmx)
 {
    unsigned long mode=DisP->mode;
    if(as_xmmx) DisP->mode|=MOD_SSE;
    else        DisP->mode|=MOD_MMX;
    if((DisP->RealCmd[1] & 0xC0) != 0xC0)
    {
-     direct ? ix86_ArgModRMnDW(str,DisP) : ix86_ArgModRMDW(str,DisP);
+     arg_cpu_modrm(str,DisP);
      if(as_xmmx) DisP->mode&=~MOD_SSE;
      else        DisP->mode&=~MOD_MMX;
    }
@@ -1479,16 +1451,16 @@ static void __NEAR__ __FASTCALL__ ix86_ArgxMM(char *str,ix86Param *DisP,tBool di
 #endif
       mmx = k86_getREG(DisP,(DisP->RealCmd[1] >> 3) & 0x07,True,brex,use64);
       if(DisP->pfx&PFX_VEX) {
-        vxx = get_VEX_reg(DisP);
+	vxx = get_VEX_reg(DisP);
 	exx = k86_getREG(DisP,DisP->RealCmd[1] & 0x07,True,brex,use64);
       }
       else {
-        if(as_xmmx) DisP->mode&=~MOD_SSE;
-        else        DisP->mode&=~MOD_MMX;
+	if(as_xmmx) DisP->mode&=~MOD_SSE;
+	else        DisP->mode&=~MOD_MMX;
 #ifdef IX86_64
-        if(x86_Bitness == DAB_USE64) brex = REX_B(K86_REX);
+	if(x86_Bitness == DAB_USE64) brex = REX_B(K86_REX);
 #endif
-        exx = k86_getREG(DisP,DisP->RealCmd[1] & 0x07,True,brex,use64);
+	exx = k86_getREG(DisP,DisP->RealCmd[1] & 0x07,True,brex,use64);
       }
       strcat(str,direct ? exx : mmx);
       strcat(str,",");
@@ -1499,20 +1471,20 @@ static void __NEAR__ __FASTCALL__ ix86_ArgxMM(char *str,ix86Param *DisP,tBool di
    DisP->mode=mode;
 }
 
-static void __NEAR__ __FASTCALL__ ix86_ArgxMMRev(char *str,ix86Param *DisP,tBool direct,tBool as_xmmx)
+static void __NEAR__ __FASTCALL__ ix86_bridge_cpu_simd(char *str,ix86Param *DisP,tBool direct,tBool as_xmmx)
 {
    unsigned long mode=DisP->mode;
    if(as_xmmx) DisP->mode|=MOD_SSE;
    else        DisP->mode|=MOD_MMX;
    if((DisP->RealCmd[1] & 0xC0) != 0xC0)
    {
-     direct ? ix86_ArgModRMnDW(str,DisP) : ix86_ArgModRMDW(str,DisP);
+     arg_cpu_modrm(str,DisP);
      if(as_xmmx) DisP->mode|=MOD_SSE;
-     else        DisP->mode&=~MOD_MMX;
+     else        DisP->mode|=MOD_MMX;
    }
    else
    {
-      const char *mmx,*exx;
+      const char *mmx,*exx,*vxx=NULL;
       tBool brex,use64;
       brex = use64 = 0;
 #ifdef IX86_64
@@ -1524,77 +1496,18 @@ static void __NEAR__ __FASTCALL__ ix86_ArgxMMRev(char *str,ix86Param *DisP,tBool
       }
 #endif
       mmx = k86_getREG(DisP,DisP->RealCmd[1] & 0x07,True,brex,use64);
-      if(as_xmmx) DisP->mode&=~MOD_SSE;
-      else        DisP->mode&=~MOD_MMX;
-#ifdef IX86_64
-      if(x86_Bitness == DAB_USE64) brex = REX_R(K86_REX);
-#endif
-      exx = k86_getREG(DisP,(DisP->RealCmd[1] >> 3) & 0x07,True,brex,use64);
-      strcat(str,direct ? exx : mmx);
-      strcat(str,",");
-      strcat(str,direct ? mmx : exx);
-      DisP->codelen++;
-   }
-   DisP->mode=mode;
-}
-
-static void __NEAR__ __FASTCALL__ ix86_ArgxMMXGroup(char *str,const char *name,ix86Param *DisP,tBool as_xmmx)
-{
-  unsigned long mode=DisP->mode;
-  tBool brex,use64;
-  brex = use64 = 0;
-#ifdef IX86_64
-  if(x86_Bitness == DAB_USE64)
-  {
-    brex = REX_B(K86_REX);
-    use64 = Use64;
-    if(brex && !as_xmmx) brex = 0; /* Note: there are only 8 mmx registers */
-  }
-#endif
-  DisP->codelen++;
-  strcpy(str,name);
-  TabSpace(str,TAB_POS);
-  if(as_xmmx) DisP->mode|=MOD_SSE;
-  else        DisP->mode|=MOD_MMX;
-  strcat(str,k86_getREG(DisP,DisP->RealCmd[1] & 0x07,True,brex,use64));
-  if(as_xmmx) DisP->mode&=~MOD_SSE;
-  else        DisP->mode&=~MOD_MMX;
-  strcat(str,",");
-  strcat(str,Get2Digit(DisP->RealCmd[2]));
-  DisP->codelen++;
-  DisP->mode=mode;
-}
-
-/* This function does not have analogs from MMX set. SSE(2) only */
-
-static void __NEAR__ __FASTCALL__ ix86_ArgRXMM(char *str,ix86Param *DisP,tBool direct)
-{
-   unsigned long mode=DisP->mode;
-   DisP->mode|=MOD_SSE;
-   if((DisP->RealCmd[1] & 0xC0) != 0xC0)
-   {
-     direct ? ix86_ArgModRMnDW(str,DisP) : ix86_ArgModRMDW(str,DisP);
-     DisP->mode&=~MOD_SSE;
-   }
-   else
-   {
-      const char *mmx,*exx,*vxx=NULL;
-      tBool brex,use64;
-      brex = use64 = 0;
-#ifdef IX86_64
-      if(x86_Bitness == DAB_USE64)
-      {
-        brex = REX_R(K86_REX);
-        use64 = Use64;
+      if(DisP->pfx&PFX_VEX) {
+	vxx = get_VEX_reg(DisP);
+	exx = k86_getREG(DisP,DisP->RealCmd[1] & 0x07,True,brex,use64);
       }
-#endif
-      mmx = k86_getREG(DisP,(DisP->RealCmd[1] >> 3) & 0x07,True,brex,use64);
-      if(DisP->pfx&PFX_VEX) vxx = get_VEX_reg(DisP);
-      DisP->mode&=~MOD_SSE;
+      else {
+	if(as_xmmx) DisP->mode&=~MOD_SSE;
+	else        DisP->mode&=~MOD_MMX;
 #ifdef IX86_64
-      if(x86_Bitness == DAB_USE64) brex = REX_B(K86_REX);
+	if(x86_Bitness == DAB_USE64) brex = REX_R(K86_REX);
 #endif
-      exx = k86_getREG(DisP,DisP->RealCmd[1] & 0x07,True,brex,use64);
+	exx = k86_getREG(DisP,(DisP->RealCmd[1] >> 3) & 0x07,True,brex,use64);
+      }
       strcat(str,direct ? exx : mmx);
       strcat(str,",");
       if(vxx) { strcat(str, vxx); strcat(str,","); }
@@ -1604,11 +1517,19 @@ static void __NEAR__ __FASTCALL__ ix86_ArgRXMM(char *str,ix86Param *DisP,tBool d
    DisP->mode=mode;
 }
 
+void   __FASTCALL__ bridge_simd_cpu(char *str,ix86Param* DisP)
+{
+    if(DisP->insn_flags&BRIDGE_CPU_SSE)
+	ix86_bridge_cpu_simd(str,DisP,(DisP->insn_flags&IX86_STORE)?True:False,(DisP->insn_flags&IX86_SSE)?True:False);
+    else
+	ix86_bridge_simd_cpu(str,DisP,(DisP->insn_flags&IX86_STORE)?True:False,(DisP->insn_flags&IX86_SSE)?True:False);
+}
+
 static void __NEAR__ __FASTCALL__ ix86_ArgRxMMRev(char *str,ix86Param *DisP,tBool direct,tBool as_xmmx)
 {
    if((DisP->RealCmd[1] & 0xC0) != 0xC0)
    {
-     direct ? ix86_ArgModRMnDW(str,DisP) : ix86_ArgModRMDW(str,DisP);
+     arg_cpu_modrm(str,DisP);
    }
    else
    {
@@ -1641,14 +1562,42 @@ static void __NEAR__ __FASTCALL__ ix86_ArgRxMMRev(char *str,ix86Param *DisP,tBoo
    }
 }
 
-static void __NEAR__ __FASTCALL__ ix86_ArgxMMxMM(char *str,ix86Param *DisP,tBool direct,tBool xmmx_first)
+static void __NEAR__ __FASTCALL__ ix86_ArgxMMXGroup(char *str,const char *name,ix86Param *DisP,tBool as_xmmx)
+{
+  unsigned long mode=DisP->mode;
+  tBool brex,use64;
+  brex = use64 = 0;
+#ifdef IX86_64
+  if(x86_Bitness == DAB_USE64)
+  {
+    brex = REX_B(K86_REX);
+    use64 = Use64;
+    if(brex && !as_xmmx) brex = 0; /* Note: there are only 8 mmx registers */
+  }
+#endif
+  DisP->codelen++;
+  strcpy(str,name);
+  TabSpace(str,TAB_POS);
+  if(as_xmmx) DisP->mode|=MOD_SSE;
+  else        DisP->mode|=MOD_MMX;
+  strcat(str,k86_getREG(DisP,DisP->RealCmd[1] & 0x07,True,brex,use64));
+  if(as_xmmx) DisP->mode&=~MOD_SSE;
+  else        DisP->mode&=~MOD_MMX;
+  strcat(str,",");
+  strcat(str,Get2Digit(DisP->RealCmd[2]));
+  DisP->codelen++;
+  DisP->mode=mode;
+}
+
+
+static void __NEAR__ __FASTCALL__ ix86_bridge_sse_mmx(char *str,ix86Param *DisP,tBool direct,tBool xmmx_first)
 {
    unsigned long mode=DisP->mode;
    if(xmmx_first) DisP->mode|=MOD_SSE;
    else           DisP->mode|=MOD_MMX;
    if((DisP->RealCmd[1] & 0xC0) != 0xC0)
    {
-     direct ? ix86_ArgModRMnDW(str,DisP) : ix86_ArgModRMDW(str,DisP);
+     arg_cpu_modrm(str,DisP);
      if(xmmx_first) DisP->mode&=~MOD_SSE;
      else           DisP->mode&=~MOD_MMX;
    }
@@ -1690,31 +1639,20 @@ static void __NEAR__ __FASTCALL__ ix86_ArgxMMxMM(char *str,ix86Param *DisP,tBool
    DisP->mode=mode;
 }
 
-void __FASTCALL__ ix86_ArgMMXD(char *str,ix86Param *DisP)
+void __FASTCALL__ bridge_sse_mmx(char *str,ix86Param* DisP)
 {
-     unsigned long mode=DisP->mode;
-     DisP->mode|=MOD_MMX;
-     ix86_ArgModRMnDW(str,DisP);
-     DisP->mode=mode;
+   ix86_bridge_sse_mmx(str,DisP,(DisP->insn_flags&IX86_STORE)?False:True,(DisP->insn_flags&BRIDGE_MMX_SSE)?False:True);
 }
 
-void __FASTCALL__ ix86_ArgMMXnD(char *str,ix86Param *DisP)
+void __FASTCALL__ arg_simd(char *str,ix86Param *DisP)
 {
-     unsigned long mode=DisP->mode;
-     DisP->mode|=MOD_MMX;
-     ix86_ArgModRMDW(str,DisP);
-     DisP->mode=mode;
+    unsigned long mode=DisP->mode;
+    if(DisP->insn_flags&IX86_MMX)	DisP->mode|=MOD_MMX;
+    else				DisP->mode|=MOD_SSE;
+    arg_cpu_modrm(str,DisP);
+    DisP->mode=mode;
 }
 
-void __FASTCALL__ ix86_ArgMMXRnD(char *str,ix86Param *DisP)
-{
-   ix86_ArgxMM(str,DisP,False,False);
-}
-
-void __FASTCALL__ ix86_ArgMMXRD(char *str,ix86Param *DisP)
-{
-   ix86_ArgxMM(str,DisP,True,False);
-}
 
 void __FASTCALL__ ix86_ArgMMXGr1(char *str,ix86Param *DisP)
 {
@@ -1746,42 +1684,7 @@ void __FASTCALL__ ix86_ArgXMMXGr3(char *str,ix86Param *DisP)
   ix86_ArgxMMXGroup(str,ix86_XMMXGr3[(DisP->RealCmd[1] >> 3) & 0x07],DisP,True);
 }
 
-void  __FASTCALL__ ix86_ArgXMMXD(char *str,ix86Param *DisP)
-{
-     unsigned long mode=DisP->mode;
-     DisP->mode|=MOD_SSE;
-     ix86_ArgModRMnDW(str,DisP);
-     DisP->mode=mode;
 
-}
-
-void  __FASTCALL__ ix86_ArgXMMXnD(char *str,ix86Param *DisP)
-{
-     unsigned long mode=DisP->mode;
-     DisP->mode|=MOD_SSE;
-     ix86_ArgModRMDW(str,DisP);
-     DisP->mode=mode;
-}
-
-void  __FASTCALL__ ix86_ArgXMMXRnD(char *str,ix86Param *DisP)
-{
-   ix86_ArgxMM(str,DisP,False,True);
-}
-
-void  __FASTCALL__ ix86_ArgXMMXRD(char *str,ix86Param *DisP)
-{
-   ix86_ArgxMM(str,DisP,True,True);
-}
-
-void  __FASTCALL__ ix86_ArgRXMMXnD(char *str,ix86Param *DisP)
-{
-   ix86_ArgRXMM(str,DisP,False);
-}
-
-void  __FASTCALL__ ix86_ArgRXMMXD(char *str,ix86Param *DisP)
-{
-   ix86_ArgRXMM(str,DisP,True);
-}
 
 void  __FASTCALL__ ix86_ArgRXMMXRevnD(char *str,ix86Param *DisP)
 {
@@ -1803,25 +1706,6 @@ void  __FASTCALL__ ix86_ArgRMMXRevD(char *str,ix86Param *DisP)
    ix86_ArgRxMMRev(str,DisP,True,False);
 }
 
-void  __FASTCALL__ ix86_ArgXMMXMMnD(char *str,ix86Param *DisP)
-{
-   ix86_ArgxMMxMM(str,DisP,False,True);
-}
-
-void  __FASTCALL__ ix86_ArgXMMXMMD(char *str,ix86Param *DisP)
-{
-   ix86_ArgxMMxMM(str,DisP,True,True);
-}
-
-void  __FASTCALL__ ix86_ArgMMXMMXnD(char *str,ix86Param *DisP)
-{
-   ix86_ArgxMMxMM(str,DisP,False,False);
-}
-
-void  __FASTCALL__ ix86_ArgMMXMMXD(char *str,ix86Param *DisP)
-{
-   ix86_ArgxMMxMM(str,DisP,True,False);
-}
 
 void __FASTCALL__ ix86_ArgMovYX(char *str,ix86Param *DisP)
 {
@@ -1888,17 +1772,13 @@ void __FASTCALL__ ix86_ArgKatmaiGrp2(char *str,ix86Param *DisP)
    ix86_ArgModB(str,DisP);
 }
 
-void __FASTCALL__  ix86_ArgXMMRMDigit(char *str,ix86Param *DisP)
+void __FASTCALL__  arg_simd_imm8(char *str,ix86Param *DisP)
 {
-   char * a1,*a2;
-   unsigned long mode=DisP->mode;
-   DisP->mode|=MOD_SSE;
-   a1 = ix86_getTileWD(DisP);
-   strcat(str,a1);
-   a2 = ix86_GetDigitTile(DisP,0,0,DisP->codelen-2);
+   char* a;
+   arg_simd(str,DisP);
+   a = ix86_GetDigitTile(DisP,0,0,DisP->codelen-2);
    DisP->codelen++;
-   ix86_CStile(str,a2);
-   DisP->mode|=mode;
+   ix86_CStile(str,a);
 }
 
 void __FASTCALL__ ix86_ArgXMM1IReg(char *str,ix86Param *DisP)
@@ -2005,62 +1885,26 @@ void __FASTCALL__  ix86_ArgXMMCmp(char *str,ix86Param *DisP)
    DisP->mode = mode;
 }
 
-void __FASTCALL__  ix86_ArgMMRMDigit(char *str,ix86Param *DisP)
-{
-   char * a1,*a2;
-   unsigned long mode=DisP->mode;
-   DisP->codelen++;
-   DisP->mode|=MOD_MMX;
-   a1 = ix86_getTileWD(DisP);
-   strcat(str,a1);
-   a2 = ix86_GetDigitTile(DisP,0,0,DisP->codelen-1);
-   ix86_CStile(str,a2);
-   DisP->mode=mode;
-}
-
-void __FASTCALL__  ix86_ArgRegXMMDigit(char *str,ix86Param *DisP)
+void __FASTCALL__  bridge_simd_cpu_imm8(char *str,ix86Param *DisP)
 {
    char * a1;
-   ix86_ArgxMMRev(str,DisP,True,False);
+   bridge_simd_cpu(str,DisP);
    a1 = ix86_GetDigitTile(DisP,0,0,DisP->codelen-1);
    ix86_CStile(str,a1);
 }
 
-void __FASTCALL__  ix86_ArgRegXMMXDigit(char *str,ix86Param *DisP)
-{
-   char * a1;
-   ix86_ArgxMMRev(str,DisP,True,True);
-   a1 = ix86_GetDigitTile(DisP,0,0,DisP->codelen-3);
-   ix86_CStile(str,a1);
-}
-
-void __FASTCALL__  ix86_ArgXMMRegDigit(char *str,ix86Param *DisP)
-{
-   char * a1;
-   ix86_ArgMMXRnD(str,DisP);
-   a1 = ix86_GetDigitTile(DisP,0,0,DisP->codelen-1);
-   ix86_CStile(str,a1);
-}
-
-void __FASTCALL__  ix86_ArgXMMXRegDigit(char *str,ix86Param *DisP)
-{
-   char * a1;
-   ix86_ArgRXMMXnD(str,DisP);
-   a1 = ix86_GetDigitTile(DisP,0,0,DisP->codelen-1);
-   ix86_CStile(str,a1);
-}
-
-void   __FASTCALL__ ix86_ArgXMM_2src_xmm0(char *str,ix86Param *DisP) {
-   ix86_ArgXMMXnD(str,DisP);
+void   __FASTCALL__ arg_simd_xmm0(char *str,ix86Param *DisP) {
+   arg_simd(str,DisP);
    ix86_CStile(str,"xmm0");
 }
+
 /* TODO: fix it !!! */
-void   __FASTCALL__ ix86_ArgXMM_3src(char *str,ix86Param *DisP) {
+void   __FASTCALL__ arg_vex(char *str,ix86Param *DisP) {
     unsigned is4,rg,brex,use64;
     unsigned long mod = DisP->mode;
     DisP->mode |= MOD_SSE;
     brex=use64=0;
-    ix86_ArgxMM(str,DisP,0,1);
+    arg_simd(str,DisP);
     is4=DisP->RealCmd[DisP->codelen];
     DisP->codelen++;
     if(x86_Bitness == DAB_USE64) {
@@ -2076,9 +1920,9 @@ void   __FASTCALL__ ix86_ArgXMM_3src(char *str,ix86Param *DisP) {
     DisP->mode = mod;
 }
 
-void   __FASTCALL__ ix86_ArgXMM_3src_digit(char *str,ix86Param *DisP) {
+void   __FASTCALL__ arg_vex_imm8(char *str,ix86Param *DisP) {
     unsigned is4;
-    ix86_ArgXMM_3src(str,DisP);
+    arg_vex(str,DisP);
     is4=DisP->RealCmd[DisP->codelen-1];
     ix86_CStile(str,Get2Digit(is4&0x0F));
 }
@@ -2089,7 +1933,7 @@ void __FASTCALL__ ix86_3dNowOpCodes( char *str,ix86Param *DisP)
  unsigned long mode=DisP->mode;
  DisP->mode|=MOD_MMX;
  ix86_Katmai_buff[0] = 0;
- ix86_ArgModRMDW(ix86_Katmai_buff,DisP);
+ arg_cpu_modrm(ix86_Katmai_buff,DisP);
  DisP->mode=mode;
  code = DisP->RealCmd[DisP->codelen-1];
  DisP->codelen++;

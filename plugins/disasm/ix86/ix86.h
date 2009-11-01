@@ -157,8 +157,8 @@ typedef void (__FASTCALL__*ix86_method)(char *encode_str,ix86Param *);
 #define IX86_GPR	0x00000000UL /* insn works with general purpose registers */
 #define IX86_FPU	0x00001000UL /* insn works with fpu registers */
 #define IX86_MMX	0x00002000UL /* insn works with mmx registers */
-#define IX86_SSE	0x00003000UL /* insn works with sse registers */
-#define IX86_AVX	0x00004000UL /* insn works with avx registers */
+#define IX86_SSE	0x00004000UL /* insn works with sse registers */
+#define IX86_AVX	0x0000C000UL /* insn works with avx registers */
 
 #define IX86_CLONEMASK	0x000F0000UL
 #define IX86_INTEL	0x00000000UL
@@ -171,7 +171,17 @@ typedef void (__FASTCALL__*ix86_method)(char *encode_str,ix86Param *);
 #define IX86_VEXMASK	0x0F000000UL
 #define IX86_VEX_V	0x01000000UL /* means insns use VVVV register extension from VEX prefix*/
 
-#define IX86_FLAGS_MASK 0xFF000000UL
+#define IX86_LOAD	0x00000000UL /* means direction: OPCODE reg,[mem] */
+#define IX86_STORE	0x10000000UL /* means direction: OPCODE [mem],reg */
+#define IX86_OP_BYTE	0x20000000UL /* means operand size is 1 byte */
+#define IX86_OP_WORD	0x00000000UL /* means operand size is word (16,32 or 64) depends on mode */
+#define IX86_USERBIT	0x40000000UL /* overloaded for special purposes */
+#define IX86_FLAGS_MASK	0x7F000000UL
+
+#define BRIDGE_MMX_SSE	IX86_USERBIT
+#define BRIDGE_SSE_MMX	0x00000000UL
+#define BRIDGE_CPU_SSE	IX86_USERBIT
+#define BRIDGE_SSE_CPU	0x00000000UL
 
 /* Furter processors */
 #define IX86_UNKCPU	IX86_CPU1286
@@ -220,11 +230,16 @@ typedef void (__FASTCALL__*ix86_method)(char *encode_str,ix86Param *);
 #define K64_VEXMASK	0x0F000000UL
 #define K64_VEX_V	0x01000000UL /* means insns use VVVV register extension from VEX prefix*/
 
+#define K64_LOAD	0x00000000UL /* means direction: OPCODE reg,[mem] */
+#define K64_STORE	0x10000000UL /* means direction: OPCODE [mem],reg */
+#define K64_OP_BYTE	0x20000000UL /* means operand size is 1 byte */
+#define K64_OP_WORD	0x00000000UL /* means operand size is word (16,32 or 64) depends on mode */
+
 #define K64_FLAGS_MASK  0x7F000000UL
 
 /* Special features flags */
 #define TABDESC_MASK		0x80000000UL
-#define TAB_NAME_IS_TABLE	0x10000000UL
+#define TAB_NAME_IS_TABLE	0x80000000UL
 
 typedef struct tag_ix86opcodes
 {
@@ -323,6 +338,8 @@ extern char * __FASTCALL__ ix86_getModRM(tBool w,unsigned char mod,unsigned char
 extern void   __FASTCALL__ ix86_setModifier(char *str,const char *modf);
 extern char * __FASTCALL__ ix86_CStile(char *str,const char *arg2);
 
+/* methods */
+
 extern void   __FASTCALL__ ix86_ArgES(char *str,ix86Param *);
 extern void   __FASTCALL__ ix86_ArgDS(char *str,ix86Param *);
 extern void   __FASTCALL__ ix86_ArgSS(char *str,ix86Param *);
@@ -336,11 +353,9 @@ extern void   __FASTCALL__ ix86_ArgDWord(char *str,ix86Param *);
 extern void   __FASTCALL__ ix86_ArgShort(char *str,ix86Param *);
 extern void   __FASTCALL__ ix86_ArgNear(char *str,ix86Param *);
 extern void   __FASTCALL__ ix86_ArgFar(char *str,ix86Param *);
-extern void   __FASTCALL__ ix86_ArgModRM(char *str,ix86Param *);
-extern void   __FASTCALL__ ix86_ArgModRMDW(char *str,ix86Param *);
-extern void   __FASTCALL__ ix86_ArgModRMnDW(char *str,ix86Param *);
-extern void   __FASTCALL__ ix86_ArgModRMDnW(char *str,ix86Param *);
-extern void   __FASTCALL__ ix86_ArgModRMnDnW(char *str,ix86Param *);
+
+extern void   __FASTCALL__ arg_cpu_modrm(char * str,ix86Param *DisP);
+
 extern void   __FASTCALL__ ix86_ArgMod(char *str,ix86Param *);
 extern void   __FASTCALL__ ix86_ArgModB(char *str,ix86Param *);
 extern void   __FASTCALL__ ix86_SMov(char * str,ix86Param *DisP);
@@ -374,46 +389,30 @@ extern void   __FASTCALL__ ix86_ArgExGr0(char *str,ix86Param *);
 extern void   __FASTCALL__ ix86_ArgExGr1(char *str,ix86Param *);
 extern void   __FASTCALL__ ix86_ArgMovXRY(char *str,ix86Param *);
 extern void   __FASTCALL__ ix86_DblShift(char *str,ix86Param *);
-extern void   __FASTCALL__ ix86_ArgMMXD(char *str,ix86Param *);
-extern void   __FASTCALL__ ix86_ArgMMXnD(char *str,ix86Param *);
-extern void   __FASTCALL__ ix86_ArgMMXRD(char *str,ix86Param *);
-extern void   __FASTCALL__ ix86_ArgMMXRnD(char *str,ix86Param *);
+
+extern void   __FASTCALL__ arg_simd(char *str,ix86Param *);
+extern void   __FASTCALL__ arg_simd_imm8(char *str,ix86Param *);
+extern void   __FASTCALL__ arg_simd_xmm0(char *str,ix86Param *);
+extern void   __FASTCALL__ bridge_sse_mmx(char *str,ix86Param* DisP);
+extern void   __FASTCALL__ bridge_simd_cpu(char *str,ix86Param* DisP);
+extern void   __FASTCALL__ bridge_simd_cpu_imm8(char *str,ix86Param* DisP);
+extern void   __FASTCALL__ arg_vex(char *str,ix86Param *);
+extern void   __FASTCALL__ arg_vex_imm8(char *str,ix86Param *DisP);
+
 extern void   __FASTCALL__ ix86_ArgMMXGr1(char *str,ix86Param *);
 extern void   __FASTCALL__ ix86_ArgMMXGr2(char *str,ix86Param *);
 extern void   __FASTCALL__ ix86_ArgMMXGr3(char *str,ix86Param *);
 extern void   __FASTCALL__ ix86_ArgXMMXGr1(char *str,ix86Param *);
 extern void   __FASTCALL__ ix86_ArgXMMXGr2(char *str,ix86Param *);
 extern void   __FASTCALL__ ix86_ArgXMMXGr3(char *str,ix86Param *);
-extern void   __FASTCALL__ ix86_ArgMMRMDigit(char *str,ix86Param *);
-extern void   __FASTCALL__ ix86_ArgRMMXRevD(char *str,ix86Param *);
-extern void   __FASTCALL__ ix86_ArgRMMXRevnD(char *str,ix86Param *);
-extern void   __FASTCALL__ ix86_ArgXMMXD(char *str,ix86Param *);
-extern void   __FASTCALL__ ix86_ArgXMMXnD(char *str,ix86Param *);
-extern void   __FASTCALL__ ix86_ArgXMMXRD(char *str,ix86Param *);
-extern void   __FASTCALL__ ix86_ArgXMMXRnD(char *str,ix86Param *);
-extern void   __FASTCALL__ ix86_ArgRXMMXD(char *str,ix86Param *);
-extern void   __FASTCALL__ ix86_ArgRXMMXnD(char *str,ix86Param *);
-extern void   __FASTCALL__ ix86_ArgRXMMXRevD(char *str,ix86Param *);
-extern void   __FASTCALL__ ix86_ArgRXMMXRevnD(char *str,ix86Param *);
-extern void   __FASTCALL__ ix86_ArgXMMXMMD(char *str,ix86Param *);
-extern void   __FASTCALL__ ix86_ArgXMMXMMnD(char *str,ix86Param *);
-extern void   __FASTCALL__ ix86_ArgMMXMMXD(char *str,ix86Param *);
-extern void   __FASTCALL__ ix86_ArgMMXMMXnD(char *str,ix86Param *);
+
 extern void   __FASTCALL__ ix86_ArgKatmaiGrp1(char *str,ix86Param *);
 extern void   __FASTCALL__ ix86_ArgKatmaiGrp2(char *str,ix86Param *);
-extern void   __FASTCALL__ ix86_ArgXMMRMDigit(char *str,ix86Param *);
 extern void   __FASTCALL__ ix86_ArgXMMCmp(char *str,ix86Param *);
-extern void   __FASTCALL__ ix86_ArgRegXMMDigit(char *str,ix86Param *);
-extern void   __FASTCALL__ ix86_ArgRegXMMXDigit(char *str,ix86Param *);
-extern void   __FASTCALL__ ix86_ArgXMMRegDigit(char *str,ix86Param *);
-extern void   __FASTCALL__ ix86_ArgXMMXRegDigit(char *str,ix86Param *);
 extern void   __FASTCALL__ ix86_ArgMovYX(char *str,ix86Param *);
 extern void   __FASTCALL__ ix86_VMX(char *str,ix86Param *);
 extern void   __FASTCALL__ ix86_0FVMX(char *str,ix86Param *DisP);
 
-extern void   __FASTCALL__ ix86_ArgXMM_2src_xmm0(char *str,ix86Param *);
-extern void   __FASTCALL__ ix86_ArgXMM_3src(char *str,ix86Param *);
-extern void   __FASTCALL__ ix86_ArgXMM_3src_digit(char *str,ix86Param *DisP);
 
 extern void   __FASTCALL__ ix86_ArgXMM1IReg(char *str,ix86Param *DisP);
 extern void   __FASTCALL__ ix86_ArgXMM1DigDig(char *str,ix86Param *DisP);
