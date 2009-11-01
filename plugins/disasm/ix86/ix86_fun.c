@@ -57,7 +57,7 @@ char *ix86_Katmai_buff;
 #define REX_W(rex) (((rex)&0x08)>>3)
 #define REX_R(rex) (((rex)&0x04)>>2)
 #define REX_X(rex) (((rex)&0x02)>>1)
-#define REX_B(rex) (((rex)&0x01)>>0)
+#define REX_B(rex) ((rex)&0x01)
 #define REX_w(rex) ((rex)&0x08)
 #define REX_r(rex) ((rex)&0x04)
 #define REX_x(rex) ((rex)&0x02)
@@ -110,6 +110,26 @@ static const char * __FASTCALL__ k86_getREG(ix86Param*DisP,unsigned char reg,tBo
  rex=rex;
  use64 = use64;
 #endif
+}
+
+static const char *get_VEX_reg(ix86Param* DisP)
+{
+    unsigned rg,brex,use64;
+    const char *rval=NULL;
+    if(x86_Bitness == DAB_USE64) {
+	use64 = Use64;
+	rg = ((DisP->VEX_vlp>>3)&0x0F)^0x0F;
+	brex = (rg>>3)&0x01;
+	if(DisP->insn_flags&K64_VEX_V) {
+	    rval=k86_getREG(DisP,rg,1,brex,use64);
+	}
+    }
+    else {
+	rg = ((DisP->VEX_vlp>>3)&0x07)^0x07;
+	if(DisP->insn_flags&IX86_VEX_V)
+	    rval=k86_getREG(DisP,rg,1,0,0);
+    }
+    return rval;
 }
 
 static char * __NEAR__ __FASTCALL__ GetDigitsApp(unsigned char loc_off,
@@ -393,7 +413,7 @@ static void __NEAR__ __FASTCALL__ getSIBRegs(ix86Param*DisP,char * base,char * s
   if(ind == 4)
   {
 #ifdef IX86_64
-	if(x86_Bitness == DAB_USE64 && ((K86_REX&2)>>1))
+	if(x86_Bitness == DAB_USE64 && REX_X(K86_REX))
 	    /*	AMD 24594.pdf rev 3.02 aug 2002:
 		REX adds fourth bit (X) which is decoded
 		that allows to use R12 as index.
@@ -410,7 +430,7 @@ static void __NEAR__ __FASTCALL__ getSIBRegs(ix86Param*DisP,char * base,char * s
      if(x86_Bitness == DAB_USE64)
      {
          use64 = HAS_67_IN64?0:1;
-         brex = (K86_REX&2)>>1;
+         brex = REX_X(K86_REX);
      }
 #endif
      strcpy(_index,k86_getREG(DisP,ind,True,brex,use64));
@@ -422,7 +442,7 @@ static void __NEAR__ __FASTCALL__ getSIBRegs(ix86Param*DisP,char * base,char * s
      if(x86_Bitness == DAB_USE64)
      {
          use64 = HAS_67_IN64?0:1;
-         brex = (K86_REX&1)>>0;
+         brex = REX_B(K86_REX);
      }
 #endif
     strcpy(base,k86_getREG(DisP,bas,True,brex,use64));
@@ -468,7 +488,7 @@ char * __FASTCALL__ ix86_getModRM(tBool w,unsigned char mod,unsigned char rm,ix8
 #ifdef IX86_64
    if(x86_Bitness == DAB_USE64)
    {
-      cptr = (HAS_67_IN64==False) ? k86_QWordRegs[REX_reg(K86_REX&1,rm)] : k86_DWordRegs[REX_reg(K86_REX&1,rm)];
+      cptr = (HAS_67_IN64==False) ? k86_QWordRegs[REX_reg(REX_b(K86_REX),rm)] : k86_DWordRegs[REX_reg(REX_B(K86_REX),rm)];
    }
    else
 #endif
@@ -566,7 +586,7 @@ char * __FASTCALL__ ix86_getModRM(tBool w,unsigned char mod,unsigned char rm,ix8
 #ifdef IX86_64
 	      if(x86_Bitness == DAB_USE64)
               {
-                brex = K86_REX&1;
+                brex = REX_B(K86_REX);
                 use64 = Use64;
               }
 #endif
@@ -600,32 +620,20 @@ static char * __NEAR__ __FASTCALL__ __getTile(ix86Param *DisP,tBool w,tBool d)
 #ifdef IX86_64
  if(x86_Bitness == DAB_USE64)
  {
-   brex = (K86_REX&4)>>2;
+   brex = REX_R(K86_REX);
    use64 = Use64;
  }
 #endif
  regs = k86_getREG(DisP,reg,w,brex,use64);
 #ifdef IX86_64
- if(x86_Bitness == DAB_USE64) brex = K86_REX&1;
+ if(x86_Bitness == DAB_USE64) brex = REX_B(K86_REX);
 #endif
  if(mod == 3) modrm = k86_getREG(DisP,rm,w,brex,use64);
  else         modrm = ix86_getModRM(w,mod,rm,DisP);
  ix86_dtile[0] = 0;
  strcat(ix86_dtile,d ? regs : modrm);
  /* add VEX.vvvv field as first source operand */
- if(DisP->pfx&PFX_VEX) {
-    unsigned rg;
-    if(x86_Bitness == DAB_USE64) {
-	rg = ((DisP->VEX_vlp>>3)&0x0F)^0x0F;
-	if(DisP->insn_flags&K64_VEX_V)
-	    ix86_CStile(ix86_dtile,k86_getREG(DisP,rg,w,brex,use64));
-    }
-    else {
-	rg = ((DisP->VEX_vlp>>3)&0x07)^0x07;
-	if(DisP->insn_flags&IX86_VEX_V)
-	    ix86_CStile(ix86_dtile,k86_getREG(DisP,rg,w,brex,use64));
-    }
- }
+ if((DisP->pfx&PFX_VEX) && (DisP->insn_flags&K64_VEX_V)) ix86_CStile(ix86_dtile,get_VEX_reg(DisP));
  ix86_CStile(ix86_dtile,d ? modrm : regs);
  return ix86_dtile;
 }
@@ -782,7 +790,7 @@ void __FASTCALL__ ix86_ArgIRegDigit(char * str,ix86Param *DisP)
 #ifdef IX86_64
   if(x86_Bitness == DAB_USE64)
   {
-    brex = K86_REX&1;
+    brex = REX_B(K86_REX);
     use64 = Use64;
   }
 #endif
@@ -800,7 +808,7 @@ void __FASTCALL__ ix86_ArgIReg(char *str,ix86Param *DisP)
 #ifdef IX86_64
   if(x86_Bitness == DAB_USE64)
   {
-    brex = K86_REX&1;
+    brex = REX_B(K86_REX);
     use64 = Use64;
   }
 #endif
@@ -814,7 +822,7 @@ void __FASTCALL__ ix86_ArgIReg64(char *str,ix86Param *DisP)
 #ifdef IX86_64
   if(x86_Bitness == DAB_USE64)
   {
-    brex = K86_REX&1;
+    brex = REX_B(K86_REX);
     use64 = Use64;
   }
 #endif
@@ -828,7 +836,7 @@ void __FASTCALL__ ix86_ArgAXIReg(char *str,ix86Param *DisP)
 #ifdef IX86_64
   if(x86_Bitness == DAB_USE64)
   {
-    brex = K86_REX&1;
+    brex = REX_B(K86_REX);
     use64 = Use64;
   }
 #endif
@@ -1458,26 +1466,33 @@ static void __NEAR__ __FASTCALL__ ix86_ArgxMM(char *str,ix86Param *DisP,tBool di
    }
    else
    {
-      const char *mmx,*exx;
+      const char *mmx,*exx,*vxx=NULL;
       tBool brex,use64;
       brex = use64 = 0;
 #ifdef IX86_64
       if(x86_Bitness == DAB_USE64)
       {
-         brex = (K86_REX&4)>>2;
+         brex = REX_R(K86_REX);
          use64 = Use64;
          if(brex && !as_xmmx) brex = 0; /* Note: there are only 8 mmx registers */
       }
 #endif
       mmx = k86_getREG(DisP,(DisP->RealCmd[1] >> 3) & 0x07,True,brex,use64);
-      if(as_xmmx) DisP->mode&=~MOD_SSE;
-      else        DisP->mode&=~MOD_MMX;
+      if(DisP->pfx&PFX_VEX) {
+        vxx = get_VEX_reg(DisP);
+	exx = k86_getREG(DisP,DisP->RealCmd[1] & 0x07,True,brex,use64);
+      }
+      else {
+        if(as_xmmx) DisP->mode&=~MOD_SSE;
+        else        DisP->mode&=~MOD_MMX;
 #ifdef IX86_64
-      if(x86_Bitness == DAB_USE64) brex = K86_REX&1;
+        if(x86_Bitness == DAB_USE64) brex = REX_B(K86_REX);
 #endif
-      exx = k86_getREG(DisP,DisP->RealCmd[1] & 0x07,True,brex,use64);
+        exx = k86_getREG(DisP,DisP->RealCmd[1] & 0x07,True,brex,use64);
+      }
       strcat(str,direct ? exx : mmx);
       strcat(str,",");
+      if(vxx) { strcat(str, vxx); strcat(str,","); }
       strcat(str,direct ? mmx : exx);
       DisP->codelen++;
    }
@@ -1503,7 +1518,7 @@ static void __NEAR__ __FASTCALL__ ix86_ArgxMMRev(char *str,ix86Param *DisP,tBool
 #ifdef IX86_64
       if(x86_Bitness == DAB_USE64)
       {
-         brex = K86_REX&1;
+         brex = REX_B(K86_REX);
          use64 = Use64;
          if(brex && !as_xmmx) brex = 0; /* Note: there are only 8 mmx registers */
       }
@@ -1512,7 +1527,7 @@ static void __NEAR__ __FASTCALL__ ix86_ArgxMMRev(char *str,ix86Param *DisP,tBool
       if(as_xmmx) DisP->mode&=~MOD_SSE;
       else        DisP->mode&=~MOD_MMX;
 #ifdef IX86_64
-      if(x86_Bitness == DAB_USE64) brex = (K86_REX&4)>>2;
+      if(x86_Bitness == DAB_USE64) brex = REX_R(K86_REX);
 #endif
       exx = k86_getREG(DisP,(DisP->RealCmd[1] >> 3) & 0x07,True,brex,use64);
       strcat(str,direct ? exx : mmx);
@@ -1531,7 +1546,7 @@ static void __NEAR__ __FASTCALL__ ix86_ArgxMMXGroup(char *str,const char *name,i
 #ifdef IX86_64
   if(x86_Bitness == DAB_USE64)
   {
-    brex = K86_REX&1;
+    brex = REX_B(K86_REX);
     use64 = Use64;
     if(brex && !as_xmmx) brex = 0; /* Note: there are only 8 mmx registers */
   }
@@ -1563,24 +1578,26 @@ static void __NEAR__ __FASTCALL__ ix86_ArgRXMM(char *str,ix86Param *DisP,tBool d
    }
    else
    {
-      const char *mmx,*exx;
+      const char *mmx,*exx,*vxx=NULL;
       tBool brex,use64;
       brex = use64 = 0;
 #ifdef IX86_64
       if(x86_Bitness == DAB_USE64)
       {
-        brex = (K86_REX&4)>>2;
+        brex = REX_R(K86_REX);
         use64 = Use64;
       }
 #endif
       mmx = k86_getREG(DisP,(DisP->RealCmd[1] >> 3) & 0x07,True,brex,use64);
+      if(DisP->pfx&PFX_VEX) vxx = get_VEX_reg(DisP);
       DisP->mode&=~MOD_SSE;
 #ifdef IX86_64
-      if(x86_Bitness == DAB_USE64) brex = K86_REX&1;
+      if(x86_Bitness == DAB_USE64) brex = REX_B(K86_REX);
 #endif
       exx = k86_getREG(DisP,DisP->RealCmd[1] & 0x07,True,brex,use64);
       strcat(str,direct ? exx : mmx);
       strcat(str,",");
+      if(vxx) { strcat(str, vxx); strcat(str,","); }
       strcat(str,direct ? mmx : exx);
       DisP->codelen++;
    }
@@ -1602,7 +1619,7 @@ static void __NEAR__ __FASTCALL__ ix86_ArgRxMMRev(char *str,ix86Param *DisP,tBoo
 #ifdef IX86_64
       if(x86_Bitness == DAB_USE64)
       {
-        brex = K86_REX&1;
+        brex = REX_B(K86_REX);
         use64 = Use64;
         if(brex && !as_xmmx) brex = 0; /* Note: there are only 8 mmx registers */
       }
@@ -1613,7 +1630,7 @@ static void __NEAR__ __FASTCALL__ ix86_ArgRxMMRev(char *str,ix86Param *DisP,tBoo
       if(as_xmmx) DisP->mode&=~MOD_SSE;
       else        DisP->mode&=~MOD_MMX;
 #ifdef IX86_64
-      if(x86_Bitness == DAB_USE64) brex = (K86_REX&4)>>2;
+      if(x86_Bitness == DAB_USE64) brex = REX_R(K86_REX);
 #endif
       exx = k86_getREG(DisP,(DisP->RealCmd[1] >> 3) & 0x07,True,brex,use64);
       strcat(str,direct ? mmx : exx);
@@ -1643,7 +1660,7 @@ static void __NEAR__ __FASTCALL__ ix86_ArgxMMxMM(char *str,ix86Param *DisP,tBool
 #ifdef IX86_64
       if(x86_Bitness == DAB_USE64)
       {
-        brex = (K86_REX&4)>>2;
+        brex = REX_R(K86_REX);
         use64 = Use64;
         if(brex && !xmmx_first) brex = 0; /* Note: there are only 8 mmx registers */
       }
@@ -1660,7 +1677,7 @@ static void __NEAR__ __FASTCALL__ ix86_ArgxMMxMM(char *str,ix86Param *DisP,tBool
         DisP->mode&=~MOD_MMX;
       }
 #ifdef IX86_64
-      if(x86_Bitness == DAB_USE64) brex = K86_REX&1;
+      if(x86_Bitness == DAB_USE64) brex = REX_B(K86_REX);
 #endif
       exx = k86_getREG(DisP,DisP->RealCmd[1] & 0x07,True,brex,use64);
       if(xmmx_first) DisP->mode&=~MOD_MMX;
@@ -1816,7 +1833,7 @@ void __FASTCALL__ ix86_ArgMovYX(char *str,ix86Param *DisP)
 #ifdef IX86_64
       if(x86_Bitness == DAB_USE64)
       {
-        brex = (K86_REX&4)>>2;
+        brex = REX_R(K86_REX);
         use64 = Use64;
       }
 #endif
@@ -1876,10 +1893,10 @@ void __FASTCALL__  ix86_ArgXMMRMDigit(char *str,ix86Param *DisP)
    char * a1,*a2;
    unsigned long mode=DisP->mode;
    DisP->mode|=MOD_SSE;
-   DisP->codelen++;
    a1 = ix86_getTileWD(DisP);
    strcat(str,a1);
-   a2 = ix86_GetDigitTile(DisP,0,0,DisP->codelen-1);
+   a2 = ix86_GetDigitTile(DisP,0,0,DisP->codelen-2);
+   DisP->codelen++;
    ix86_CStile(str,a2);
    DisP->mode|=mode;
 }
@@ -1893,7 +1910,7 @@ void __FASTCALL__ ix86_ArgXMM1IReg(char *str,ix86Param *DisP)
 #ifdef IX86_64
   if(x86_Bitness == DAB_USE64)
   {
-    brex = K86_REX&1;
+    brex = REX_B(K86_REX);
     use64 = Use64;
   }
 #endif
@@ -1911,7 +1928,7 @@ void __FASTCALL__ ix86_ArgXMM1DigDig(char *str,ix86Param *DisP)
 #ifdef IX86_64
   if(x86_Bitness == DAB_USE64)
   {
-    brex = K86_REX&1;
+    brex = REX_B(K86_REX);
     use64 = Use64;
   }
 #endif
@@ -1939,7 +1956,7 @@ void __FASTCALL__ ix86_ArgXMM1RegDigDig(char *str,ix86Param *DisP)
 #ifdef IX86_64
   if(x86_Bitness == DAB_USE64)
   {
-    brex = K86_REX&1;
+    brex = REX_B(K86_REX);
     use64 = Use64;
   }
 #endif
@@ -2013,7 +2030,7 @@ void __FASTCALL__  ix86_ArgRegXMMXDigit(char *str,ix86Param *DisP)
 {
    char * a1;
    ix86_ArgxMMRev(str,DisP,True,True);
-   a1 = ix86_GetDigitTile(DisP,0,0,DisP->codelen-1);
+   a1 = ix86_GetDigitTile(DisP,0,0,DisP->codelen-3);
    ix86_CStile(str,a1);
 }
 
@@ -2040,21 +2057,25 @@ void   __FASTCALL__ ix86_ArgXMM_2src_xmm0(char *str,ix86Param *DisP) {
 /* TODO: fix it !!! */
 void   __FASTCALL__ ix86_ArgXMM_3src(char *str,ix86Param *DisP) {
     unsigned is4,rg,brex,use64;
+    unsigned long mod = DisP->mode;
+    DisP->mode |= MOD_SSE;
     brex=use64=0;
-    ix86_ArgxMM(str,DisP,1,1);
+    ix86_ArgxMM(str,DisP,0,1);
     is4=DisP->RealCmd[DisP->codelen];
     DisP->codelen++;
     if(x86_Bitness == DAB_USE64) {
-	brex = (K86_REX&4)>>2;
+	brex = (is4>>7)&0x01;
 	use64 = HAS_67_IN64?0:1;
-	rg = ((is4>>4)&0x0F)/*^0x0F*/;
+	rg = ((is4>>4)&0x07)/*^0x0F*/;
 	ix86_CStile(str,k86_getREG(DisP,rg,1,brex,use64));
     }
     else {
 	rg = ((is4>>4)&0x07)/*^0x07*/;
 	ix86_CStile(str,k86_getREG(DisP,rg,1,brex,use64));
     }
+    DisP->mode = mod;
 }
+
 void   __FASTCALL__ ix86_ArgXMM_3src_digit(char *str,ix86Param *DisP) {
     unsigned is4;
     ix86_ArgXMM_3src(str,DisP);

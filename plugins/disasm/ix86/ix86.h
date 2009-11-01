@@ -210,8 +210,8 @@ typedef void (__FASTCALL__*ix86_method)(char *encode_str,ix86Param *);
 #define K64_GPR         0x00000000UL /* insn works with general purpose registers */
 #define K64_FPU         0x00001000UL /* insn works with fpu registers */
 #define K64_MMX         0x00002000UL /* insn works with mmx registers */
-#define K64_SSE         0x00003000UL /* insn works with sse registers */
-#define K64_AVX         0x00004000UL /* insn works with avx registers */
+#define K64_SSE         0x00004000UL /* insn works with sse registers */
+#define K64_AVX         0x0000C000UL /* insn works with avx registers */
 #define K64_NOCOMPAT	0x00010000UL /* means insns has no 16 or 32 bit forms */
 #define K64_DEF32	0x00020000UL /* means insns size depends on default data size but not address size */
 #define K64_SYSTEMMASK	0x00F00000UL
