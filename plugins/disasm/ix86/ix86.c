@@ -4135,7 +4135,7 @@ static DisasmRet __FASTCALL__ ix86Disassembler(__filesize_t ulShift,
  if(has_lock + has_rep > 1 || has_seg > 1 || ua > 1 || ud > 1 || has_vex > 1 || has_rex > 1)
  {
    bad_prefixes:
-   DisP.codelen = 0;
+   DisP.codelen = ud;
    strcpy(ix86_voidstr,"???");
    goto ExitDisAsm;
  }
