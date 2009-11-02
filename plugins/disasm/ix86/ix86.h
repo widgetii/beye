@@ -182,6 +182,9 @@ typedef void (__FASTCALL__*ix86_method)(char *encode_str,ix86Param *);
 #define BRIDGE_SSE_MMX	0x00000000UL
 #define BRIDGE_CPU_SSE	IX86_USERBIT
 #define BRIDGE_SSE_CPU	0x00000000UL
+#define IMM_BYTE	IX86_USERBIT
+#define IMM_WORD	0x00000000UL
+#define K64_FORCE64	IX86_USERBIT
 
 /* Furter processors */
 #define IX86_UNKCPU	IX86_CPU1286
@@ -346,30 +349,24 @@ extern void   __FASTCALL__ ix86_ArgSS(char *str,ix86Param *);
 extern void   __FASTCALL__ ix86_ArgCS(char *str,ix86Param *);
 extern void   __FASTCALL__ ix86_ArgFS(char *str,ix86Param *);
 extern void   __FASTCALL__ ix86_ArgGS(char *str,ix86Param *);
-extern void   __FASTCALL__ ix86_ArgByte(char *str,ix86Param *);
-extern void   __FASTCALL__ ix86_ArgWord(char *str,ix86Param *);
-extern void   __FASTCALL__ ix86_ArgWord_Byte(char *str,ix86Param *);
-extern void   __FASTCALL__ ix86_ArgDWord(char *str,ix86Param *);
-extern void   __FASTCALL__ ix86_ArgShort(char *str,ix86Param *);
-extern void   __FASTCALL__ ix86_ArgNear(char *str,ix86Param *);
-extern void   __FASTCALL__ ix86_ArgFar(char *str,ix86Param *);
 
-extern void   __FASTCALL__ arg_cpu_modrm(char * str,ix86Param *DisP);
+extern void   __FASTCALL__ arg_cpu_modregrm(char * str,ix86Param *DisP);
+extern void   __FASTCALL__ arg_cpu_mod_rm(char* str,ix86Param *DisP);
+extern void   __FASTCALL__ arg_cpu_mod_rm_imm(char *str,ix86Param *DisP);
+extern void   __FASTCALL__ arg_cpu_modregrm_imm(char *str,ix86Param *DisP);
+extern void   __FASTCALL__ arg_offset(char *str,ix86Param *);
+extern void   __FASTCALL__ arg_segoff(char *str,ix86Param *);
+extern void   __FASTCALL__ arg_insnreg(char *str,ix86Param *); /* reg is part of insn */
+extern void   __FASTCALL__ arg_insnreg_imm(char *str,ix86Param *);
+extern void   __FASTCALL__ arg_cpu_modsegrm(char * str,ix86Param *DisP);
+extern void   __FASTCALL__ arg_r0_imm(char *str,ix86Param *);
+extern void   __FASTCALL__ arg_r0rm(char *str,ix86Param *);
+extern void   __FASTCALL__ arg_r0mem(char *str,ix86Param *DisP);
+extern void   __FASTCALL__ arg_imm(char *str,ix86Param *);
+extern void   __FASTCALL__ arg_imm8(char *str,ix86Param *);
+extern void   __FASTCALL__ arg_imm16(char *str,ix86Param *);
+extern void   __FASTCALL__ arg_imm16_imm8(char *str,ix86Param *);
 
-extern void   __FASTCALL__ ix86_ArgMod(char *str,ix86Param *);
-extern void   __FASTCALL__ ix86_ArgModB(char *str,ix86Param *);
-extern void   __FASTCALL__ ix86_SMov(char * str,ix86Param *DisP);
-extern void   __FASTCALL__ ix86_ArgSegRM(char * str,ix86Param *DisP);
-extern void   __FASTCALL__ ix86_ArgAXMem(char *str,ix86Param *DisP);
-extern void   __FASTCALL__ ix86_ArgAXDigit(char *str,ix86Param *);
-extern void   __FASTCALL__ ix86_ArgRMDigit(char *str,ix86Param *);
-extern void   __FASTCALL__ ix86_ArgIRegDigit(char *str,ix86Param *);
-extern void   __FASTCALL__ ix86_ArgIReg(char *str,ix86Param *);
-extern void   __FASTCALL__ ix86_ArgIReg64(char *str,ix86Param *);
-extern void   __FASTCALL__ ix86_ArgAXIReg(char *str,ix86Param *);
-extern void   __FASTCALL__ ix86_ArgSInt(char *str,ix86Param *);
-extern void   __FASTCALL__ ix86_ArgInt(char *str,ix86Param *);
-extern void   __FASTCALL__ ix86_ArgRegRMDigit(char *str,ix86Param *);
 extern void   __FASTCALL__ ix86_ArgOp1(char *str,ix86Param *);
 extern void   __FASTCALL__ ix86_ArgOp2(char *str,ix86Param *);
 extern void   __FASTCALL__ ix86_ShOp2(char *str,ix86Param *);
@@ -393,6 +390,9 @@ extern void   __FASTCALL__ ix86_DblShift(char *str,ix86Param *);
 extern void   __FASTCALL__ arg_simd(char *str,ix86Param *);
 extern void   __FASTCALL__ arg_simd_imm8(char *str,ix86Param *);
 extern void   __FASTCALL__ arg_simd_xmm0(char *str,ix86Param *);
+extern void   __FASTCALL__ arg_simd_regrm(char *str,ix86Param *);
+extern void   __FASTCALL__ arg_simd_regrm_imm8_imm8(char *str,ix86Param *);
+extern void   __FASTCALL__ arg_simd_rm_imm8_imm8(char *str,ix86Param *);
 extern void   __FASTCALL__ bridge_sse_mmx(char *str,ix86Param* DisP);
 extern void   __FASTCALL__ bridge_simd_cpu(char *str,ix86Param* DisP);
 extern void   __FASTCALL__ bridge_simd_cpu_imm8(char *str,ix86Param* DisP);
@@ -410,13 +410,9 @@ extern void   __FASTCALL__ ix86_ArgKatmaiGrp1(char *str,ix86Param *);
 extern void   __FASTCALL__ ix86_ArgKatmaiGrp2(char *str,ix86Param *);
 extern void   __FASTCALL__ ix86_ArgXMMCmp(char *str,ix86Param *);
 extern void   __FASTCALL__ ix86_ArgMovYX(char *str,ix86Param *);
+
 extern void   __FASTCALL__ ix86_VMX(char *str,ix86Param *);
 extern void   __FASTCALL__ ix86_0FVMX(char *str,ix86Param *DisP);
-
-
-extern void   __FASTCALL__ ix86_ArgXMM1IReg(char *str,ix86Param *DisP);
-extern void   __FASTCALL__ ix86_ArgXMM1DigDig(char *str,ix86Param *DisP);
-extern void   __FASTCALL__ ix86_ArgXMM1RegDigDig(char *str,ix86Param *DisP);
 
 #endif
 
