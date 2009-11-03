@@ -816,7 +816,7 @@ void  __FASTCALL__ ix86_DblShift(char *str,ix86Param *DisP)
     unsigned char code = DisP->RealCmd[0];
     const char *a;
     arg_cpu_modregrm(str,DisP);
-    a = code & 0x01 ? "cl" : ix86_GetDigitTile(DisP,0,0,DisP->codelen);
+    a = code & 0x01 ? "cl" : ix86_GetDigitTile(DisP,0,0,DisP->codelen-1);
     ix86_CStile(str,a);
 }
 
