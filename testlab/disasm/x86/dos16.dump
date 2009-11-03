@@ -1,0 +1,332 @@
+;
+;Disassembler dump of 'dos16.com'
+;Range :                0H-             3CFH
+;Written by  Binary Viewer v 6.0.2-x86_64.Linux64 Build: Nov  3 2009 
+;Dumped : Tue Nov  3 19:53:07 2009
+
+;Format : Binary file
+
+
+L00000000: enter     000A,0C			; C80A000C
+L00000004: jp	     L00000357			; 0F8A4F03
+L00000008: js	     L00000357			; 0F884B03
+L0000000C: salc					; D6
+L0000000D: sahf					; 9E
+L0000000E: pusha				; 60
+L0000000F: push	     0080			; 688000
+L00000012: push	(w)  +7F			; 6A7F
+L00000014: push	     0080			; 688000
+L00000017: push	     00000080			; 666880000000
+L0000001D: pushad				; 6660
+L0000001F: popa					; 61
+L00000020: popad				; 6661
+L00000022: mov	     al,00			; B000
+L00000024: mov	     cl,00			; B100
+L00000026: mov	     bl,00			; B300
+L00000028: mov	     dh,00			; B600
+L0000002A: mov (b)   [+0000],01			; C606000001
+L0000002F: mov (w)   [+0001],0002		; C70601000200
+L00000035: mov (d)   [+0002],00000003		; 66C706020003000000
+L0000003E: mov	     eax,00000001		; 66B801000000
+L00000044: mov	     eax,00000002		; 66B802000000
+L0000004A: mov	     eax,00000004		; 66B804000000
+L00000050: mov	     eax,00000008		; 66B808000000
+L00000056: mov	     bx,0001			; BB0100
+L00000059: mov	     cr0,eax			; 0F22C0
+L0000005C: mov	     cr2,ebx			; 0F22D3
+L0000005F: mov	     cr4,edx			; 0F22E2
+L00000062: mov	     eax,tr0			; 0F2400
+L00000065: mov	     dr1,edx			; 0F23CA
+L00000068: mov	     eax,dr7			; 0F21F8
+L0000006B: mov	     [+0000],ds			; 8C1E0000
+L0000006F: mov	     [+0008],es			; 8C060800
+L00000073: mov	     ax,cs			; 8CC8
+L00000075: mov	     ax,ss			; 668CD0
+L00000078: mov	     gs,ax			; 8EE8
+L0000007A: mov	     fs,ax			; 8EE0
+L0000007C: mov	     es,[cs:+0000]		; 2E8E060000
+L00000081: mov	     ds,[+0004]			; 8E1E0400
+L00000085: mov	     ds,[ss:+0010]		; 368E1E1000
+L0000008A: mov	     [+0000],al			; A20000
+L0000008D: mov	     [+0000],bl			; 881E0000
+L00000091: mov	     [+0001],al			; A20100
+L00000094: mov	     [+0001],bl			; 881E0100
+L00000098: mov	     ecx,edx			; 6689D1
+L0000009B: movsx     ax,[ecx]			; 670FBE01
+L0000009F: movzx     ebx,[eax]			; 67660FB718
+L000000A4: movzx     ecx,[ebx]			; 67660FB60B
+L000000A9: fstenv    [es:ecx+05]		; 2667D97105
+L000000AE: nop					; 90
+L000000AF: push	     cs				; 0E
+L000000B0: push	     cs				; 0E
+L000000B1: push	     cs				; 660E
+L000000B3: push	     ds				; 1E
+L000000B4: push	     es				; 06
+L000000B5: push	     fs				; 0FA0
+L000000B7: push	     gs				; 0FA8
+L000000B9: pop	     ds				; 1F
+L000000BA: pop	     es				; 07
+L000000BB: pop	     fs				; 0FA1
+L000000BD: pop	     gs				; 0FA9
+L000000BF: xchg	     bl,al			; 86D8
+L000000C1: xchg	     al,[+0000]			; 86060000
+L000000C5: xchg	     al,[+0000]			; 86060000
+L000000C9: xchg	     ax,bx			; 93
+L000000CA: xchg	     ax,cx			; 91
+L000000CB: xchg	     ax,[+0000]			; 87060000
+L000000CF: xchg	     cx,[+0000]			; 870E0000
+L000000D3: xchg	     cx,[+0000]			; 870E0000
+L000000D7: xchg	     eax,edx			; 6692
+L000000D9: xchg	     eax,ebx			; 6693
+L000000DB: xchg	     ebx,ecx			; 6687D9
+L000000DE: xchg	     ecx,[+0000]		; 66870E0000
+L000000E3: xchg	     eax,[+0000]		; 6687060000
+L000000E8: in	     al,37			; E437
+L000000EA: in	     ax,63			; E563
+L000000EC: in	     eax,64			; 66E564
+L000000EF: in	     al,dx			; EC
+L000000F0: in	     ax,dx			; ED
+L000000F1: in	     eax,dx			; 66ED
+L000000F3: insb					; 6C
+L000000F4: insw					; 6D
+L000000F5: outsb				; 6E
+L000000F6: outsw				; 6F
+L000000F7: out	     37,al			; E637
+L000000F9: out	     42,ax			; E742
+L000000FB: out	     4D,eax			; 66E74D
+L000000FE: out	     dx,al			; EE
+L000000FF: out	     dx,ax			; EF
+L00000100: out	     dx,eax			; 66EF
+L00000102: lea	     bx,[+0005]			; 8D1E0500
+L00000106: lea	     ebx,[+0020]		; 668D1E2000
+L0000010B: lds	     si,[+0000]			; C5360000
+L0000010F: lds	     ax,[+0001]			; C5060100
+L00000113: lds	     ax,[+0001]			; C5060100
+L00000117: lds	     ax,[+0001]			; C5060100
+L0000011B: lds	     ax,[+0001]			; C5060100
+L0000011F: lds	     eax,[+0001]		; 66C5060100
+L00000124: lds	     eax,[+0001]		; 66C5060100
+L00000129: lds	     eax,[+0001]		; 66C5060100
+L0000012E: les	     di,[+0005]			; C43E0500
+L00000132: lds	     eax,[+0007]		; 66C5060700
+L00000137: les	     ebx,[+0009]		; 66C41E0900
+L0000013C: lss	     esp,[+000B]		; 660FB2260B00
+L00000142: lfs	     ecx,[+000D]		; 660FB40E0D00
+L00000148: lgs	     edx,[+000F]		; 660FB5160F00
+L0000014E: add	     ax,bx			; 01D8
+L00000150: mul (w)   cx				; F7E1
+L00000152: mul (b)   bl				; F6E3
+L00000154: mul (w)   bx				; F7E3
+L00000156: mul (d)   ebx			; 66F7E3
+L00000159: imul	     si,bp,02			; 6BF502
+L0000015C: sub	     bx,di			; 29FB
+L0000015E: div (b)   ah				; F6F4
+L00000160: idiv	(b)  al				; F6F8
+L00000162: idiv	(b)  [bx]			; F63F
+L00000164: idiv	(w)  [bx+si]			; F738
+L00000166: idiv	(d)  [bp+00]			; 66F77E00
+L0000016A: neg (w)   cx				; F7D9
+L0000016C: nop					; 90
+L0000016D: idiv	(b)  al				; F6F8
+L0000016F: idiv	(w)  ax				; F7F8
+L00000171: idiv	(d)  eax			; 66F7F8
+L00000174: nop					; 90
+L00000175: idiv	(b)  [+0000]			; F63E0000
+L00000179: idiv	(b)  [+FFFFFFFF]		; 67F63DFFFFFFFF
+L00000180: idiv	(b)  [+0000]			; F63E0000
+L00000184: idiv	(d)  [es:+00000005]		; 266766F73D05000000
+L0000018D: idiv	(d)  [cs:+0005]			; 2E66F73E0500
+L00000193: idiv	(w)  [ss:edi+00000005]		; 3667F7BF05000000
+L0000019B: nop					; 90
+L0000019C: not (d)   eax			; 66F7D0
+L0000019F: and	     eax,00000E00		; 6625000E0000
+L000001A5: or (d)    ebx,+23			; 6683CB23
+L000001A9: xor	     ecx,00000E00		; 6681F1000E0000
+L000001B0: or	     edx,00000023		; 6681CA23000000
+L000001B7: xor	     si,0E00			; 81F6000E
+L000001BB: and (d)   edi,+23			; 6683E723
+L000001BF: or	     ebp,00000E00		; 6681CD000E0000
+L000001C6: xor (d)   esp,+23			; 6683F423
+L000001CA: and	     eax,00000E00		; 6625000E0000
+L000001D0: or	     ebx,00000023		; 6681CB23000000
+L000001D7: xor	     cx,0E00			; 81F1000E
+L000001DB: and (d)   edx,+23			; 6683E223
+L000001DF: imul	     eax,eax,04			; 666BC004
+L000001E3: aad on    0A				; D50A
+L000001E5: aam on    0A				; D40A
+L000001E7: aad on    05				; D505
+L000001E9: aam on    0A				; D40A
+L000001EB: shl (b)   al,05			; C0E005
+L000001EE: shl (b)   bl,1			; D0E3
+L000001F0: shl (b)   cl,cl			; D2E1
+L000001F2: shr (w)   ax,05			; C1E805
+L000001F5: shr (w)   bx,1			; D1EB
+L000001F7: shr (w)   cx,cl			; D3E9
+L000001F9: shld	     ax,bx,05			; 0FA4D805
+L000001FD: shrd	     cx,dx,cl			; 0FADD1
+L00000200: shld	     ecx,edx,0A			; 660FA4D10A
+L00000205: shld	     eax,ebx,cl			; 660FA5D8
+L00000209: retn					; C3
+L0000020A: retf					; CB
+L0000020B: retn	     0008			; C20800
+L0000020E: retf	     0010			; CA1000
+L00000211: setc	     al				; 0F92D0
+L00000214: setc	(b)  [+0000]			; 0F92160000
+L00000219: rol (w)   ax,cl			; D3C0
+L0000021B: ror (w)   bx,03			; C1CB03
+L0000021E: rcl (w)   cx,02			; C1D102
+L00000221: rcr (w)   dx,1			; D1DA
+L00000223: sar (w)   si,cl			; D3FE
+L00000225: shl (b)   ah,04			; C0E404
+L00000228: shr (b)   dh,cl			; D2EE
+L0000022A: bsf	     ax,dx			; 0FBCC2
+L0000022D: bsr	     cx,bx			; 0FBDCB
+L00000230: bt	     si,di			; 0FA3FE
+L00000233: btr	     sp,bp			; 0FB3EC
+L00000236: bts	     ax,dx			; 0FABD0
+L00000239: bsf	     dx,[bx+si]			; 0FBC10
+L0000023C: bsr	     bx,[bx+si]			; 0FBD18
+L0000023F: bt	     [bx+si],di			; 0FA338
+L00000242: btr	     [bx+si],bp			; 0FB328
+L00000245: bts	     [bx+si],dx			; 0FAB10
+L00000248: bswap     ecx			; 660FC9
+L0000024B: cmpxchg   [bx+si],dx			; 0FB110
+L0000024E: cmpxchg8b [bx+si]			; 0FC708
+L00000251: xadd	     [bx+si],di			; 0FC138
+L00000254: cpuid				; 0FA2
+L00000256: rdpmc				; 0F33
+L00000258: pushf				; 9C
+L00000259: int	     0A				; CD0A
+L0000025B: popfd				; 669D
+L0000025D: iret16				; CF
+L0000025E: bound     sp,[+0004]			; 62260400
+L00000262: arpl	     [bx+si],ax			; 6300
+L00000264: clts					; 0F06
+L00000266: lar	     ax,[bx+si]			; 0F0200
+L00000269: lgdt	(p)  [bx+si]			; 0F0110
+L0000026C: lidt	(p)  [bx+si]			; 0F0118
+L0000026F: lldt	(w)  [bx+si]			; 0F0010
+L00000272: lsl	     ax,[bx+si]			; 0F0300
+L00000275: ltr (w)   [bx+si]			; 0F0018
+L00000278: sgdt	(p)  [bx+si]			; 0F0100
+L0000027B: sidt	(p)  [bx+si]			; 0F0108
+L0000027E: sldt	(w)  [bx+si]			; 0F0000
+L00000281: smsw	(w)  [bx+si]			; 0F0120
+L00000284: str (w)   [bx+si]			; 0F0008
+L00000287: verr	(w)  [bx+si]			; 0F0020
+L0000028A: verw	(w)  [bx+si]			; 0F0028
+L0000028D: invd					; 0F08
+L0000028F: invlpg    [bx+si]			; 0F0138
+L00000292: wbinvd				; 0F09
+L00000294: rsm					; 0FAA
+L00000296: rdmsr				; 0F32
+L00000298: rdtsc				; 0F31
+L0000029A: wrmsr				; 0F30
+L0000029C: fxsave (w)[+0000]			; 0FAE060000
+L000002A1: fsetpm				; DBE4
+L000002A3: fld (d)   st(0),[+0000]		; D9060000
+L000002A7: fld (q)   st(0),[+0004]		; DD060400
+L000002AB: fld (t)   st(0),[+0010]		; DB2E1000
+L000002AF: fld	     st(2)			; D9C2
+L000002B1: fstp	(d)  [+0000],st(0)		; D91E0000
+L000002B5: fstp	     st(4),st(0)		; DDDC
+L000002B7: fild	(w)  st(0),[+0000]		; DF060000
+L000002BB: fild	(d)  st(0),[+0004]		; DB060400
+L000002BF: fild	(q)  st(0),[+0008]		; DF2E0800
+L000002C3: fbld	(t)  st(0),[+0064]		; DF266400
+L000002C7: fbld	(t)  st(0),[+000A]		; DF260A00
+L000002CB: fst (d)   [+0001],st(0)		; D9160100
+L000002CF: fst (q)   [+0008],st(0)		; DD160800
+L000002D3: fst	     st(1),st(0)		; DDD1
+L000002D5: fxch	     st(1)			; D9C9
+L000002D7: fxch	     st(1)			; D9C9
+L000002D9: fxch	     st(2)			; D9CA
+L000002DB: fxch	     st(2)			; D9CA
+L000002DD: fcom	(d)  st(0),[+0000]		; D8160000
+L000002E1: fcom	(q)  st(0),[+0008]		; DC160800
+L000002E5: fcom	     st(0),st(1)		; D8D1
+L000002E7: fucom     st(2)			; DDE2
+L000002E9: fucomp    st(3)			; DDEB
+L000002EB: fucompp   st(1)			; DAE9
+L000002ED: fcos	     st(0)			; D9FF
+L000002EF: fprem1    st(0)			; D9F5
+L000002F1: fsin	     st(0)			; D9FE
+L000002F3: fsincos   st(0)			; D9FB
+L000002F5: fcom	     st(0),st(0)		; D8D0
+L000002F7: fucom     st(7)			; DDE7
+L000002F9: fucomp    st(5)			; DDED
+L000002FB: fadd	(d)  st(0),[+000A]		; D8060A00
+L000002FF: fadd	(q)  st(0),[+0005]		; DC060500
+L00000303: fadd	     st(0),st(0)		; D8C0
+L00000305: fadd	     st(0),st(5)		; D8C5
+L00000307: fadd	     st(7),st(0)		; DCC7
+L00000309: fadd	     st(6),st(0)		; DCC6
+L0000030B: faddp     st(1),st(0)		; DEC1
+L0000030D: faddp     st(2),st(0)		; DEC2
+L0000030F: faddp     st(5),st(0)		; DEC5
+L00000311: fiadd (w) st(0),[+000A]		; DE060A00
+L00000315: fucomi    st(0),st(2)		; DBEA
+L00000317: fcmove    st(0),st(6)		; DACE
+L00000319: fcmovu    st(0),st(5)		; DADD
+L0000031B: fisub (d) st(0),[+0004]		; DA260400
+L0000031F: fldcw     [+0000]			; D92E0000
+L00000323: fstcw     [+0004]			; D93E0400
+L00000327: wait					; 9B
+L00000328: fstcw     [+0004]			; D93E0400
+L0000032C: fstsw     [+0008]			; DD3E0800
+L00000330: fstsw     ax				; DFE0
+L00000332: wait					; 9B
+L00000333: fstsw     [+0000]			; DD3E0000
+L00000337: wait					; 9B
+L00000338: fstsw     ax				; DFE0
+L0000033A: ffree     st(1)			; DDC1
+L0000033C: ffreep    st(0)			; DFC0
+L0000033E: fsub	     st(0),st(1)		; D8E1
+L00000340: fsubp     st(1),st(0)		; DEE9
+L00000342: fsubr     st(0),st(1)		; D8E9
+L00000344: fsubrp    st(1),st(0)		; DEE1
+L00000346: fdiv	     st(0),st(1)		; D8F1
+L00000348: fdivp     st(1),st(0)		; DEF9
+L0000034A: fdivr     st(0),st(1)		; D8F9
+L0000034C: fdivrp    st(1),st(0)		; DEF1
+L0000034E: fxrstor (w) [+0000]			; 0FAE0E0000
+L00000353: jc	     L00000357			; 7202
+L00000355: jc	     L00000357			; 7200
+L00000357: je	     L00000357			; 74FE
+L00000359: je	     L00000357			; 0F84FAFF
+L0000035D: loop	     L00000357			; E2F8
+L0000035F: jcxz	     L00000357			; E3F6
+L00000361: jcxz	     L00000357			; 67E3F3
+L00000364: calln     L00000357			; E8F0FF
+L00000367: call	(w)  [+0357]			; FF165703
+L0000036B: call	(d)  [+0357]			; 66FF165703
+L00000370: jmps	     L00000357			; EBE5
+L00000372: jmpn	     L00000357			; E9E2FF
+L00000375: jmp (d)   [+0357]			; FF2E5703
+L00000379: jmpf32    1234:+56789ABC		; 66EABC9A78563412
+L00000381: call	(d)  [+0357]			; FF1E5703
+L00000385: loop	     L00000357			; E2D0
+L00000387: jcxz	     L00000357			; E3CE
+L00000389: jcxz	     L00000357			; 67E3CB
+L0000038C: repne;    lodsw			; F2AD
+L0000038E: repne;    lodsd			; 66F2AD
+L00000391: rep;	     stosb			; F3AA
+L00000393: rep;	     cmpsb			; F3A6
+L00000395: rep;	     movsb			; F3A4
+L00000397: push	     si				; 56
+L00000398: push	     esi			; 6656
+L0000039A: pop	     edi			; 665F
+L0000039C: leave				; C9
+L0000039D: retn					; C3
+L0000039E: jmp (d)   [+0002]			; FF2E0200
+L000003A2: mov	     ax,[+0002]			; A10200
+L000003A5: push	(d)  [+0002]			; 66FF360200
+L000003AA: mov	     ax,0002			; B80200
+L000003AD: mov	     ax,6261			; B86162
+L000003B0: mov	     ax,FFFF			; B8FFFF
+L000003B3: mov	     eax,11111111		; 66B811111111
+L000003B9: syscall				; 0F05
+L000003BB: sysret				; 0F07
+L000003BD: jmpf	     1234:9ABC			; EABC9A3412
+L000003C2: callf32   1234:+56789ABC		; 669ABC9A78563412
+L000003CA: call	(d)  [ss:+0000]			; 36FF1E0000

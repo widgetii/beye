@@ -622,7 +622,7 @@ void __FASTCALL__ arg_cpu_modsegrm(char * str,ix86Param *DisP)
   char mod   = MODRM_MOD(DisP->RealCmd[1]);
   const char *tileptr,*sregptr;
   unsigned long mode = DisP->mode;
-  DisP->mode&= ~MOD_WIDE_DATA;
+  DisP->mode&= ~MOD_WIDE_DATA; /* disable: 'mov eax, ds' constructions */
   sregptr = getSREG(sreg);
   DisP->codelen = 2;
   tileptr = ix86_getModRM(True,mod,reg,DisP);
