@@ -1,0 +1,71 @@
+;
+;Disassembler dump of '3dnow.o'
+;Range :                0H-             288H
+;Written by  Binary Viewer v 6.0.2-x86_64.Linux64 Build: Nov  3 2009 
+;Dumped : Tue Nov  3 20:44:29 2009
+
+;Format : ELF (Executable and Linking Format)
+
+
+
+SEGMENT Unknown0 BYTE PUBLIC USE32 'NoObject'
+; size: 64 bytes
+
+; L0000000000000000H-L0000000000000040H - no object
+resb               40H
+
+SEGMENT .text BYTE PUBLIC USE32 'CODE'
+; size: 208 bytes
+
+public prec_14bit:
+L00000040: femms				; 0F0E
+L00000042: prefetch (d)	[+00000000]		; 0F0D0500000000
+L00000049: prefetchw (d) [+0000000C]		; 0F0D0D0C000000
+L00000050: movd	     mm0,[+00000000]		; 0F6E0500000000
+L00000057: pfrcp     mm0,mm0			; 0F0FC096
+L0000005B: movq	     mm2,[+00000004]		; 0F6F1504000000
+L00000062: pfmul     mm2,mm0			; 0F0FD0B4
+L00000066: movntq    [+0000000C],mm2		; 0FE7150C000000
+L0000006D: retn					; C3
+public prec_15bit:
+L0000006E: movd	     mm0,[+00000000]		; 0F6E0500000000
+L00000075: pfrsqrt   mm1,mm0			; 0F0FC897
+L00000079: pfmul     mm0,mm1			; 0F0FC1B4
+L0000007D: movq	     [+00000008],mm0		; 0F7F0508000000
+L00000084: retn					; C3
+public prec_24bit:
+L00000085: movd	     mm0,[+00000000]		; 0F6E0500000000
+L0000008C: pfrsqrt   mm1,mm0			; 0F0FC897
+L00000090: movq	     mm2,mm1			; 0F6FD1
+L00000093: pfmul     mm1,mm1			; 0F0FC9B4
+L00000097: pfrsqit1  mm1,mm0			; 0F0FC8A7
+L0000009B: pfrcpit2  mm1,mm2			; 0F0FCAB6
+L0000009F: pfmul     mm0,mm1			; 0F0FC1B4
+L000000A3: movd	     [+00000008],mm0		; 0F7E0508000000
+L000000AA: nop					; 90
+L000000AB: pfrcpit1  mm0,mm1			; 0F0FC1A6
+L000000AF: movq	     mm2,[+0000000C]		; 0F6F150C000000
+L000000B6: pfrcpit2  mm0,mm1			; 0F0FC1B6
+L000000BA: pfmul     mm2,mm0			; 0F0FD0B4
+L000000BE: movntq    [+00000010],mm2		; 0FE71510000000
+L000000C5: retn					; C3
+L000000C6: pfadd     mm0,[+0000001E]		; 0F0F051E0000009E
+L000000CE: pavgusb   mm4,[+00000026]		; 0F0F2526000000BF
+L000000D6: pswapd    mm3,mm4			; 0F0FDCBB
+L000000DA: pf2id     mm2,[+00000028]		; 0F0F15280000001D
+L000000E2: pfcmpge   mm0,mm2			; 0F0FC290
+L000000E6: pfmax     mm3,[+0000003C]		; 0F0F1D3C000000A4
+L000000EE: pfsubr    mm1,mm3			; 0F0FCBAA
+L000000F2: pi2fd     mm2,[+00000000]		; 0F0F15000000000D
+L000000FA: movntq    [+00000050],mm2		; 0FE71550000000
+L00000101: pf2iw     mm7,mm0			; 0F0FF81C
+L00000105: pfnacc    mm6,mm5			; 0F0FF58A
+L00000109: pfpnacc   mm4,mm6			; 0F0FE68E
+L0000010D: femms				; 0F0E
+L0000010F: retn					; C3
+
+SEGMENT Unknown0 BYTE PUBLIC USE32 'NoObject'
+; size: 376 bytes
+
+; L0000000000000110H-L0000000000000288H - no object
+resb              178H
