@@ -336,7 +336,7 @@ extern const char * ix86_KatmaiGr1Names[];
 extern const char * ix86_KatmaiGr2Names[];
 extern const char * ix86_KatmaiCmpSuffixes[];
 
-extern const ix86_ExOpcodes* __FASTCALL__ ix86_prepare_flags(const ix86_ExOpcodes *extable,ix86Param *DisP,unsigned char *code);
+extern const ix86_ExOpcodes* __FASTCALL__ ix86_prepare_flags(const ix86_ExOpcodes *extable,ix86Param *DisP,unsigned char *code,unsigned char *codelen);
 extern char * __FASTCALL__ ix86_getModRM(tBool w,unsigned char mod,unsigned char rm,ix86Param *DisP);
 extern void   __FASTCALL__ ix86_setModifier(char *str,const char *modf);
 extern char * __FASTCALL__ ix86_CStile(char *str,const char *arg2);

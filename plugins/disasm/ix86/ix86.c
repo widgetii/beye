@@ -177,7 +177,7 @@ const ix86_Opcodes ix86_table[256] =
   /*0x60*/ DECLARE_BASE_INSN("pushaw","pushad","???",NULL,NULL,IX86_CPU186,K64_ATHLON|K64_NOCOMPAT),
   /*0x61*/ DECLARE_BASE_INSN("popaw","popad","???",NULL,NULL,IX86_CPU186,K64_ATHLON|K64_NOCOMPAT),
   /*0x62*/ DECLARE_BASE_INSN("bound","bound","???",arg_cpu_modregrm,arg_cpu_modregrm,IX86_CPU286,K64_ATHLON|K64_NOCOMPAT),
-  /*0x63*/ DECLARE_BASE_INSN("arpl","arpl","movsxd",arg_cpu_modregrm,arg_cpu_modregrm,IX86_CPU286,K64_ATHLON|K64_NOCOMPAT),
+  /*0x63*/ DECLARE_BASE_INSN("arpl","arpl","movsxd",arg_cpu_modregrm,arg_cpu_modregrm,IX86_CPU286|IX86_STORE,K64_ATHLON|K64_NOCOMPAT),
   /*0x64*/ DECLARE_BASE_INSN("seg","seg","seg",ix86_ArgFS,ix86_ArgFS,IX86_CPU386,K64_ATHLON),
   /*0x65*/ DECLARE_BASE_INSN("seg","seg","seg",ix86_ArgGS,ix86_ArgGS,IX86_CPU386,K64_ATHLON),
   /*0x66*/ DECLARE_BASE_INSN("???","???","???",NULL,NULL,IX86_CPU386,K64_ATHLON),
@@ -4307,10 +4307,11 @@ static DisasmRet __FASTCALL__ ix86Disassembler(__filesize_t ulShift,
     else
     if((DisP.pfx&PFX_VEX) && DisP.VEX_m==0x03) ecode = 0x3A;
 
-    SSE2_ext=ix86_prepare_flags(SSE2_ext,&DisP,&ecode);
+    SSE2_ext=ix86_prepare_flags(SSE2_ext,&DisP,&ecode,&up);
 
     if((DisP.pfx&PFX_VEX) && DisP.VEX_m>1) {
 	DisP.RealCmd=&DisP.RealCmd[-1];
+	up--;
     }
     if(DisP.pfx&PFX_VEX)	ecode=DisP.RealCmd[0];
     else			ecode=DisP.RealCmd[1];
@@ -4427,7 +4428,7 @@ static DisasmRet __FASTCALL__ ix86Disassembler(__filesize_t ulShift,
 	DisP.pro_clone |= IX86_CPU386;
     }
  }
- Ret.pro_clone = DisP.pro_clone;
+ Ret.pro_clone = (x86_Bitness == DAB_USE64)?DisP.insn_flags:DisP.pro_clone;
  Ret.codelen = DisP.codelen;
  Bye:
  return Ret;
