@@ -3766,7 +3766,6 @@ const char *ix86_XMMXGr3[] = { "???", "???", "psrlq", "psrldq", "???",   "???", 
 
 const char *ix86_3dPrefetchGrp[] = { "prefetch", "prefetchw", "prefetch", "prefetch", "prefetch", "prefetch", "prefetch", "prefetch" };
 
-const char *ix86_KatmaiGr1Names[] = { "fxsave", "fxrstor", "ldmxcsr", "stmxcsr", "???", "lfence", "mfence", "sfence" };
 const char *ix86_KatmaiGr2Names[] = { "prefetchnta", "prefetcht0", "prefetcht1", "prefetcht2", "???", "???", "???", "???" };
 const char *ix86_KatmaiCmpSuffixes[] = { "eq", "lt", "le", "unord", "neq", "nlt", "nle", "ord" };
 

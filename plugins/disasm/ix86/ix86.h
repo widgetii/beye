@@ -332,7 +332,6 @@ extern const char * ix86_XMMXGr3[];
 
 extern const char * ix86_3dPrefetchGrp[];
 
-extern const char * ix86_KatmaiGr1Names[];
 extern const char * ix86_KatmaiGr2Names[];
 extern const char * ix86_KatmaiCmpSuffixes[];
 

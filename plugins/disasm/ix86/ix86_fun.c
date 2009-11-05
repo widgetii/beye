@@ -1128,24 +1128,6 @@ void  __FASTCALL__ ix86_ArgExGr1(char *str,ix86Param *DisP)
         return;
       }
       else
-      if(DisP->RealCmd[1] == 0xC7)
-      {
-	unsigned char rm =  MODRM_REG(DisP->RealCmd[1]);
-	unsigned char reg = MODRM_RM(DisP->RealCmd[1]);
-	unsigned char mod = MODRM_MOD(DisP->RealCmd[1]);
-	DisP->codelen++;
-	if(rm==0x06)
-	{
-	    strcpy(str,"vmclear");
-	    TabSpace(str,TAB_POS);
-	    DisP->codelen++;
-	    strcat(str,ix86_getModRM(True,mod,reg,DisP));
-	    DisP->pro_clone &= ~IX86_CPUMASK;
-	    DisP->pro_clone |= IX86_P6;
-	}
-        return;
-      }
-      else
       if(DisP->RealCmd[1] == 0xC8)
       {
         strcpy(str,"monitor");
@@ -1161,6 +1143,24 @@ void  __FASTCALL__ ix86_ArgExGr1(char *str,ix86Param *DisP)
         DisP->codelen++;
 	DisP->pro_clone &= ~(IX86_CPUMASK|IX86_CPL0);
 	DisP->pro_clone |= IX86_P5;
+        return;
+      }
+      else
+      if(DisP->RealCmd[1] == 0xD0)
+      {
+        strcpy(str,"xgetbv");
+        DisP->codelen++;
+	DisP->pro_clone &= ~(IX86_CPUMASK|IX86_CPL0);
+	DisP->pro_clone |= IX86_P8;
+        return;
+      }
+      else
+      if(DisP->RealCmd[1] == 0xD1)
+      {
+        strcpy(str,"xsetbv");
+        DisP->codelen++;
+	DisP->pro_clone &= ~(IX86_CPUMASK|IX86_CPL0);
+	DisP->pro_clone |= IX86_P8;
         return;
       }
 #ifdef IX86_64
@@ -1489,22 +1489,33 @@ void __FASTCALL__ ix86_BitGrp(char *str,ix86Param *DisP)
    strcat(str,ix86_GetDigitTile(DisP,0,0,DisP->codelen++));
 }
 
+static const char *ix86_KatmaiGr1Names[] = { "fxsave", "fxrstor", "ldmxcsr", "stmxcsr", "xsave", "xrstor", "???", "???" };
+static const char *ix86_KatmaiGr1Names11[] = { "???", "???", "???", "???", "???", "lfence", "mfence", "sfence" };
 void __FASTCALL__ ix86_ArgKatmaiGrp1(char *str,ix86Param *DisP)
 {
    unsigned char cop = MODRM_COP(DisP->RealCmd[1]);
-   strcpy(str,ix86_KatmaiGr1Names[cop]);
-   if(cop < 5)
+   unsigned char mod = MODRM_MOD(DisP->RealCmd[1]);
+   if(mod==3)	strcpy(str,ix86_KatmaiGr1Names11[cop]);
+   else		strcpy(str,ix86_KatmaiGr1Names[cop]);
+   if(mod < 3)
    {
      TabSpace(str,TAB_POS);
      arg_cpu_mod_rm(str,DisP);
+	if(x86_Bitness != DAB_USE64) {
+	    DisP->pro_clone &= ~IX86_CPUMASK;
+	    DisP->pro_clone |= IX86_P8|IX86_SSE;
+	}
+	else {
+	    DisP->pro_clone &= ~K64_CLONEMASK;
+	    DisP->pro_clone |= K64_FAM11|K64_SSE;
+	}
    }
    else DisP->codelen++;
-   if(cop == 5 || cop == 6)
-#ifdef IX86_64
-	if(x86_Bitness != DAB_USE64)
-#endif
-	DisP->pro_clone &= ~IX86_CPUMASK;
-	DisP->pro_clone |= IX86_P4|IX86_MMX;
+   if((cop==5 || cop==6) && mod==3)
+	if(x86_Bitness != DAB_USE64) {
+	    DisP->pro_clone &= ~IX86_CPUMASK;
+	    DisP->pro_clone |= IX86_P4|IX86_MMX;
+	}
 }
 
 void __FASTCALL__ ix86_ArgKatmaiGrp2(char *str,ix86Param *DisP)
@@ -1545,16 +1556,10 @@ void __FASTCALL__ arg_simd_regrm(char *str,ix86Param *DisP)
 void __FASTCALL__ arg_simd_regrm_imm8_imm8(char *str,ix86Param *DisP)
 {
   arg_simd_regrm(str,DisP);
-  strcat(str,",");
-  if(!((DisP->flags & __DISF_SIZEONLY) == __DISF_SIZEONLY))
-    disAppendDigits(str,DisP->CodeAddress+DisP->codelen,
-                 APREF_USE_TYPE,1,&DisP->RealCmd[DisP->codelen],DISARG_BYTE);
-  DisP->codelen++;
-  strcat(str,",");
-  if(!((DisP->flags & __DISF_SIZEONLY) == __DISF_SIZEONLY))
-    disAppendDigits(str,DisP->CodeAddress+DisP->codelen,
-                 APREF_USE_TYPE,1,&DisP->RealCmd[DisP->codelen],DISARG_BYTE);
-  DisP->codelen++;
+  if(!((DisP->flags & __DISF_SIZEONLY) == __DISF_SIZEONLY)) strcat(str,",");
+  arg_imm8(str,DisP);
+  if(!((DisP->flags & __DISF_SIZEONLY) == __DISF_SIZEONLY)) strcat(str,",");
+  arg_imm8(str,DisP);
 }
 
 void __FASTCALL__ arg_simd_rm_imm8_imm8(char *str,ix86Param *DisP)
@@ -1572,16 +1577,12 @@ void __FASTCALL__ arg_simd_rm_imm8_imm8(char *str,ix86Param *DisP)
   DisP->mode|=MOD_SSE;
   strcat(str,k86_getREG(DisP,MODRM_RM(DisP->RealCmd[1]),True,brex,use64));
   DisP->mode=mode;
-  strcat(str,",");
-  if(!((DisP->flags & __DISF_SIZEONLY) == __DISF_SIZEONLY))
-    disAppendDigits(str,DisP->CodeAddress+DisP->codelen,
-                 APREF_USE_TYPE,1,&DisP->RealCmd[DisP->codelen],DISARG_BYTE);
   DisP->codelen++;
-  strcat(str,",");
-  if(!((DisP->flags & __DISF_SIZEONLY) == __DISF_SIZEONLY))
-    disAppendDigits(str,DisP->CodeAddress+DisP->codelen,
-                 APREF_USE_TYPE,1,&DisP->RealCmd[DisP->codelen],DISARG_BYTE);
-  DisP->codelen+=2;
+
+  if(!((DisP->flags & __DISF_SIZEONLY) == __DISF_SIZEONLY)) strcat(str,",");
+  arg_imm8(str,DisP);
+  if(!((DisP->flags & __DISF_SIZEONLY) == __DISF_SIZEONLY)) strcat(str,",");
+  arg_imm8(str,DisP);
 }
 
 
