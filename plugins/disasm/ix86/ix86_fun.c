@@ -1687,7 +1687,7 @@ void __FASTCALL__ ix86_3dNowOpCodes( char *str,ix86Param *DisP)
  ix86_Katmai_buff[0] = 0;
  arg_cpu_modregrm(ix86_Katmai_buff,DisP);
  DisP->mode=mode;
- code = DisP->RealCmd[DisP->codelen-1];
+ code = DisP->RealCmd[DisP->codelen];
  DisP->codelen++;
  strcpy(str,ix86_3dNowtable[code].name);
  TabSpace(str,TAB_POS);
