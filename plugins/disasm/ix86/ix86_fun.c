@@ -1414,6 +1414,14 @@ void __FASTCALL__ bridge_sse_mmx(char *str,ix86Param* DisP)
    ix86_bridge_sse_mmx(str,DisP,(DisP->insn_flags&BRIDGE_MMX_SSE)?False:True);
 }
 
+void __FASTCALL__ arg_emms(char *str,ix86Param *DisP)
+{
+    if(DisP->pfx&PFX_VEX) {
+	if(DisP->VEX_vlp&0x04)	strcpy(str,"vzeroall");
+	else			strcpy(str,"vzeroupper");
+    }
+}
+
 void __FASTCALL__ arg_simd(char *str,ix86Param *DisP)
 {
     unsigned long mode=DisP->mode;
@@ -1677,6 +1685,24 @@ void   __FASTCALL__ arg_vex_imm8(char *str,ix86Param *DisP) {
     arg_vex(str,DisP);
     is4=DisP->RealCmd[DisP->codelen-1];
     ix86_CStile(str,Get2Digit(is4&0x0F));
+}
+
+void __FASTCALL__ arg_fma(char *str,ix86Param *DisP)
+{
+    unsigned long mode=DisP->mode;
+    if(DisP->insn_flags&IX86_MMX)	DisP->mode|=MOD_MMX;
+    else				DisP->mode|=MOD_SSE;
+    if(DisP->pfx&PFX_VEX) {
+	char *ptr;
+	char vex_w = REX_W(DisP->REX)^1; /* complement it back */
+	if(!vex_w) {
+	    ptr=strstr(str,"pd ");
+	    if(!ptr) ptr=strstr(str,"sd ");
+	    if(ptr) ptr[1] = 's';
+	}
+    }
+    arg_cpu_modregrm(str,DisP);
+    DisP->mode=mode;
 }
 
 void __FASTCALL__ ix86_3dNowOpCodes( char *str,ix86Param *DisP)

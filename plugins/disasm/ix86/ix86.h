@@ -387,6 +387,7 @@ extern void   __FASTCALL__ ix86_ArgExGr1(char *str,ix86Param *);
 extern void   __FASTCALL__ ix86_ArgMovXRY(char *str,ix86Param *);
 extern void   __FASTCALL__ ix86_DblShift(char *str,ix86Param *);
 
+extern void   __FASTCALL__ arg_emms(char *str,ix86Param *);
 extern void   __FASTCALL__ arg_simd(char *str,ix86Param *);
 extern void   __FASTCALL__ arg_simd_imm8(char *str,ix86Param *);
 extern void   __FASTCALL__ arg_simd_xmm0(char *str,ix86Param *);
@@ -398,6 +399,7 @@ extern void   __FASTCALL__ bridge_simd_cpu(char *str,ix86Param* DisP);
 extern void   __FASTCALL__ bridge_simd_cpu_imm8(char *str,ix86Param* DisP);
 extern void   __FASTCALL__ arg_vex(char *str,ix86Param *);
 extern void   __FASTCALL__ arg_vex_imm8(char *str,ix86Param *DisP);
+extern void   __FASTCALL__ arg_fma(char *str,ix86Param *);
 
 extern void   __FASTCALL__ ix86_ArgMMXGr1(char *str,ix86Param *);
 extern void   __FASTCALL__ ix86_ArgMMXGr2(char *str,ix86Param *);
