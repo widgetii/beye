@@ -4348,7 +4348,7 @@ static DisasmRet __FASTCALL__ ix86Disassembler(__filesize_t ulShift,
    {
      if(Use64) strcpy(Ret.str,ix86_table[code].name64);
      else
-     if(!(DisP.mode&MOD_WIDE_ADDR))	strcpy(Ret.str,ix86_table[code].name16);
+     if(!(DisP.mode&MOD_WIDE_DATA))	strcpy(Ret.str,ix86_table[code].name16);
      else				strcpy(Ret.str,ix86_table[code].name32);
    }
    else
@@ -4358,7 +4358,7 @@ static DisasmRet __FASTCALL__ ix86Disassembler(__filesize_t ulShift,
  }
  else
 #endif
- strcpy(Ret.str,(DisP.pfx&PFX_66) ? ix86_table[code].name32 : ix86_table[code].name16);
+ strcpy(Ret.str,(DisP.mode&MOD_WIDE_DATA) ? ix86_table[code].name32 : ix86_table[code].name16);
 #ifdef IX86_64
  if(x86_Bitness == DAB_USE64)
  {
