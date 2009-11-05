@@ -350,6 +350,7 @@ extern void   __FASTCALL__ ix86_ArgFS(char *str,ix86Param *);
 extern void   __FASTCALL__ ix86_ArgGS(char *str,ix86Param *);
 
 extern void   __FASTCALL__ arg_cpu_modregrm(char * str,ix86Param *DisP);
+extern void   __FASTCALL__ arg_cpu_modREGrm(char * str,ix86Param *DisP); /* CRC32 */
 extern void   __FASTCALL__ arg_cpu_mod_rm(char* str,ix86Param *DisP);
 extern void   __FASTCALL__ arg_cpu_mod_rm_imm(char *str,ix86Param *DisP);
 extern void   __FASTCALL__ arg_cpu_modregrm_imm(char *str,ix86Param *DisP);
