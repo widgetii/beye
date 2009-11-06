@@ -1,4 +1,6 @@
 global cpu_asm
+global vmx
+global smx
 global simd1
 global simd2
 global sse_width
@@ -12,6 +14,7 @@ global fma
 [bits 32]
 cpu_asm:
 enter 10, 12
+pause
 jp near label
 js near label
 salc
@@ -224,8 +227,8 @@ bt   [bx+si],di
 btr  [bx+si],bp
 bts  [bx+si],dx
 bswap ecx
-cmpxchg [bx+si],dx
-cmpxchg8b qword [bx+si]
+lock cmpxchg [bx+si],dx
+lock cmpxchg8b qword [bx+si]
 xadd [bx+si],di
 cpuid
 rdpmc
@@ -373,9 +376,40 @@ call far [ss:0]
 
 rep gs movsd
 fs rep movsd
+leave
+retn
 
+
+vmx:
+db 0x66, 0x0F, 0x38, 0x80, 0x3E ;invept edi, qword [esi]
+db 0x66, 0x0F, 0x38, 0x81, 0xA  ;invvpid ecx, qword [edx]
+vmcall
+vmclear [12]
+vmlaunch
+vmresume
+vmptrld [8]
+vmptrst [eax]
+vmread [ebx], ecx
+vmwrite ebp, [ebp]
+vmxoff
+vmxon [esi*4+edi+400]
+
+smx:
+enter 10,0
+mov eax, 0
+db 0x0F, 0x37 ; getsec
+leave
+retn
 
 simd1:
+enter 10,0
+prefetcht0 [32]
+prefetcht1 [16]
+prefetcht2 [8]
+prefetchnta [0]
+
+fxsave [eax+ebx]
+
 movntps [0], xmm4
 movntps dqword [0], xmm5
 movntq [8], mm6
@@ -387,9 +421,16 @@ movss dword [8], xmm3
 pcmpeqb xmm3, xmm4
 pcmpgtw mm0, mm2
 
+fxrstor [eax*2+edi]
+
+lfence
+mfence
+sfence
+leave
 retn
 
 simd2:
+enter 20,0
 pextrw ebx, mm5, 0
 pextrw ecx, xmm0, 1
 
@@ -498,8 +539,10 @@ cmpss xmm0, [es:eax], 0
 
 cmpsd xmm0, [eax], 0
 cmpsd xmm0, [es:eax], 0
-
+leave
+retn
 sse_width:
+enter 40,2
 cpu sse2
 
 xsave [4]
@@ -1073,10 +1116,11 @@ xorpd xmm1, dqword [ebx]
 
 xorps xmm1, xmm2
 xorps xmm1, dqword [ebx]
-
+leave
 retn
 
 sse3:
+enter 800,4
 addsubpd xmm5, xmm7
 addsubpd xmm0, [eax]
 addsubps xmm1, xmm5
@@ -1101,10 +1145,11 @@ movshdup xmm2, [0]
 movsldup xmm0, xmm7
 movsldup xmm5, dqword [eax+ebx]
 mwait
-
+leave
 retn
 
 ssse3:
+enter 1000,1
 %MACRO TEST_GENERIC 5
 ;global _test_ %+ %1 %+ _ %+ %4
 ;global test_ %+ %1 %+ _ %+ %4
@@ -1176,10 +1221,11 @@ test_ %+ %1 %+ _ %+ %4:
 
 TEST_ALIGNR palignr, movq, mm0, mmx, mm1
 TEST_ALIGNR palignr, movdqu, xmm0, xmm, xmm1
-
+leave
 retn
 
 sse4:
+enter 23,8
 blendpd xmm1, xmm2, 5
 blendpd xmm1, [4], 5
 
@@ -1404,9 +1450,11 @@ roundsd xmm1, [4], 5
 
 roundss xmm1, xmm2, 5
 roundss xmm1, [4], 5
+leave
 retn
 
 aes:
+enter 26,3
 aesenc xmm1, xmm2
 aesenc xmm1, [eax]
 aesenc xmm1, dqword [eax]
@@ -1485,10 +1533,11 @@ pclmullqhqdq xmm1, dqword [eax]
 pclmulhqhqdq xmm1, xmm2
 pclmulhqhqdq xmm1, [eax]
 pclmulhqhqdq xmm1, dqword [eax]
-
+leave
 retn
 
 avx:
+enter 200,0
 cpu sse2
 addpd xmm1, xmm2
 addpd xmm1, [eax]
@@ -4073,111 +4122,112 @@ vxorps ymm1, ymm2, [eax]
 vxorps ymm1, ymm2, yword [eax]
 
 vzeroall
-
 vzeroupper
-
+emms
+leave
 retn
 
 fma:
+enter 100,0
 vfmadd132ss xmm1, xmm2, xmm3
 vfmadd132ss xmm1, xmm2, dword [eax]
-vfmadd132ss xmm1, xmm3, xmm2, [eax]
+vfmadd132ss xmm1, xmm3, [ebx]
 vfmadd231ss xmm1, xmm2, xmm3
-vfmadd231ss xmm1, xmm2, dword [eax]
-vfmadd231ss xmm1, xmm2, [eax]
+vfmadd231ss xmm1, xmm2, dword [ecx]
+vfmadd231ss xmm1, xmm2, [edx]
 vfmadd213ss xmm1, xmm2, xmm3
-vfmadd213ss xmm1, xmm2, dword [eax]
-vfmadd213ss xmm1, xmm2, [eax]
+vfmadd213ss xmm1, xmm2, dword [edi]
+vfmadd213ss xmm1, xmm2, [esi]
 vfmadd132sd xmm1, xmm2, xmm3
-vfmadd132sd xmm1, xmm2, qword [eax]
-vfmadd132sd xmm1, xmm2, [eax]
+vfmadd132sd xmm1, xmm2, qword [esp]
+vfmadd132sd xmm1, xmm2, [ebp]
 vfmadd231sd xmm1, xmm2, xmm3
 vfmadd231sd xmm1, xmm2, qword [eax]
-vfmadd231sd xmm1, xmm2, [eax]
+vfmadd231sd xmm1, xmm2, [eax+257]
 vfmadd213sd xmm1, xmm2, xmm3
-vfmadd213sd xmm1, xmm2, qword [eax]
-vfmadd213sd xmm1, xmm2, [eax]
+vfmadd213sd xmm1, xmm2, qword [ebx+257]
+vfmadd213sd xmm1, xmm2, [ecx+257]
 vfmadd132ps xmm1, xmm2, xmm3
 vfmadd132ps xmm1, xmm2, xmm3
-vfmadd132ps xmm1, xmm2, [eax]
+vfmadd132ps xmm1, xmm2, [edx+257]
 vfmadd231ps xmm1, xmm2, xmm3
 vfmadd231ps xmm1, xmm2, xmm3
-vfmadd231ps xmm1, xmm2, [eax]
+vfmadd231ps xmm1, xmm2, [esi+257]
 vfmadd213ps xmm1, xmm2, xmm3
 vfmadd213ps xmm1, xmm2, xmm3
-vfmadd213ps xmm1, xmm2, [eax]
+vfmadd213ps xmm1, xmm2, [edi+257]
 vfmadd132ps ymm1, ymm2, ymm3
-vfmadd132ps ymm1, ymm2, yword [eax]
-vfmadd132ps ymm1, ymm2, [eax]
+vfmadd132ps ymm1, ymm2, yword [ebp+257]
+vfmadd132ps ymm1, ymm2, [esp+257]
 vfmadd231ps ymm1, ymm2, ymm3
-vfmadd231ps ymm1, ymm2, yword [eax]
-vfmadd231ps ymm1, ymm2, [eax]
+vfmadd231ps ymm1, ymm2, yword [eax*2+ebx+300]
+vfmadd231ps ymm1, ymm2, [ebx*2+ecx+300]
 vfmadd213ps ymm1, ymm2, ymm3
-vfmadd213ps ymm1, ymm2, yword [eax]
-vfmadd213ps ymm1, ymm2, [eax]
+vfmadd213ps ymm1, ymm2, yword [edx*2+esi+300]
+vfmadd213ps ymm1, ymm2, [esi*2+edi+300]
 vfmadd132pd xmm1, xmm2, xmm3
-vfmadd132pd xmm1, xmm2, dqword [eax]
-vfmadd132pd xmm1, xmm2, [eax]
+vfmadd132pd xmm1, xmm2, dqword [edi*2+ebp+300]
+vfmadd132pd xmm1, xmm2, [esi*2+ebp+300]
 vfmadd231pd xmm1, xmm2, xmm3
-vfmadd231pd xmm1, xmm2, dqword [eax]
-vfmadd231pd xmm1, xmm2, [eax]
+vfmadd231pd xmm1, xmm2, dqword [ebp*2+esp+300]
+vfmadd231pd xmm1, xmm2, [esp+eax+300]
 vfmadd213pd xmm1, xmm2, xmm3
-vfmadd213pd xmm1, xmm2, dqword [eax]
-vfmadd213pd xmm1, xmm2, [eax]
+vfmadd213pd xmm1, xmm2, dqword [eax*4+ebx+600]
+vfmadd213pd xmm1, xmm2, [ebx*4+ecx+600]
 vfmadd132pd ymm1, ymm2, ymm3
-vfmadd132pd ymm1, ymm2, yword [eax]
-vfmadd132pd ymm1, ymm2, [eax]
+vfmadd132pd ymm1, ymm2, yword [edx*4+esi+600]
+vfmadd132pd ymm1, ymm2, [esi*4+edi+600]
 vfmadd231pd ymm1, ymm2, ymm3
-vfmadd231pd ymm1, ymm2, yword [eax]
-vfmadd231pd ymm1, ymm2, [eax]
+vfmadd231pd ymm1, ymm2, yword [edi*4+esp+600]
+vfmadd231pd ymm1, ymm2, [ebp*4+esp+600]
 vfmadd213pd ymm1, ymm2, ymm3
-vfmadd213pd ymm1, ymm2, yword [eax]
-vfmadd213pd ymm1, ymm2, [eax]
+vfmadd213pd ymm1, ymm2, yword [esp+eax*4+600]
+vfmadd213pd ymm1, ymm2, [eax*8]
 vfmsub132ss xmm1, xmm2, xmm3
-vfmsub132ss xmm1, xmm2, dword [eax]
-vfmsub132ss xmm1, xmm2, [eax]
+vfmsub132ss xmm1, xmm2, dword [ebx*8]
+vfmsub132ss xmm1, xmm2, [ecx*8]
 vfmsub231ss xmm1, xmm2, xmm3
-vfmsub231ss xmm1, xmm2, dword [eax]
-vfmsub231ss xmm1, xmm2, [eax]
+vfmsub231ss xmm1, xmm2, dword [edx*8]
+vfmsub231ss xmm1, xmm2, [edi*8]
 vfmsub213ss xmm1, xmm2, xmm3
-vfmsub213ss xmm1, xmm2, dword [eax]
-vfmsub213ss xmm1, xmm2, [eax]
+vfmsub213ss xmm1, xmm2, dword [esi*8]
+vfmsub213ss xmm1, xmm2, [ebp*8]
 vfmsub132sd xmm1, xmm2, xmm3
-vfmsub132sd xmm1, xmm2, qword [eax]
-vfmsub132sd xmm1, xmm2, [eax]
+vfmsub132sd xmm1, xmm2, qword [esp]
+vfmsub132sd xmm1, xmm2, [eax+8]
 vfmsub231sd xmm1, xmm2, xmm3
-vfmsub231sd xmm1, xmm2, qword [eax]
-vfmsub231sd xmm1, xmm2, [eax]
+vfmsub231sd xmm1, xmm2, qword [ebx+8]
+vfmsub231sd xmm1, xmm2, [ecx+8]
 vfmsub213sd xmm1, xmm2, xmm3
-vfmsub213sd xmm1, xmm2, qword [eax]
-vfmsub213sd xmm1, xmm2, [eax]
+vfmsub213sd xmm1, xmm2, qword [edx+8]
+vfmsub213sd xmm1, xmm2, [edi+8]
 vfmsub132ps xmm1, xmm2, xmm3
 vfmsub132ps xmm1, xmm2, xmm3
-vfmsub132ps xmm1, xmm2, [eax]
+vfmsub132ps xmm1, xmm2, [esi+8]
 vfmsub231ps xmm1, xmm2, xmm3
 vfmsub231ps xmm1, xmm2, xmm3
-vfmsub231ps xmm1, xmm2, [eax]
+vfmsub231ps xmm1, xmm2, [ebp+8]
 vfmsub213ps xmm1, xmm2, xmm3
 vfmsub213ps xmm1, xmm2, xmm3
-vfmsub213ps xmm1, xmm2, [eax]
+vfmsub213ps xmm1, xmm2, [esp+8]
 vfmsub132ps ymm1, ymm2, ymm3
-vfmsub132ps ymm1, ymm2, yword [eax]
-vfmsub132ps ymm1, ymm2, [eax]
+vfmsub132ps ymm1, ymm2, yword [8]
+vfmsub132ps ymm1, ymm2, [8]
 vfmsub231ps ymm1, ymm2, ymm3
-vfmsub231ps ymm1, ymm2, yword [eax]
-vfmsub231ps ymm1, ymm2, [eax]
+vfmsub231ps ymm1, ymm2, yword [8]
+vfmsub231ps ymm1, ymm2, [8]
 vfmsub213ps ymm1, ymm2, ymm3
-vfmsub213ps ymm1, ymm2, yword [eax]
-vfmsub213ps ymm1, ymm2, [eax]
+vfmsub213ps ymm1, ymm2, yword [8]
+vfmsub213ps ymm1, ymm2, [8]
 vfmsub132pd xmm1, xmm2, xmm3
-vfmsub132pd xmm1, xmm2, dqword [eax]
-vfmsub132pd xmm1, xmm2, [eax]
+vfmsub132pd xmm1, xmm2, dqword [8]
+vfmsub132pd xmm1, xmm2, [8]
 vfmsub231pd xmm1, xmm2, xmm3
-vfmsub231pd xmm1, xmm2, dqword [eax]
-vfmsub231pd xmm1, xmm2, [eax]
+vfmsub231pd xmm1, xmm2, dqword [8]
+vfmsub231pd xmm1, xmm2, [8]
 vfmsub213pd xmm1, xmm2, xmm3
-vfmsub213pd xmm1, xmm2, dqword [eax]
-vfmsub213pd xmm1, xmm2, [eax]
+vfmsub213pd xmm1, xmm2, dqword [8]
+vfmsub213pd xmm1, xmm2, [8]
 vfmsub132pd ymm1, ymm2, ymm3
 vfmsub132pd ymm1, ymm2, yword [eax]
 vfmsub132pd ymm1, ymm2, [eax]
@@ -4367,3 +4417,5 @@ vfmsubadd231pd ymm1, ymm2, [eax]
 vfmsubadd213pd ymm1, ymm2, ymm3
 vfmsubadd213pd ymm1, ymm2, yword [eax]
 vfmsubadd213pd ymm1, ymm2, [eax]
+leave
+retn
