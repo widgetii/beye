@@ -1533,6 +1533,66 @@ pclmullqhqdq xmm1, dqword [eax]
 pclmulhqhqdq xmm1, xmm2
 pclmulhqhqdq xmm1, [eax]
 pclmulhqhqdq xmm1, dqword [eax]
+
+pclmulqdq xmm1, xmm2, 5
+pclmulqdq xmm1, [eax], byte 5
+pclmulqdq xmm1, dqword [eax], 5
+vpclmulqdq xmm1, xmm2, 0x10
+vpclmulqdq xmm1, dqword [ebx], 0x10
+vpclmulqdq xmm0, xmm1, xmm2, 0x10
+vpclmulqdq xmm0, xmm1, dqword [ebx], 0x10
+
+pclmullqlqdq xmm1, xmm2
+pclmullqlqdq xmm1, [eax]
+pclmullqlqdq xmm1, dqword [eax]
+vpclmullqlqdq xmm1, xmm2
+vpclmullqlqdq xmm1, dqword[ebx]
+vpclmullqlqdq xmm0, xmm1, xmm2
+vpclmullqlqdq xmm0, xmm1, dqword[ebx]
+
+pclmulhqlqdq xmm1, xmm2
+pclmulhqlqdq xmm1, [eax]
+pclmulhqlqdq xmm1, dqword [eax]
+vpclmulhqlqdq xmm1, xmm2
+vpclmulhqlqdq xmm1, dqword[ebx]
+vpclmulhqlqdq xmm0, xmm1, xmm2
+vpclmulhqlqdq xmm0, xmm1, dqword[ebx]
+
+pclmullqhqdq xmm1, xmm2
+pclmullqhqdq xmm1, [eax]
+pclmullqhqdq xmm1, dqword [eax]
+vpclmullqhqdq xmm1, xmm2
+vpclmullqhqdq xmm1, dqword[ebx]
+vpclmullqhqdq xmm0, xmm1, xmm2
+vpclmullqhqdq xmm0, xmm1, dqword[ebx]
+
+pclmulhqhqdq xmm1, xmm2
+pclmulhqhqdq xmm1, [eax]
+pclmulhqhqdq xmm1, dqword [eax]
+vpclmulhqhqdq xmm1, xmm2
+vpclmulhqhqdq xmm1, dqword[ebx]
+vpclmulhqhqdq xmm0, xmm1, xmm2
+vpclmulhqhqdq xmm0, xmm1, dqword[ebx]
+
+movbe cx, [ebx+ecx]
+movbe cx, word [eax+ecx]
+movbe ecx, [eax]
+movbe cx, word [eax]
+movbe ax, [5]
+movbe eax, dword [5]
+movbe edx, [5]
+movbe dx, word [5]
+movbe [5], bx
+movbe word [5], bx
+movbe [5], ebx
+movbe dword [5], ebx
+movbe [5], esi
+movbe dword [5], edi
+movbe [5], ebx
+movbe dword [5], ebx
+movbe [5], esp
+movbe dword [5], ebp
+
 leave
 retn
 
