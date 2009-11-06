@@ -3777,8 +3777,6 @@ char *ix86_da_out;
 
 char ix86_segpref[4] = "";
 
-tBool Use64;
-
 const unsigned char leave_insns[] = { 0x07, 0x17, 0x1F, 0x58, 0x59, 0x5A, 0x5B, 0x5C, 0x5D, 0x5E, 0x5F, 0x61, 0x90, 0xC9 };
 
 
@@ -4021,7 +4019,6 @@ static unsigned char parse_REX(unsigned char code,ix86Param* DisP)
     {
         DisP->pfx|=PFX_REX;
         DisP->REX = code;
-        Use64 = (code & 0x0F)>>3;
     }
     DisP->CodeAddress++;
     DisP->RealCmd = &DisP->RealCmd[1];
@@ -4118,9 +4115,6 @@ static DisasmRet __FASTCALL__ ix86Disassembler(__filesize_t ulShift,
 
  Ret.str = ix86_voidstr;
  Ret.str[0] = 0;
-#ifdef IX86_64
- Use64 = False;
-#endif
  RepeateByPrefix:
 #ifdef IX86_64
  if(x86_Bitness == DAB_USE64)
@@ -4342,10 +4336,10 @@ static DisasmRet __FASTCALL__ ix86Disassembler(__filesize_t ulShift,
  if(x86_Bitness == DAB_USE64)
  {
    DisP.mode|=MOD_WIDE_ADDR; /* there is no way to use 16-bit addresing in 64-bit mode */
-   if(Use64) DisP.mode|=MOD_WIDE_DATA; /* 66h prefix is ignored if REX prefix is present*/
+   if(REX_W(DisP.REX)) DisP.mode|=MOD_WIDE_DATA; /* 66h prefix is ignored if REX prefix is present*/
    if(ix86_table[code].flags64 & K64_DEF32)
    {
-     if(Use64) strcpy(Ret.str,ix86_table[code].name64);
+     if(REX_W(DisP.REX)) strcpy(Ret.str,ix86_table[code].name64);
      else
      if(!(DisP.mode&MOD_WIDE_DATA))	strcpy(Ret.str,ix86_table[code].name16);
      else				strcpy(Ret.str,ix86_table[code].name32);

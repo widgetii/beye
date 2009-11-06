@@ -134,7 +134,16 @@ typedef struct tagix86Param
   unsigned char VEX_vlp;
 }ix86Param;
 
-extern tBool Use64;
+#define K86_REX (DisP->REX)
+#define REX_W(rex) (((rex)&0x08)>>3)
+#define REX_R(rex) (((rex)&0x04)>>2)
+#define REX_X(rex) (((rex)&0x02)>>1)
+#define REX_B(rex) ((rex)&0x01)
+#define REX_w(rex) ((rex)&0x08)
+#define REX_r(rex) ((rex)&0x04)
+#define REX_x(rex) ((rex)&0x02)
+#define REX_b(rex) ((rex)&0x01)
+
 extern char * SJump[];
 typedef void (__FASTCALL__*ix86_method)(char *encode_str,ix86Param *);
 
