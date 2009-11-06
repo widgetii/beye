@@ -588,6 +588,7 @@ void __FASTCALL__ arg_cpu_modREGrm(char * str,ix86Param *DisP)
   char reg = MODRM_REG(DisP->RealCmd[1]);
   char mod = MODRM_MOD(DisP->RealCmd[1]);
   char rm = MODRM_RM(DisP->RealCmd[1]);
+  unsigned long mode = DisP->mode;
   brex = use64 = 0;
 #ifdef IX86_64
   if(x86_Bitness == DAB_USE64)
@@ -596,7 +597,9 @@ void __FASTCALL__ arg_cpu_modREGrm(char * str,ix86Param *DisP)
     use64 = REX_W(K86_REX);
   }
 #endif
+  if(x86_Bitness>DAB_USE16 && (DisP->mode&MOD_WIDE_DATA)==0) DisP->mode|=MOD_WIDE_DATA;
   strcat(str,k86_getREG(DisP,reg,True,brex,use64));
+  DisP->mode=mode;
   DisP->codelen++;
   if(!((DisP->flags & __DISF_SIZEONLY) == __DISF_SIZEONLY)) strcat(str,",");
   strcat(str,ix86_getModRM((DisP->insn_flags&IX86_OP_BYTE)?False:True,mod,rm,DisP));

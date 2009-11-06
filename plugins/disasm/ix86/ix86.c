@@ -586,8 +586,8 @@ const ix86_ExOpcodes ix86_0F38_Table[256] =
   /*0xED*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
   /*0xEE*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
   /*0xEF*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
-  /*0xF0*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
-  /*0xF1*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
+  /*0xF0*/ DECLARE_EX_INSN("movbe", "movbe", arg_cpu_modregrm, arg_cpu_modregrm, IX86_P8, K64_ATHLON),
+  /*0xF1*/ DECLARE_EX_INSN("movbe", "movbe", arg_cpu_modregrm, arg_cpu_modregrm, IX86_P8|IX86_STORE, K64_ATHLON|K64_STORE),
   /*0xF2*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
   /*0xF3*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
   /*0xF4*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
@@ -4288,12 +4288,15 @@ static DisasmRet __FASTCALL__ ix86Disassembler(__filesize_t ulShift,
     unsigned char ecode;
     const char *nam;
     ix86_method mthd;
+    /* for continuing  */
+    unsigned char up_saved = up;
+    ix86Param DisP_saved=DisP;
     fake_0F_opcode:
     if(DisP.pfx&PFX_F2_REPNE) SSE2_ext=ix86_F20F_PentiumTable;
     else
     if(DisP.pfx&PFX_F3_REP)   SSE2_ext=ix86_F30F_PentiumTable;
     else
-    if(DisP.pfx&PFX_66)       SSE2_ext=ix86_660F_PentiumTable; 
+    if(DisP.pfx&PFX_66)       SSE2_ext=ix86_660F_PentiumTable;
     ecode = (DisP.pfx&PFX_VEX)?DisP.RealCmd[0]:DisP.RealCmd[1];
     if((DisP.pfx&PFX_VEX) && DisP.VEX_m==0x02) ecode = 0x38;
     else
@@ -4310,7 +4313,11 @@ static DisasmRet __FASTCALL__ ix86Disassembler(__filesize_t ulShift,
 
     nam=((x86_Bitness==DAB_USE64)?SSE2_ext[ecode].name64:SSE2_ext[ecode].name);
     if(nam) {
-	if(DisP.pfx&PFX_66) DisP.mode^=MOD_WIDE_DATA;
+	if(DisP.pfx&PFX_66&&
+	    (SSE2_ext==ix86_660F_PentiumTable||
+	     SSE2_ext==ix86_660F38_Table||
+	     SSE2_ext==ix86_660F3A_Table
+	    )) DisP.mode^=MOD_WIDE_DATA;
 	if(DisP.pfx&PFX_VEX && nam[0]!='v') {
 	    strcpy(Ret.str,"v");
 	    strcat(Ret.str,nam);
@@ -4330,7 +4337,11 @@ static DisasmRet __FASTCALL__ ix86Disassembler(__filesize_t ulShift,
 	}
 	goto ExitDisAsm;
     }
-    /* else continue ordinal execution */
+    else {
+	    DisP=DisP_saved;
+	    up=up_saved;
+	    /* continue ordinal execution */
+    }
  }
 #ifdef IX86_64
  if(x86_Bitness == DAB_USE64)
