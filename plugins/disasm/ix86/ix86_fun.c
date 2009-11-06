@@ -1071,7 +1071,7 @@ void   __FASTCALL__ ix86_VMX(char *str,ix86Param *DisP)
     DisP->pro_clone |= IX86_P6;
 }
 
-static char *ix86_0Fvmxname[]={"???","cmpxchg8b","???","???","???","???","vmptrld","vmptrst",};
+static const char *ix86_0Fvmxname[]={"???","cmpxchg8b","???","???","???","???","vmptrld","vmptrst",};
 void   __FASTCALL__ ix86_0FVMX(char *str,ix86Param *DisP)
 {
     unsigned char rm = MODRM_RM(DisP->RealCmd[1]);
@@ -1092,6 +1092,23 @@ void   __FASTCALL__ ix86_0FVMX(char *str,ix86Param *DisP)
     }
 }
 
+static const char *ix86_660Fvmxname[]={"???","???","???","???","???","???","vmclear","???",};
+void   __FASTCALL__ ix86_660FVMX(char *str,ix86Param *DisP)
+{
+    unsigned char rm = MODRM_RM(DisP->RealCmd[1]);
+    unsigned char cop = MODRM_COP(DisP->RealCmd[1]);
+    unsigned char mod = MODRM_MOD(DisP->RealCmd[1]);
+    strcpy(str,ix86_660Fvmxname[cop]);
+    TabSpace(str,TAB_POS);
+    DisP->codelen++;
+    strcat(str,ix86_getModRM(True,mod,rm,DisP));
+    if(rm > 1) {
+	DisP->pro_clone &= ~IX86_CPUMASK;
+	DisP->pro_clone |= IX86_P6;
+    }
+}
+
+static const char * ix86_ExGrp1[] = { "sgdt", "sidt", "lgdt", "lidt", "smsw", "???", "lmsw", "invlpg" };
 void  __FASTCALL__ ix86_ArgExGr1(char *str,ix86Param *DisP)
 {
     unsigned char cop = MODRM_COP(DisP->RealCmd[1]);

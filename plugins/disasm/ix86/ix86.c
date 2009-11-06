@@ -1000,8 +1000,8 @@ const ix86_ExOpcodes ix86_extable[256] = /* for 0FH leading */
   /*0x75*/ DECLARE_EX_INSN("pcmpeqw","pcmpeqw",arg_simd,arg_simd,IX86_CPU586|IX86_MMX,K64_ATHLON|K64_MMX),
   /*0x76*/ DECLARE_EX_INSN("pcmpeqd","pcmpeqd",arg_simd,arg_simd,IX86_CPU586|IX86_MMX,K64_ATHLON|K64_MMX),
   /*0x77*/ DECLARE_EX_INSN("emms","emms",arg_emms,arg_emms,IX86_CPU586|IX86_MMX,K64_ATHLON|K64_MMX),
-  /*0x78*/ DECLARE_EX_INSN("vmread","vmread",arg_cpu_mod_rm,arg_cpu_mod_rm,IX86_P6,K64_ATHLON),
-  /*0x79*/ DECLARE_EX_INSN("vmwrite","vmwrite",arg_cpu_mod_rm,arg_cpu_mod_rm,IX86_P6|IX86_STORE,K64_ATHLON|K64_STORE),
+  /*0x78*/ DECLARE_EX_INSN("vmread","vmread",arg_cpu_modregrm,arg_cpu_modregrm,IX86_P6|IX86_STORE,K64_ATHLON|K64_STORE),
+  /*0x79*/ DECLARE_EX_INSN("vmwrite","vmwrite",arg_cpu_modregrm,arg_cpu_modregrm,IX86_P6,K64_ATHLON),
   /*0x7A*/ DECLARE_EX_INSN("svldt","???",arg_cpu_mod_rm,arg_cpu_mod_rm,IX86_CYRIX486,K64_ATHLON),
   /*0x7B*/ DECLARE_EX_INSN("rsldt","???",arg_cpu_mod_rm,arg_cpu_mod_rm,IX86_CYRIX486,K64_ATHLON),
   /*0x7C*/ DECLARE_EX_INSN("svts","???",arg_cpu_mod_rm,arg_cpu_mod_rm,IX86_CYRIX486,K64_ATHLON),
@@ -1795,8 +1795,8 @@ const ix86_ExOpcodes ix86_660F38_Table[256] =
   /*0x7D*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
   /*0x7E*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
   /*0x7F*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
-  /*0x80*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
-  /*0x81*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
+  /*0x80*/ DECLARE_EX_INSN("invept", "invept", arg_cpu_modregrm, arg_cpu_modregrm, IX86_P7, K64_ATHLON),
+  /*0x81*/ DECLARE_EX_INSN("invvpid", "invvpid", arg_cpu_modregrm, arg_cpu_modregrm, IX86_P7, K64_ATHLON),
   /*0x82*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
   /*0x83*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
   /*0x84*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
@@ -2386,7 +2386,7 @@ const ix86_ExOpcodes ix86_660F_PentiumTable[256] =
   /*0xC4*/ DECLARE_EX_INSN("pinsrw","pinsrw",bridge_simd_cpu_imm8,bridge_simd_cpu_imm8,IX86_P4|IX86_SSE|IX86_VEX_V,K64_ATHLON|K64_SSE|K64_VEX_V),
   /*0xC5*/ DECLARE_EX_INSN("pextrw","pextrw",bridge_simd_cpu_imm8,bridge_simd_cpu_imm8,IX86_P4|IX86_SSE|BRIDGE_CPU_SSE|IX86_STORE,K64_ATHLON|K64_SSE|K64_STORE|BRIDGE_CPU_SSE),
   /*0xC6*/ DECLARE_EX_INSN("shufpd","shufpd",arg_simd_imm8,arg_simd_imm8,IX86_P4|IX86_SSE|IX86_VEX_V,K64_ATHLON|K64_SSE|K64_VEX_V),
-  /*0xC7*/ DECLARE_EX_INSN(NULL,NULL,NULL,NULL,IX86_UNKMMX,K64_ATHLON|K64_SSE),
+  /*0xC7*/ DECLARE_EX_INSN("!!!","!!!",ix86_660FVMX,ix86_660FVMX,IX86_CPU586,K64_ATHLON),
   /*0xC8*/ DECLARE_EX_INSN(NULL,NULL,NULL,NULL,IX86_UNKMMX,K64_ATHLON|K64_SSE),
   /*0xC9*/ DECLARE_EX_INSN(NULL,NULL,NULL,NULL,IX86_UNKMMX,K64_ATHLON|K64_SSE),
   /*0xCA*/ DECLARE_EX_INSN(NULL,NULL,NULL,NULL,IX86_UNKMMX,K64_ATHLON|K64_SSE),
@@ -3752,7 +3752,6 @@ const char * ix86_Gr1Names[] = { "test", "RESERVED", "not", "neg", "mul", "imul"
 const char * ix86_Gr2Names[] = { "inc", "dec", "call", "call", "jmp", "jmp", "push", "???"/** pop - not real */};
 
 const char * ix86_ExGrp0[] = { "sldt", "str", "lldt", "ltr", "verr", "verw", "???", "???" };
-const char * ix86_ExGrp1[] = { "sgdt", "sidt", "lgdt", "lidt", "smsw", "???", "lmsw", "invlpg" };
 
 const char * ix86_BitGrpNames[] = { "???", "???", "???", "???", "bt", "bts", "btr", "btc" };
 

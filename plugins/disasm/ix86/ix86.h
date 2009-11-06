@@ -320,7 +320,6 @@ extern const char * ix86_Gr1Names[];
 extern const char * ix86_Gr2Names[];
 
 extern const char * ix86_ExGrp0[];
-extern const char * ix86_ExGrp1[];
 extern const char * ix86_BitGrpNames[];
 
 extern const char * ix86_MMXGr1[];
@@ -415,6 +414,7 @@ extern void   __FASTCALL__ ix86_ArgMovYX(char *str,ix86Param *);
 
 extern void   __FASTCALL__ ix86_VMX(char *str,ix86Param *);
 extern void   __FASTCALL__ ix86_0FVMX(char *str,ix86Param *DisP);
+extern void   __FASTCALL__ ix86_660FVMX(char *str,ix86Param *DisP);
 
 #endif
 
