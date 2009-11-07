@@ -114,13 +114,13 @@ static const char *get_VEX_reg(ix86Param* DisP)
 	use64 = REX_W(K86_REX);
 	rg = ((DisP->VEX_vlp>>3)&0x0F)^0x0F;
 	brex = (rg>>3)&0x01;
-	if(DisP->insn_flags&K64_VEX_V) {
+	if(DisP->insn_flags&INSN_VEX_V) {
 	    rval=k86_getREG(DisP,rg,1,brex,use64);
 	}
     }
     else {
 	rg = ((DisP->VEX_vlp>>3)&0x07)^0x07;
-	if(DisP->insn_flags&IX86_VEX_V)
+	if(DisP->insn_flags&INSN_VEX_V)
 	    rval=k86_getREG(DisP,rg,1,0,0);
     }
     return rval;
@@ -663,7 +663,7 @@ static char * __NEAR__ __FASTCALL__ __getTile(ix86Param *DisP,tBool w,tBool d)
  ix86_dtile[0] = 0;
  strcat(ix86_dtile,d ? regs : modrm);
  /* add VEX.vvvv field as first source operand */
- if((DisP->pfx&PFX_VEX) && (DisP->insn_flags&K64_VEX_V)) ix86_CStile(ix86_dtile,get_VEX_reg(DisP));
+ if((DisP->pfx&PFX_VEX) && (DisP->insn_flags&INSN_VEX_V)) ix86_CStile(ix86_dtile,get_VEX_reg(DisP));
  ix86_CStile(ix86_dtile,d ? modrm : regs);
  return ix86_dtile;
 }
@@ -671,7 +671,7 @@ static char * __NEAR__ __FASTCALL__ __getTile(ix86Param *DisP,tBool w,tBool d)
 void __FASTCALL__ arg_cpu_modregrm(char * str,ix86Param *DisP)
 {
  DisP->codelen++;
- strcat(str,__getTile(DisP,(DisP->insn_flags&IX86_OP_BYTE)?False:True,(DisP->insn_flags&IX86_STORE)?False:True));
+ strcat(str,__getTile(DisP,(DisP->insn_flags&INSN_OP_BYTE)?False:True,(DisP->insn_flags&INSN_STORE)?False:True));
 }
 
 void __FASTCALL__ arg_cpu_modREGrm(char * str,ix86Param *DisP)
@@ -694,14 +694,14 @@ void __FASTCALL__ arg_cpu_modREGrm(char * str,ix86Param *DisP)
   DisP->mode=mode;
   DisP->codelen++;
   if(!((DisP->flags & __DISF_SIZEONLY) == __DISF_SIZEONLY)) strcat(str,",");
-  strcat(str,ix86_getModRM((DisP->insn_flags&IX86_OP_BYTE)?False:True,mod,rm,DisP));
+  strcat(str,ix86_getModRM((DisP->insn_flags&INSN_OP_BYTE)?False:True,mod,rm,DisP));
 }
 
 void __FASTCALL__ arg_cpu_mod_rm(char* str,ix86Param *DisP)
 {
   char mod = MODRM_MOD(DisP->RealCmd[1]);
   char rm = MODRM_RM(DisP->RealCmd[1]);
-  tBool w = (DisP->insn_flags&IX86_OP_BYTE)?False:True;
+  tBool w = (DisP->insn_flags&INSN_OP_BYTE)?False:True;
   if(mod<3) ix86_setModifier(str,ix86_sizes[ix86_calcModifier(DisP,w)]);
   DisP->codelen++;
   strcat(str,ix86_getModRM(w,mod,rm,DisP));
@@ -824,12 +824,12 @@ void __FASTCALL__ arg_insnreg(char *str,ix86Param *DisP)
     use64 = REX_W(K86_REX);
   }
 #endif
-  strcat(str,k86_getREG(DisP,MODRM_RM(DisP->RealCmd[0]),(DisP->insn_flags&IX86_OP_BYTE)?False:True,brex,(DisP->insn_flags&K64_FORCE64)?1:use64));
+  strcat(str,k86_getREG(DisP,MODRM_RM(DisP->RealCmd[0]),(DisP->insn_flags&INSN_OP_BYTE)?False:True,brex,(DisP->insn_flags&K64_FORCE64)?1:use64));
 }
 
 void __FASTCALL__ arg_insnreg_imm(char * str,ix86Param *DisP)
 {
-  char w = (DisP->insn_flags&IX86_OP_BYTE)?0:1;
+  char w = (DisP->insn_flags&INSN_OP_BYTE)?0:1;
   arg_insnreg(str,DisP);
 #ifdef IX86_64
   if(x86_Bitness == DAB_USE64 && REX_W(K86_REX) && w) w = -1; /* special case for do64 */
@@ -1068,11 +1068,11 @@ const ix86_ExOpcodes* __FASTCALL__ ix86_prepare_flags(const ix86_ExOpcodes *exta
     }
     else {
 	if(x86_Bitness == DAB_USE64) {
-		DisP->pro_clone = extable[*code].flags64&(~K64_FLAGS_MASK);
+		DisP->pro_clone = extable[*code].flags64&(~INSN_FLAGS_MASK);
 		DisP->insn_flags = extable[*code].flags64;
 	}
 	else {
-		DisP->pro_clone = extable[*code].pro_clone&(~IX86_FLAGS_MASK);
+		DisP->pro_clone = extable[*code].pro_clone&(~INSN_FLAGS_MASK);
 		DisP->insn_flags = extable[*code].pro_clone;
 	}
 	in_chain=0;
@@ -1141,7 +1141,7 @@ void  __FASTCALL__ ix86_ArgExGr0(char *str,ix86Param *DisP)
 #ifdef IX86_64
     if(x86_Bitness != DAB_USE64)
 #endif
-    if(cop < 4) DisP->pro_clone |= IX86_CPL0;
+    if(cop < 4) DisP->pro_clone |= INSN_CPL0;
 }
 
 static char *ix86_vmxname[]={"???","???","???","???","???","???","vmclear","???",};
@@ -1210,7 +1210,7 @@ void  __FASTCALL__ ix86_ArgExGr1(char *str,ix86Param *DisP)
       {
 	strcpy(str,"swapgs");
 	DisP->codelen++;
-	DisP->pro_clone |= K64_CPL0;
+	DisP->pro_clone |= INSN_CPL0;
 	return;
       }
     }
@@ -1256,7 +1256,7 @@ void  __FASTCALL__ ix86_ArgExGr1(char *str,ix86Param *DisP)
       {
 	strcpy(str,"monitor");
 	DisP->codelen++;
-	DisP->pro_clone &= ~(IX86_CPUMASK|IX86_CPL0);
+	DisP->pro_clone &= ~(IX86_CPUMASK|INSN_CPL0);
 	DisP->pro_clone |= IX86_P5;
 	return;
       }
@@ -1265,7 +1265,7 @@ void  __FASTCALL__ ix86_ArgExGr1(char *str,ix86Param *DisP)
       {
 	strcpy(str,"mwait");
 	DisP->codelen++;
-	DisP->pro_clone &= ~(IX86_CPUMASK|IX86_CPL0);
+	DisP->pro_clone &= ~(IX86_CPUMASK|INSN_CPL0);
 	DisP->pro_clone |= IX86_P5;
 	return;
       }
@@ -1274,7 +1274,7 @@ void  __FASTCALL__ ix86_ArgExGr1(char *str,ix86Param *DisP)
       {
 	strcpy(str,"xgetbv");
 	DisP->codelen++;
-	DisP->pro_clone &= ~(IX86_CPUMASK|IX86_CPL0);
+	DisP->pro_clone &= ~(IX86_CPUMASK|INSN_CPL0);
 	DisP->pro_clone |= IX86_P8;
 	return;
       }
@@ -1283,7 +1283,7 @@ void  __FASTCALL__ ix86_ArgExGr1(char *str,ix86Param *DisP)
       {
 	strcpy(str,"xsetbv");
 	DisP->codelen++;
-	DisP->pro_clone &= ~(IX86_CPUMASK|IX86_CPL0);
+	DisP->pro_clone &= ~(IX86_CPUMASK|INSN_CPL0);
 	DisP->pro_clone |= IX86_P8;
 	return;
       }
@@ -1293,7 +1293,7 @@ void  __FASTCALL__ ix86_ArgExGr1(char *str,ix86Param *DisP)
       {
 	strcpy(str,"vmrun");
 	DisP->codelen++;
-	DisP->pro_clone = K64_FAM10|K64_CPL0;
+	DisP->pro_clone = K64_FAM10|INSN_CPL0;
 	TabSpace(str,TAB_POS);
 	strcat(str,k86_getREG(DisP,0,True,REX_B(K86_REX),REX_W(K86_REX)));
 	return;
@@ -1303,7 +1303,7 @@ void  __FASTCALL__ ix86_ArgExGr1(char *str,ix86Param *DisP)
       {
 	strcpy(str,"vmmcall");
 	DisP->codelen++;
-	DisP->pro_clone = K64_FAM10|K64_CPL0;
+	DisP->pro_clone = K64_FAM10|INSN_CPL0;
 	return;
       }
       else
@@ -1311,7 +1311,7 @@ void  __FASTCALL__ ix86_ArgExGr1(char *str,ix86Param *DisP)
       {
 	strcpy(str,"vmload");
 	DisP->codelen++;
-	DisP->pro_clone = K64_FAM10|K64_CPL0;
+	DisP->pro_clone = K64_FAM10|INSN_CPL0;
 	TabSpace(str,TAB_POS);
 	strcat(str,k86_getREG(DisP,0,True,REX_B(K86_REX),REX_W(K86_REX)));
 	return;
@@ -1321,7 +1321,7 @@ void  __FASTCALL__ ix86_ArgExGr1(char *str,ix86Param *DisP)
       {
 	strcpy(str,"vmsave");
 	DisP->codelen++;
-	DisP->pro_clone = K64_FAM10|K64_CPL0;
+	DisP->pro_clone = K64_FAM10|INSN_CPL0;
 	TabSpace(str,TAB_POS);
 	strcat(str,k86_getREG(DisP,0,True,REX_B(K86_REX),REX_W(K86_REX)));
 	return;
@@ -1331,7 +1331,7 @@ void  __FASTCALL__ ix86_ArgExGr1(char *str,ix86Param *DisP)
       {
 	strcpy(str,"stgi");
 	DisP->codelen++;
-	DisP->pro_clone = K64_FAM10|K64_CPL0;
+	DisP->pro_clone = K64_FAM10|INSN_CPL0;
 	return;
       }
       else
@@ -1339,7 +1339,7 @@ void  __FASTCALL__ ix86_ArgExGr1(char *str,ix86Param *DisP)
       {
 	strcpy(str,"clgi");
 	DisP->codelen++;
-	DisP->pro_clone = K64_FAM10|K64_CPL0;
+	DisP->pro_clone = K64_FAM10|INSN_CPL0;
 	return;
       }
       else
@@ -1347,7 +1347,7 @@ void  __FASTCALL__ ix86_ArgExGr1(char *str,ix86Param *DisP)
       {
 	strcpy(str,"skinit");
 	DisP->codelen++;
-	DisP->pro_clone = K64_FAM10|K64_CPL0;
+	DisP->pro_clone = K64_FAM10|INSN_CPL0;
 	TabSpace(str,TAB_POS);
 	strcat(str,"eax");
 	return;
@@ -1357,7 +1357,7 @@ void  __FASTCALL__ ix86_ArgExGr1(char *str,ix86Param *DisP)
       {
 	strcpy(str,"invlpga");
 	DisP->codelen++;
-	DisP->pro_clone = K64_FAM10|K64_CPL0;
+	DisP->pro_clone = K64_FAM10|INSN_CPL0;
 	TabSpace(str,TAB_POS);
 	strcat(str,k86_getREG(DisP,0,True,REX_B(K86_REX),REX_W(K86_REX)));
 	ix86_CStile(str,"ecx");
@@ -1471,7 +1471,7 @@ static void __NEAR__ __FASTCALL__ ix86_bridge_cpu_simd(char *str,ix86Param *DisP
 
 void   __FASTCALL__ bridge_simd_cpu(char *str,ix86Param* DisP)
 {
-    ix86_bridge_cpu_simd(str,DisP,(DisP->insn_flags&BRIDGE_CPU_SSE)?True:False,(DisP->insn_flags&IX86_SSE)?True:False);
+    ix86_bridge_cpu_simd(str,DisP,(DisP->insn_flags&BRIDGE_CPU_SSE)?True:False,(DisP->insn_flags&INSN_SSE)?True:False);
 }
 
 void __FASTCALL__  bridge_simd_cpu_imm8(char *str,ix86Param *DisP)
@@ -1540,7 +1540,7 @@ void __FASTCALL__ arg_emms(char *str,ix86Param *DisP)
 void __FASTCALL__ arg_simd(char *str,ix86Param *DisP)
 {
     unsigned long mode=DisP->mode;
-    if(DisP->insn_flags&IX86_MMX)	DisP->mode|=MOD_MMX;
+    if(DisP->insn_flags&INSN_MMX)	DisP->mode|=MOD_MMX;
     else				DisP->mode|=MOD_SSE;
     arg_cpu_modregrm(str,DisP);
     DisP->mode=mode;
@@ -1655,18 +1655,18 @@ void __FASTCALL__ ix86_ArgKatmaiGrp1(char *str,ix86Param *DisP)
      arg_cpu_mod_rm(str,DisP);
 	if(x86_Bitness != DAB_USE64) {
 	    DisP->pro_clone &= ~IX86_CPUMASK;
-	    DisP->pro_clone |= IX86_P8|IX86_SSE;
+	    DisP->pro_clone |= IX86_P8|INSN_SSE;
 	}
 	else {
 	    DisP->pro_clone &= ~K64_CLONEMASK;
-	    DisP->pro_clone |= K64_FAM11|K64_SSE;
+	    DisP->pro_clone |= K64_FAM11|INSN_SSE;
 	}
    }
    else DisP->codelen++;
    if((cop==5 || cop==6) && mod==3)
 	if(x86_Bitness != DAB_USE64) {
 	    DisP->pro_clone &= ~IX86_CPUMASK;
-	    DisP->pro_clone |= IX86_P4|IX86_MMX;
+	    DisP->pro_clone |= IX86_P4|INSN_MMX;
 	}
 }
 
@@ -1774,7 +1774,7 @@ void   __FASTCALL__ arg_simd_xmm0(char *str,ix86Param *DisP) {
 }
 
 /* TODO: fix it !!! */
-void   __FASTCALL__ arg_vex(char *str,ix86Param *DisP) {
+void   __FASTCALL__ arg_fma4(char *str,ix86Param *DisP) {
     unsigned is4,rg,brex,use64;
     unsigned long mod = DisP->mode;
     DisP->mode |= MOD_SSE;
@@ -1795,9 +1795,9 @@ void   __FASTCALL__ arg_vex(char *str,ix86Param *DisP) {
     DisP->mode = mod;
 }
 
-void   __FASTCALL__ arg_vex_imm8(char *str,ix86Param *DisP) {
+void   __FASTCALL__ arg_fma4_imm8(char *str,ix86Param *DisP) {
     unsigned is4;
-    arg_vex(str,DisP);
+    arg_fma4(str,DisP);
     is4=DisP->RealCmd[DisP->codelen-1];
     ix86_CStile(str,Get2Digit(is4&0x0F));
 }
@@ -1805,7 +1805,7 @@ void   __FASTCALL__ arg_vex_imm8(char *str,ix86Param *DisP) {
 void __FASTCALL__ arg_fma(char *str,ix86Param *DisP)
 {
     unsigned long mode=DisP->mode;
-    if(DisP->insn_flags&IX86_MMX)	DisP->mode|=MOD_MMX;
+    if(DisP->insn_flags&INSN_MMX)	DisP->mode|=MOD_MMX;
     else				DisP->mode|=MOD_SSE;
     if(DisP->pfx&PFX_VEX) {
 	char *ptr;
@@ -1834,7 +1834,7 @@ void __FASTCALL__ ix86_3dNowOpCodes( char *str,ix86Param *DisP)
  TabSpace(str,TAB_POS);
  strcat(str,ix86_Katmai_buff);
 #ifdef IX86_64
-   if(x86_Bitness == DAB_USE64) DisP->pro_clone = K64_ATHLON|K64_MMX;
+   if(x86_Bitness == DAB_USE64) DisP->pro_clone = K64_ATHLON|INSN_MMX;
    else
 #endif
    DisP->pro_clone = ix86_3dNowtable[code].pro_clone;

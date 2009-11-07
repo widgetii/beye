@@ -67,6 +67,7 @@ typedef struct tagix86Param
 #define PFX_OF			0x00000100 /* for VEX compatibility */
 #define PFX_REX			0x01000000
 #define PFX_VEX			0x02000000
+#define PFX_XOP			0x04000000
   unsigned long pfx;
 #define MOD_WIDE_DATA		0x00000001
 #define MOD_WIDE_ADDR		0x00000002
@@ -132,6 +133,7 @@ typedef struct tagix86Param
 */
   unsigned char VEX_m;
   unsigned char VEX_vlp;
+  unsigned char XOP_m;
 }ix86Param;
 
 #define K86_REX (DisP->REX)
@@ -160,47 +162,7 @@ typedef void (__FASTCALL__*ix86_method)(char *encode_str,ix86Param *);
 #define IX86_CPU1086	0x0000000AUL
 #define IX86_CPU1186	0x0000000BUL
 #define IX86_CPU1286	0x0000000CUL
-#define IX86_CPUMASK	0x00000FFFUL
-
-#define IX86_REGGROUP	0x0000F000UL
-#define IX86_GPR	0x00000000UL /* insn works with general purpose registers */
-#define IX86_FPU	0x00001000UL /* insn works with fpu registers */
-#define IX86_MMX	0x00002000UL /* insn works with mmx registers */
-#define IX86_SSE	0x00004000UL /* insn works with sse registers */
-#define IX86_AVX	0x0000C000UL /* insn works with avx registers */
-
-#define IX86_CLONEMASK	0x000F0000UL
-#define IX86_INTEL	0x00000000UL
-#define IX86_AMD	0x00010000UL
-#define IX86_CYRIX	0x00020000UL
-
-#define IX86_SYSTEMMASK	0x00F00000UL
-#define IX86_CPL0	0x00100000UL
-
-#define IX86_VEXMASK	0x0F000000UL
-#define IX86_VEX_V	0x01000000UL /* means insns use VVVV register extension from VEX prefix*/
-
-#define IX86_LOAD	0x00000000UL /* means direction: OPCODE reg,[mem] */
-#define IX86_STORE	0x10000000UL /* means direction: OPCODE [mem],reg */
-#define IX86_OP_BYTE	0x20000000UL /* means operand size is 1 byte */
-#define IX86_OP_WORD	0x00000000UL /* means operand size is word (16,32 or 64) depends on mode */
-#define IX86_USERBIT	0x40000000UL /* overloaded for special purposes */
-#define IX86_FLAGS_MASK	0x7F000000UL
-
-#define BRIDGE_MMX_SSE	IX86_USERBIT
-#define BRIDGE_SSE_MMX	0x00000000UL
-#define BRIDGE_CPU_SSE	IX86_USERBIT
-#define BRIDGE_SSE_CPU	0x00000000UL
-#define IMM_BYTE	IX86_USERBIT
-#define IMM_WORD	0x00000000UL
-#define K64_FORCE64	IX86_USERBIT
-
-/* Furter processors */
-#define IX86_UNKCPU	IX86_CPU1286
-#define IX86_UNKFPU	(IX86_UNKCPU|IX86_FPU)
-#define IX86_UNKMMX	(IX86_UNKCPU|IX86_MMX)
-#define IX86_UNKSSE	(IX86_UNKCPU|IX86_SSE)
-#define IX86_UNKAVX	(IX86_UNKCPU|IX86_AVX)
+#define IX86_CPUMASK	0x000000FFUL
 
 #define IX86_P2		IX86_CPU686
 #define IX86_P3		IX86_CPU786
@@ -213,45 +175,68 @@ typedef void (__FASTCALL__*ix86_method)(char *encode_str,ix86Param *);
 #define IX86_P7		IX86_CPU1186
 #define IX86_P8		IX86_CPU1286
 
-#define IX86_K6		(IX86_AMD|IX86_CPU586)
-#define IX86_3DNOW	(IX86_AMD|IX86_CPU686|IX86_MMX)
-#define IX86_ATHLON	(IX86_AMD|IX86_CPU786|IX86_MMX)
-#define IX86_UNKAMD	(IX86_AMD|IX86_CPU886|IX86_MMX)
-
-#define IX86_CYRIX486		(IX86_CYRIX|IX86_CPU486)
-#define IX86_CYRIX686		(IX86_CYRIX|IX86_CPU586)
-#define IX86_CYRIX686MMX	(IX86_CYRIX|IX86_CPU586|IX86_MMX)
-#define IX86_UNKCYRIX		(IX86_CYRIX|IX86_CPU686)
-
 #define K64_ATHLON	0x00000000UL
 #define K64_FAM9	0x00000001UL
 #define K64_FAM10	0x00000002UL
 #define K64_FAM11	0x00000003UL
-#define K64_CLONEMASK	0x00000FFFUL
-#define K64_REGGROUP    0x0000F000UL
-#define K64_GPR         0x00000000UL /* insn works with general purpose registers */
-#define K64_FPU         0x00001000UL /* insn works with fpu registers */
-#define K64_MMX         0x00002000UL /* insn works with mmx registers */
-#define K64_SSE         0x00004000UL /* insn works with sse registers */
-#define K64_AVX         0x0000C000UL /* insn works with avx registers */
-#define K64_NOCOMPAT	0x00010000UL /* means insns has no 16 or 32 bit forms */
-#define K64_DEF32	0x00020000UL /* means insns size depends on default data size but not address size */
-#define K64_SYSTEMMASK	0x00F00000UL
-#define K64_CPL0	0x00100000UL /* means insns requires cpl0 privilegies to be executed */
+#define K64_CLONEMASK	0x000000FFUL
 
-#define K64_VEXMASK	0x0F000000UL
-#define K64_VEX_V	0x01000000UL /* means insns use VVVV register extension from VEX prefix*/
+#define IX86_CLONEMASK	0x00000700UL
+#define IX86_INTEL	0x00000000UL
+#define IX86_AMD	0x00000100UL
+#define IX86_CYRIX	0x00000200UL
 
-#define K64_LOAD	0x00000000UL /* means direction: OPCODE reg,[mem] */
-#define K64_STORE	0x10000000UL /* means direction: OPCODE [mem],reg */
-#define K64_OP_BYTE	0x20000000UL /* means operand size is 1 byte */
-#define K64_OP_WORD	0x00000000UL /* means operand size is word (16,32 or 64) depends on mode */
+#define INSN_SYSTEMMASK	0x00000800UL
+#define INSN_CPL0	0x00000800UL
 
-#define K64_FLAGS_MASK  0x7F000000UL
+#define INSN_REGGROUP	0x0000F000UL
+#define INSN_GPR	0x00000000UL /* insn works with general purpose registers */
+#define INSN_FPU	0x00001000UL /* insn works with fpu registers */
+#define INSN_MMX	0x00002000UL /* insn works with mmx registers */
+#define INSN_SSE	0x00004000UL /* insn works with sse registers */
+#define INSN_AVX	0x0000C000UL /* insn works with avx registers */
+
+#define INSN_VEXMASK		0x000F0000UL
+#define INSN_VEX_V		0x00010000UL /* means insns use VVVV register extension from VEX prefix*/
+#define INSN_VEXW_AS_SWAP	0x00020000UL /* means use VEX.W register to swap sources */
+
+#define INSN_FLAGS_MASK	0xFFF00000UL
+#define INSN_LOAD	0x00000000UL /* means direction: OPCODE reg,[mem] */
+#define INSN_STORE	0x00100000UL /* means direction: OPCODE [mem],reg */
+#define INSN_OP_BYTE	0x00200000UL /* means operand size is 1 byte */
+#define INSN_OP_WORD	0x00000000UL /* means operand size is word (16,32 or 64) depends on mode */
+#define K64_NOCOMPAT	0x01000000UL /* means insns has no 16 or 32 bit forms */
+#define K64_DEF32	0x02000000UL /* means insns size depends on default data size but not address size */
+#define INSN_USERBIT	0x40000000UL /* overloaded for special purposes */
+
+#define BRIDGE_MMX_SSE	INSN_USERBIT
+#define BRIDGE_SSE_MMX	0x00000000UL
+#define BRIDGE_CPU_SSE	INSN_USERBIT
+#define BRIDGE_SSE_CPU	0x00000000UL
+#define IMM_BYTE	INSN_USERBIT
+#define IMM_WORD	0x00000000UL
+#define K64_FORCE64	INSN_USERBIT
 
 /* Special features flags */
 #define TABDESC_MASK		0x80000000UL
 #define TAB_NAME_IS_TABLE	0x80000000UL
+
+/* Furter processors */
+#define IX86_UNKCPU	IX86_CPU1286
+#define IX86_UNKFPU	(IX86_UNKCPU|INSN_FPU)
+#define IX86_UNKMMX	(IX86_UNKCPU|INSN_MMX)
+#define IX86_UNKSSE	(IX86_UNKCPU|INSN_SSE)
+#define IX86_UNKAVX	(IX86_UNKCPU|INSN_AVX)
+
+#define IX86_K6		(IX86_AMD|IX86_CPU586)
+#define IX86_3DNOW	(IX86_AMD|IX86_CPU686|INSN_MMX)
+#define IX86_ATHLON	(IX86_AMD|IX86_CPU786|INSN_MMX)
+#define IX86_UNKAMD	(IX86_AMD|IX86_CPU886|INSN_MMX)
+
+#define IX86_CYRIX486		(IX86_CYRIX|IX86_CPU486)
+#define IX86_CYRIX686		(IX86_CYRIX|IX86_CPU586)
+#define IX86_CYRIX686MMX	(IX86_CYRIX|IX86_CPU586|INSN_MMX)
+#define IX86_UNKCYRIX		(IX86_CYRIX|IX86_CPU686)
 
 typedef struct tag_ix86opcodes
 {
@@ -405,9 +390,9 @@ extern void   __FASTCALL__ arg_simd_rm_imm8_imm8(char *str,ix86Param *);
 extern void   __FASTCALL__ bridge_sse_mmx(char *str,ix86Param* DisP);
 extern void   __FASTCALL__ bridge_simd_cpu(char *str,ix86Param* DisP);
 extern void   __FASTCALL__ bridge_simd_cpu_imm8(char *str,ix86Param* DisP);
-extern void   __FASTCALL__ arg_vex(char *str,ix86Param *);
-extern void   __FASTCALL__ arg_vex_imm8(char *str,ix86Param *DisP);
 extern void   __FASTCALL__ arg_fma(char *str,ix86Param *);
+extern void   __FASTCALL__ arg_fma4(char *str,ix86Param *);
+extern void   __FASTCALL__ arg_fma4_imm8(char *str,ix86Param *DisP);
 
 extern void   __FASTCALL__ ix86_ArgMMXGr1(char *str,ix86Param *);
 extern void   __FASTCALL__ ix86_ArgMMXGr2(char *str,ix86Param *);
