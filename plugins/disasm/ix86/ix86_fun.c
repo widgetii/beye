@@ -408,7 +408,73 @@ static char * __NEAR__ __FASTCALL__ ConstrSibMod(ix86Param*DisP,char * store,cha
    return store;
 }
 
-char * __FASTCALL__ ix86_getModRM(tBool w,unsigned char mod,unsigned char rm,ix86Param *DisP)
+
+char * __FASTCALL__ ix86_getModRM16(tBool w,unsigned char mod,unsigned char rm,ix86Param *DisP)
+{
+ const char *cptr;
+ char square[50];
+ char ret1[50];
+ char base[8];
+ char _index[8];
+ char scale[4];
+ char new_mode = mod;
+ unsigned char clen;
+ tBool as_sign,is_disponly,as_rip;
+ clen = 2;
+ cptr = ix86_A16[rm];
+ strcpy(square,cptr);
+ mod = new_mode;
+ if(mod != 3)
+ {
+    strcat(ix86_modrm_ret,ix86_segpref);
+    ix86_segpref[0] = 0;
+ }
+ is_disponly = False;
+ as_sign = True;
+ as_rip=False;
+ switch(mod)
+ {
+	case 0:
+		if(rm != 6) { /* i.e. combine address */
+		    clen = 0;
+		    strcat(ix86_modrm_ret,square);
+		}
+		else { /* i.e. displacement only. fake mod = 2 */
+		    square[0] = 0;
+		    is_disponly = True;
+		    as_sign = False;
+		    goto disp_long;
+		}
+		break;
+	case 1:
+		strcat(ix86_modrm_ret,ix86_segpref);
+		ix86_segpref[0] = 0;
+		clen = 1;
+		strcat(ix86_modrm_ret,square);
+		/* The "disp8" nomenclature denotes an 8-bit displacement
+		   following the ModR/M or SIB byte, to be sign-extended
+		   and added to the index. */
+		strcat(ix86_modrm_ret,Get2SquareDig(2,DisP,True));
+		break;
+	case 2: {
+		disp_long:
+		strcat(ix86_modrm_ret,ix86_segpref);
+		ix86_segpref[0] = 0;
+		strcat(ix86_modrm_ret,square);
+		strcat(ix86_modrm_ret,Get4SquareDig(2,DisP,as_sign,is_disponly));
+		clen = 2;
+		}
+		break;
+	default:
+		clen = 0;
+		strcat(ix86_modrm_ret,k86_getREG(DisP,rm,w,0,0));
+		break;
+ }
+ if(mod != 3) DisP->codelen += clen;
+ return ix86_modrm_ret;
+}
+
+char * __FASTCALL__ ix86_getModRM32(tBool w,unsigned char mod,unsigned char rm,ix86Param *DisP)
 {
  const char *cptr;
  char square[50];
@@ -420,124 +486,150 @@ char * __FASTCALL__ ix86_getModRM(tBool w,unsigned char mod,unsigned char rm,ix8
  unsigned char clen,tmp;
  tBool as_sign,is_disponly,as_rip;
  clen = 2;
- if(rm == 4 && USE_WIDE_ADDR) cptr = ConstrSibMod(DisP,ret1,base,_index,scale,DisP->RealCmd[2],&new_mode);
- else
- {
-#ifdef IX86_64
-   if(x86_Bitness == DAB_USE64)
-   {
-      cptr = (HAS_67_IN64==False) ? k86_QWordRegs[REX_reg(REX_b(K86_REX),rm)] : k86_DWordRegs[REX_reg(REX_B(K86_REX),rm)];
-   }
-   else
-#endif
-   cptr = USE_WIDE_ADDR ? ix86_DWordRegs[rm] : ix86_A16[rm];
-#if 0
-   is_stack = USE_WIDE_ADDR ? rm == 4 || rm == 5 : rm == 2 || rm == 3 || rm == 6;
-#endif
- }
+ if(rm == 4)	cptr = ConstrSibMod(DisP,ret1,base,_index,scale,DisP->RealCmd[2],&new_mode);
+ else		cptr = k86_DWordRegs[REX_reg(REX_b(K86_REX),rm)];
  strcpy(square,cptr);
  mod = new_mode;
- ix86_modrm_ret[0] = 0;
  if(mod != 3)
  {
-   strcpy(ix86_modrm_ret,"[");
-   strcat(ix86_modrm_ret,ix86_segpref);
-   ix86_segpref[0] = 0;
+    strcat(ix86_modrm_ret,ix86_segpref);
+    ix86_segpref[0] = 0;
  }
  is_disponly = False;
  as_sign = True;
  as_rip=False;
  switch(mod)
  {
-       case 0:
-             {
-               if((rm != 6 && !USE_WIDE_ADDR) || (rm != 5 && USE_WIDE_ADDR)) /* i.e. combine address */
-               {
-                 clen = 0;
-                 if(USE_WIDE_ADDR && rm == 4) clen = 1;
-                 strcat(ix86_modrm_ret,square);
-               }
-               else /* i.e. displacement only. fake mod = 2 */
-               {
-                  square[0] = 0;
-                  is_disponly = True;
-                  as_sign = False;
-                  goto disp_long;
-               }
-             }
-             break;
-       case 1:
-             {
-               if(!USE_WIDE_ADDR)
-               {
-                 strcat(ix86_modrm_ret,ix86_segpref);
-                 ix86_segpref[0] = 0;
-                 tmp = 2;
-                 clen = 1;
-               }
-               else
-               {
-                 if(rm != 4) { tmp = 2; clen = 1; }
-                 else        { tmp = 3; clen = 2; }
-               }
-               strcat(ix86_modrm_ret,square);
-               /* The "disp8" nomenclature denotes an 8-bit displacement
-                  following the ModR/M or SIB byte, to be sign-extended
-                  and added to the index. */
-               strcat(ix86_modrm_ret,Get2SquareDig(tmp,DisP,True));
-             }
-             break;
-       case 2:
-            {
-              disp_long:
+	case 0:
+		if(rm != 5) { /* i.e. combine address */
+		    clen = 0;
+		    if(rm == 4) clen = 1;
+		    strcat(ix86_modrm_ret,square);
+		}
+		else { /* i.e. displacement only. fake mod = 2 */
+		    square[0] = 0;
+		    is_disponly = True;
+		    as_sign = False;
+		    goto disp_long;
+		}
+		break;
+	case 1:
+		if(rm != 4) { tmp = 2; clen = 1; }
+		else        { tmp = 3; clen = 2; }
+		strcat(ix86_modrm_ret,square);
+		/* The "disp8" nomenclature denotes an 8-bit displacement
+		   following the ModR/M or SIB byte, to be sign-extended
+		   and added to the index. */
+		strcat(ix86_modrm_ret,Get2SquareDig(tmp,DisP,True));
+		break;
+	case 2: {
+		disp_long:
+		if(rm != 4) { tmp = 2; clen = 4; }
+		else        { tmp = 3; clen = 5; }
+		strcat(ix86_modrm_ret,square);
+		strcat(ix86_modrm_ret,Get8SquareDig(tmp,DisP,as_sign,is_disponly,as_rip));
+		}
+		break;
+	default:
+		clen = 0;
+		strcat(ix86_modrm_ret,k86_getREG(DisP,rm,w,0,0));
+		break;
+ }
+ if(mod != 3) DisP->codelen += clen;
+ return ix86_modrm_ret;
+}
+
 #ifdef IX86_64
-		 if(x86_Bitness == DAB_USE64 && is_disponly)
-		 {
-		   strcat(ix86_modrm_ret,"rip");
-		   as_sign = True;
-		   is_disponly = False;
-		   as_rip=True;
-		 }
+char * __FASTCALL__ ix86_getModRM64(tBool w,unsigned char mod,unsigned char rm,ix86Param *DisP)
+{
+ const char *cptr;
+ char square[50];
+ char ret1[50];
+ char base[8];
+ char _index[8];
+ char scale[4];
+ char new_mode = mod;
+ unsigned char clen,tmp;
+ tBool as_sign,is_disponly,as_rip;
+ clen = 2;
+ if(rm == 4)	cptr = ConstrSibMod(DisP,ret1,base,_index,scale,DisP->RealCmd[2],&new_mode);
+ else		cptr = k86_QWordRegs[REX_reg(REX_b(K86_REX),rm)];
+ strcpy(square,cptr);
+ mod = new_mode;
+ if(mod != 3)
+ {
+    strcat(ix86_modrm_ret,ix86_segpref);
+    ix86_segpref[0] = 0;
+ }
+ is_disponly = False;
+ as_sign = True;
+ as_rip=False;
+ switch(mod)
+ {
+	case 0:
+		if(rm != 5) { /* i.e. combine address */
+		    clen = 0;
+		    if(rm == 4) clen = 1;
+		    strcat(ix86_modrm_ret,square);
+		}
+		else { /* i.e. displacement only. fake mod = 2 */
+		    square[0] = 0;
+		    is_disponly = True;
+		    as_sign = False;
+		    goto disp_long;
+		}
+		break;
+	case 1:
+		if(rm != 4) { tmp = 2; clen = 1; }
+		else        { tmp = 3; clen = 2; }
+		strcat(ix86_modrm_ret,square);
+		/* The "disp8" nomenclature denotes an 8-bit displacement
+		   following the ModR/M or SIB byte, to be sign-extended
+		   and added to the index. */
+		strcat(ix86_modrm_ret,Get2SquareDig(tmp,DisP,True));
+		break;
+	case 2: {
+		disp_long:
+		if(is_disponly)
+		{
+		    strcat(ix86_modrm_ret,"rip");
+		    as_sign = True;
+		    is_disponly = False;
+		    as_rip=True;
+		}
+		if(rm != 4) { tmp = 2; clen = 4; }
+		else        { tmp = 3; clen = 5; }
+		strcat(ix86_modrm_ret,square);
+		strcat(ix86_modrm_ret,Get8SquareDig(tmp,DisP,as_sign,is_disponly,as_rip));
+		}
+		break;
+	default: {
+		tBool brex, use64;
+		clen = 0;
+		brex = REX_B(K86_REX);
+		use64 = REX_W(K86_REX);
+		strcat(ix86_modrm_ret,k86_getREG(DisP,rm,w,brex,use64));
+		}
+		break;
+ }
+ if(mod != 3) DisP->codelen += clen;
+ return ix86_modrm_ret;
+}
 #endif
-              if(!USE_WIDE_ADDR)
-              {
-                strcat(ix86_modrm_ret,ix86_segpref);
-                ix86_segpref[0] = 0;
-                strcat(ix86_modrm_ret,square);
-                strcat(ix86_modrm_ret,Get4SquareDig(2,DisP,as_sign,is_disponly));
-                clen = 2;
-              }
-              else
-              {
-                if(rm != 4) { tmp = 2; clen = 4; }
-                else        { tmp = 3; clen = 5; }
-                strcat(ix86_modrm_ret,square);
-                strcat(ix86_modrm_ret,Get8SquareDig(tmp,DisP,as_sign,is_disponly,as_rip));
-              }
-            }
-            break;
-      default:
-            {
-              tBool brex, use64;
-              clen = 0;
-              brex = use64 = 0;
+
+char * __FASTCALL__ ix86_getModRM(tBool w,unsigned char mod,unsigned char rm,ix86Param *DisP)
+{
+    char *rval;
+    if(mod!=3)	strcpy(ix86_modrm_ret,"[");
+    else	ix86_modrm_ret[0]=0;
+    if((x86_Bitness == DAB_USE16 || x86_Bitness == DAB_USE32) && !USE_WIDE_ADDR) rval = ix86_getModRM16(w,mod,rm,DisP);
 #ifdef IX86_64
-	      if(x86_Bitness == DAB_USE64)
-              {
-                brex = REX_B(K86_REX);
-                use64 = REX_W(K86_REX);
-              }
+    else
+    if(x86_Bitness == DAB_USE64 && USE_WIDE_ADDR) rval = ix86_getModRM64(w,mod,rm,DisP);
 #endif
-              strcat(ix86_modrm_ret,k86_getREG(DisP,rm,w,brex,use64));
-            }
-            break;
-   }
-   if(mod != 3)
-   {
-     DisP->codelen += clen;
-     strcat(ix86_modrm_ret,"]");
-   }
-   return ix86_modrm_ret;
+    else rval = ix86_getModRM32(w,mod,rm,DisP);
+    if(mod!=3)	strcat(ix86_modrm_ret,"]");
+    return rval;
 }
 
 char * __FASTCALL__ ix86_CStile(char *str,const char *arg2)
@@ -597,7 +689,7 @@ void __FASTCALL__ arg_cpu_modREGrm(char * str,ix86Param *DisP)
     use64 = REX_W(K86_REX);
   }
 #endif
-  if(x86_Bitness>DAB_USE16 && (DisP->mode&MOD_WIDE_DATA)==0) DisP->mode|=MOD_WIDE_DATA;
+  if(x86_Bitness>DAB_USE16) DisP->mode|=MOD_WIDE_DATA;
   strcat(str,k86_getREG(DisP,reg,True,brex,use64));
   DisP->mode=mode;
   DisP->codelen++;

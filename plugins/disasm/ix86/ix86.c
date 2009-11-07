@@ -4346,7 +4346,6 @@ static DisasmRet __FASTCALL__ ix86Disassembler(__filesize_t ulShift,
 #ifdef IX86_64
  if(x86_Bitness == DAB_USE64)
  {
-   DisP.mode|=MOD_WIDE_ADDR; /* there is no way to use 16-bit addresing in 64-bit mode */
    if(REX_W(DisP.REX)) DisP.mode|=MOD_WIDE_DATA; /* 66h prefix is ignored if REX prefix is present*/
    if(ix86_table[code].flags64 & K64_DEF32)
    {
