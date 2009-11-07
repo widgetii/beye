@@ -760,6 +760,7 @@ void __FASTCALL__ arg_r0_imm(char * str,ix86Param *DisP)
 
 void __FASTCALL__ arg_r0rm(char *str,ix86Param *DisP)
 {
+  unsigned char rm = MODRM_RM(DisP->RealCmd[0]);
   tBool brex,use64;
   brex = use64 = 0;
 #ifdef IX86_64
@@ -769,8 +770,11 @@ void __FASTCALL__ arg_r0rm(char *str,ix86Param *DisP)
     use64 = REX_W(K86_REX);
   }
 #endif
-  strcat(str,k86_getREG(DisP,0,True,0,use64));
-  ix86_CStile(str,k86_getREG(DisP,MODRM_RM(DisP->RealCmd[0]),True,brex,use64));
+  if(rm==0 && !HAS_REX) strcpy(str,"nop");
+  else {
+    strcat(str,k86_getREG(DisP,0,True,0,use64));
+    ix86_CStile(str,k86_getREG(DisP,rm,True,brex,use64));
+  }
 }
 
 void __FASTCALL__ arg_r0mem(char *str,ix86Param *DisP)
@@ -793,9 +797,9 @@ void __FASTCALL__ arg_r0mem(char *str,ix86Param *DisP)
 #endif
     mem = USE_WIDE_ADDR ?   Get8SquareDig(1,DisP,False,True,False) :
 			    Get4SquareDig(1,DisP,False,True);
-  strcpy(ix86_appstr,ix86_segpref);
+  strcpy(ix86_appstr,"[");
+  strcat(ix86_appstr,ix86_segpref);
   ix86_segpref[0] = 0;
-  strcat(ix86_appstr,"[");
   strcat(ix86_appstr,mem);
   strcat(ix86_appstr,"]");
   reg = k86_getREG(DisP,0,DisP->RealCmd[0] & 0x01,0,use64);
@@ -1161,7 +1165,7 @@ void   __FASTCALL__ ix86_0FVMX(char *str,ix86Param *DisP)
     unsigned char cop = MODRM_COP(DisP->RealCmd[1]);
     unsigned char mod = MODRM_MOD(DisP->RealCmd[1]);
 #ifdef IX86_64
-    if(x86_Bitness == DAB_USE64 && USE_WIDE_DATA && cop==1)
+    if(x86_Bitness == DAB_USE64 && REX_W(K86_REX) && cop==1)
 	strcpy(str,"cmpxchg16b");
     else
 #endif

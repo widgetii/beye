@@ -222,7 +222,7 @@ const ix86_Opcodes ix86_table[256] =
   /*0x8D*/ DECLARE_BASE_INSN("lea","lea","lea",arg_cpu_modregrm,arg_cpu_modregrm,IX86_CPU086,K64_ATHLON),
   /*0x8E*/ DECLARE_BASE_INSN("mov","mov","mov",arg_cpu_modsegrm,arg_cpu_modsegrm,IX86_CPU086,K64_ATHLON),
   /*0x8F*/ DECLARE_BASE_INSN("pop","pop","pop",arg_cpu_mod_rm,arg_cpu_mod_rm,IX86_CPU086|IX86_STORE,K64_ATHLON|K64_STORE),
-  /*0x90*/ DECLARE_BASE_INSN("nop","nop","nop",NULL,NULL,IX86_CPU086,K64_ATHLON),
+  /*0x90*/ DECLARE_BASE_INSN("xchg","xchg","xchg",arg_r0rm,arg_r0rm,IX86_CPU086,K64_ATHLON),
   /*0x91*/ DECLARE_BASE_INSN("xchg","xchg","xchg",arg_r0rm,arg_r0rm,IX86_CPU086,K64_ATHLON),
   /*0x92*/ DECLARE_BASE_INSN("xchg","xchg","xchg",arg_r0rm,arg_r0rm,IX86_CPU086,K64_ATHLON),
   /*0x93*/ DECLARE_BASE_INSN("xchg","xchg","xchg",arg_r0rm,arg_r0rm,IX86_CPU086,K64_ATHLON),
@@ -4160,55 +4160,47 @@ static DisasmRet __FASTCALL__ ix86Disassembler(__filesize_t ulShift,
               break;
 #endif
    case 0x26:
-              if(has_seg) break;
-	      if(x86_Bitness < DAB_USE64) {
-		/*in 64-bit mode, the CS,DS,ES,SS segment overrides are ignored*/
+		if(has_seg) break;
+		/*in 64-bit mode, the CS,DS,ES,SS segment overrides are ignored but may be specified */
 		DisP.pfx|=PFX_SEG_ES;
 		strcpy(ix86_segpref,"es:");
-	      }
-              has_seg++;
-              goto MakePref;
+		has_seg++;
+		goto MakePref;
    case 0x2E:
-              if(has_seg) break;
-	      if(x86_Bitness < DAB_USE64) {
-		/*in 64-bit mode, the CS,DS,ES,SS segment overrides are ignored*/
+		if(has_seg) break;
+		/*in 64-bit mode, the CS,DS,ES,SS segment overrides are ignored but may be specified */
 		DisP.pfx|=PFX_SEG_CS;
 		strcpy(ix86_segpref,"cs:");
-	      }
-              has_seg++;
-              goto MakePref;
+		has_seg++;
+		goto MakePref;
    case 0x36:
-              if(has_seg) break;
-	      if(x86_Bitness < DAB_USE64) {
-		/*in 64-bit mode, the CS,DS,ES,SS segment overrides are ignored*/
+		if(has_seg) break;
+		/*in 64-bit mode, the CS,DS,ES,SS segment overrides are ignored but may be specified */
 		DisP.pfx|=PFX_SEG_SS;
 		strcpy(ix86_segpref,"ss:");
-	      }
-              has_seg++;
-              goto MakePref;
+		has_seg++;
+		goto MakePref;
    case 0x3E:
-              if(has_seg) break;
-	      if(x86_Bitness < DAB_USE64) {
-		/*in 64-bit mode, the CS,DS,ES,SS segment overrides are ignored*/
+		if(has_seg) break;
+		/*in 64-bit mode, the CS,DS,ES,SS segment overrides are ignored but may be specified */
 		DisP.pfx|=PFX_SEG_DS;
 		strcpy(ix86_segpref,"ds:");
-	      }
-              has_seg++;
-              goto MakePref;
+		has_seg++;
+		goto MakePref;
    case 0x64:
-              if(has_seg) break;
-	      DisP.pfx|=PFX_SEG_FS;
-              strcpy(ix86_segpref,"fs:");
-              has_seg++;
-              DisP.pro_clone = IX86_CPU386;
-              goto MakePref;
+		if(has_seg) break;
+		DisP.pfx|=PFX_SEG_FS;
+		strcpy(ix86_segpref,"fs:");
+		has_seg++;
+		DisP.pro_clone = IX86_CPU386;
+		goto MakePref;
    case 0x65:
-              if(has_seg) break;
-	      DisP.pfx|=PFX_SEG_GS;
-              strcpy(ix86_segpref,"gs:");
-              has_seg++;
-              DisP.pro_clone = IX86_CPU386;
-              goto MakePref;
+		if(has_seg) break;
+		DisP.pfx|=PFX_SEG_GS;
+		strcpy(ix86_segpref,"gs:");
+		has_seg++;
+		DisP.pro_clone = IX86_CPU386;
+		goto MakePref;
    case 0x66:
 		ud++;
 		DisP.pfx |= PFX_66;
