@@ -997,8 +997,9 @@ void __FillCPUInfo(char *buff,unsigned cbBuff,void (*percent_callback)(int))
 "           [%c] - CR8 in Legacy Mode         [%c] - ABM\n"
 "           [%c] - SSE4a                      [%c] - Misalign SSE\n"
 "           [%c] - PREFETCH insns             [%c] - OSVW\n"
-"           [%c] - IBS (sampling)             [%c] - SSE5\n"
+"           [%c] - IBS (sampling)             [%c] - XOP\n"
 "           [%c] - SKINIT/STGI                [%c] - WDT (timer)\n"
+"           [%c] - FMA4                       [%c] - CVT16\n"
             ,__edx & BIT_NO( 5) ? 'x' : ' '
             ,__edx & BIT_NO(11) ? 'x' : ' '
             ,__edx & BIT_NO(20) ? 'x' : ' '
@@ -1023,6 +1024,8 @@ void __FillCPUInfo(char *buff,unsigned cbBuff,void (*percent_callback)(int))
             ,__ecx & BIT_NO(11) ? 'x' : ' '
             ,__ecx & BIT_NO(12) ? 'x' : ' '
             ,__ecx & BIT_NO(13) ? 'x' : ' '
+            ,__ecx & BIT_NO(16) ? 'x' : ' '
+            ,__ecx & BIT_NO(18) ? 'x' : ' '
             );
         is_core_smp_legacy=__ecx & BIT_NO( 1);
         if(__highest_excpuid >= 0x80000007LU)
