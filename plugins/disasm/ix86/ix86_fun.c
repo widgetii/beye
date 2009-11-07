@@ -1208,149 +1208,160 @@ void  __FASTCALL__ ix86_ArgExGr1(char *str,ix86Param *DisP)
     {
       if(DisP->RealCmd[1] == 0xF8)
       {
-        strcpy(str,"swapgs");
-        DisP->codelen++;
+	strcpy(str,"swapgs");
+	DisP->codelen++;
 	DisP->pro_clone |= K64_CPL0;
-        return;
+	return;
       }
     }
 #endif
     {
       if(DisP->RealCmd[1] == 0xC1)
       {
-        strcpy(str,"vmcall");
-        DisP->codelen++;
+	strcpy(str,"vmcall");
+	DisP->codelen++;
 	DisP->pro_clone &= ~IX86_CPUMASK;
 	DisP->pro_clone |= IX86_P6;
-        return;
+	return;
       }
       else
       if(DisP->RealCmd[1] == 0xC2)
       {
-        strcpy(str,"vmlaunch");
-        DisP->codelen++;
+	strcpy(str,"vmlaunch");
+	DisP->codelen++;
 	DisP->pro_clone &= ~IX86_CPUMASK;
 	DisP->pro_clone |= IX86_P6;
-        return;
+	return;
       }
       else
       if(DisP->RealCmd[1] == 0xC3)
       {
-        strcpy(str,"vmresume");
-        DisP->codelen++;
+	strcpy(str,"vmresume");
+	DisP->codelen++;
 	DisP->pro_clone &= ~IX86_CPUMASK;
 	DisP->pro_clone |= IX86_P6;
-        return;
+	return;
       }
       else
       if(DisP->RealCmd[1] == 0xC4)
       {
-        strcpy(str,"vmxoff");
-        DisP->codelen++;
+	strcpy(str,"vmxoff");
+	DisP->codelen++;
 	DisP->pro_clone &= ~IX86_CPUMASK;
 	DisP->pro_clone |= IX86_P6;
-        return;
+	return;
       }
       else
       if(DisP->RealCmd[1] == 0xC8)
       {
-        strcpy(str,"monitor");
-        DisP->codelen++;
+	strcpy(str,"monitor");
+	DisP->codelen++;
 	DisP->pro_clone &= ~(IX86_CPUMASK|IX86_CPL0);
 	DisP->pro_clone |= IX86_P5;
-        return;
+	return;
       }
       else
       if(DisP->RealCmd[1] == 0xC9)
       {
-        strcpy(str,"mwait");
-        DisP->codelen++;
+	strcpy(str,"mwait");
+	DisP->codelen++;
 	DisP->pro_clone &= ~(IX86_CPUMASK|IX86_CPL0);
 	DisP->pro_clone |= IX86_P5;
-        return;
+	return;
       }
       else
       if(DisP->RealCmd[1] == 0xD0)
       {
-        strcpy(str,"xgetbv");
-        DisP->codelen++;
+	strcpy(str,"xgetbv");
+	DisP->codelen++;
 	DisP->pro_clone &= ~(IX86_CPUMASK|IX86_CPL0);
 	DisP->pro_clone |= IX86_P8;
-        return;
+	return;
       }
       else
       if(DisP->RealCmd[1] == 0xD1)
       {
-        strcpy(str,"xsetbv");
-        DisP->codelen++;
+	strcpy(str,"xsetbv");
+	DisP->codelen++;
 	DisP->pro_clone &= ~(IX86_CPUMASK|IX86_CPL0);
 	DisP->pro_clone |= IX86_P8;
-        return;
+	return;
       }
 #ifdef IX86_64
       else
       if(DisP->RealCmd[1] == 0xD8)
       {
-        strcpy(str,"vmrun");
-        DisP->codelen++;
+	strcpy(str,"vmrun");
+	DisP->codelen++;
 	DisP->pro_clone = K64_FAM10|K64_CPL0;
-        return;
+	TabSpace(str,TAB_POS);
+	strcat(str,k86_getREG(DisP,0,True,REX_B(K86_REX),REX_W(K86_REX)));
+	return;
       }
       else
       if(DisP->RealCmd[1] == 0xD9)
       {
-        strcpy(str,"vmmcall");
-        DisP->codelen++;
+	strcpy(str,"vmmcall");
+	DisP->codelen++;
 	DisP->pro_clone = K64_FAM10|K64_CPL0;
-        return;
+	return;
       }
       else
       if(DisP->RealCmd[1] == 0xDA)
       {
-        strcpy(str,"vmload");
-        DisP->codelen++;
+	strcpy(str,"vmload");
+	DisP->codelen++;
 	DisP->pro_clone = K64_FAM10|K64_CPL0;
-        return;
+	TabSpace(str,TAB_POS);
+	strcat(str,k86_getREG(DisP,0,True,REX_B(K86_REX),REX_W(K86_REX)));
+	return;
       }
       else
       if(DisP->RealCmd[1] == 0xDB)
       {
-        strcpy(str,"vmsave");
-        DisP->codelen++;
+	strcpy(str,"vmsave");
+	DisP->codelen++;
 	DisP->pro_clone = K64_FAM10|K64_CPL0;
-        return;
+	TabSpace(str,TAB_POS);
+	strcat(str,k86_getREG(DisP,0,True,REX_B(K86_REX),REX_W(K86_REX)));
+	return;
       }
       else
       if(DisP->RealCmd[1] == 0xDC)
       {
-        strcpy(str,"stgi");
-        DisP->codelen++;
+	strcpy(str,"stgi");
+	DisP->codelen++;
 	DisP->pro_clone = K64_FAM10|K64_CPL0;
-        return;
+	return;
       }
       else
       if(DisP->RealCmd[1] == 0xDD)
       {
-        strcpy(str,"clgi");
-        DisP->codelen++;
+	strcpy(str,"clgi");
+	DisP->codelen++;
 	DisP->pro_clone = K64_FAM10|K64_CPL0;
-        return;
+	return;
       }
       else
       if(DisP->RealCmd[1] == 0xDE)
       {
-        strcpy(str,"skinit");
-        DisP->codelen++;
+	strcpy(str,"skinit");
+	DisP->codelen++;
 	DisP->pro_clone = K64_FAM10|K64_CPL0;
-        return;
+	TabSpace(str,TAB_POS);
+	strcat(str,"eax");
+	return;
       }
       else
       if(DisP->RealCmd[1] == 0xDF)
       {
-        strcpy(str,"invlpga");
-        DisP->codelen++;
+	strcpy(str,"invlpga");
+	DisP->codelen++;
 	DisP->pro_clone = K64_FAM10|K64_CPL0;
-        return;
+	TabSpace(str,TAB_POS);
+	strcat(str,k86_getREG(DisP,0,True,REX_B(K86_REX),REX_W(K86_REX)));
+	ix86_CStile(str,"ecx");
+	return;
       }
 #endif
     }
@@ -1362,13 +1373,13 @@ void  __FASTCALL__ ix86_ArgExGr1(char *str,ix86Param *DisP)
     word = True;
     if(cop == 7)
     {
-      word = False;
+	word = False;
 #ifdef IX86_64
-      if(x86_Bitness != DAB_USE64)
+	if(x86_Bitness != DAB_USE64)
 #endif
-      DisP->pro_clone = IX86_CPU486;
-      buf = 1;
-      ptr = DUMMY_PTR;
+	DisP->pro_clone = IX86_CPU486;
+	buf = 1;
+	ptr = DUMMY_PTR;
     }
     else  if(cop == 4 || cop == 6) ptr = WORD_PTR;
     ix86_setModifier(str,ix86_sizes[ptr]);

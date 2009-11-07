@@ -274,8 +274,8 @@ const ix86_Opcodes ix86_table[256] =
   /*0xC1*/ DECLARE_BASE_INSN("!!!","!!!","!!!",ix86_ShOp2,ix86_ShOp2,IX86_CPU186|IX86_STORE,K64_ATHLON|K64_STORE),
   /*0xC2*/ DECLARE_BASE_INSN("retn16","retn32","retn32",arg_imm16,arg_imm16,IX86_CPU086,K64_ATHLON),
   /*0xC3*/ DECLARE_BASE_INSN("retn16","retn32","retn32",NULL,NULL,IX86_CPU086,K64_ATHLON),
-  /*0xC4*/ DECLARE_BASE_INSN("les","les","???",arg_cpu_modregrm,arg_cpu_modregrm,IX86_CPU086,K64_ATHLON),
-  /*0xC5*/ DECLARE_BASE_INSN("lds","lds","???",arg_cpu_modregrm,arg_cpu_modregrm,IX86_CPU086,K64_ATHLON),
+  /*0xC4*/ DECLARE_BASE_INSN("les","les","vex",arg_cpu_modregrm,arg_cpu_modregrm,IX86_CPU086,K64_ATHLON),
+  /*0xC5*/ DECLARE_BASE_INSN("lds","lds","vex",arg_cpu_modregrm,arg_cpu_modregrm,IX86_CPU086,K64_ATHLON),
   /*0xC6*/ DECLARE_BASE_INSN("mov","mov","mov",arg_cpu_mod_rm_imm,arg_cpu_mod_rm_imm,IX86_CPU086|IX86_OP_BYTE|IMM_BYTE|IX86_STORE,K64_ATHLON|K64_OP_BYTE|IMM_BYTE|K64_STORE),
   /*0xC7*/ DECLARE_BASE_INSN("mov","mov","mov",arg_cpu_mod_rm_imm,arg_cpu_mod_rm_imm,IX86_CPU086|IX86_STORE,K64_ATHLON|K64_STORE),
   /*0xC8*/ DECLARE_BASE_INSN("enter","enter","enter",arg_imm16_imm8,arg_imm16_imm8,IX86_CPU186,K64_ATHLON),
@@ -3874,11 +3874,11 @@ static void ix86_gettype(DisasmRet *dret,ix86Param *_DisP)
               goto MakePref;
    case 0xC4:
 	      if(x86_Bitness == DAB_USE64) has_vex++;
-	      else if((insn[1]&0x80)==0x80) has_vex++;
+	      else if((insn[1]&0xC0)==0xC0) has_vex++;
 	      insn=&insn[2];
    case 0xC5:
 	      if(x86_Bitness == DAB_USE64) has_vex++;
-	      else if((insn[1]&0x80)==0x80) has_vex++;
+	      else if((insn[1]&0xC0)==0xC0) has_vex++;
 	      insn=&insn[1];
 	      goto MakePref;
    case 0xF2:
@@ -4214,7 +4214,7 @@ static DisasmRet __FASTCALL__ ix86Disassembler(__filesize_t ulShift,
 		goto MakePref;
    case 0xC4:
 		if(x86_Bitness == DAB_USE64) has_vex++;
-		else if((DisP.RealCmd[1]&0x80)==0x80) has_vex++;
+		else if((DisP.RealCmd[1]&0xC0)==0xC0) has_vex++;
 		if(has_vex) {
 		    parse_VEX_C4(&DisP);
 		    DisP.CodeAddress+=2;
@@ -4225,7 +4225,7 @@ static DisasmRet __FASTCALL__ ix86Disassembler(__filesize_t ulShift,
 		break;
    case 0xC5:
 		if(x86_Bitness == DAB_USE64) has_vex++;
-		else if((DisP.RealCmd[1]&0x80)==0x80) has_vex++;
+		else if((DisP.RealCmd[1]&0xC0)==0xC0) has_vex++;
 		if(has_vex) {
 		    parse_VEX_C5(&DisP);
 		    DisP.CodeAddress++;
