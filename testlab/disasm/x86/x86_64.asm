@@ -11,31 +11,41 @@ global aes
 global avx
 global fma
 
-[bits 32]
+[bits 64]
 cpu_asm:
 enter 10, 12
 pause
 jp near label
 js near label
-salc
+lahf
 sahf
-pusha
 push 128
 push byte 127
 push word 128
 push dword 128
-pushad
-popaw
-popad
+push dword 1000000000000
 
-mov ax,[eax+ebx+ecx-eax]
+mov rax, 0x1000
+mov rax, 0x1122334455667788
+mov rax, qword 0x1000
+mov rax,[qword es:123456789abcdef0h]
+mov qword [rax], 0x1000
+mov qword [rax], 0x1122334455667788
+add rax, 0x1000
+add rax, 0x1122334455667788
+mov [fs:0x1000], rax
+mov [qword 0x1122334455667788], rax
+mov rax,[rel dword fs:foo]
+mov rbx, [abs es:foo]
+
+mov ax,[gs:eax+ebx+ecx-eax]
 mov ax,[eax+ecx+ebx-eax]
 lea edi,[edi*8+eax+label]
 lea edi,[eax+edi*8+label]
 mov eax,[eax*2]
 mov eax,[nosplit eax*2]
-mov eax,[esi+ebp]
-mov eax,[ebp+esi]
+mov eax,[r12]
+mov eax,[rbp+rsi]
 mov eax,[esi*1+ebp]
 mov eax,[ebp*1+esi]
 mov eax,[byte eax]
@@ -44,11 +54,31 @@ xor eax, [ebp+4*ecx   ]
 xor ebx, [ebp+4*ecx+ 4]
 xor esi, [ebp+4*ecx+ 8]
 xor edi, [ebp+4*ecx+12]
+mov al, [qword 0xfedcba9876543210]
+mov al, [0xfedcba9876543210]
+mov r8, [r9]
+mov edx, [rip]
+mov rcx, [rip+5]
+mov rbx, [esi]
+mov rdx, [rsp]
+mov rax, [r12]
+mov rcx, [rbp]
+mov rbx, [r13]
+mov ah, [rip]
+mov bh, [rcx]
 
 mov al, 0
 mov byte cl, 0
 mov bl, byte 0
 mov byte dh, byte 0
+
+mov bl, r8b
+mov sil, r9b
+mov r10w, r11w
+mov r15d, r12d
+mov r13, r14
+inc ebx
+dec ecx
 
 mov byte [0], 1
 mov [1], word 2
@@ -60,21 +90,21 @@ mov eax, dword 4
 
 mov dword eax, dword 8
 mov bx, 1h
-mov cr0, eax
-mov cr2, ebx
-mov cr4, edx
+mov cr0, rax
+mov cr2, rbx
+mov cr4, rdx
 db 0x0F, 0x24, 0x00 ; mov eax, tr0
-mov dr1, edx
-mov eax, dr7
-mov [0], ds
-mov word [8], es
-mov ax, cs
-mov eax, ss
+mov dr1, rdx
+mov rax, dr7
+mov [0], gs
+mov word [8], fs
+mov ax, fs
+mov eax, gs
 mov gs, ax
 mov fs, eax
-mov es, [cs:0]
-mov ds, word [4]
-mov word ds, [ss:16]
+mov gs, [fs:0]
+mov gs, word [4]
+mov word fs, [gs:16]
 
 mov [0], al
 mov [0], bl
@@ -85,18 +115,11 @@ movsx ax, [ecx]
 
 movzx ebx, word [eax]
 movzx ecx, byte [ebx]
-fnstenv [es:ecx+5]
+fnstenv [rcx+5]
 nop
 
-push cs
-push word cs
-push dword cs ; NASM unsupported
-push ds
-push es
 push fs
 push gs
-pop ds
-pop es
 pop fs
 pop gs
 xchg al, bl
@@ -112,6 +135,34 @@ xchg ebx, eax
 xchg ecx, ebx
 xchg [0], ecx
 xchg eax, [0]
+xchg al, al
+xchg al, r8b
+xchg r8b, al
+xchg ax, ax
+xchg ax, r8w
+xchg r8w, ax
+xchg ax, r9w
+xchg r9w, ax
+xchg eax, eax
+xchg eax, r8d
+xchg r8d, eax
+xchg eax, r9d
+xchg r9d, eax
+xchg rax, rax
+xchg rax, r8
+xchg r8, rax
+xchg rax, r9
+xchg r9, rax
+db 0x90,
+db 0x66, 0x90,
+db 0x0F, 0x1F, 0x0
+db 0x0F, 0x1F, 0x40, 0x00
+db 0x0F, 0x1F, 0x44, 0x00, 0x00
+db 0x66, 0x0F, 0x1F, 0x44, 0x00, 0x00
+db 0x0F, 0x1F, 0x80, 0x00, 0x00, 0x00, 0x00
+db 0x0F, 0x1F, 0x84, 0x00, 0x00, 0x00, 0x00, 0x00
+db 0x66, 0x0F, 0x1F, 0x84, 0x00, 0x00, 0x00, 0x00, 0x00
+
 in al, 55
 in ax, 99
 in eax, 100
@@ -130,25 +181,27 @@ out dx, ax
 out dx, eax
 lea bx, [5]
 lea ebx, [32]
-lds si, [0]
-lds ax, [1]
-lds ax,[1]
-lds ax,word [1]
-lds ax,dword [1]
-lds eax,[1]
-lds eax,word [1]
-lds eax,dword [1]
+lfs si, [0]
+lfs ax, [1]
+lgs ax,[1]
+lfs ax,word [1]
+lgs ax,dword [1]
+lfs eax,[0]
+lfs eax,word [1]
+lgs eax,dword [1]
 
 
-les di, [5]
-lds eax, [7]
-les ebx, [9]
-lss esp, [11]
+lgs di, [5]
+lfs eax, [7]
+lgs ebx, [9]
+lgs esp, [11]
 lfs ecx, [13]
 lgs edx, [15]
 
 ;; TODO: add arith stuff
 add ax,bx
+adc byte [eax], 12h
+adc byte [r8d], 12h
 mul cx
 mul bl
 mul bx
@@ -157,21 +210,21 @@ imul si,bp,2
 sub bx,di
 div ah
 idiv al
-idiv byte [bx]
-idiv word [bx+si]
-idiv dword [bp]
+idiv byte [rbx]
+idiv word [rbx+rsi]
+idiv dword [rbp]
 neg cx
 nop
 idiv al
 idiv ax
 idiv eax
 nop
-idiv byte [word 0]
+idiv byte [0]
 idiv byte [dword 0xFFFFFFFF]
 idiv byte [0]
-idiv dword [es:dword 5]
-idiv dword [byte cs:5]
-idiv word [ss:dword edi+5]
+idiv dword [fs:dword 5]
+idiv dword [byte gs:5]
+idiv word [fs:dword rdi+5]
 nop
 not eax
 and eax, 3584
@@ -188,10 +241,6 @@ xor cx,  strict word 3584
 and edx, strict byte 35
 
 imul eax, 4
-aad
-aam
-aad 5
-aam 10
 shl al, 5
 shl bl, 1
 shl cl, cl
@@ -221,39 +270,39 @@ bsr  cx,bx
 bt   si,di
 btr  sp,bp
 bts  ax,dx
-bsf  dx,[bx+si]
-bsr  bx,[bx+si]
-bt   [bx+si],di
-btr  [bx+si],bp
-bts  [bx+si],dx
+bsf  dx,[rbx+rsi]
+bsr  bx,[rbx+rsi]
+bt   [rbx+rsi],di
+btr  [rbx+rsi],bp
+bts  [rbx+rsi],dx
 bswap ecx
-lock cmpxchg [bx+si],dx
-lock cmpxchg8b qword [bx+si]
-xadd [bx+si],di
+bswap r8
+bswap rax
+lock cmpxchg [rbx+rsi],dx
+lock cmpxchg8b [rsi]
+lock cmpxchg16b [rdi]
+xadd [rbx+rsi],di
 cpuid
 rdpmc
 pushf
 int 10
-popfd
 iret
-bound sp,word [4]
-arpl [bx+si],ax
 clts
-lar  ax,[bx+si]
-lgdt [bx+si]
-lidt [bx+si]
-lldt [bx+si]
-lsl  ax,[bx+si]
-ltr  [bx+si]
-sgdt [bx+si]
-sidt [bx+si]
-sldt [bx+si]
-smsw [bx+si]
-str  [bx+si]
-verr [bx+si]
-verw [bx+si]
+lar  ax,[rbx+rsi]
+lgdt [rbx+rsi]
+lidt [rbx+rsi]
+lldt [rbx+rsi]
+lsl  ax,[rbx+rsi]
+ltr  [rbx+rsi]
+sgdt [rbx+rsi]
+sidt [rbx+rsi]
+sldt [rbx+rsi]
+smsw [rbx+rsi]
+str  [rbx+rsi]
+verr [rbx+rsi]
+verw [rbx+rsi]
 invd
-invlpg [bx+si]
+invlpg [rbx+rsi]
 wbinvd
 rsm
 rdmsr
@@ -336,14 +385,11 @@ jcxz label
 jecxz label
 call label
 call [label]
-call dword [label]
+call qword [label]
 ;jmp label
 jmp short label
 jmp near label
-jmp far [label]
-jmp far dword 0x1234:0x56789ABC
-call far word [label]
-loop short label
+loop label
 jcxz short label
 jecxz short label
 repne lodsw
@@ -351,51 +397,53 @@ repnz lodsd
 rep stosb
 repe cmpsb
 repz movsb
-es stosb
-ss stosw
-fs stosd
-gs movsb
-cs movsw
 
 push si
-push esi
+push rsi
 
-pop edi
+pop rdi
 leave
-ret
+retn word 2
 
 foo equ 1:2
 jmp far[foo]
 mov ax,[foo]
-push dword [foo]
+push qword [foo]
 mov ax,foo
 
 mov ax, 'abcd'
 mov ax, 0x1ffff
 mov eax, 0x111111111
 syscall
+fxsave [0]
+o64 fxsave [0]
 sysret
-jmp 0x1234:0x56789ABC
-call dword 0x1234:0x56789ABC
-call far [ss:0]
+o64 sysret
+
+jmp 0x56789ABC
+call 0x56789ABC
+call near [8]
 
 rep gs movsd
 fs rep movsd
+o64 loop next
+next:
+
 leave
 retn
 
 
 vmx:
-db 0x66, 0x0F, 0x38, 0x80, 0x3E ;invept edi, qword [esi]
-db 0x66, 0x0F, 0x38, 0x81, 0xA  ;invvpid ecx, qword [edx]
+db 0x66, 0x0F, 0x38, 0x80, 0x3E ;invept edi, qword [rsi]
+db 0x66, 0x0F, 0x38, 0x81, 0x0A ;invvpid ecx, qword [rdx]
 vmcall
 vmclear [12]
 vmlaunch
 vmresume
 vmptrld [8]
 vmptrst [eax]
-vmread [ebx], ecx
-vmwrite ebp, [ebp]
+vmread [ebx], rcx
+vmwrite rbp, [ebp]
 vmxoff
 vmxon [esi*4+edi+400]
 
@@ -415,8 +463,9 @@ prefetchnta [0]
 
 fxsave [eax+ebx]
 
+movdqa xmm10, xmm1
 movntps [0], xmm4
-movntps dqword [0], xmm5
+movntps dqword [0], xmm10
 movntq [8], mm6
 movntq qword [8], mm7
 movss xmm0, [0]
@@ -426,16 +475,69 @@ movss dword [8], xmm3
 pcmpeqb xmm3, xmm4
 pcmpgtw mm0, mm2
 
+movd eax, mm0
+movd mm7, eax
+movd rax, mm0
+movd mm5, rax
+movd [0], mm0
+movd mm6, [0]
+
+movd eax, xmm0
+movd xmm8, eax
+movd rax, xmm0
+movd xmm9, rax
+movd [0], xmm0
+movd xmm10, [0]
+
+movq [0], xmm0
+movq xmm11, [0]
+movq xmm0, xmm12
+movq xmm1, xmm0
+
+movq [0], mm0
+movq mm0, [0]
+movq mm0, mm1
+movq mm1, mm0
+
+movd r9, xmm0
+movd xmm8, r10
+
+movd rax, mm0
+movd mm0, rax
+
+psrlw mm0, 1
+psrld mm0, 1
+psrlq mm0, 1
+psraw mm1, 1
+psrad mm1, 1
+
+psrlw xmm0, 1
+psrld xmm0, 1
+psrlq xmm0, 1
+psraw xmm1, 1
+psrad xmm1, 1
+
 fxrstor [eax*2+edi]
 
 lfence
 mfence
 sfence
+
 leave
 retn
 
 simd2:
 enter 20,0
+
+cvtsi2sd xmm0,eax
+cvtsi2sd xmm8,rax
+cvtsd2si rax,xmm0
+cvtsi2ss xmm0,rax
+cvtsd2si rax,xmm0
+cvtss2si rax,xmm8
+cvttsd2si rax,xmm0
+cvttss2si rax,xmm8
+
 pextrw ebx, mm5, 0
 pextrw ecx, xmm0, 1
 
@@ -445,25 +547,25 @@ pinsrw mm3, [0], 4
 pinsrw xmm1, eax, 3
 pinsrw xmm1, [0], 2
 
-movmskpd edx, xmm7
+movmskpd edx, xmm11
 movmskps eax, xmm1
 
 pmovmskb edi, mm0
 pmovmskb esi, xmm1
 
-cvtdq2pd xmm5, xmm4
+cvtdq2pd xmm10, xmm4
 cvtdq2pd xmm3, [4]
 cvtdq2pd xmm2, qword [8]
 
 cvtdq2ps xmm1, xmm2
 cvtdq2ps xmm4, [4]
-cvtdq2ps xmm5, dqword [8]
+cvtdq2ps xmm10, dqword [8]
 
 cvtpd2dq xmm0, xmm1
 cvtpd2dq xmm2, [4]
 cvtpd2dq xmm3, dqword [8]
 
-cvtpd2pi mm4, xmm5
+cvtpd2pi mm4, xmm10
 cvtpd2pi mm6, [4]
 cvtpd2pi mm7, dqword [8]
 
@@ -471,23 +573,23 @@ cvtpd2ps xmm1, xmm2
 cvtpd2ps xmm3, [4]
 cvtpd2ps xmm4, dqword [8]
 
-cvtpi2pd xmm5, mm6
-cvtpi2pd xmm7, [4]
+cvtpi2pd xmm10, mm6
+cvtpi2pd xmm11, [4]
 cvtpi2pd xmm0, qword [0]
 
 cvtpi2ps xmm2, mm3
 cvtpi2ps xmm4, [4]
-cvtpi2ps xmm5, qword [0]
+cvtpi2ps xmm10, qword [0]
 
-cvtps2dq xmm6, xmm7
+cvtps2dq xmm6, xmm11
 cvtps2dq xmm0, [4]
 cvtps2dq xmm1, dqword [8]
 
 cvtps2pd xmm2, xmm3
 cvtps2pd xmm4, [4]
-cvtps2pd xmm5, qword [0]
+cvtps2pd xmm10, qword [0]
 
-cvtps2pi mm6, xmm7
+cvtps2pi mm6, xmm11
 cvtps2pi mm0, [4]
 cvtps2pi mm1, qword [0]
 
@@ -499,19 +601,19 @@ cvtsd2ss xmm1, xmm2
 cvtsd2ss xmm3, [4]
 cvtsd2ss xmm4, qword [0]
 
-cvtsi2sd xmm5, eax
-cvtsi2sd xmm6, [4]
-cvtsi2sd xmm7, dword [0]
+cvtsi2sd xmm10, eax
+cvtsi2sd xmm6, dword [4]
+cvtsi2sd xmm11, dword [0]
 
 cvtsi2ss xmm0, edx
-cvtsi2ss xmm1, [4]
+cvtsi2ss xmm1, dword [4]
 cvtsi2ss xmm2, dword [0]
 
 cvtss2sd xmm3, xmm4
-cvtss2sd xmm5, [4]
+cvtss2sd xmm10, [4]
 cvtss2sd xmm6, dword [0]
 
-cvtss2si ebx, xmm7
+cvtss2si ebx, xmm11
 cvtss2si ecx, [4]
 cvtss2si eax, dword [0]
 
@@ -519,15 +621,15 @@ cvttpd2pi mm0, xmm1
 cvttpd2pi mm2, [4]
 cvttpd2pi mm3, dqword [8]
 
-cvttpd2dq xmm4, xmm5
+cvttpd2dq xmm4, xmm10
 cvttpd2dq xmm6, [4]
-cvttpd2dq xmm7, dqword [8]
+cvttpd2dq xmm11, dqword [8]
 
 cvttps2dq xmm0, xmm1
 cvttps2dq xmm2, [4]
 cvttps2dq xmm3, dqword [8]
 
-cvttps2pi mm4, xmm5
+cvttps2pi mm4, xmm10
 cvttps2pi mm6, [4]
 cvttps2pi mm7, qword [8]
 
@@ -540,10 +642,11 @@ cvttss2si ebp, [4]
 cvttss2si eax, dword [8]
 
 cmpss xmm0, [eax], 0
-cmpss xmm0, [es:eax], 0
+cmpss xmm8, [eax], 0
 
 cmpsd xmm0, [eax], 0
-cmpsd xmm0, [es:eax], 0
+cmpsd xmm11, [r8], 0
+
 leave
 retn
 sse_width:
@@ -1121,34 +1224,36 @@ xorpd xmm1, dqword [ebx]
 
 xorps xmm1, xmm2
 xorps xmm1, dqword [ebx]
+xorps xmm2, xmm2
+xorps xmm10, xmm10
 leave
 retn
 
 sse3:
 enter 800,4
-addsubpd xmm5, xmm7
+addsubpd xmm10, xmm11
 addsubpd xmm0, [eax]
-addsubps xmm1, xmm5
+addsubps xmm1, xmm10
 addsubps xmm3, dqword [edx]
 fisttp word [0]
 fisttp dword [4]
 fisttp qword [8]
 haddpd xmm2, xmm4
-haddpd xmm7, [ecx+4]
+haddpd xmm11, [ecx+4]
 haddps xmm6, xmm1
 haddps xmm0, dqword [0]
-hsubpd xmm5, xmm3
+hsubpd xmm10, xmm3
 hsubpd xmm1, [ebp]
 hsubps xmm4, xmm1
 hsubps xmm2, [esp]
 lddqu xmm3, [ecx+edx*4+8]
 monitor
-movddup xmm7, xmm6
+movddup xmm11, xmm6
 movddup xmm1, qword [4]
 movshdup xmm3, xmm4
 movshdup xmm2, [0]
-movsldup xmm0, xmm7
-movsldup xmm5, dqword [eax+ebx]
+movsldup xmm0, xmm11
+movsldup xmm10, dqword [eax+ebx]
 mwait
 leave
 retn
@@ -1463,15 +1568,15 @@ enter 26,3
 aesenc xmm1, xmm2
 aesenc xmm1, [eax]
 aesenc xmm1, dqword [eax]
-aesenc xmm5, xmm6
-aesenc xmm5, [eax+edi*4]
-aesenc xmm5, [edx+ecx*4]
+aesenc xmm10, xmm6
+aesenc xmm10, [rax+rdi*4]
+aesenc xmm10, [rdx+rcx*4]
 vaesenc xmm1, xmm2
-vaesenc xmm1, [eax]
-vaesenc xmm1, dqword [eax]
+vaesenc xmm1, [rax]
+vaesenc xmm1, dqword [rax]
 vaesenc xmm1, xmm2, xmm3
-vaesenc xmm1, xmm2, [eax]
-vaesenc xmm1, xmm2, dqword [eax]
+vaesenc xmm1, xmm2, [rax]
+vaesenc xmm1, xmm2, dqword [rax]
 
 aesenclast xmm1, xmm2
 aesenclast xmm1, [eax]
@@ -1540,63 +1645,72 @@ pclmulhqhqdq xmm1, [eax]
 pclmulhqhqdq xmm1, dqword [eax]
 
 pclmulqdq xmm1, xmm2, 5
-pclmulqdq xmm1, [eax], byte 5
-pclmulqdq xmm1, dqword [eax], 5
+pclmulqdq xmm1, [rax], byte 5
+pclmulqdq xmm1, dqword [rax], 5
 vpclmulqdq xmm1, xmm2, 0x10
-vpclmulqdq xmm1, dqword [ebx], 0x10
+vpclmulqdq xmm1, dqword [rbx], 0x10
 vpclmulqdq xmm0, xmm1, xmm2, 0x10
-vpclmulqdq xmm0, xmm1, dqword [ebx], 0x10
+vpclmulqdq xmm0, xmm1, dqword [rbx], 0x10
 
 pclmullqlqdq xmm1, xmm2
-pclmullqlqdq xmm1, [eax]
-pclmullqlqdq xmm1, dqword [eax]
+pclmullqlqdq xmm1, [rax]
+pclmullqlqdq xmm1, dqword [rax]
 vpclmullqlqdq xmm1, xmm2
-vpclmullqlqdq xmm1, dqword[ebx]
+vpclmullqlqdq xmm1, dqword[rbx]
 vpclmullqlqdq xmm0, xmm1, xmm2
-vpclmullqlqdq xmm0, xmm1, dqword[ebx]
+vpclmullqlqdq xmm0, xmm1, dqword[rbx]
 
 pclmulhqlqdq xmm1, xmm2
-pclmulhqlqdq xmm1, [eax]
-pclmulhqlqdq xmm1, dqword [eax]
+pclmulhqlqdq xmm1, [rax]
+pclmulhqlqdq xmm1, dqword [rax]
 vpclmulhqlqdq xmm1, xmm2
-vpclmulhqlqdq xmm1, dqword[ebx]
+vpclmulhqlqdq xmm1, dqword[rbx]
 vpclmulhqlqdq xmm0, xmm1, xmm2
-vpclmulhqlqdq xmm0, xmm1, dqword[ebx]
+vpclmulhqlqdq xmm0, xmm1, dqword[rbx]
 
 pclmullqhqdq xmm1, xmm2
-pclmullqhqdq xmm1, [eax]
-pclmullqhqdq xmm1, dqword [eax]
+pclmullqhqdq xmm1, [rax]
+pclmullqhqdq xmm1, dqword [rax]
 vpclmullqhqdq xmm1, xmm2
-vpclmullqhqdq xmm1, dqword[ebx]
+vpclmullqhqdq xmm1, dqword[rbx]
 vpclmullqhqdq xmm0, xmm1, xmm2
-vpclmullqhqdq xmm0, xmm1, dqword[ebx]
+vpclmullqhqdq xmm0, xmm1, dqword[rbx]
 
 pclmulhqhqdq xmm1, xmm2
-pclmulhqhqdq xmm1, [eax]
-pclmulhqhqdq xmm1, dqword [eax]
+pclmulhqhqdq xmm1, [rax]
+pclmulhqhqdq xmm1, dqword [rax]
 vpclmulhqhqdq xmm1, xmm2
-vpclmulhqhqdq xmm1, dqword[ebx]
+vpclmulhqhqdq xmm1, dqword[rbx]
 vpclmulhqhqdq xmm0, xmm1, xmm2
-vpclmulhqhqdq xmm0, xmm1, dqword[ebx]
+vpclmulhqhqdq xmm0, xmm1, dqword[rbx]
 
+movbe ax, [eax]
+movbe ax, [rax]
+movbe ax, [r8d]
+movbe eax, [eax]
+movbe eax, [rax]
+movbe eax, [r8d]
+movbe rax, [eax]
+movbe rax, [rax]
+movbe rax, [r8d]
 movbe cx, [ebx+ecx]
-movbe cx, word [eax+ecx]
+movbe cx, word [rbx+rcx]
 movbe ecx, [eax]
-movbe cx, word [eax]
-movbe ax, [5]
-movbe eax, dword [5]
-movbe edx, [5]
-movbe dx, word [5]
-movbe [5], bx
-movbe word [5], bx
-movbe [5], ebx
-movbe dword [5], ebx
-movbe [5], esi
-movbe dword [5], edi
-movbe [5], ebx
-movbe dword [5], ebx
-movbe [5], esp
-movbe dword [5], ebp
+movbe cx, word [r15d]
+movbe rcx, [r12+5]
+movbe rcx, qword [r14d+5]
+movbe r9, [r12d+5]
+movbe r9, qword [r14+5]
+movbe [r13+5], bx
+movbe word [r13d+5], bx
+movbe [r11+5], ebx
+movbe dword [r11d+5], ebx
+movbe [r8+5], r10d
+movbe dword [r8d+5], r10d
+movbe [rax+5], rbx
+movbe qword [eax+edx+5], rbx
+movbe [rsi+r9+5], r10
+movbe qword [r12+r15+5], r10
 
 leave
 retn
@@ -1607,23 +1721,23 @@ cpu sse2
 addpd xmm1, xmm2
 addpd xmm1, [eax]
 addpd xmm1, dqword [eax]
-addpd xmm5, xmm6
-addpd xmm5, [eax+edi*4]
-addpd xmm5, [esi+edi*4]
+addpd xmm10, xmm12
+addpd xmm10, [eax+edi*4]
+addpd xmm10, [esi+edi*4]
 
 vaddpd xmm1, xmm2
 vaddpd xmm1, [eax]
 vaddpd xmm1, dqword [eax]
-vaddpd xmm5, xmm6
-vaddpd xmm5, [eax+edi*4]
-vaddpd xmm5, [esi+edi*4]
+vaddpd xmm10, xmm12
+vaddpd xmm10, [eax+edi*4]
+vaddpd xmm10, [esi+edi*4]
 
 vaddpd xmm1, xmm2, xmm3
 vaddpd xmm1, xmm2, [eax]
 vaddpd xmm1, xmm2, dqword [eax]
-vaddpd xmm5, xmm6, xmm7
-vaddpd xmm5, xmm6, [eax+edi*4]
-vaddpd xmm5, xmm6, [esi+edi*4]
+vaddpd xmm10, xmm12, xmm11
+vaddpd xmm10, xmm12, [eax+edi*4]
+vaddpd xmm10, xmm12, [esi+edi*4]
 
 vaddpd ymm1, ymm2, ymm3
 vaddpd ymm1, ymm2, [eax]
@@ -3554,12 +3668,12 @@ vpsignd xmm1, xmm2, [eax]
 vpsignd xmm1, xmm2, dqword [eax]
 
 ; Test these with high regs as it goes into VEX.B (REX.B)
-pslldq xmm7, 5
-pslldq xmm7, byte 5
-vpslldq xmm7, 5
-vpslldq xmm7, byte 5
-vpslldq xmm7, xmm6, 5
-vpslldq xmm7, xmm6, byte 5
+pslldq xmm11, 5
+pslldq xmm11, byte 5
+vpslldq xmm11, 5
+vpslldq xmm11, byte 5
+vpslldq xmm11, xmm12, 5
+vpslldq xmm11, xmm12, byte 5
 
 pslldq xmm1, 5
 pslldq xmm1, byte 5
