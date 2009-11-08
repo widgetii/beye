@@ -943,8 +943,10 @@ int __FASTCALL__ disAppendDigits(char *str,__filesize_t ulShift,int flags,
      {
        strncpy(sout,str,sizeof(sout)-1);
        sout[sizeof(sout)-1] = 0;
+       if(!strlen(sout)) strcpy(sout,"disAppendDigits");
        ErrMessageBox(sout," Internal disassembler error detected ");
        displayed = True;
+       COREDUMP();
      }
   }
 #endif
@@ -1198,8 +1200,10 @@ int __FASTCALL__ disAppendFAddr(char * str,__fileoff_t ulShift,__fileoff_t disti
      {
        strncpy(sout,str,sizeof(sout)-1);
        sout[sizeof(sout)-1] = 0;
+       if(!strlen(sout)) strcpy(sout,"disAppendFAddr");
        ErrMessageBox(sout," Internal disassembler error detected ");
        displayed = True;
+       COREDUMP();
      }
   }
 #endif
