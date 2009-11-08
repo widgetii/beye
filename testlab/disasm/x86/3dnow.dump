@@ -1,8 +1,8 @@
 ;
 ;Disassembler dump of '3dnow.o'
-;Range :                0H-             288H
-;Written by  Binary Viewer v 6.0.2-x86_64.Linux64 Build: Nov  3 2009 
-;Dumped : Tue Nov  3 20:44:29 2009
+;Range :                0H-             D38H
+;Written by  Binary Viewer v 6.1.0-x86_64.Linux64 Build: Nov  8 2009 
+;Dumped : Sun Nov  8 21:56:34 2009
 
 ;Format : ELF (Executable and Linking Format)
 
@@ -15,57 +15,424 @@ SEGMENT Unknown0 BYTE PUBLIC USE32 'NoObject'
 resb               40H
 
 SEGMENT .text BYTE PUBLIC USE32 'CODE'
-; size: 208 bytes
+; size: 2837 bytes
 
+public svm:
+L00000040: invlpga   eax,ecx			; 0F01DF
+L00000043: invlpga   eax,ecx			; 0F01DF
+L00000046: invlpga   eax,ecx			; 670F01DF
+L0000004A: skinit    eax			; 0F01DE
+L0000004D: skinit    eax			; 0F01DE
+L00000050: vmload    eax			; 0F01DA
+L00000053: vmload    eax			; 0F01DA
+L00000056: vmload    eax			; 670F01DA
+L0000005A: vmrun     eax			; 0F01D8
+L0000005D: vmrun     eax			; 0F01D8
+L00000060: vmrun     eax			; 670F01D8
+L00000064: vmsave    eax			; 0F01DB
+L00000067: vmsave    eax			; 0F01DB
+L0000006A: vmsave    eax			; 670F01DB
 public prec_14bit:
-L00000040: femms				; 0F0E
-L00000042: prefetch (d)	[+00000000]		; 0F0D0500000000
-L00000049: prefetchw (d) [+0000000C]		; 0F0D0D0C000000
-L00000050: movd	     mm0,[+00000000]		; 0F6E0500000000
-L00000057: pfrcp     mm0,mm0			; 0F0FC096
-L0000005B: movq	     mm2,[+00000004]		; 0F6F1504000000
-L00000062: pfmul     mm2,mm0			; 0F0FD0B4
-L00000066: movntq    [+0000000C],mm2		; 0FE7150C000000
-L0000006D: retn					; C3
+L0000006E: femms				; 0F0E
+L00000070: prefetch (d)	[+00000000]		; 0F0D0500000000
+L00000077: prefetchw (d) [+0000000C]		; 0F0D0D0C000000
+L0000007E: movd	     mm0,[+00000000]		; 0F6E0500000000
+L00000085: pfrcp     mm0,mm0			; 0F0FC096
+L00000089: movq	     mm2,[+00000004]		; 0F6F1504000000
+L00000090: pfmul     mm2,mm0			; 0F0FD0B4
+L00000094: movntq    [+0000000C],mm2		; 0FE7150C000000
+L0000009B: retn					; C3
 public prec_15bit:
-L0000006E: movd	     mm0,[+00000000]		; 0F6E0500000000
-L00000075: pfrsqrt   mm1,mm0			; 0F0FC897
-L00000079: pfmul     mm0,mm1			; 0F0FC1B4
-L0000007D: movq	     [+00000008],mm0		; 0F7F0508000000
-L00000084: retn					; C3
+L0000009C: movd	     mm0,[+00000000]		; 0F6E0500000000
+L000000A3: pfrsqrt   mm1,mm0			; 0F0FC897
+L000000A7: pfmul     mm0,mm1			; 0F0FC1B4
+L000000AB: movq	     [+00000008],mm0		; 0F7F0508000000
+L000000B2: retn					; C3
 public prec_24bit:
-L00000085: movd	     mm0,[+00000000]		; 0F6E0500000000
-L0000008C: pfrsqrt   mm1,mm0			; 0F0FC897
-L00000090: movq	     mm2,mm1			; 0F6FD1
-L00000093: pfmul     mm1,mm1			; 0F0FC9B4
-L00000097: pfrsqit1  mm1,mm0			; 0F0FC8A7
-L0000009B: pfrcpit2  mm1,mm2			; 0F0FCAB6
-L0000009F: pfmul     mm0,mm1			; 0F0FC1B4
-L000000A3: movd	     [+00000008],mm0		; 0F7E0508000000
-L000000AA: nop					; 90
-L000000AB: pfrcpit1  mm0,mm1			; 0F0FC1A6
-L000000AF: movq	     mm2,[+0000000C]		; 0F6F150C000000
-L000000B6: pfrcpit2  mm0,mm1			; 0F0FC1B6
-L000000BA: pfmul     mm2,mm0			; 0F0FD0B4
-L000000BE: movntq    [+00000010],mm2		; 0FE71510000000
-L000000C5: retn					; C3
-L000000C6: pfadd     mm0,[+0000001E]		; 0F0F051E0000009E
-L000000CE: pavgusb   mm4,[+00000026]		; 0F0F2526000000BF
-L000000D6: pswapd    mm3,mm4			; 0F0FDCBB
-L000000DA: pf2id     mm2,[+00000028]		; 0F0F15280000001D
-L000000E2: pfcmpge   mm0,mm2			; 0F0FC290
-L000000E6: pfmax     mm3,[+0000003C]		; 0F0F1D3C000000A4
-L000000EE: pfsubr    mm1,mm3			; 0F0FCBAA
-L000000F2: pi2fd     mm2,[+00000000]		; 0F0F15000000000D
-L000000FA: movntq    [+00000050],mm2		; 0FE71550000000
-L00000101: pf2iw     mm7,mm0			; 0F0FF81C
-L00000105: pfnacc    mm6,mm5			; 0F0FF58A
-L00000109: pfpnacc   mm4,mm6			; 0F0FE68E
-L0000010D: femms				; 0F0E
-L0000010F: retn					; C3
+L000000B3: movd	     mm0,[+00000000]		; 0F6E0500000000
+L000000BA: pfrsqrt   mm1,mm0			; 0F0FC897
+L000000BE: movq	     mm2,mm1			; 0F6FD1
+L000000C1: pfmul     mm1,mm1			; 0F0FC9B4
+L000000C5: pfrsqit1  mm1,mm0			; 0F0FC8A7
+L000000C9: pfrcpit2  mm1,mm2			; 0F0FCAB6
+L000000CD: pfmul     mm0,mm1			; 0F0FC1B4
+L000000D1: movd	     [+00000008],mm0		; 0F7E0508000000
+L000000D8: retn					; C3
+public unsorted:
+L000000D9: pfrcpit1  mm0,mm1			; 0F0FC1A6
+L000000DD: movq	     mm2,[+0000000C]		; 0F6F150C000000
+L000000E4: pfrcpit2  mm0,mm1			; 0F0FC1B6
+L000000E8: pfmul     mm2,mm0			; 0F0FD0B4
+L000000EC: movntq    [+00000010],mm2		; 0FE71510000000
+L000000F3: retn					; C3
+L000000F4: pfadd     mm0,[+0000001E]		; 0F0F051E0000009E
+L000000FC: pavgusb   mm4,[+00000026]		; 0F0F2526000000BF
+L00000104: pswapd    mm3,mm4			; 0F0FDCBB
+L00000108: pf2id     mm2,[+00000028]		; 0F0F15280000001D
+L00000110: pfcmpge   mm0,mm2			; 0F0FC290
+L00000114: pfmax     mm3,[+0000003C]		; 0F0F1D3C000000A4
+L0000011C: pfsubr    mm1,mm3			; 0F0FCBAA
+L00000120: pi2fd     mm2,[+00000000]		; 0F0F15000000000D
+L00000128: movntq    [+00000050],mm2		; 0FE71550000000
+L0000012F: pf2iw     mm7,mm0			; 0F0FF81C
+L00000133: pfnacc    mm6,mm5			; 0F0FF58A
+L00000137: pfpnacc   mm4,mm6			; 0F0FE68E
+L0000013B: femms				; 0F0E
+L0000013D: retn					; C3
+public amd_sse4a:
+L0000013E: extrq     xmm0,05,04			; 660F78C00504
+L00000144: extrq     xmm6,00,07			; 660F78C60007
+L0000014A: extrq     xmm2,xmm3			; 660F79D3
+L0000014E: insertq   xmm0,xmm1,05,04		; F20F78C10504
+L00000154: insertq   xmm5,xmm6,00,07		; F20F78EE0007
+L0000015A: insertq   xmm2,xmm3			; F20F79D3
+L0000015E: movntsd   [+00000004],xmm1		; F20F2B0D04000000
+L00000166: movntsd   [+00000004],xmm5		; F20F2B2D04000000
+L0000016E: movntss   [+00000004],xmm3		; F30F2B1D04000000
+L00000176: movntss   [+00000004],xmm7		; F30F2B3D04000000
+L0000017E: lzcnt     ax,bx			; 66F30FBDC3
+L00000183: lzcnt     cx,[+00000004]		; 66F30FBD0D04000000
+L0000018C: lzcnt     dx,[+00000004]		; 66F30FBD1504000000
+L00000195: lzcnt     eax,ebx			; F30FBDC3
+L00000199: lzcnt     ecx,[+00000004]		; F30FBD0D04000000
+L000001A1: lzcnt     edx,[+00000004]		; F30FBD1504000000
+L000001A9: lzcnt     eax,ebx			; F30FBDC3
+L000001AD: lzcnt     ecx,[+00000004]		; F30FBD0D04000000
+L000001B5: lzcnt     edx,[+00000004]		; F30FBD1504000000
+L000001BD: popcnt    ax,bx			; 66F30FB8C3
+L000001C2: popcnt    cx,[+00000004]		; 66F30FB80D04000000
+L000001CB: popcnt    dx,[+00000004]		; 66F30FB81504000000
+L000001D4: popcnt    eax,ebx			; F30FB8C3
+L000001D8: popcnt    ecx,[+00000004]		; F30FB80D04000000
+L000001E0: popcnt    edx,[+00000004]		; F30FB81504000000
+L000001E8: popcnt    eax,ebx			; F30FB8C3
+L000001EC: popcnt    ecx,[+00000004]		; F30FB80D04000000
+L000001F4: popcnt    edx,[+00000004]		; F30FB81504000000
+L000001FC: retn					; C3
+public amd_sse5:
+L000001FD: vfrczpd   xmm1,xmm2			; 8FE97881CA
+L00000202: vfrczpd   xmm1,[+00000000]		; 8FE978810D00000000
+L0000020B: vfrczpd   xmm1,[+00000000]		; 8FE978810D00000000
+L00000214: vfrczpd   ymm1,ymm2			; 8FE97C81CA
+L00000219: vfrczpd   ymm1,[+00000000]		; 8FE97C810D00000000
+L00000222: vfrczpd   ymm1,[+00000000]		; 8FE97C810D00000000
+L0000022B: vfrczps   xmm1,xmm2			; 8FE97880CA
+L00000230: vfrczps   xmm1,[+00000000]		; 8FE978800D00000000
+L00000239: vfrczps   xmm1,[+00000000]		; 8FE978800D00000000
+L00000242: vfrczps   ymm1,ymm2			; 8FE97C80CA
+L00000247: vfrczps   ymm1,[+00000000]		; 8FE97C800D00000000
+L00000250: vfrczps   ymm1,[+00000000]		; 8FE97C800D00000000
+L00000259: vfrczsd   xmm1,xmm2			; 8FE97883CA
+L0000025E: vfrczsd   xmm1,[+00000000]		; 8FE978830D00000000
+L00000267: vfrczsd   xmm1,[+00000000]		; 8FE978830D00000000
+L00000270: vfrczss   xmm1,xmm2			; 8FE97882CA
+L00000275: vfrczss   xmm1,[+00000000]		; 8FE978820D00000000
+L0000027E: vfrczss   xmm1,[+00000000]		; 8FE978820D00000000
+L00000287: vpcmov    xmm1,xmm2,xmm3,xmm4	; 8FE868A2CB40
+L0000028D: vpcmov    xmm1,xmm2,[+00000000],xmm0	; 8FE8E8A20D0000000030
+L00000297: vpcmov    xmm1,xmm2,[+00000000],xmm0	; 8FE8E8A20D0000000030
+L000002A1: vpcmov    xmm1,xmm2,[+00000000],xmm0	; 8FE868A20D0000000040
+L000002AB: vpcmov    xmm1,xmm2,[+00000000],xmm0	; 8FE868A20D0000000040
+L000002B5: vpcmov    ymm1,ymm2,ymm3,ymm4	; 8FE86CA2CB40
+L000002BB: vpcmov    ymm1,ymm2,[+00000000],ymm0	; 8FE8ECA20D0000000030
+L000002C5: vpcmov    ymm1,ymm2,[+00000000],ymm0	; 8FE8ECA20D0000000030
+L000002CF: vpcmov    ymm1,ymm2,[+00000000],ymm0	; 8FE86CA20D0000000040
+L000002D9: vpcmov    ymm1,ymm2,[+00000000],ymm0	; 8FE86CA20D0000000040
+L000002E3: vpcomb    xmm1,xmm4,xmm7,05		; 8FE858CCCF05
+L000002E9: vpcomb    xmm2,xmm5,[+00000000],05	; 8FE850CC150000000005
+L000002F3: vpcomb    xmm3,xmm6,[+00000000],05	; 8FE848CC1D0000000005
+L000002FD: vpcomd    xmm1,xmm4,xmm7,05		; 8FE858CECF05
+L00000303: vpcomd    xmm2,xmm5,[+00000000],05	; 8FE850CE150000000005
+L0000030D: vpcomd    xmm3,xmm6,[+00000000],05	; 8FE848CE1D0000000005
+L00000317: vpcomq    xmm1,xmm4,xmm7,05		; 8FE858CFCF05
+L0000031D: vpcomq    xmm2,xmm5,[+00000000],05	; 8FE850CF150000000005
+L00000327: vpcomq    xmm3,xmm6,[+00000000],05	; 8FE848CF1D0000000005
+L00000331: vpcomub   xmm1,xmm4,xmm7,05		; 8FE858ECCF05
+L00000337: vpcomub   xmm2,xmm5,[+00000000],05	; 8FE850EC150000000005
+L00000341: vpcomub   xmm3,xmm6,[+00000000],05	; 8FE848EC1D0000000005
+L0000034B: vpcomud   xmm1,xmm4,xmm7,05		; 8FE858EECF05
+L00000351: vpcomud   xmm2,xmm5,[+00000000],05	; 8FE850EE150000000005
+L0000035B: vpcomud   xmm3,xmm6,[+00000000],05	; 8FE848EE1D0000000005
+L00000365: vpcomuq   xmm1,xmm4,xmm7,05		; 8FE858EFCF05
+L0000036B: vpcomuq   xmm2,xmm5,[+00000000],05	; 8FE850EF150000000005
+L00000375: vpcomuq   xmm3,xmm6,[+00000000],05	; 8FE848EF1D0000000005
+L0000037F: vpcomuw   xmm1,xmm4,xmm7,05		; 8FE858EDCF05
+L00000385: vpcomuw   xmm2,xmm5,[+00000000],05	; 8FE850ED150000000005
+L0000038F: vpcomuw   xmm3,xmm6,[+00000000],05	; 8FE848ED1D0000000005
+L00000399: vpcomw    xmm1,xmm4,xmm7,05		; 8FE858CDCF05
+L0000039F: vpcomw    xmm2,xmm5,[+00000000],05	; 8FE850CD150000000005
+L000003A9: vpcomw    xmm3,xmm6,[+00000000],05	; 8FE848CD1D0000000005
+L000003B3: vphaddbd  xmm1,xmm2			; 8FE978C2CA
+L000003B8: vphaddbd  xmm1,[+00000000]		; 8FE978C20D00000000
+L000003C1: vphaddbd  xmm1,[+00000000]		; 8FE978C20D00000000
+L000003CA: vphaddbq  xmm1,xmm2			; 8FE978C3CA
+L000003CF: vphaddbq  xmm1,[+00000000]		; 8FE978C30D00000000
+L000003D8: vphaddbq  xmm1,[+00000000]		; 8FE978C30D00000000
+L000003E1: vphaddbw  xmm1,xmm2			; 8FE978C1CA
+L000003E6: vphaddbw  xmm1,[+00000000]		; 8FE978C10D00000000
+L000003EF: vphaddbw  xmm1,[+00000000]		; 8FE978C10D00000000
+L000003F8: vphadddq  xmm1,xmm2			; 8FE978CBCA
+L000003FD: vphadddq  xmm1,[+00000000]		; 8FE978CB0D00000000
+L00000406: vphadddq  xmm1,[+00000000]		; 8FE978CB0D00000000
+L0000040F: vphaddubd xmm1,xmm2			; 8FE978D2CA
+L00000414: vphaddubd xmm1,[+00000000]		; 8FE978D20D00000000
+L0000041D: vphaddubd xmm1,[+00000000]		; 8FE978D20D00000000
+L00000426: vphaddubq xmm1,xmm2			; 8FE978D3CA
+L0000042B: vphaddubq xmm1,[+00000000]		; 8FE978D30D00000000
+L00000434: vphaddubq xmm1,[+00000000]		; 8FE978D30D00000000
+L0000043D: vphaddubw xmm1,xmm2			; 8FE978D1CA
+L00000442: vphaddubw xmm1,[+00000000]		; 8FE978D10D00000000
+L0000044B: vphaddubw xmm1,[+00000000]		; 8FE978D10D00000000
+L00000454: vphaddudq xmm1,xmm2			; 8FE978D8CA
+L00000459: vphaddudq xmm1,[+00000000]		; 8FE978D80D00000000
+L00000462: vphaddudq xmm1,[+00000000]		; 8FE978D80D00000000
+L0000046B: vphadduwd xmm1,xmm2			; 8FE978D6CA
+L00000470: vphadduwd xmm1,[+00000000]		; 8FE978D60D00000000
+L00000479: vphadduwd xmm1,[+00000000]		; 8FE978D60D00000000
+L00000482: vphadduwq xmm1,xmm2			; 8FE978D7CA
+L00000487: vphadduwq xmm1,[+00000000]		; 8FE978D70D00000000
+L00000490: vphadduwq xmm1,[+00000000]		; 8FE978D70D00000000
+L00000499: vphaddwd  xmm1,xmm2			; 8FE978C6CA
+L0000049E: vphaddwd  xmm1,[+00000000]		; 8FE978C60D00000000
+L000004A7: vphaddwd  xmm1,[+00000000]		; 8FE978C60D00000000
+L000004B0: vphaddwq  xmm1,xmm2			; 8FE978C7CA
+L000004B5: vphaddwq  xmm1,[+00000000]		; 8FE978C70D00000000
+L000004BE: vphaddwq  xmm1,[+00000000]		; 8FE978C70D00000000
+L000004C7: vphsubbw  xmm1,xmm2			; 8FE978E1CA
+L000004CC: vphsubbw  xmm1,[+00000000]		; 8FE978E10D00000000
+L000004D5: vphsubbw  xmm1,[+00000000]		; 8FE978E10D00000000
+L000004DE: vphsubdq  xmm1,xmm2			; 8FE978E3CA
+L000004E3: vphsubdq  xmm1,[+00000000]		; 8FE978E30D00000000
+L000004EC: vphsubdq  xmm1,[+00000000]		; 8FE978E30D00000000
+L000004F5: vphsubwd  xmm1,xmm2			; 8FE978E2CA
+L000004FA: vphsubwd  xmm1,[+00000000]		; 8FE978E20D00000000
+L00000503: vphsubwd  xmm1,[+00000000]		; 8FE978E20D00000000
+L0000050C: vpmacsdd  xmm1,xmm4,xmm7,xmm3	; 8FE8589ECF30
+L00000512: vpmacsdd  xmm2,xmm5,[+00000000],xmm0	; 8FE8509E150000000000
+L0000051C: vpmacsdd  xmm3,xmm6,[+00000000],xmm0	; 8FE8489E1D0000000020
+L00000526: vpmacsdqh xmm1,xmm4,xmm7,xmm3	; 8FE8589FCF30
+L0000052C: vpmacsdqh xmm2,xmm5,[+00000000],xmm0	; 8FE8509F150000000000
+L00000536: vpmacsdqh xmm3,xmm6,[+00000000],xmm0	; 8FE8489F1D0000000020
+L00000540: vpmacsdql xmm1,xmm4,xmm7,xmm3	; 8FE85897CF30
+L00000546: vpmacsdql xmm2,xmm5,[+00000000],xmm0	; 8FE85097150000000000
+L00000550: vpmacsdql xmm3,xmm6,[+00000000],xmm0	; 8FE848971D0000000020
+L0000055A: vpmacssdd xmm1,xmm4,xmm7,xmm3	; 8FE8588ECF30
+L00000560: vpmacssdd xmm2,xmm5,[+00000000],xmm0	; 8FE8508E150000000000
+L0000056A: vpmacssdd xmm3,xmm6,[+00000000],xmm0	; 8FE8488E1D0000000020
+L00000574: vpmacssdqh xmm1,xmm4,xmm7,xmm3	; 8FE8588FCF30
+L0000057A: vpmacssdqh xmm2,xmm5,[+00000000],xmm0; 8FE8508F150000000000
+L00000584: vpmacssdqh xmm3,xmm6,[+00000000],xmm0; 8FE8488F1D0000000020
+L0000058E: vpmacssdql xmm1,xmm4,xmm7,xmm3	; 8FE85887CF30
+L00000594: vpmacssdql xmm2,xmm5,[+00000000],xmm0; 8FE85087150000000000
+L0000059E: vpmacssdql xmm3,xmm6,[+00000000],xmm0; 8FE848871D0000000020
+L000005A8: vpmacsswd xmm1,xmm4,xmm7,xmm3	; 8FE85886CF30
+L000005AE: vpmacsswd xmm2,xmm5,[+00000000],xmm0	; 8FE85086150000000000
+L000005B8: vpmacsswd xmm3,xmm6,[+00000000],xmm0	; 8FE848861D0000000020
+L000005C2: vpmacssww xmm1,xmm4,xmm7,xmm3	; 8FE85885CF30
+L000005C8: vpmacssww xmm2,xmm5,[+00000000],xmm0	; 8FE85085150000000000
+L000005D2: vpmacssww xmm3,xmm6,[+00000000],xmm0	; 8FE848851D0000000020
+L000005DC: vpmacswd  xmm1,xmm4,xmm7,xmm3	; 8FE85896CF30
+L000005E2: vpmacswd  xmm2,xmm5,[+00000000],xmm0	; 8FE85096150000000000
+L000005EC: vpmacswd  xmm3,xmm6,[+00000000],xmm0	; 8FE848961D0000000020
+L000005F6: vpmacsww  xmm1,xmm4,xmm7,xmm3	; 8FE85895CF30
+L000005FC: vpmacsww  xmm2,xmm5,[+00000000],xmm0	; 8FE85095150000000000
+L00000606: vpmacsww  xmm3,xmm6,[+00000000],xmm0	; 8FE848951D0000000020
+L00000610: vpmadcsswd xmm1,xmm4,xmm7,xmm3	; 8FE858A6CF30
+L00000616: vpmadcsswd xmm2,xmm5,[+00000000],xmm0; 8FE850A6150000000000
+L00000620: vpmadcsswd xmm3,xmm6,[+00000000],xmm0; 8FE848A61D0000000020
+L0000062A: vpmadcswd xmm1,xmm4,xmm7,xmm3	; 8FE858B6CF30
+L00000630: vpmadcswd xmm2,xmm5,[+00000000],xmm0	; 8FE850B6150000000000
+L0000063A: vpmadcswd xmm3,xmm6,[+00000000],xmm0	; 8FE848B61D0000000020
+L00000644: vpperm    xmm1,xmm2,xmm3,xmm4	; 8FE868A3CB40
+L0000064A: vpperm    xmm1,xmm2,[+00000000],xmm0	; 8FE8E8A30D0000000030
+L00000654: vpperm    xmm1,xmm2,[+00000000],xmm0	; 8FE8E8A30D0000000030
+L0000065E: vpperm    xmm1,xmm2,[+00000000],xmm0	; 8FE868A30D0000000040
+L00000668: vpperm    xmm1,xmm2,[+00000000],xmm0	; 8FE868A30D0000000040
+L00000672: vprotb    xmm1,xmm2,xmm3		; 8FE96090CA
+L00000677: vprotb    xmm1,xmm2,[+00000000]	; 8FE9E8900D00000000
+L00000680: vprotb    xmm1,xmm2,[+00000000]	; 8FE9E8900D00000000
+L00000689: vprotb    xmm1,[+00000000],xmm3	; 8FE960900D00000000
+L00000692: vprotb    xmm1,[+00000000],xmm3	; 8FE960900D00000000
+L0000069B: vprotb    xmm1,xmm2,05		; 8FE878C0CA05
+L000006A1: vprotb    xmm1,[+00000000],05	; 8FE878C00D0000000005
+L000006AB: vprotb    xmm1,[+00000000],05	; 8FE878C00D0000000005
+L000006B5: vprotd    xmm1,xmm2,xmm3		; 8FE96092CA
+L000006BA: vprotd    xmm1,xmm2,[+00000000]	; 8FE9E8920D00000000
+L000006C3: vprotd    xmm1,xmm2,[+00000000]	; 8FE9E8920D00000000
+L000006CC: vprotd    xmm1,[+00000000],xmm3	; 8FE960920D00000000
+L000006D5: vprotd    xmm1,[+00000000],xmm3	; 8FE960920D00000000
+L000006DE: vprotd    xmm1,xmm2,05		; 8FE878C2CA05
+L000006E4: vprotd    xmm1,[+00000000],05	; 8FE878C20D0000000005
+L000006EE: vprotd    xmm1,[+00000000],05	; 8FE878C20D0000000005
+L000006F8: vprotq    xmm1,xmm2,xmm3		; 8FE96093CA
+L000006FD: vprotq    xmm1,xmm2,[+00000000]	; 8FE9E8930D00000000
+L00000706: vprotq    xmm1,xmm2,[+00000000]	; 8FE9E8930D00000000
+L0000070F: vprotq    xmm1,[+00000000],xmm3	; 8FE960930D00000000
+L00000718: vprotq    xmm1,[+00000000],xmm3	; 8FE960930D00000000
+L00000721: vprotq    xmm1,xmm2,05		; 8FE878C3CA05
+L00000727: vprotq    xmm1,[+00000000],05	; 8FE878C30D0000000005
+L00000731: vprotq    xmm1,[+00000000],05	; 8FE878C30D0000000005
+L0000073B: vprotw    xmm1,xmm2,xmm3		; 8FE96091CA
+L00000740: vprotw    xmm1,xmm2,[+00000000]	; 8FE9E8910D00000000
+L00000749: vprotw    xmm1,xmm2,[+00000000]	; 8FE9E8910D00000000
+L00000752: vprotw    xmm1,[+00000000],xmm3	; 8FE960910D00000000
+L0000075B: vprotw    xmm1,[+00000000],xmm3	; 8FE960910D00000000
+L00000764: vprotw    xmm1,xmm2,05		; 8FE878C1CA05
+L0000076A: vprotw    xmm1,[+00000000],05	; 8FE878C10D0000000005
+L00000774: vprotw    xmm1,[+00000000],05	; 8FE878C10D0000000005
+L0000077E: vpshab    xmm1,xmm2,xmm3		; 8FE96098CA
+L00000783: vpshab    xmm1,xmm2,[+00000000]	; 8FE9E8980D00000000
+L0000078C: vpshab    xmm1,xmm2,[+00000000]	; 8FE9E8980D00000000
+L00000795: vpshab    xmm1,[+00000000],xmm3	; 8FE960980D00000000
+L0000079E: vpshab    xmm1,[+00000000],xmm3	; 8FE960980D00000000
+L000007A7: vpshad    xmm1,xmm2,xmm3		; 8FE9609ACA
+L000007AC: vpshad    xmm1,xmm2,[+00000000]	; 8FE9E89A0D00000000
+L000007B5: vpshad    xmm1,xmm2,[+00000000]	; 8FE9E89A0D00000000
+L000007BE: vpshad    xmm1,[+00000000],xmm3	; 8FE9609A0D00000000
+L000007C7: vpshad    xmm1,[+00000000],xmm3	; 8FE9609A0D00000000
+L000007D0: vpshaq    xmm1,xmm2,xmm3		; 8FE9609BCA
+L000007D5: vpshaq    xmm1,xmm2,[+00000000]	; 8FE9E89B0D00000000
+L000007DE: vpshaq    xmm1,xmm2,[+00000000]	; 8FE9E89B0D00000000
+L000007E7: vpshaq    xmm1,[+00000000],xmm3	; 8FE9609B0D00000000
+L000007F0: vpshaq    xmm1,[+00000000],xmm3	; 8FE9609B0D00000000
+L000007F9: vpshaw    xmm1,xmm2,xmm3		; 8FE96099CA
+L000007FE: vpshaw    xmm1,xmm2,[+00000000]	; 8FE9E8990D00000000
+L00000807: vpshaw    xmm1,xmm2,[+00000000]	; 8FE9E8990D00000000
+L00000810: vpshaw    xmm1,[+00000000],xmm3	; 8FE960990D00000000
+L00000819: vpshaw    xmm1,[+00000000],xmm3	; 8FE960990D00000000
+L00000822: vpshlb    xmm1,xmm2,xmm3		; 8FE96094CA
+L00000827: vpshlb    xmm1,xmm2,[+00000000]	; 8FE9E8940D00000000
+L00000830: vpshlb    xmm1,xmm2,[+00000000]	; 8FE9E8940D00000000
+L00000839: vpshlb    xmm1,[+00000000],xmm3	; 8FE960940D00000000
+L00000842: vpshlb    xmm1,[+00000000],xmm3	; 8FE960940D00000000
+L0000084B: vpshld    xmm1,xmm3,xmm2		; 8FE96096CA
+L00000850: vpshld    xmm1,xmm2,[+00000000]	; 8FE9E8960D00000000
+L00000859: vpshld    xmm1,xmm2,[+00000000]	; 8FE9E8960D00000000
+L00000862: vpshld    xmm1,xmm3,[+00000000]	; 8FE960960D00000000
+L0000086B: vpshld    xmm1,xmm3,[+00000000]	; 8FE960960D00000000
+L00000874: vpshlq    xmm1,xmm3,xmm2		; 8FE96097CA
+L00000879: vpshlq    xmm1,xmm2,[+00000000]	; 8FE9E8970D00000000
+L00000882: vpshlq    xmm1,xmm2,[+00000000]	; 8FE9E8970D00000000
+L0000088B: vpshlq    xmm1,xmm3,[+00000000]	; 8FE960970D00000000
+L00000894: vpshlq    xmm1,xmm3,[+00000000]	; 8FE960970D00000000
+L0000089D: vpshlw    xmm1,xmm3,xmm2		; 8FE96095CA
+L000008A2: vpshlw    xmm1,xmm2,[+00000000]	; 8FE9E8950D00000000
+L000008AB: vpshlw    xmm1,xmm2,[+00000000]	; 8FE9E8950D00000000
+L000008B4: vpshlw    xmm1,xmm3,[+00000000]	; 8FE960950D00000000
+L000008BD: vpshlw    xmm1,xmm3,[+00000000]	; 8FE960950D00000000
+L000008C6: vpcomb    xmm1,xmm2,xmm3,00		; 8FE868CCCB00
+L000008CC: vpcomb    xmm1,xmm2,xmm3,01		; 8FE868CCCB01
+L000008D2: vpcomb    xmm1,xmm2,xmm3,02		; 8FE868CCCB02
+L000008D8: vpcomb    xmm1,xmm2,xmm3,03		; 8FE868CCCB03
+L000008DE: vpcomb    xmm1,xmm2,xmm3,04		; 8FE868CCCB04
+L000008E4: vpcomb    xmm1,xmm2,xmm3,05		; 8FE868CCCB05
+L000008EA: vpcomb    xmm1,xmm2,xmm3,05		; 8FE868CCCB05
+L000008F0: vpcomb    xmm1,xmm2,xmm3,06		; 8FE868CCCB06
+L000008F6: vpcomb    xmm1,xmm2,xmm3,07		; 8FE868CCCB07
+L000008FC: vpcomuw   xmm1,xmm2,xmm3,00		; 8FE868EDCB00
+L00000902: vpcomuw   xmm1,xmm2,xmm3,01		; 8FE868EDCB01
+L00000908: vpcomuw   xmm1,xmm2,xmm3,02		; 8FE868EDCB02
+L0000090E: vpcomuw   xmm1,xmm2,xmm3,03		; 8FE868EDCB03
+L00000914: vpcomuw   xmm1,xmm2,xmm3,04		; 8FE868EDCB04
+L0000091A: vpcomuw   xmm1,xmm2,xmm3,05		; 8FE868EDCB05
+L00000920: vpcomuw   xmm1,xmm2,xmm3,05		; 8FE868EDCB05
+L00000926: vpcomuw   xmm1,xmm2,xmm3,06		; 8FE868EDCB06
+L0000092C: vpcomuw   xmm1,xmm2,xmm3,07		; 8FE868EDCB07
+L00000932: vfmaddpd  xmm1,xmm2,xmm3,xmm4	; C4E36969CB40
+L00000938: vfmaddpd  xmm0,xmm1,xmm2,xmm3	; C4E37169C230
+L0000093E: vfmaddpd  xmm0,xmm1,[eax],xmm3	; C4E371690030
+L00000944: vfmaddpd  xmm0,xmm1,[eax],xmm3	; C4E371690030
+L0000094A: vfmaddpd  xmm0,xmm1,xmm2,[eax]	; C4E3F1690020
+L00000950: vfmaddpd  xmm0,xmm1,xmm2,[eax]	; C4E3F1690020
+L00000956: vfmaddpd  ymm0,ymm1,ymm2,ymm3	; C4E37569C230
+L0000095C: vfmaddpd  ymm0,ymm1,[eax],ymm3	; C4E375690030
+L00000962: vfmaddpd  ymm0,ymm1,[eax],ymm3	; C4E375690030
+L00000968: vfmaddpd  ymm0,ymm1,ymm2,[eax]	; C4E3F5690020
+L0000096E: vfmaddpd  ymm0,ymm1,ymm2,[eax]	; C4E3F5690020
+L00000974: vfmaddps  xmm0,xmm1,xmm2,xmm3	; C4E37168C230
+L0000097A: vfmaddps  xmm0,xmm1,[eax],xmm3	; C4E371680030
+L00000980: vfmaddps  xmm0,xmm1,xmm2,[eax]	; C4E3F1680020
+L00000986: vfmaddps  ymm0,ymm1,ymm2,ymm3	; C4E37568C230
+L0000098C: vfmaddps  ymm0,ymm1,[eax],ymm3	; C4E375680030
+L00000992: vfmaddps  ymm0,ymm1,ymm2,[eax]	; C4E3F5680020
+L00000998: vfmaddsd  xmm0,xmm1,xmm2,xmm3	; C4E3716BC230
+L0000099E: vfmaddsd  xmm0,xmm1,[eax],xmm3	; C4E3716B0030
+L000009A4: vfmaddsd  xmm0,xmm1,[eax],xmm3	; C4E3716B0030
+L000009AA: vfmaddsd  xmm0,xmm1,xmm2,[eax]	; C4E3F16B0020
+L000009B0: vfmaddsd  xmm0,xmm1,xmm2,[eax]	; C4E3F16B0020
+L000009B6: vfmaddss  xmm0,xmm1,xmm2,xmm3	; C4E3716AC230
+L000009BC: vfmaddss  xmm0,xmm1,[eax],xmm3	; C4E3716A0030
+L000009C2: vfmaddss  xmm0,xmm1,xmm2,[eax]	; C4E3F16A0020
+L000009C8: vfmaddsubpd xmm0,xmm1,xmm2,xmm3	; C4E3715DC230
+L000009CE: vfmaddsubpd xmm0,xmm1,[eax],xmm3	; C4E3715D0030
+L000009D4: vfmaddsubpd xmm0,xmm1,xmm2,[eax]	; C4E3F15D0020
+L000009DA: vfmaddsubpd ymm0,ymm1,ymm2,ymm3	; C4E3755DC230
+L000009E0: vfmaddsubpd ymm0,ymm1,[eax],ymm3	; C4E3755D0030
+L000009E6: vfmaddsubpd ymm0,ymm1,ymm2,[eax]	; C4E3F55D0020
+L000009EC: vfmaddsubps xmm0,xmm1,xmm2,xmm3	; C4E3715CC230
+L000009F2: vfmaddsubps xmm0,xmm1,[eax],xmm3	; C4E3715C0030
+L000009F8: vfmaddsubps xmm0,xmm1,xmm2,[eax]	; C4E3F15C0020
+L000009FE: vfmaddsubps ymm0,ymm1,ymm2,ymm3	; C4E3755CC230
+L00000A04: vfmaddsubps ymm0,ymm1,[eax],ymm3	; C4E3755C0030
+L00000A0A: vfmaddsubps ymm0,ymm1,ymm2,[eax]	; C4E3F55C0020
+L00000A10: vfmsubpd  xmm0,xmm1,xmm2,xmm3	; C4E3716DC230
+L00000A16: vfmsubpd  xmm0,xmm1,[eax],xmm3	; C4E3716D0030
+L00000A1C: vfmsubpd  xmm0,xmm1,xmm2,[eax]	; C4E3F16D0020
+L00000A22: vfmsubpd  ymm0,ymm1,ymm2,ymm3	; C4E3756DC230
+L00000A28: vfmsubpd  ymm0,ymm1,[eax],ymm3	; C4E3756D0030
+L00000A2E: vfmsubpd  ymm0,ymm1,ymm2,[eax]	; C4E3F56D0020
+L00000A34: vfmsubps  xmm0,xmm1,xmm2,xmm3	; C4E3716CC230
+L00000A3A: vfmsubps  xmm0,xmm1,[eax],xmm3	; C4E3716C0030
+L00000A40: vfmsubps  xmm0,xmm1,xmm2,[eax]	; C4E3F16C0020
+L00000A46: vfmsubps  ymm0,ymm1,ymm2,ymm3	; C4E3756CC230
+L00000A4C: vfmsubps  ymm0,ymm1,[eax],ymm3	; C4E3756C0030
+L00000A52: vfmsubps  ymm0,ymm1,ymm2,[eax]	; C4E3F56C0020
+L00000A58: vfmsubsd  xmm0,xmm1,xmm2,xmm3	; C4E3716FC230
+L00000A5E: vfmsubsd  xmm0,xmm1,[eax],xmm3	; C4E3716F0030
+L00000A64: vfmsubsd  xmm0,xmm1,xmm2,[eax]	; C4E3F16F0020
+L00000A6A: vfmsubss  xmm0,xmm1,xmm2,xmm3	; C4E3716EC230
+L00000A70: vfmsubss  xmm0,xmm1,[eax],xmm3	; C4E3716E0030
+L00000A76: vfmsubss  xmm0,xmm1,xmm2,[eax]	; C4E3F16E0020
+L00000A7C: vfnmaddpd xmm0,xmm1,xmm2,xmm3	; C4E37179C230
+L00000A82: vfnmaddpd xmm0,xmm1,[eax],xmm3	; C4E371790030
+L00000A88: vfnmaddpd xmm0,xmm1,xmm2,[eax]	; C4E3F1790020
+L00000A8E: vfnmaddpd ymm0,ymm1,ymm2,ymm3	; C4E37579C230
+L00000A94: vfnmaddpd ymm0,ymm1,[eax],ymm3	; C4E375790030
+L00000A9A: vfnmaddpd ymm0,ymm1,ymm2,[eax]	; C4E3F5790020
+L00000AA0: vfnmaddps xmm0,xmm1,xmm2,xmm3	; C4E37178C230
+L00000AA6: vfnmaddps xmm0,xmm1,[eax],xmm3	; C4E371780030
+L00000AAC: vfnmaddps xmm0,xmm1,xmm2,[eax]	; C4E3F1780020
+L00000AB2: vfnmaddps ymm0,ymm1,ymm2,ymm3	; C4E37578C230
+L00000AB8: vfnmaddps ymm0,ymm1,[eax],ymm3	; C4E375780030
+L00000ABE: vfnmaddps ymm0,ymm1,ymm2,[eax]	; C4E3F5780020
+L00000AC4: vfnmaddsd xmm0,xmm1,xmm2,xmm3	; C4E3717BC230
+L00000ACA: vfnmaddsd xmm0,xmm1,[eax],xmm3	; C4E3717B0030
+L00000AD0: vfnmaddsd xmm0,xmm1,xmm2,[eax]	; C4E3F17B0020
+L00000AD6: vfnmaddss xmm0,xmm1,xmm2,xmm3	; C4E3717AC230
+L00000ADC: vfnmaddss xmm0,xmm1,[eax],xmm3	; C4E3717A0030
+L00000AE2: vfnmaddss xmm0,xmm1,xmm2,[eax]	; C4E3F17A0020
+L00000AE8: vfnmsubpd xmm0,xmm1,xmm2,xmm3	; C4E3717DC230
+L00000AEE: vfnmsubpd xmm0,xmm1,[eax],xmm3	; C4E3717D0030
+L00000AF4: vfnmsubpd xmm0,xmm1,xmm2,[eax]	; C4E3F17D0020
+L00000AFA: vfnmsubpd ymm0,ymm1,ymm2,ymm3	; C4E3757DC230
+L00000B00: vfnmsubpd ymm0,ymm1,[eax],ymm3	; C4E3757D0030
+L00000B06: vfnmsubpd ymm0,ymm1,ymm2,[eax]	; C4E3F57D0020
+L00000B0C: vfnmsubps xmm0,xmm1,xmm2,xmm3	; C4E3717CC230
+L00000B12: vfnmsubps xmm0,xmm1,[eax],xmm3	; C4E3717C0030
+L00000B18: vfnmsubps xmm0,xmm1,xmm2,[eax]	; C4E3F17C0020
+L00000B1E: vfnmsubps ymm0,ymm1,ymm2,ymm3	; C4E3757CC230
+L00000B24: vfnmsubps ymm0,ymm1,[eax],ymm3	; C4E3757C0030
+L00000B2A: vfnmsubps ymm0,ymm1,ymm2,[eax]	; C4E3F57C0020
+L00000B30: vfnmsubsd xmm0,xmm1,xmm2,xmm3	; C4E3717FC230
+L00000B36: vfnmsubsd xmm0,xmm1,[eax],xmm3	; C4E3717F0030
+L00000B3C: vfnmsubsd xmm0,xmm1,xmm2,[eax]	; C4E3F17F0020
+L00000B42: vfnmsubss xmm0,xmm1,xmm2,xmm3	; C4E3717EC230
+L00000B48: vfnmsubss xmm0,xmm1,[eax],xmm3	; C4E3717E0030
+L00000B4E: vfnmsubss xmm0,xmm1,xmm2,[eax]	; C4E3F17E0020
+L00000B54: retn					; C3
 
 SEGMENT Unknown0 BYTE PUBLIC USE32 'NoObject'
-; size: 376 bytes
+; size: 483 bytes
 
-; L0000000000000110H-L0000000000000288H - no object
-resb              178H
+; L0000000000000B55H-L0000000000000D38H - no object
+resb              1E3H

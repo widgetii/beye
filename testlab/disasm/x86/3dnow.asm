@@ -391,6 +391,7 @@ vpcomneuw xmm1, xmm2, xmm3
 vpcomfalseuw xmm1, xmm2, xmm3
 vpcomtrueuw xmm1, xmm2, xmm3
 
+vfmaddpd xmm1, xmm2, xmm3, xmm4
 vfmaddpd xmm0, xmm1, xmm2, xmm3
 vfmaddpd xmm0, xmm1, [eax], xmm3
 vfmaddpd xmm0, xmm1, dqword [eax], xmm3
