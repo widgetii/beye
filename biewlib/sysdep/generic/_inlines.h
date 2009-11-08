@@ -177,6 +177,10 @@ __inline static tUInt64 __ByteSwapLL(tUInt64 x)\
 }
 #endif
 
+#ifndef COREDUMP
+#define COREDUMP()
+#endif
+
 #ifdef __cplusplus
 }
 #endif

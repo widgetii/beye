@@ -193,6 +193,8 @@ extern void (__FASTCALL__ *ShortsToChars_ptr)(tUInt32 limit,
 #define ShortsToChars(a,b,c) (*ShortsToChars_ptr)(a,b,c)
 #define __SHORTS_TO_CHARS ShortsToChars
 
+#define COREDUMP() { __asm __volatile(".short 0xffff":::"memory"); }
+
 #endif
 #endif
 #undef ___INLINES_H

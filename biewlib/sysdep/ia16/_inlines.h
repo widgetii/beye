@@ -86,6 +86,8 @@ static tUInt32 __FASTCALL__ ByteSwapL(tUInt32  val) =
 #define hfree hfree
 #define HMemCpy HMemCpy
 
+#define COREDUMP() { __asm __volatile(".short 0xffff":::"memory"); }
+
 #undef ___INLINES_H
 #include "biewlib/sysdep/generic/_inlines.h"
 
