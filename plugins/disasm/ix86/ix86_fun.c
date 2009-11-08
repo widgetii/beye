@@ -413,10 +413,6 @@ char * __FASTCALL__ ix86_getModRM16(tBool w,unsigned char mod,unsigned char rm,i
 {
  const char *cptr;
  char square[50];
- char ret1[50];
- char base[8];
- char _index[8];
- char scale[4];
  char new_mode = mod;
  unsigned char clen;
  tBool as_sign,is_disponly,as_rip;

@@ -1558,9 +1558,9 @@ const ix86_ExOpcodes K64_XOP_Table[256] =
   /*0x8E*/ DECLARE_EX_INSN("vpmacssdd", "vpmacssdd", arg_fma4, arg_fma4, K64_FAM11|INSN_SSE|INSN_VEX_V, K64_FAM11|INSN_SSE|INSN_VEX_V),
   /*0x8F*/ DECLARE_EX_INSN("vpmacssdqh", "vpmacssdqh", arg_fma4, arg_fma4, K64_FAM11|INSN_SSE|INSN_VEX_V, K64_FAM11|INSN_SSE|INSN_VEX_V),
   /*0x90*/ DECLARE_EX_INSN("vprotb", "vprotb", arg_simd, arg_simd, K64_FAM11|INSN_SSE|INSN_VEX_V|INSN_VEXW_AS_SWAP, K64_FAM11|INSN_SSE|INSN_VEX_V|INSN_VEXW_AS_SWAP),
-  /*0x91*/ DECLARE_EX_INSN("???", "???", NULL, NULL, K64_FAM11, K64_FAM11),
+  /*0x91*/ DECLARE_EX_INSN("vprotw", "vprotw", arg_simd, arg_simd, K64_FAM11|INSN_SSE|INSN_VEX_V|INSN_VEXW_AS_SWAP, K64_FAM11|INSN_SSE|INSN_VEX_V|INSN_VEXW_AS_SWAP),
   /*0x92*/ DECLARE_EX_INSN("vprotd", "vprotd", arg_simd, arg_simd, K64_FAM11|INSN_SSE|INSN_VEX_V|INSN_VEXW_AS_SWAP, K64_FAM11|INSN_SSE|INSN_VEX_V|INSN_VEXW_AS_SWAP),
-  /*0x93*/ DECLARE_EX_INSN("???", "???", NULL, NULL, K64_FAM11, K64_FAM11),
+  /*0x93*/ DECLARE_EX_INSN("vprotq", "vprotq", arg_simd, arg_simd, K64_FAM11|INSN_SSE|INSN_VEX_V|INSN_VEXW_AS_SWAP, K64_FAM11|INSN_SSE|INSN_VEX_V|INSN_VEXW_AS_SWAP),
   /*0x94*/ DECLARE_EX_INSN("vpshlb", "vpshlb", arg_simd, arg_simd, K64_FAM11|INSN_VEX_V|INSN_SSE|INSN_VEXW_AS_SWAP, K64_FAM11|INSN_VEX_V|INSN_SSE|INSN_VEXW_AS_SWAP),
   /*0x95*/ DECLARE_EX_INSN("vpmacsww", "vpshlw", arg_fma4, arg_simd, K64_FAM11|INSN_SSE|INSN_VEX_V, K64_FAM11|INSN_SSE|INSN_VEX_V|INSN_VEXW_AS_SWAP),
   /*0x96*/ DECLARE_EX_INSN("vpmacswd", "vpshld", arg_fma4, arg_simd, K64_FAM11|INSN_SSE|INSN_VEX_V, K64_FAM11|INSN_SSE|INSN_VEX_V|INSN_VEXW_AS_SWAP),
@@ -4627,10 +4627,12 @@ static DisasmRet __FASTCALL__ ix86Disassembler(__filesize_t ulShift,
     else			strcpy(Ret.str,_this->name64);
     if(DisP.XOP_m==0x08 && _this->method) { /* emulate 8F.08 */
 	TabSpace(Ret.str,TAB_POS);
+	DisP.insn_flags = _this->flags64;
 	_this->method(Ret.str,&DisP);
     }
     else if(DisP.XOP_m==0x09 &&_this->method64) {
 	TabSpace(Ret.str,TAB_POS);
+	DisP.insn_flags = _this->pro_clone;
 	_this->method64(Ret.str,&DisP);
     }
  }
