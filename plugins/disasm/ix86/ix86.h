@@ -281,32 +281,23 @@ extern const ix86_3dNowopcodes ix86_3dNowtable[];
 
 extern char ix86_segpref[];
 extern const char * ix86_sizes[];
-
 extern const char * ix86_A16[];
+extern const char * i8086_ByteRegs[];
+extern const char * k64_ByteRegs[];
 
-extern const char * ix86_ByteRegs[];
-extern const char * ix86_WordRegs[];
-extern const char * ix86_DWordRegs[];
 extern const char * ix86_MMXRegs[];
-extern const char * ix86_XMMXRegs[];
-extern const char * ix86_YMMXRegs[];
-#ifdef IX86_64
-extern const char * k86_ByteRegs[];
-extern const char * k86_WordRegs[];
-extern const char * k86_DWordRegs[];
-extern const char * k86_QWordRegs[];
-extern const char * k86_XMMXRegs[];
-extern const char * k86_YMMXRegs[];
-extern const char * k86_CrxRegs[];
-extern const char * k86_DrxRegs[];
-extern const char * k86_TrxRegs[];
-extern const char * k86_XrxRegs[];
-#endif
+
+extern const char * k64_WordRegs[];
+extern const char * k64_DWordRegs[];
+extern const char * k64_QWordRegs[];
+extern const char * k64_XMMXRegs[];
+extern const char * k64_YMMXRegs[];
+extern const char * k64_CrxRegs[];
+extern const char * k64_DrxRegs[];
+extern const char * k64_TrxRegs[];
+extern const char * k64_XrxRegs[];
+
 extern const char * ix86_SegRegs[];
-extern const char * ix86_CrxRegs[];
-extern const char * ix86_DrxRegs[];
-extern const char * ix86_TrxRegs[];
-extern const char * ix86_XrxRegs[];
 
 extern const char * ix86_Op1Names[];
 extern const char * ix86_ShNames[];
