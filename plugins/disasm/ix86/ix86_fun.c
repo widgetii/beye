@@ -43,7 +43,6 @@ char *ix86_Katmai_buff;
 
 #define ix86_setModifier(str,modf) disSetModifier(str,modf)
 #define getSREG(sreg) (ix86_SegRegs[(unsigned char)sreg])
-#define getTile(DisP) __getTile(DisP,DisP->RealCmd[0] & 0x01,DisP->RealCmd[0] & 0x02)
 
 #define REX_reg(rex,reg) (reg|((rex&1)<<3))
 
@@ -584,13 +583,13 @@ char * __FASTCALL__ ix86_CStile(char *str,const char *arg2)
   return str;
 }
 
-static char * __NEAR__ __FASTCALL__ __getTile(ix86Param *DisP,tBool w,tBool d)
+static char * __NEAR__ __FASTCALL__ __buildModRegRm(ix86Param *DisP,tBool w,tBool d)
 {
  char reg = MODRM_REG(DisP->RealCmd[1]);
  char mod = MODRM_MOD(DisP->RealCmd[1]);
  char rm  = MODRM_RM(DisP->RealCmd[1]);
- const char *regs,* modrm;
- tBool brex, wrex;
+ const char *regs,* modrm, *ends, *vxx=NULL;
+ tBool brex, wrex, vex_d;
  brex = REX_R(K64_REX);
  wrex = REX_W(K64_REX);
  regs = k64_getREG(DisP,reg,w,brex,wrex);
@@ -598,17 +597,46 @@ static char * __NEAR__ __FASTCALL__ __getTile(ix86Param *DisP,tBool w,tBool d)
  if(mod == 3) modrm = k64_getREG(DisP,rm,w,brex,wrex);
  else         modrm = ix86_getModRM(w,mod,rm,DisP);
  ix86_dtile[0] = 0;
+ vex_d = 0;
+ if(DisP->insn_flags&INSN_VEXW_AS_SWAP && DisP->pfx&PFX_VEX) vex_d = REX_W(K64_REX);
  strcat(ix86_dtile,d ? regs : modrm);
  /* add VEX.vvvv field as first source operand */
+ ends = d ? modrm : regs;
+ if((DisP->pfx&PFX_VEX) && (DisP->insn_flags&INSN_VEX_V)) vxx = get_VEX_reg(DisP);
+ if(vxx) {
+    ix86_CStile(ix86_dtile,vex_d ? ends : vxx);
+    ix86_CStile(ix86_dtile,vex_d ? vxx : ends);
+ }
+ else     ix86_CStile(ix86_dtile,ends);
+ return ix86_dtile;
+}
+
+static char * __NEAR__ __FASTCALL__ __buildModRegRmReg(ix86Param *DisP,tBool d,unsigned char wrex,unsigned char reg2)
+{
+ char reg = MODRM_REG(DisP->RealCmd[1]);
+ char mod = MODRM_MOD(DisP->RealCmd[1]);
+ char rm  = MODRM_RM(DisP->RealCmd[1]);
+ const char *dest,*src1,*src2;
+ unsigned char brex;
+ brex = REX_R(K64_REX);
+ dest = k64_getREG(DisP,reg,1,brex,wrex);
+ brex = REX_B(K64_REX);
+ if(mod == 3) src1 = k64_getREG(DisP,rm,1,brex,wrex);
+ else         src1 = ix86_getModRM(1,mod,rm,DisP);
+ src2 = k64_getREG(DisP,reg2&0x07,1,(reg2>>3)|1,wrex);
+ ix86_dtile[0] = 0;
+ strcat(ix86_dtile,dest);
+ /* add VEX.vvvv field as first source operand */
  if((DisP->pfx&PFX_VEX) && (DisP->insn_flags&INSN_VEX_V)) ix86_CStile(ix86_dtile,get_VEX_reg(DisP));
- ix86_CStile(ix86_dtile,d ? modrm : regs);
+ ix86_CStile(ix86_dtile,d ? src2 : src1);
+ ix86_CStile(ix86_dtile,d ? src1 : src2);
  return ix86_dtile;
 }
 
 void __FASTCALL__ arg_cpu_modregrm(char * str,ix86Param *DisP)
 {
  DisP->codelen++;
- strcat(str,__getTile(DisP,(DisP->insn_flags&INSN_OP_BYTE)?False:True,(DisP->insn_flags&INSN_STORE)?False:True));
+ strcat(str,__buildModRegRm(DisP,(DisP->insn_flags&INSN_OP_BYTE)?False:True,(DisP->insn_flags&INSN_STORE)?False:True));
 }
 
 void __FASTCALL__ arg_cpu_modREGrm(char * str,ix86Param *DisP)
@@ -1593,21 +1621,20 @@ void   __FASTCALL__ arg_simd_xmm0(char *str,ix86Param *DisP) {
 void   __FASTCALL__ arg_fma4(char *str,ix86Param *DisP) {
     unsigned is4,rg,brex,wrex;
     unsigned long mod = DisP->mode;
+    unsigned char d;
     DisP->mode |= MOD_SSE;
-    brex=wrex=0;
-    arg_simd(str,DisP);
+    d = 0;
+    if(DisP->insn_flags&INSN_VEXW_AS_SWAP && DisP->pfx&PFX_VEX) d = REX_W(K64_REX);
+
     is4=DisP->RealCmd[DisP->codelen];
-    DisP->codelen++;
+    DisP->codelen+=2;
+    rg = ((is4>>4)&0x07)/*^0x07*/;
+    brex=wrex=0;
     if(x86_Bitness == DAB_USE64) {
 	brex = (is4>>7)&0x01;
 	wrex = HAS_67_IN64?0:1;
-	rg = ((is4>>4)&0x07)/*^0x0F*/;
-	ix86_CStile(str,k64_getREG(DisP,rg,1,brex,wrex));
     }
-    else {
-	rg = ((is4>>4)&0x07)/*^0x07*/;
-	ix86_CStile(str,k64_getREG(DisP,rg,1,brex,wrex));
-    }
+    strcat(str,__buildModRegRmReg(DisP,d,1,rg|((brex&0x01)<<3)));
     DisP->mode = mod;
 }
 
