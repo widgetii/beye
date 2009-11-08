@@ -623,7 +623,7 @@ static char * __NEAR__ __FASTCALL__ __buildModRegRmReg(ix86Param *DisP,tBool d,u
  brex = REX_B(K64_REX);
  if(mod == 3) src1 = k64_getREG(DisP,rm,1,brex,wrex);
  else         src1 = ix86_getModRM(1,mod,rm,DisP);
- src2 = k64_getREG(DisP,reg2&0x07,1,(reg2>>3)|1,wrex);
+ src2 = k64_getREG(DisP,reg2&0x07,1,(reg2>>3)&1,wrex);
  ix86_dtile[0] = 0;
  strcat(ix86_dtile,dest);
  /* add VEX.vvvv field as first source operand */
@@ -1626,8 +1626,9 @@ void   __FASTCALL__ arg_fma4(char *str,ix86Param *DisP) {
     d = 0;
     if(DisP->insn_flags&INSN_VEXW_AS_SWAP && DisP->pfx&PFX_VEX) d = REX_W(K64_REX);
 
+    DisP->codelen++;
     is4=DisP->RealCmd[DisP->codelen];
-    DisP->codelen+=2;
+    DisP->codelen++;
     rg = ((is4>>4)&0x07)/*^0x07*/;
     brex=wrex=0;
     if(x86_Bitness == DAB_USE64) {
