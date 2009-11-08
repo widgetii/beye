@@ -4335,7 +4335,8 @@ static DisasmRet __FASTCALL__ ix86Disassembler(__filesize_t ulShift,
  unsigned char code;
  DisasmRet Ret;
  ix86Param DisP;
- char ua,ud,up,has_lock,has_rep,has_seg;
+ unsigned char ua,ud,up;
+ char has_lock,has_rep,has_seg;
  tBool has_vex,has_rex,has_xop;
 
  memset(&DisP,0,sizeof(DisP));
@@ -4604,14 +4605,12 @@ static DisasmRet __FASTCALL__ ix86Disassembler(__filesize_t ulShift,
 	}
 	goto ExitDisAsm;
     }
-    else {
-	    DisP=DisP_saved;
-	    up=up_saved;
-	    /* continue ordinal execution */
-    }
+    /* continue ordinal execution */
+    DisP=DisP_saved;
+    up=up_saved;
  }
  if(DisP.pfx&PFX_XOP) {
-    ix86_ExOpcodes* _this = &K64_XOP_Table[code];
+    const ix86_ExOpcodes* _this = &K64_XOP_Table[code];
     if(DisP.XOP_m==0x08)	strcpy(Ret.str,_this->name); /* emulate 8F.08 */
     else			strcpy(Ret.str,_this->name64);
     if(DisP.XOP_m==0x08 && _this->method) { /* emulate 8F.08 */
