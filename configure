@@ -540,6 +540,7 @@ case "$build_arch" in
     ;;
 
   *)
+  _cdefsys="-D__MACHINE__=generic -D__CPU_NAME__='\"generic\"' -D__DEFAULT_DISASM=0"
     echo "It seems noone has ported biew to your OS or CPU type yet."
     echo "using $build_arch architecture"
     ;;

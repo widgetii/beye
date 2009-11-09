@@ -104,7 +104,7 @@
 #define tUntPtr		int_ptr_t
 #define tUIntPtr	uint_ptr_t
 
-#define tIntMax		int_max_t
-#define tUIntMax	uint_max_t
+#define tIntMax		intmax_t
+#define tUIntMax	uintmax_t
 
 #endif	/* ____CONFIG_H */
