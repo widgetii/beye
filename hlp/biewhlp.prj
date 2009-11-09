@@ -12,7 +12,7 @@
 [OPTION]
 ; This is output file name
 output = biew.hlp
-id = BIEW_HLP v6.0.0
+id = BIEW_HLP v6.1.0
 [ITEMS]
 ; item_id = source_file_name
 1 = ../doc/licence.en

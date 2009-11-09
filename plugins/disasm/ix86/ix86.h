@@ -104,13 +104,13 @@ typedef struct tagix86Param
   2-byte VEX C5 | 11000101 | |R| vvvv|L| pp|
                 +----------+ +-+-----+-+---+
 
-   R: REX.R in 1’s complement (inverted) form
+   R: REX.R in 1's complement (inverted) form
       1: Same as REX.R=0 (must be 1 in 32-bit mode)
       0: Same as REX.R=1 (64-bit mode only)
-   X: REX.X in 1’s complement (inverted) form
+   X: REX.X in 1's complement (inverted) form
       1: Same as REX.X=0 (must be 1 in 32-bit mode)
       0: Same as REX.X=1 (64-bit mode only)
-   B: REX.B in 1’s complement (inverted) form
+   B: REX.B in 1's complement (inverted) form
       1: Same as REX.B=0 (Ignored in 32-bit mode).
       0: Same as REX.B=1 (64-bit mode only)
    W: opcode specific (use like REX.W, or used for memory operand
@@ -121,7 +121,7 @@ typedef struct tagix86Param
      00010: implied 0F 38 leading opcode bytes
      00011: implied 0F 3A leading opcode bytes
      00100-11111: Reserved for future use (will #UD)
-   vvvv: a register specifier (in 1’s complement form) or 1111 if unused.			   					      
+   vvvv: a register specifier (in 1's complement form) or 1111 if unused.			   					      
    L: Vector Length
         0: scalar or 128-bit vector
         1: 256-bit vector
