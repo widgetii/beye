@@ -1624,7 +1624,7 @@ void   __FASTCALL__ arg_fma4(char *str,ix86Param *DisP) {
     unsigned char d;
     DisP->mode |= MOD_SSE;
     d = 0;
-    if(DisP->insn_flags&INSN_VEXW_AS_SWAP && DisP->pfx&PFX_VEX) d = REX_W(K64_REX)?0:1;
+    if(DisP->insn_flags&INSN_VEXW_AS_SWAP && DisP->pfx&PFX_VEX) d = REX_W(K64_REX)^0x01;
 
     DisP->codelen++;
     is4=DisP->RealCmd[DisP->codelen];
