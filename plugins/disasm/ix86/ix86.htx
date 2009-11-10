@@ -1275,6 +1275,24 @@
 ³ vmxon       [F3_0F_C7/6]            Enter VMX Operation                 ³
 ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
 ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+³                  %BVIA PadLock instruction mnemonics%b                      ³
+³ The VIA PadLock Security Engine comprises ground-breaking features      ³
+³ integrated into all recent VIA x86 processors. As part of the VIA       ³
+³ PadLock Security Initiative, the VIA PadLock Security Engine provides a ³
+³ platform approach to computer security, ensuring uncompromising security³
+³ performance working in concert with leading edge security software.     ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
+³ xstore-rng  [0F_A7_C0]              Store Available Random Bytes        ³
+³ xcryptecb   [0F_A7_C8]              Electronic Code Book                ³
+³ xcryptcbc   [0F_A7_D0]              Cipher Block Chaining               ³
+³ xcryptctr   [0F_A7_D8]              Counter Mode                        ³
+³ xcryptcfb   [0F_A7_E0]              Cipher Feedback Mode                ³
+³ xcryptofb   [0F_A7_E8]              Output Feedback Mode                ³
+³ montmul     [0F_A6_C0]              Montgomery Multiplier               ³
+³ xsha1       [0F_A6_C8]              Hash Function SHA-1                 ³
+³ xsha256     [0F_A6_D0]              Hash Function SHA-256               ³
+ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 ³                     %BIntel-Atom instruction mnemonics%b                    ³
 ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
 ³ movbe       [0F_38_F0],[0F_38_F1]   Move Data After Swapping Bytes      ³
