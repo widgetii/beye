@@ -38,7 +38,7 @@
 
 #define MAX_IX86_INSN_LEN 15
 
-const char ix86CloneSNames[3] = { 'i', 'a', 'c' };
+const char ix86CloneSNames[3] = { 'i', 'a', 'c', 'v' };
 const char * ix86_sizes[] = { "", "(b)", "(w)", "(d)", "(p)", "(q)", "(t)" };
 const char * ix86_A16[] = { "bx+si", "bx+di", "bp+si", "bp+di", "si" , "di" , "bp" , "bx" };
 
