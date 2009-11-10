@@ -4649,16 +4649,18 @@ static DisasmRet __FASTCALL__ ix86Disassembler(__filesize_t ulShift,
  {
    if(ix86_table[code].method64)
    {
-     TabSpace(Ret.str,TAB_POS);
-     ix86_table[code].method64(Ret.str,&DisP);
+	DisP.insn_flags = ix86_table[code].flags64;
+	TabSpace(Ret.str,TAB_POS);
+	ix86_table[code].method64(Ret.str,&DisP);
    }
  }
  else
 #endif
  if(ix86_table[code].method)
  {
-   TabSpace(Ret.str,TAB_POS);
-   ix86_table[code].method(Ret.str,&DisP);
+	DisP.insn_flags = ix86_table[code].pro_clone;
+	TabSpace(Ret.str,TAB_POS);
+	ix86_table[code].method(Ret.str,&DisP);
  }
  /** Special case for jmp call ret modify table name */
  switch(code)
@@ -4714,7 +4716,7 @@ static DisasmRet __FASTCALL__ ix86Disassembler(__filesize_t ulShift,
 	DisP.pro_clone |= IX86_CPU386;
     }
  }
- Ret.pro_clone = (x86_Bitness == DAB_USE64)?DisP.insn_flags:DisP.pro_clone;
+ Ret.pro_clone = DisP.insn_flags;
  Ret.codelen = DisP.codelen;
  Bye:
  return Ret;
@@ -4829,7 +4831,7 @@ static ColorAttr  __FASTCALL__ ix86altGetAsmColor(unsigned long clone)
 #ifdef IX86_64
      if(x86_Bitness == DAB_USE64)
      {
-	if((clone & INSN_SSE) == INSN_SSE) return disasm_cset.cpu_cset[2].clone[clone & K64_CLONEMASK];
+	if(clone & INSN_SSE) return disasm_cset.cpu_cset[2].clone[clone & K64_CLONEMASK];
 	else
 	if(clone & (INSN_FPU|INSN_MMX)) return disasm_cset.cpu_cset[1].clone[clone & K64_CLONEMASK];
 	else
@@ -4838,7 +4840,7 @@ static ColorAttr  __FASTCALL__ ix86altGetAsmColor(unsigned long clone)
      else
 #endif
      {
-	if((clone & INSN_SSE) == INSN_SSE || (clone & INSN_AVX) == INSN_AVX) return disasm_cset.cpu_cset[2].clone[0];
+	if(clone & INSN_SSE) return disasm_cset.cpu_cset[2].clone[0];
 	else
 	if(clone & (INSN_FPU|INSN_MMX)) return disasm_cset.cpu_cset[1].clone[0];
 	else
