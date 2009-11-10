@@ -1,6 +1,7 @@
 global cpu_asm
 global vmx
 global smx
+global padlock
 global simd1
 global simd2
 global sse_width
@@ -403,6 +404,20 @@ smx:
 enter 10,0
 mov eax, 0
 db 0x0F, 0x37 ; getsec
+leave
+retn
+
+padlock:
+xstorerng
+xstore
+xcryptecb
+xcryptcbc
+xcryptctr
+xcryptcfb
+xcryptofb
+montmul
+xsha1
+xsha256
 leave
 retn
 

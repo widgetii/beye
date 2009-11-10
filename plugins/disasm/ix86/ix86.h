@@ -185,6 +185,7 @@ typedef void (__FASTCALL__*ix86_method)(char *encode_str,ix86Param *);
 #define IX86_INTEL	0x00000000UL
 #define IX86_AMD	0x00000100UL
 #define IX86_CYRIX	0x00000200UL
+#define IX86_VIA	0x00000400UL
 
 #define INSN_SYSTEMMASK	0x00000800UL
 #define INSN_CPL0	0x00000800UL
