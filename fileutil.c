@@ -277,6 +277,16 @@ static void __NEAR__ __FASTCALL__ make_addr_column(char *buff,__filesize_t offse
    strcat(buff,":");
 }
 
+static void __make_dump_name(const char *end)
+{
+ /* construct name */
+ char *p;
+ strcpy(ff_fname,BMName());
+ p = strrchr(ff_fname,'.');
+ if(!p) p = &ff_fname[strlen(ff_fname)];
+ strcpy(p,end);
+}
+
 static tBool FStore( void )
 {
  unsigned long flags;
@@ -292,6 +302,7 @@ static tBool FStore( void )
  DumpMode = True;
  ff_startpos = BMGetCurrFilePos();
  if(!ff_len) ff_len = BMGetFLength() - ff_startpos;
+ __make_dump_name(".$$$");
  if(GetFStoreDlg(" Save information to file ",ff_fname,&flags,&ff_startpos,&ff_len,FILE_PRMT))
  {
   endpos = ff_startpos + ff_len;
@@ -691,6 +702,7 @@ static tBool FRestore( void )
  tBool ret;
  ret = False;
  flags = FSDLG_NOMODES;
+ __make_dump_name(".$$$");
  if(GetFStoreDlg(" Restore information from file ",ff_fname,&flags,&ff_startpos,&ff_len,FILE_PRMT))
  {
    __filesize_t flen,lval;
