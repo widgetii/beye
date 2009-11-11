@@ -101,16 +101,23 @@ mmfHandle       __FASTCALL__ __mmfSync(mmfHandle mh)
 {
   struct mmfRecord *mrec = (struct mmfRecord *)mh;
   long length;
+  void * new_addr;
   length = __FileLength(mrec->fhandle);
   msync(mrec->addr,min(length,mrec->length),MS_SYNC);
-  if((mrec->addr = mremap(mrec->addr,mrec->length,length,MREMAP_MAYMOVE)) != (void *)-1)
-  {
-     mrec->length = length;
-     return mrec;
+  if(length!=mrec->length) {
+    if((new_addr = mremap(mrec->addr,mrec->length,length,0)) != (void *)-1)
+    {
+	mrec->length = length;
+	mrec->addr = new_addr;
+    }
+    else
+    {
+	__OsClose(mrec->fhandle);
+	PFree(mrec);
+	return NULL;
+    }
   }
-  __OsClose(mrec->fhandle);
-  PFree(mrec);
-  return NULL;
+  return mrec;
 }
 
 tBool              __FASTCALL__ __mmfProtect(mmfHandle mh,int flags)

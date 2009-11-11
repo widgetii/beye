@@ -218,6 +218,32 @@ static tBool __NEAR__ __FASTCALL__ __putc(BFILE  *obj,unsigned char ch)
   return ret;
 }
 
+#if 0
+static void __NEAR__ __FASTCALL__ dump_BFILE(BFILE*obj)
+{
+fprintf(stderr,
+	"      %p\n"
+	"      FilePos=%llu FLength=%llu\n"
+	"      %s openmode=%u optimize=%i\n"
+	"      is_mmf=%i primary_mmf=%i\n"
+	"      VFB:\n"
+	"        handle = %p FBufStart=%llu MBuffer=%p\n"
+	"        MBufLen=%u MBufSize=%u updated=%u\n"
+	"      MMB: mmf=%p mmf_addr=%p\n"
+	"        handle = %p FBufStart=%llu MBuffer=%p\n"
+	"        MBufLen=%u MBufSize=%u updated=%u\n"
+	"      is_eof=%i\n"
+	,obj
+	,obj->FilePos,obj->FLength
+	,obj->FileName,obj->openmode,obj->optimize
+	,obj->is_mmf,obj->primary_mmf
+	,obj->b.vfb.handle,obj->b.vfb.FBufStart,obj->b.vfb.MBuffer
+	,obj->b.vfb.MBufLen,obj->b.vfb.MBufSize,obj->b.vfb.updated
+	,obj->is_mmf?obj->b.mmb->mmf:0,obj->is_mmf?obj->b.mmb->mmf_addr:0
+	,obj->is_eof);
+}
+#endif
+
 static tBool __NEAR__ __FASTCALL__ __getbuff(BFILE  *obj,char * buff,unsigned cbBuff)
 {
   unsigned diffsize;
@@ -329,9 +355,8 @@ BGLOBAL  __FASTCALL__ bioOpen(const char * fname,unsigned openmode,unsigned bSiz
  ret = PMalloc(sizeof(BFILE));
  if(ret)
  {
+   memset(ret,0,sizeof(BFILE));
    bFile = MK_FPTR(ret);
-   bFile->FilePos = 0;
-   bFile->is_eof = False;
    bFile->openmode = openmode;
    if(!(bFile->FileName = PMalloc(strlen(fname)+1)))
    {
@@ -339,7 +364,6 @@ BGLOBAL  __FASTCALL__ bioOpen(const char * fname,unsigned openmode,unsigned bSiz
      return &bNull;
    }
    strcpy(bFile->FileName,fname);
-   bFile->is_mmf = False;
    /* Attempt open as MMF */
    if(!IS_WRITEABLE(openmode) && optimization == BIO_OPT_USEMMF)
    {

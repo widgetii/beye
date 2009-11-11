@@ -316,11 +316,13 @@ mmfHandle     __FASTCALL__ __mmfSync(mmfHandle mh)
   long length;
   length = __FileLength(mrec->fhandle);
   DosUpdateMMF(mrec,min((ADRSIZE)length,mrec->ulSize));
-  if(DosReallocMMF(mrec,length))
-  {
-    VirtualFree(mrec->pData, 0L, MEM_RELEASE);
-    __OsClose(mrec->fhandle);
-    mrec = NULL;
+  if(length!=mrec->ulSize) {
+    if(DosReallocMMF(mrec,length))
+    {
+	VirtualFree(mrec->pData, 0L, MEM_RELEASE);
+	__OsClose(mrec->fhandle);
+	mrec = NULL;
+    }
   }
   return mrec;
 }
