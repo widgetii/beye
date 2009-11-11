@@ -38,7 +38,7 @@
 
 #define MAX_IX86_INSN_LEN 15
 
-const char ix86CloneSNames[3] = { 'i', 'a', 'c', 'v' };
+const char ix86CloneSNames[4] = { 'i', 'a', 'c', 'v' };
 const char * ix86_sizes[] = { "", "(b)", "(w)", "(d)", "(p)", "(q)", "(t)" };
 const char * ix86_A16[] = { "bx+si", "bx+di", "bp+si", "bp+di", "si" , "di" , "bp" , "bx" };
 
@@ -5351,11 +5351,11 @@ static ColorAttr  __FASTCALL__ ix86altGetAsmColor(unsigned long clone)
 #ifdef IX86_64
      if(x86_Bitness == DAB_USE64)
      {
-	if(clone & INSN_SSE) return disasm_cset.cpu_cset[2].clone[clone & K64_CLONEMASK];
+	if(clone & INSN_SSE) return disasm_cset.cpu_cset[2].clone[clone & K64_CPUMASK];
 	else
-	if(clone & (INSN_FPU|INSN_MMX)) return disasm_cset.cpu_cset[1].clone[clone & K64_CLONEMASK];
+	if(clone & (INSN_FPU|INSN_MMX)) return disasm_cset.cpu_cset[1].clone[clone & K64_CPUMASK];
 	else
-	return disasm_cset.cpu_cset[0].clone[clone & K64_CLONEMASK];
+	return disasm_cset.cpu_cset[0].clone[clone & K64_CPUMASK];
      }
      else
 #endif
@@ -5521,7 +5521,7 @@ static tBool __FASTCALL__ x86Select_Bitness( void )
 
 static int __FASTCALL__ ix86MaxInsnLen( void ) { return MAX_IX86_INSN_LEN; }
 static int __FASTCALL__ ix86GetBitness( void ) { return BITNESS; }
-static char __FASTCALL__ ix86GetClone(unsigned long clone) { if(x86_Bitness == DAB_USE64) return 'a'; else return ix86CloneSNames[(clone >> 24) & 0x0F]; }
+static char __FASTCALL__ ix86GetClone(unsigned long clone) { if(x86_Bitness == DAB_USE64) return 'a'; else return ix86CloneSNames[((clone&IX86_CLONEMASK)>>8)&0x07]; }
 
 extern char *ix86_Katmai_buff;
 extern char *ix86_appstr;

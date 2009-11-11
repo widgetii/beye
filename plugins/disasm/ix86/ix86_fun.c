@@ -1032,7 +1032,7 @@ void  __FASTCALL__ ix86_ExOpCodes(char *str,ix86Param *DisP)
    TabSpace(str,TAB_POS);
    extable[code].method(str,DisP);
  }
- if(x86_Bitness == DAB_USE64) DisP->pro_clone = extable[code].flags64&K64_CLONEMASK;
+ if(x86_Bitness == DAB_USE64) DisP->pro_clone = extable[code].flags64&K64_CPUMASK;
  else
  if((DisP->pro_clone&IX86_CPUMASK) < (extable[code].pro_clone&IX86_CPUMASK))
  {
@@ -1514,7 +1514,7 @@ void __FASTCALL__ ix86_ArgKatmaiGrp1(char *str,ix86Param *DisP)
 	    DisP->pro_clone |= IX86_P8|INSN_SSE;
 	}
 	else {
-	    DisP->pro_clone &= ~K64_CLONEMASK;
+	    DisP->pro_clone &= ~K64_CPUMASK;
 	    DisP->pro_clone |= K64_FAM11|INSN_SSE;
 	}
    }
