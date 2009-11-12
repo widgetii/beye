@@ -79,6 +79,7 @@ extern char **  ArgVector;
 static int HiLight = 1;
 static char detected_syntax_name[FILENAME_MAX+1] = "";
 static unsigned char word_set[UCHAR_MAX+1],wset[UCHAR_MAX+1];
+static char *escape;
 
 #define MAX_STRLEN 1000 /**< defines maximal length of string */
 #define is_legal_word_char(ch) ((int)word_set[(unsigned char)ch])
@@ -114,6 +115,15 @@ static ColorAttr __NEAR__ __FASTCALL__ hlFindKwd(const char *str,Color col,unsig
   return defcol;
 }
 
+static int __FASTCALL__ testLeadingEscape(__fileoff_t cpos) {
+	char tmps[MAX_STRLEN];
+	__fileoff_t epos = BMGetCurrFilePos();
+	unsigned escl = strlen(escape);
+	BMReadBufferEx(tmps,escl,(cpos-1)-escl,BM_SEEK_SET);
+	BMSeek(epos,BM_SEEK_SET);
+	return (memcmp(tmps,escape,escl)==0);
+}
+
 static void __NEAR__ __FASTCALL__ txtMarkupCtx(void)
 {
     long ii,fpos,flen;
@@ -138,7 +148,7 @@ static void __NEAR__ __FASTCALL__ txtMarkupCtx(void)
 	    {
 		if(ii==0) ss_idx=1;
 		else
-		{ 
+		{
 		    long ccpos;
 		    ccpos=BMGetCurrFilePos();
 		    chn=BMReadByteEx(ii-1,BM_SEEK_SET);
@@ -148,7 +158,7 @@ static void __NEAR__ __FASTCALL__ txtMarkupCtx(void)
 	    }
 	    if(ch==syntax_hl.context[i].start_seq[ss_idx])
 	    {
-		long cpos;
+		__fileoff_t cpos;
 		len=strlen(syntax_hl.context[i].start_seq);
 		cpos=BMGetCurrFilePos();
 		found=0;
@@ -158,6 +168,8 @@ static void __NEAR__ __FASTCALL__ txtMarkupCtx(void)
 		    if(memcmp(tmps,&syntax_hl.context[i].start_seq[ss_idx+1],len-(ss_idx+1))==0) found=1;
 		}
 		else found=1;
+		/*avoid markup escape sequences */
+		if(found && escape) found = !testLeadingEscape(cpos);
 		if(found)
 		{
 		    /* avoid context markup if it's equal one of keywords */
@@ -200,6 +212,7 @@ static void __NEAR__ __FASTCALL__ txtMarkupCtx(void)
 				if(memcmp(tmps,&etmps[1],len-1)==0) found=1;
 			    }
 			    else found=1;
+			    if(found && escape) found=!testLeadingEscape(ecpos);
 			    if(found)
 			    {
 				ii+=len;
@@ -216,7 +229,7 @@ static void __NEAR__ __FASTCALL__ txtMarkupCtx(void)
 		else BMSeek(cpos,BM_SEEK_SET);
 	    }
 	}
-    }    
+    }
     BMSeek(fpos,BM_SEEK_SET);
     CloseWnd(hwnd);
 }
@@ -383,6 +396,11 @@ static tBool __FASTCALL__ txtFiUserFunc2(IniInfo * info)
      {
        syntax_hl.name=malloc(strlen(info->value)+1);
        strcpy(syntax_hl.name,info->value);
+     }
+     if(strcmp(info->item,"Escape")==0)
+     {
+       escape=malloc(strlen(info->value)+1);
+       strcpy(escape,info->value);
      }
      if(strcmp(info->item,"WSet")==0)
      {
@@ -1254,6 +1272,8 @@ static void __FASTCALL__ txtTerm( void )
   PFREE(ptlines);
   if(txtHandle != BMbioHandle()) { bioClose(txtHandle); txtHandle = &bNull; }
   if(syntax_hl.name) free(syntax_hl.name);
+  if(escape) free(escape);
+  escape=NULL;
   if(syntax_hl.context)
   {
      for(i=0;i<syntax_hl.context_num;i++) { free(syntax_hl.context[i].start_seq); free(syntax_hl.context[i].end_seq); }

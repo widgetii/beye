@@ -4,7 +4,7 @@
 
 [General]
 WSet=ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_0123456789
-
+Escape=\
 [Context]
   <Comments>
     base=#...\n
@@ -12,6 +12,7 @@ WSet=ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_0123456789
     base="..."
     extended='...'
     alt=`...`
+    reserved=EOF...EOF
 [Keywords]
 base=and
 base=or
