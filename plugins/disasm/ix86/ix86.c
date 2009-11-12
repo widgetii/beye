@@ -5315,20 +5315,26 @@ static const char * altPipesNames[] =
 
 static int color_mode=0;
 
+static ColorAttr  __FASTCALL__ ix86altGetAsmColor(unsigned long clone)
+{
+	color_mode=1;
+	if(clone & INSN_SSE) return disasm_cset.engine[2].engine;
+	else
+	if(clone & (INSN_FPU|INSN_MMX)) return disasm_cset.engine[1].engine;
+	else
+	return disasm_cset.engine[0].engine;
+}
+
+static ColorAttr  __FASTCALL__ ix86altGetOpcodeColor(unsigned long clone)
+{
+  return ((clone & INSN_CPL0) == INSN_CPL0)?disasm_cset.opcodes0:disasm_cset.opcodes;
+}
+
 static ColorAttr  __FASTCALL__ ix86GetAsmColor(unsigned long clone)
 {
     color_mode=0;
-#ifdef IX86_64
-     if(x86_Bitness == DAB_USE64)
-     {
-	if((clone & INSN_SSE) == INSN_SSE) return disasm_cset.cpu_cset[2].clone[0];
-	else
-	if(clone & (INSN_FPU|INSN_MMX)) return disasm_cset.cpu_cset[1].clone[0];
-	else
-	return disasm_cset.cpu_cset[0].clone[0];
-     }
+     if(x86_Bitness == DAB_USE64) return ix86altGetAsmColor(clone);
      else
-#endif
      if((clone&INSN_MMX)|(clone&INSN_SSE)) return disasm_cset.cpu_cset[2].clone[clone & IX86_CPUMASK];
      else
        if((clone&INSN_FPU))	return disasm_cset.cpu_cset[1].clone[clone & IX86_CPUMASK];
@@ -5337,46 +5343,9 @@ static ColorAttr  __FASTCALL__ ix86GetAsmColor(unsigned long clone)
 
 static ColorAttr  __FASTCALL__ ix86GetOpcodeColor(unsigned long clone)
 {
-#ifdef IX86_64
-   if(x86_Bitness == DAB_USE64)
-	return ((clone & INSN_CPL0) == INSN_CPL0)?disasm_cset.opcodes0:disasm_cset.opcodes;
-   else
-#endif
   return ((clone & INSN_CPL0) == INSN_CPL0)?disasm_cset.opcodes0:disasm_cset.opcodes;
 }
 
-static ColorAttr  __FASTCALL__ ix86altGetAsmColor(unsigned long clone)
-{
-    color_mode=1;
-#ifdef IX86_64
-     if(x86_Bitness == DAB_USE64)
-     {
-	if(clone & INSN_SSE) return disasm_cset.cpu_cset[2].clone[clone & K64_CPUMASK];
-	else
-	if(clone & (INSN_FPU|INSN_MMX)) return disasm_cset.cpu_cset[1].clone[clone & K64_CPUMASK];
-	else
-	return disasm_cset.cpu_cset[0].clone[clone & K64_CPUMASK];
-     }
-     else
-#endif
-     {
-	if(clone & INSN_SSE) return disasm_cset.cpu_cset[2].clone[0];
-	else
-	if(clone & (INSN_FPU|INSN_MMX)) return disasm_cset.cpu_cset[1].clone[0];
-	else
-	return disasm_cset.cpu_cset[0].clone[0];
-     }
-}
-
-static ColorAttr  __FASTCALL__ ix86altGetOpcodeColor(unsigned long clone)
-{
-#ifdef IX86_64
-   if(x86_Bitness == DAB_USE64)
-	return ((clone & INSN_CPL0) == INSN_CPL0)?disasm_cset.opcodes0:disasm_cset.opcodes;
-   else
-#endif
-  return ((clone & INSN_CPL0) == INSN_CPL0)?disasm_cset.opcodes0:disasm_cset.opcodes;
-}
 
 static tBool __FASTCALL__ x86AsmRef( void )
 {
@@ -5442,21 +5411,21 @@ static void __FASTCALL__ ix86HelpAsm( void )
    i=0;
 //   for(i = 0;i < 10;i++)
    {
-     twSetColorAttr(disasm_cset.cpu_cset[0].clone[i]);
+     twSetColorAttr(disasm_cset.engine[0].engine);
      twPutS((x86_Bitness == DAB_USE64)?CPU64Names[0]:altPipesNames[0]);
      twClrEOL();
    }
    twGotoXY(5,4);
 //   for(i = 0;i < 10;i++)
    {
-     twSetColorAttr(disasm_cset.cpu_cset[1].clone[i]);
+     twSetColorAttr(disasm_cset.engine[1].engine);
      twPutS((x86_Bitness == DAB_USE64)?CPU64Names[1]:altPipesNames[1]);
      twClrEOL();
    }
    twGotoXY(5,5);
 //   for(i = 0;i < 10;i++)
    {
-     twSetColorAttr(disasm_cset.cpu_cset[2].clone[i]);
+     twSetColorAttr(disasm_cset.engine[2].engine);
      twPutS((x86_Bitness == DAB_USE64)?CPU64Names[2]:altPipesNames[2]);
      twClrEOL();
    }

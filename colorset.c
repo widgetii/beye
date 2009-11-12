@@ -185,6 +185,14 @@ tBool csetReadIniFile(const char *ini_name)
       has_err |= readColorPair(cset,"Disasm",csec,cval,&disasm_cset.cpu_cset[j].clone[i]);
     }
   }
+  strcpy(csec,"Engine");
+  for(j = 0;j < sizeof(disasm_cset.engine)/sizeof(EngineCSet);j++)
+  {
+    sprintf(cval,"Engine%i",j);
+    has_err |= readColorPair(cset,"Disasm",csec,cval,&disasm_cset.engine[j].engine);
+    sprintf(cval,"Engine%i_unopt",j);
+    has_err |= readColorPair(cset,"Disasm",csec,cval,&disasm_cset.engine[j].engine_unopt);
+  }
   has_err |= readColorPair(cset,"Programming","","BadExpr",&prog_cset.bads);
   has_err |= readColorPair(cset,"Programming","Comments","base",&prog_cset.comments.base);
   has_err |= readColorPair(cset,"Programming","Comments","extended",&prog_cset.comments.extended);
@@ -408,6 +416,15 @@ DisasmCSet disasm_cset =
      LOGFB_TO_PHYS(Black, Blue)
     }
    }
+  },
+  {
+    { LOGFB_TO_PHYS(LightCyan, Blue), LOGFB_TO_PHYS(LightGray, Blue) },
+    { LOGFB_TO_PHYS(Cyan, Blue), LOGFB_TO_PHYS(Gray, Blue) },
+    { LOGFB_TO_PHYS(LightBlue, Blue), LOGFB_TO_PHYS(Black, Blue) },
+    { LOGFB_TO_PHYS(White, Blue), LOGFB_TO_PHYS(Yellow, Blue) },
+    { LOGFB_TO_PHYS(LightGreen, Blue), LOGFB_TO_PHYS(Green, Blue) },
+    { LOGFB_TO_PHYS(LightMagenta, Blue), LOGFB_TO_PHYS(Magenta, Blue) },
+    { LOGFB_TO_PHYS(LightRed, Blue), LOGFB_TO_PHYS(Red, Blue) }
   }
 };
 

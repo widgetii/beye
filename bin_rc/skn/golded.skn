@@ -85,21 +85,21 @@
     Clone16      = Black:Blue
  < Processor1 > ; Second Processor (for x86 - it FPU)
     Clone1       = Black:Cyan
-    Clone2       = Black:Black
+    Clone2       = Black:Blue
     Clone3       = Black:Brown
     Clone4       = Black:Green
     Clone5       = Black:Magenta
-    Clone6       = Black:Black
+    Clone6       = Black:Blue
     Clone7       = Black:LightMagenta
     Clone8       = Black:LightBlue
     Clone9       = Black:Blue
     Clone10      = Black:Gray
-    Clone11      = Black:Black
-    Clone12      = Black:Black
-    Clone13      = Black:Black
-    Clone14      = Black:Black
-    Clone15      = Black:Black
-    Clone16      = Black:Black
+    Clone11      = Black:Blue
+    Clone12      = Black:Blue
+    Clone13      = Black:Blue
+    Clone14      = Black:Blue
+    Clone15      = Black:Blue
+    Clone16      = Black:Blue
  < Processor2 > ; Third Processor (for x86 it MMX)
     Clone1       = Black:LightBlue
     Clone2       = Black:Blue
@@ -118,22 +118,37 @@
     Clone15      = Black:Blue
     Clone16      = Black:Blue
  < Processor3 > ; for x86 it's not used
-    Clone1       = Black:Black
-    Clone2       = Black:Black
-    Clone3       = Black:Black
-    Clone4       = Black:Black
-    Clone5       = Black:Black
-    Clone6       = Black:Black
-    Clone7       = Black:Black
-    Clone8       = Black:Black
-    Clone9       = Black:Black
-    Clone10      = Black:Black
-    Clone11      = Black:Black
-    Clone12      = Black:Black
-    Clone13      = Black:Black
-    Clone14      = Black:Black
-    Clone15      = Black:Black
-    Clone16      = Black:Black
+    Clone1       = Black:Blue
+    Clone2       = Black:Blue
+    Clone3       = Black:Blue
+    Clone4       = Black:Blue
+    Clone5       = Black:Blue
+    Clone6       = Black:Blue
+    Clone7       = Black:Blue
+    Clone8       = Black:Blue
+    Clone9       = Black:Blue
+    Clone10      = Black:Blue
+    Clone11      = Black:Blue
+    Clone12      = Black:Blue
+    Clone13      = Black:Blue
+    Clone14      = Black:Blue
+    Clone15      = Black:Blue
+    Clone16      = Black:Blue
+ < Engine >
+    Engine0      = Black:LightCyan
+    Engine0_unopt= Black:LightGray
+    Engine1      = Black:Cyan
+    Engine1_unopt= Black:Gray
+    Engine2      = Black:LightBlue
+    Engine2_unopt= Black:Blue
+    Engine3      = Black:White
+    Engine3_unopt= Black:Yellow
+    Engine4      = Black:LightGreen
+    Engine4_unopt= Black:Green
+    Engine5      = Black:LightMagenta
+    Engine5_unopt= Black:Magenta
+    Engine6      = Black:LightRed
+    Engine6_unopt= Black:Red
 [ Programming ]
   BadExpr      = Red:Blue
   <Comments>

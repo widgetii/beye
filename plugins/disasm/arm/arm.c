@@ -119,19 +119,19 @@ static void __FASTCALL__ armHelpAsm( void )
    twGotoXY(2,3);
    i=0;
    {
-     twSetColorAttr(disasm_cset.cpu_cset[0].clone[i]);
+     twSetColorAttr(disasm_cset.engine[0].engine);
      twPutS("ARM CPU");
      twClrEOL();
    }
    twGotoXY(2,4);
    {
-     twSetColorAttr(disasm_cset.cpu_cset[1].clone[i]);
+     twSetColorAttr(disasm_cset.engine[1].engine);
      twPutS("VFP extension");
      twClrEOL();
    }
    twGotoXY(2,5);
    {
-     twSetColorAttr(disasm_cset.cpu_cset[2].clone[i]);
+     twSetColorAttr(disasm_cset.engine[2].engine);
      twPutS("XScale extensions");
      twClrEOL();
    }
@@ -149,11 +149,11 @@ static void __FASTCALL__ armHelpAsm( void )
 static int    __FASTCALL__ armMaxInsnLen( void ) { return 8; }
 static ColorAttr __FASTCALL__ armGetAsmColor( unsigned long clone )
 {
-  if((clone & ARM_XSCALE)==ARM_XSCALE) return disasm_cset.cpu_cset[2].clone[0];
+  if((clone & ARM_XSCALE)==ARM_XSCALE) return disasm_cset.engine[2].engine;
   else
-  if((clone & ARM_FPU)==ARM_FPU) return disasm_cset.cpu_cset[1].clone[0];
+  if((clone & ARM_FPU)==ARM_FPU) return disasm_cset.engine[1].engine;
   else
-	return disasm_cset.cpu_cset[0].clone[0];
+	return disasm_cset.engine[0].engine;
 }
 
 static int       __FASTCALL__ armGetBitness( void ) { return armBitness; }

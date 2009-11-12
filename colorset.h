@@ -111,6 +111,11 @@ typedef struct tag_CPUCSet
   ColorAttr clone[16];
 }CPUCSet;
 
+typedef struct tag_EngineCSet
+{
+  ColorAttr engine,engine_unopt;
+}EngineCSet;
+
 /** Disassembler highlight */
 typedef struct tag_DisasmCSet
 {
@@ -124,6 +129,7 @@ typedef struct tag_DisasmCSet
   ColorAttr opcodes5;
   ColorAttr comments;
   CPUCSet   cpu_cset[4];
+  EngineCSet engine[7];
 }DisasmCSet;
 
 extern DisasmCSet disasm_cset;

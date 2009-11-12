@@ -1518,19 +1518,19 @@ static void __FASTCALL__ ppcHelpAsm( void )
    twGotoXY(2,3);
    i=0;
    {
-     twSetColorAttr(disasm_cset.cpu_cset[0].clone[i]);
+     twSetColorAttr(disasm_cset.engine[0].engine);
      twPutS("PPC CPU");
      twClrEOL();
    }
    twGotoXY(2,4);
    {
-     twSetColorAttr(disasm_cset.cpu_cset[1].clone[i]);
+     twSetColorAttr(disasm_cset.engine[1].engine);
      twPutS("PPC FPU");
      twClrEOL();
    }
    twGotoXY(2,5);
    {
-     twSetColorAttr(disasm_cset.cpu_cset[2].clone[i]);
+     twSetColorAttr(disasm_cset.engine[2].engine);
      twPutS("AltiVec");
      twClrEOL();
    }
@@ -1548,11 +1548,11 @@ static void __FASTCALL__ ppcHelpAsm( void )
 static int    __FASTCALL__ ppcMaxInsnLen( void ) { return 8; }
 static ColorAttr __FASTCALL__ ppcGetAsmColor( unsigned long clone )
 {
-  if((clone & PPC_CLONE_MSK)==PPC_ALTIVEC) return disasm_cset.cpu_cset[2].clone[0];
+  if((clone & PPC_CLONE_MSK)==PPC_ALTIVEC) return disasm_cset.engine[2].engine;
   else
-  if((clone & PPC_CLONE_MSK)==PPC_FPU) return disasm_cset.cpu_cset[1].clone[0];
+  if((clone & PPC_CLONE_MSK)==PPC_FPU) return disasm_cset.engine[1].engine;
   else
-	return disasm_cset.cpu_cset[0].clone[0];
+	return disasm_cset.engine[0].engine;
 }
 
 static int       __FASTCALL__ ppcGetBitness( void ) { return ppcBitness; }

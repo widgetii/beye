@@ -134,6 +134,21 @@
     Clone14      = Blue:Black
     Clone15      = Blue:Black
     Clone16      = Blue:Black
+ < Engine >
+    Engine0      = Blue:LightCyan
+    Engine0_unopt= Blue:LightGray
+    Engine1      = Blue:Cyan
+    Engine1_unopt= Blue:Gray
+    Engine2      = Blue:LightBlue
+    Engine2_unopt= Blue:Black
+    Engine3      = Blue:White
+    Engine3_unopt= Blue:Yellow
+    Engine4      = Blue:LightGreen
+    Engine4_unopt= Blue:Green
+    Engine5      = Blue:LightMagenta
+    Engine5_unopt= Blue:Magenta
+    Engine6      = Blue:LightRed
+    Engine6_unopt= Blue:Red
 [ Programming ]
   BadExpr      = Red:Black
   <Comments>
