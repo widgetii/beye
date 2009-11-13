@@ -162,8 +162,8 @@
     alt        = Blue:Black
   <Keyword>
     base       = Blue:Yellow
-    extended   = Blue:LightRed
-    reserved   = Blue:Red
+    extended   = Blue:LightMagenta
+    reserved   = Blue:LightRed
     alt        = Blue:White
   <Constant>
     base       = Blue:LightGreen
