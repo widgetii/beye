@@ -1849,16 +1849,16 @@
 ³ vphadduwd    XOP.09[D6]             Packed Horizontal Add U16 to U32    ³
 ³ vphadduwq    XOP.09[D7]             Packed Horizontal Add U16 to U64    ³
 ³ vphaddwd     XOP.09[C6]             Packed Horizontal Add S16 to S32    ³
-³ vphaddwq     XOP.09[D7]             Packed Horizontal Add S16 to S64    ³
+³ vphaddwq     XOP.09[C7]             Packed Horizontal Add S16 to S64    ³
 ³ vphsubbw     XOP.09[E1]             Packed Horizontal Subtract S8 to S16³
 ³ vphsubdq     XOP.09[E3]             Packed Horizontal Subtract S32to S64³
 ³ vphsubwd     XOP.09[E2]             Packed Horizontal Subtract S16to S32³
 ³ vpmacsdd     XOP.08[9E]             Packed Multiply Accumulate S32to S32³
 ³ vpmacsdqh    XOP.08[9F]             Packed Multiply Acc high S32 to S64 ³
-³ vpmacsdqh    XOP.08[97]             Packed Multiply Acc low  S32 to S64 ³
+³ vpmacsdql    XOP.08[97]             Packed Multiply Acc low  S32 to S64 ³
 ³ vpmacssdd    XOP.08[8E]             Packed Multiply Acc S32 to S32 w sat³
 ³ vpmacssdqh   XOP.08[8F]             Packed Multiply Acc h S32 to S64 w s³
-³ vpmacssdqh   XOP.08[87]             Packed Multiply Acc l S32 to S64 w s³
+³ vpmacssdql   XOP.08[87]             Packed Multiply Acc l S32 to S64 w s³
 ³ vpmacsswd    XOP.08[86]             Packed Multiply Acc S16 to S32 w sat³
 ³ vpmacssww    XOP.08[85]             Packed Multiply Acc S16 to S16 w sat³
 ³ vpmacswd     XOP.08[96]             Packed Multiply Acc S16 to S32      ³
