@@ -1,0 +1,249 @@
+;
+; "Light theme" BIEW experimantal skin by Nickols_K
+;
+[ Skin info ]
+ Name = Insight theme
+[ Color map ]
+  Black        = 0
+  Blue         = 1
+  Green        = 2
+  Cyan         = 3
+  Red          = 4
+  Magenta      = 5
+  Brown        = 6
+  LightGray    = 7
+  Gray         = 8
+  LightBlue    = 9
+  LightGreen   = 10
+  LightCyan    = 11
+  LightRed     = 12
+  LightMagenta = 13
+  Yellow       = 14
+  White        = 15
+[ Terminal ]
+  Trans1       = Blue
+  Trans2       =
+  Trans3       =
+  Trans4       =
+  Trans5       =
+  Trans6       =
+  Trans7       =
+  Trans8       =
+[ Browser ]
+  Main         = LightGray:Black
+  Bound        = LightGray:Yellow
+  HighLight    = Red:Black
+  HighLightLine= LightGray:White
+  Title        = LightGray:Blue
+  Footer       = Green:Blue
+  Scroller     = LightGray:Yellow
+  < Edit >
+    Main         = LightGray:White     ; multiline editor
+    Change       = LightGray:LightRed  ; when undo buffer is not same with editor
+    Selected     = LightGray:Black ; for future: when buffer is selected
+[ Prompt ] ; Lower string of BIEW
+  Button       = Cyan:White        ; Color of buttons
+  Digit        = Cyan:LightRed     ; Color of digits
+  Control      = Cyan:LightBlue         ; Lower left corner of screen
+[ Title ]  ; Upper string of BIEW
+  Main         = Cyan:Blue
+  Change       = Cyan:Red
+[ Text ]   ; HighLight text support (still for textmode)
+  Normal       = LightGray:Black
+  Bold         = LightGray:White
+  Italic       = LightGray:Gray
+  Underline    = LightGray:Yellow
+  StrikeThrough= LightGray:LightRed
+[ Disasm ] ; HighLight disassembler support
+  FamilyId     = LightGray:LightCyan
+  Opcodes      = LightGray:Blue
+  Opcodes0     = LightGray:LightGray
+  Opcodes1     = LightGray:Cyan
+  Opcodes2     = LightGray:Red
+  Opcodes3     = LightGray:Magenta
+  Opcodes4     = LightGray:Brown
+  Opcodes5     = LightGray:Blue
+  Comments     = LightGray:Yellow
+ < Processor0 > ; Main processor (or Central Processor Unit)
+    Clone1       = LightGray:LightCyan
+    Clone2       = LightGray:Black
+    Clone3       = LightGray:Yellow
+    Clone4       = LightGray:LightGreen
+    Clone5       = LightGray:Red
+    Clone6       = LightGray:LightRed
+    Clone7       = LightGray:LightMagenta
+    Clone8       = LightGray:LightBlue
+    Clone9       = LightGray:Blue
+    Clone10      = LightGray:Gray
+    Clone11      = LightGray:Blue
+    Clone12      = LightGray:Blue
+    Clone13      = LightGray:Blue
+    Clone14      = LightGray:Blue
+    Clone15      = LightGray:Blue
+    Clone16      = LightGray:Blue
+ < Processor1 > ; Second Processor (for x86 - it FPU)
+    Clone1       = LightGray:Cyan
+    Clone2       = LightGray:Blue
+    Clone3       = LightGray:Brown
+    Clone4       = LightGray:Green
+    Clone5       = LightGray:Magenta
+    Clone6       = LightGray:Blue
+    Clone7       = LightGray:LightMagenta
+    Clone8       = LightGray:LightBlue
+    Clone9       = LightGray:Blue
+    Clone10      = LightGray:Gray
+    Clone11      = LightGray:Blue
+    Clone12      = LightGray:Blue
+    Clone13      = LightGray:Blue
+    Clone14      = LightGray:Blue
+    Clone15      = LightGray:Blue
+    Clone16      = LightGray:Blue
+ < Processor2 > ; Third Processor (for x86 it MMX)
+    Clone1       = LightGray:LightBlue
+    Clone2       = LightGray:Blue
+    Clone3       = LightGray:Blue
+    Clone4       = LightGray:Blue
+    Clone5       = LightGray:Blue
+    Clone6       = LightGray:White
+    Clone7       = LightGray:LightMagenta
+    Clone8       = LightGray:LightBlue
+    Clone9       = LightGray:Blue
+    Clone10      = LightGray:Gray
+    Clone11      = LightGray:Blue
+    Clone12      = LightGray:Blue
+    Clone13      = LightGray:Blue
+    Clone14      = LightGray:Blue
+    Clone15      = LightGray:Blue
+    Clone16      = LightGray:Blue
+ < Processor3 > ; for x86 it's not used
+    Clone1       = LightGray:Blue
+    Clone2       = LightGray:Blue
+    Clone3       = LightGray:Blue
+    Clone4       = LightGray:Blue
+    Clone5       = LightGray:Blue
+    Clone6       = LightGray:Blue
+    Clone7       = LightGray:Blue
+    Clone8       = LightGray:Blue
+    Clone9       = LightGray:Blue
+    Clone10      = LightGray:Blue
+    Clone11      = LightGray:Blue
+    Clone12      = LightGray:Blue
+    Clone13      = LightGray:Blue
+    Clone14      = LightGray:Blue
+    Clone15      = LightGray:Blue
+    Clone16      = LightGray:Blue
+ < Engine >
+    Engine0      = LightGray:Black
+    Engine0_unopt= LightGray:Gray
+    Engine1      = LightGray:Blue
+    Engine1_unopt= LightGray:LightBlue
+    Engine2      = LightGray:White
+    Engine2_unopt= LightGray:Yellow
+    Engine3      = LightGray:LightCyan
+    Engine3_unopt= LightGray:Cyan
+    Engine4      = LightGray:LightGreen
+    Engine4_unopt= LightGray:Green
+    Engine5      = LightGray:LightMagenta
+    Engine5_unopt= LightGray:Magenta
+    Engine6      = LightGray:LightRed
+    Engine6_unopt= LightGray:Red
+[ Programming ]
+  BadExpr      = Red:Blue
+  <Comments>
+    base       = LightGray:Gray
+    extended   = LightGray:Blue
+    reserved   = LightGray:Brown
+    alt        = LightGray:Green
+  <Keyword>
+    base       = LightGray:Blue
+    extended   = LightGray:Red
+    reserved   = LightGray:Brown
+    alt        = LightGray:Cyan
+  <Constant>
+    base       = LightGray:Green
+    extended   = LightGray:Blue
+    reserved   = LightGray:Green
+    alt        = LightGray:Magenta
+  <Operator>
+    base       = LightGray:White
+    extended   = LightGray:Blue
+    reserved   = LightGray:Green
+    alt        = LightGray:Red
+  <Preproc>
+    base       = LightGray:Green
+    extended   = LightGray:Magenta
+    reserved   = LightGray:Blue
+    alt        = LightGray:Brown
+[ Error ] ; Error message box
+  Main         = Red:Yellow
+  Border       = Red:LightRed
+  < Button > ; for future
+    Active     = Green:Yellow
+    Focused    = Cyan:White
+    Disabled   = LightGray:Gray
+[ Warning ] ; Warning box
+  Main         = Magenta:White
+  Border       = Magenta:LightMagenta
+  < Button > ; for future
+    Active     = Green:Yellow
+    Focused    = Cyan:White
+    Disabled   = LightGray:Gray
+[ Notify ] ; Notify box
+  Main         = Green:White
+  Border       = Green:Yellow
+  < Button > ; for future
+    Active     = Green:Yellow
+    Focused    = Cyan:White
+    Disabled   = LightGray:Gray
+[ Dialog ] ; Dialog box support
+  Main         = LightGray:Black
+  Border       = LightGray:White
+  Title        = LightGray:Yellow
+  Footer       = LightGray:Black
+  SelFooter    = LightGray:White        ; Footer text if [ENTER] changes file position
+  Entry        = LightGray:White        ; highlighted entry point
+  AltEntry     = Blue:Yellow        ; highlighted alterantive entry point
+  AddInfo      = LightGray:Yellow   ; addition information
+  AltInfo      = LightGray:LightCyan; information about alternative entry
+  ExtraInfo    = LightGray:Red      ; extra information (sample: when old MZ file is compressed by pklite)
+  < Group > ; group + check & radio buttons inside the group
+    Active       = Cyan:LightCyan
+    Focused      = Cyan:Yellow ; for group elements only
+    Disabled     = Cyan:Gray
+  < Button > ; for future
+    Active       = Blue:Yellow
+    Focused      = Green:White
+    Disabled     = LightGray:Gray
+  < Any > ; for any unknown today control
+    Active       = LightGray:Black
+    Focused      = LightGray:Black
+    Disabled     = LightGray:Gray
+  < Editor >
+    Active       = Cyan:White
+    Focused      = Cyan:Yellow
+    Disabled     = LightGray:Gray
+    Select       = Cyan:LightBlue ; for future
+[ Menu ] ; Combine for lists and menu (in future)
+  Main           = LightGray:Blue
+  Border         = LightGray:White
+  Title          = LightGray:Yellow
+  HighLight      = Blue:Black
+  < HotKey >
+    Active       = LightGray:Red
+    Focused      = Cyan:LightRed
+    Disabled     = LightGray:Gray
+  < Item >
+    Active       = LightGray:Blue
+    Focused      = Cyan:LightCyan
+    Disabled     = LightGray:Gray
+[ Help ] ; Help system
+  Main         = LightGray:Black
+  Border       = LightGray:Blue
+  Title        = LightGray:LightGreen
+  Bold         = LightGray:Yellow
+  Italic       = LightGray:Blue
+  Reverse      = LightGray:Magenta
+  Underline    = LightGray:Red
+  StrikeThrough= LightGray:Gray
+  Link         = LightGray:Yellow
+  SelLink      = LightGray:White
