@@ -78,6 +78,20 @@ base=while
 %CPP_TYPE%=using
 %CPP_TYPE%=virtual
 %CPP_TYPE%=wchar_t
+extended=typeof
+extended=__label__
+extended=__complex__
+extended=_Complex
+extended=__real__
+extended=__imag__
+extended=__attribute__
+extended=__alignof__
+extended=__extension__
+extended=__asm__
+extended=__inline__
+extended=__thread
+alt=__restricted
+alt=__restricted__
 
 [Operators]
 base=+

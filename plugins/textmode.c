@@ -79,10 +79,23 @@ extern char **  ArgVector;
 static int HiLight = 1;
 static char detected_syntax_name[FILENAME_MAX+1] = "";
 static unsigned char word_set[UCHAR_MAX+1],wset[UCHAR_MAX+1];
-static char *escape;
+static char *escape=NULL;
 
 #define MAX_STRLEN 1000 /**< defines maximal length of string */
 #define is_legal_word_char(ch) ((int)word_set[(unsigned char)ch])
+
+static tBool __FASTCALL__ testLeadingEscape(__fileoff_t cpos) {
+	char tmps[MAX_STRLEN];
+	__fileoff_t epos = BMGetCurrFilePos(),spos;
+	unsigned escl = strlen(escape);
+	spos=(cpos-1)-escl;
+	if(escl && spos>=0) {
+	    BMReadBufferEx(tmps,escl,spos,BM_SEEK_SET);
+	    BMSeek(epos,BM_SEEK_SET);
+	    return (memcmp(tmps,escape,escl)==0);
+	}
+	return 0;
+}
 
 static ColorAttr __NEAR__ __FASTCALL__ hlFindKwd(const char *str,Color col,unsigned *st_len)
 {
@@ -115,57 +128,53 @@ static ColorAttr __NEAR__ __FASTCALL__ hlFindKwd(const char *str,Color col,unsig
   return defcol;
 }
 
-static int __FASTCALL__ testLeadingEscape(__fileoff_t cpos) {
-	char tmps[MAX_STRLEN];
-	__fileoff_t epos = BMGetCurrFilePos();
-	unsigned escl = strlen(escape);
-	BMReadBufferEx(tmps,escl,(cpos-1)-escl,BM_SEEK_SET);
-	BMSeek(epos,BM_SEEK_SET);
-	return (memcmp(tmps,escape,escl)==0);
-}
 
 static void __NEAR__ __FASTCALL__ txtMarkupCtx(void)
 {
-    long ii,fpos,flen;
+    long fptr,fpos,flen;
     unsigned i,len;
     int found;
-    char tmps[MAX_STRLEN],etmps[MAX_STRLEN],ktmps[MAX_STRLEN],ch,chn;
+    char tmps[MAX_STRLEN],ktmps[MAX_STRLEN],ch,chn;
+    const char *sseq,*eseq;
     TWindow *hwnd;
     hwnd=PleaseWaitWnd();
     flen=BMGetFLength();
     fpos=BMGetCurrFilePos();
     BMSeek(0,BM_SEEK_SET);
     acontext_num=0;
-    for(ii=0;ii<flen;ii++)
+    for(fptr=0;fptr<flen;fptr++)
     {
+	tmps[0]=0;
 	ch=BMReadByte();
+	found=0;
 	if(ch=='\r') ch='\n';
 	for(i=0;i<syntax_hl.context_num;i++)
 	{
 	    unsigned ss_idx;
 	    ss_idx=0;
-	    if(syntax_hl.context[i].start_seq[0]=='\n')
+	    sseq=syntax_hl.context[i].start_seq;
+	    if(sseq[0]=='\n')
 	    {
-		if(ii==0) ss_idx=1;
+		if(fptr==0) ss_idx=1;
 		else
 		{
 		    long ccpos;
 		    ccpos=BMGetCurrFilePos();
-		    chn=BMReadByteEx(ii-1,BM_SEEK_SET);
+		    chn=BMReadByteEx(fptr-1,BM_SEEK_SET);
 		    BMSeek(ccpos, BM_SEEK_SET);
 		    if(chn=='\n' || chn=='\r') ss_idx=1;
 		}
 	    }
-	    if(ch==syntax_hl.context[i].start_seq[ss_idx])
+	    if(ch==sseq[ss_idx])
 	    {
 		__fileoff_t cpos;
-		len=strlen(syntax_hl.context[i].start_seq);
+		len=strlen(sseq);
 		cpos=BMGetCurrFilePos();
 		found=0;
 		if(len>(ss_idx+1))
 		{
 		    BMReadBuffer(tmps,len-(ss_idx+1));
-		    if(memcmp(tmps,&syntax_hl.context[i].start_seq[ss_idx+1],len-(ss_idx+1))==0) found=1;
+		    if(memcmp(tmps,&sseq[ss_idx+1],len-(ss_idx+1))==0) found=1;
 		}
 		else found=1;
 		/*avoid markup escape sequences */
@@ -191,17 +200,17 @@ static void __NEAR__ __FASTCALL__ txtMarkupCtx(void)
 		    if(!acontext) acontext=PHMalloc(sizeof(acontext_hl_t));
 		    else	  acontext=PHRealloc(acontext,sizeof(acontext_hl_t)*(acontext_num+1));
 		    acontext[acontext_num].color=LOGFB_TO_PHYS(syntax_hl.context[i].color,BACK_COLOR(text_cset.normal));
-		    acontext[acontext_num].start_off=ii-ss_idx;
+		    acontext[acontext_num].start_off=fptr-ss_idx;
 		    acontext[acontext_num].end_off=flen;
-		    ii+=len;
-		    BMSeek(ii,BM_SEEK_SET);
+		    fptr+=len;
+		    BMSeek(fptr,BM_SEEK_SET);
 		    /* try find end */
-		    strcpy(etmps,syntax_hl.context[i].end_seq);
-		    len=strlen(etmps);
-		    for(;ii<flen;ii++)
+		    eseq=syntax_hl.context[i].end_seq;
+		    len=strlen(eseq);
+		    for(;fptr<flen;fptr++)
 		    {
 			ch=BMReadByte();
-			if(ch==etmps[0])
+			if(ch==eseq[0])
 			{
 			    long ecpos;
 			    ecpos=BMGetCurrFilePos();
@@ -209,25 +218,26 @@ static void __NEAR__ __FASTCALL__ txtMarkupCtx(void)
 			    if(len>1)
 			    {
 				BMReadBuffer(tmps,len-1);
-				if(memcmp(tmps,&etmps[1],len-1)==0) found=1;
+				if(memcmp(tmps,&eseq[1],len-1)==0) found=1;
 			    }
 			    else found=1;
 			    if(found && escape) found=!testLeadingEscape(ecpos);
 			    if(found)
 			    {
-				ii+=len;
-				BMSeek(ii,BM_SEEK_SET);
-				acontext[acontext_num].end_off=ii;
+				fptr+=len;
+				BMSeek(fptr,BM_SEEK_SET);
+				acontext[acontext_num].end_off=fptr;
 				break;
 			    }
 			    else BMSeek(ecpos,BM_SEEK_SET);
 			}
 		    }
 		    acontext_num++;
-		    ii--;
+		    fptr--;
 		}
 		else BMSeek(cpos,BM_SEEK_SET);
 	    }
+	    if(found) break;
 	}
     }
     BMSeek(fpos,BM_SEEK_SET);

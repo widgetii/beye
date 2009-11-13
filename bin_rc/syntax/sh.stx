@@ -34,3 +34,9 @@ base=until
 [Operators]
 base=$
 base=\x3B
+base=)
+base=(
+base={
+base=}
+base=&
+base=|

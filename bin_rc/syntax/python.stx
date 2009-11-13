@@ -3,15 +3,17 @@
 ;
 
 [General]
+Name=Python syntax
 WSet=ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_0123456789
-Escape="
+Escape=
 [Context]
   <Comments>
-    base="""..."""
-    extended=#...\n
+    base=#...\n
   <Constants>
+    extended="""..."""
+    extended='''...'''
     base="..."
-    extended='...'
+    base='...'
 [Keywords]
 base=access
 base=and

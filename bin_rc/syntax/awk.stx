@@ -3,6 +3,7 @@
 ;
 
 [General]
+Name=Awk syntax
 WSet=ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_0123456789
 Escape=\
 [Context]
