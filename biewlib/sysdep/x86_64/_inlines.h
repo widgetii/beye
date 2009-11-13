@@ -34,7 +34,7 @@
 #define HMemCpy memcpy     /**< For x86_64 platform is alias of huge memcpy */
 
 #ifdef __ENABLE_FASTCALL
-#define __FASTCALL__ __attribute__ (( __regparm__(3) )) /**< Fastcall modifier for x86_64 , Note: gcc is not ready to speedup with __stdcall__ */
+#define __FASTCALL__ __attribute__ (( __regparm__(6) )) /**< Fastcall modifier for x86_64 , Note: gcc is not ready to speedup with __stdcall__ */
 #else
 #define __FASTCALL__
 #endif

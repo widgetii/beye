@@ -199,10 +199,11 @@ Base features:
   --target-arch=ARCH     target architecture (i386, alpha, etc)   [auto,generic]
   --enable-debug[=1-3]   compile debugging information into biew [disable]
   --enable-profile       compile profiling information into biew [disable]
+  --enable-gcov          compile gnu coverage information into biew [disable]
 
 Optional features:
-  --enable-slang        disable S-Lang programming library [vt100]
-  --enable-curses       disable "curses" terminal control library [vt100]
+  --enable-slang         disable S-Lang programming library [vt100]
+  --enable-curses        disable "curses" terminal control library [vt100]
   --disable-iconv        disable iconv library [autodetect]
 
 Use these options if autodetection fails:
@@ -243,7 +244,10 @@ _target_arch=auto
 _x11incdir=
 _x11libdir=
 _profile=
+_gcov=
 _debug=
+_osldef=
+_oslibs=
 disable _curses
 disable _slang
 enable  _iconv
@@ -273,11 +277,12 @@ for ac_option do
   --cp=*)
     _cp=`echo $ac_option | cut -d '=' -f 2`
     ;;
-  --disable-profile)
-    _profile=
-    ;;
   --enable-profile)
     _profile='-pg'
+    ;;
+  --enable-gcov)
+    _gcov='-fprofile-arcs -ftest-coverage'
+    _oslibs="-lgcov"
     ;;
   --enable-debug)
     _debug='-g'
@@ -491,8 +496,6 @@ echores "$_target_system"
 echo "Detected host..."$system_name
 
 _cdefos="-DDATADIR='\"$_datadir\"'"
-_osldef=
-_oslibs=
 
 cc_name=`$_cc -v 2>&1 | tail -n 1 | cut -d ' ' -f 1`
 cc_version=`$_cc -dumpversion`
@@ -575,8 +578,8 @@ if test -z "$_x11libdir" ; then
 fi
 
 test -z "$_debug" && _osldef="-s $_osldef" || _cdefos="-finline-limit-5 $_cdefos"
-if test "$_profile" || test "$_debug" ; then
-  _cdefos="-W -Wall -O2 -fno-builtin $_debug $_profile $_cdefos"
+if test "$_profile" -o "$_debug" -o "$_gcov"; then
+  _cdefos="-W -Wall -O2 -fno-builtin $_debug $_profile $_gcov $_cdefos"
   _osldef="$_debug $_profile $_osldef"
 elif test -z "$CFLAGS" ; then
     _cdefos="-DNDEBUG=1 -O2 -ffast-math -fomit-frame-pointer $_cdefos"
