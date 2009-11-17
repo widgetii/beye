@@ -611,18 +611,21 @@ static char * __NEAR__ __FASTCALL__ __buildModRegRm(ix86Param *DisP,tBool w,tBoo
  return ix86_dtile;
 }
 
-static char * __NEAR__ __FASTCALL__ __buildModRegRmReg(ix86Param *DisP,tBool d,unsigned char wrex,unsigned char reg2)
+static char * __NEAR__ __FASTCALL__ __buildModRegRmReg(ix86Param *DisP,tBool d,unsigned char wrex)
 {
  char reg = MODRM_REG(DisP->RealCmd[1]);
  char mod = MODRM_MOD(DisP->RealCmd[1]);
  char rm  = MODRM_RM(DisP->RealCmd[1]);
  const char *dest,*src1,*src2;
- unsigned char brex;
+ unsigned char is4,brex,reg2;
  brex = REX_R(K64_REX);
  dest = k64_getREG(DisP,reg,1,brex,wrex);
  brex = REX_B(K64_REX);
  if(mod == 3) src1 = k64_getREG(DisP,rm,1,brex,wrex);
  else         src1 = ix86_getModRM(1,mod,rm,DisP);
+ DisP->codelen++; // Why this happens ????
+ is4=DisP->RealCmd[DisP->codelen];
+ reg2 = ((is4>>4)&0x0F);
  src2 = k64_getREG(DisP,reg2&0x07,1,(reg2>>3)&1,wrex);
  ix86_dtile[0] = 0;
  strcat(ix86_dtile,dest);
@@ -630,6 +633,7 @@ static char * __NEAR__ __FASTCALL__ __buildModRegRmReg(ix86Param *DisP,tBool d,u
  if((DisP->pfx&PFX_VEX) && (DisP->insn_flags&INSN_VEX_V)) ix86_CStile(ix86_dtile,get_VEX_reg(DisP));
  ix86_CStile(ix86_dtile,d ? src2 : src1);
  ix86_CStile(ix86_dtile,d ? src1 : src2);
+ DisP->codelen++;
  return ix86_dtile;
 }
 
@@ -1619,23 +1623,15 @@ void   __FASTCALL__ arg_simd_xmm0(char *str,ix86Param *DisP) {
 
 /* TODO: fix it !!! */
 void   __FASTCALL__ arg_fma4(char *str,ix86Param *DisP) {
-    unsigned is4,rg,brex,wrex;
+    unsigned wrex;
     unsigned long mod = DisP->mode;
     unsigned char d;
     DisP->mode |= MOD_SSE;
     d = 0;
     if(DisP->insn_flags&INSN_VEXW_AS_SWAP && DisP->pfx&PFX_VEX) d = REX_W(K64_REX)^0x01;
-
-    DisP->codelen++;
-    is4=DisP->RealCmd[DisP->codelen];
-    DisP->codelen++;
-    rg = ((is4>>4)&0x07)/*^0x07*/;
-    brex=wrex=0;
-    if(x86_Bitness == DAB_USE64) {
-	brex = (is4>>7)&0x01;
-	wrex = HAS_67_IN64?0:1;
-    }
-    strcat(str,__buildModRegRmReg(DisP,d,1,rg|((brex&0x01)<<3)));
+    wrex=0;
+    if(x86_Bitness == DAB_USE64) wrex = HAS_67_IN64?0:1;
+    strcat(str,__buildModRegRmReg(DisP,d,wrex));
     DisP->mode = mod;
 }
 
