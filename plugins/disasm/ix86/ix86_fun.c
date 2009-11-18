@@ -621,9 +621,9 @@ static char * __NEAR__ __FASTCALL__ __buildModRegRmReg(ix86Param *DisP,tBool d,u
  brex = REX_R(K64_REX);
  dest = k64_getREG(DisP,reg,1,brex,wrex);
  brex = REX_B(K64_REX);
+ DisP->codelen++;
  if(mod == 3) src1 = k64_getREG(DisP,rm,1,brex,wrex);
  else         src1 = ix86_getModRM(1,mod,rm,DisP);
- DisP->codelen++; // Why this happens ????
  is4=DisP->RealCmd[DisP->codelen];
  reg2 = ((is4>>4)&0x0F);
  src2 = k64_getREG(DisP,reg2&0x07,1,(reg2>>3)&1,wrex);
@@ -1630,7 +1630,6 @@ void   __FASTCALL__ arg_fma4(char *str,ix86Param *DisP) {
     d = 0;
     if(DisP->insn_flags&INSN_VEXW_AS_SWAP && DisP->pfx&PFX_VEX) d = REX_W(K64_REX)^0x01;
     wrex=0;
-    if(x86_Bitness == DAB_USE64) wrex = HAS_67_IN64?0:1;
     strcat(str,__buildModRegRmReg(DisP,d,wrex));
     DisP->mode = mod;
 }
