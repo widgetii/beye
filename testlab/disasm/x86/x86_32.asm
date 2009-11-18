@@ -621,6 +621,13 @@ cmpss xmm1, dword [ebx], 0
 cmpeqss xmm1, xmm2
 cmpeqss xmm1, dword [ebx]
 cmpeqss xmm1, dword [8]
+cmpnltss xmm1, xmm2
+cmpnless xmm1, dword [ebx]
+cmpltss xmm1, dword [ecx]
+cmpless xmm1, dword [edi]
+cmpneqss xmm1, dword [ebx]
+cmpunordss xmm1, dword [4]
+cmpordss xmm1, dword [0]
 
 comisd xmm1, xmm2
 comisd xmm1, qword [ebx]

@@ -1584,8 +1584,7 @@ void __FASTCALL__ arg_simd_rm_imm8_imm8(char *str,ix86Param *DisP)
   arg_imm8(str,DisP);
 }
 
-
-void __FASTCALL__  ix86_ArgXMMCmp(char *str,ix86Param *DisP)
+static void __FASTCALL__  ix86_ArgXMMCmp(char *str,ix86Param *DisP,const char **sfx,unsigned namlen,unsigned precopy)
 {
    char *a;
    unsigned char suffix;
@@ -1595,25 +1594,39 @@ void __FASTCALL__  ix86_ArgXMMCmp(char *str,ix86Param *DisP)
    ix86_Katmai_buff[0] = 0;
    arg_cpu_modregrm(ix86_Katmai_buff,DisP);
    suffix = DisP->RealCmd[DisP->codelen];
+   a = NULL;
    if(suffix < 8)
    {
-    /*Note: this code suppose that name is cmpXY*/
-      strncpy(name, str, 5);
-      name[5] = 0;
-      strncpy(realname,name,3);
-      realname[3] = 0;
-      strcat(realname,ix86_KatmaiCmpSuffixes[suffix]);
-      strcat(realname, &name[3]);
-      strcpy(str, realname);
-      TabSpace(str, TAB_POS);
-      strcat(str,ix86_Katmai_buff);
+	strncpy(name, str, namlen);
+	name[namlen] = 0;
+	strncpy(realname,name,precopy);
+	realname[precopy] = 0;
+	strcat(realname,sfx[suffix]);
+	strcat(realname, &name[precopy]);
+	strcpy(str, realname);
+	TabSpace(str, TAB_POS);
    }
    else {
-	strcat(str,ix86_Katmai_buff);
-	a = ix86_GetDigitTile(DisP,0,0,DisP->codelen);
+	a = Get2Digit(suffix);
    }
+   strcat(str,ix86_Katmai_buff);
+   if(a) ix86_CStile(str,a);
    DisP->mode = mode;
    DisP->codelen++;
+}
+
+static const char *ix86_KatmaiCmpSuffixes[] = { "eq", "lt", "le", "unord", "neq", "nlt", "nle", "ord" };
+void __FASTCALL__  arg_simd_cmp(char *str,ix86Param *DisP)
+{
+    /*Note: this code suppose that name is cmpXY*/
+    return ix86_ArgXMMCmp(str,DisP,ix86_KatmaiCmpSuffixes,5,3);
+}
+
+static const char *xop_cmp_sfx[] = { "lt", "le", "gt", "ge", "eq", "ne", "false", "true" };
+void __FASTCALL__  arg_xop_cmp(char *str,ix86Param *DisP)
+{
+    /*Note: this code suppose that name is vpcomXY?? */
+    return ix86_ArgXMMCmp(str,DisP,xop_cmp_sfx,7,5);
 }
 
 void   __FASTCALL__ arg_simd_xmm0(char *str,ix86Param *DisP) {

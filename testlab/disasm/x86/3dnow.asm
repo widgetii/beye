@@ -141,37 +141,37 @@ vpcmov ymm1, ymm2, ymm3, yword [0]
 vpcmov ymm1, ymm2, [0], ymm4
 vpcmov ymm1, ymm2, yword [0], ymm4
 
-vpcomb xmm1, xmm4, xmm7, 5
-vpcomb xmm2, xmm5, [0], byte 5
-vpcomb xmm3, xmm6, dqword [0], 5
+vpcomb xmm1, xmm4, xmm7, 0
+vpcomb xmm2, xmm5, [0], byte 1
+vpcomb xmm3, xmm6, dqword [0], 2
 
-vpcomd xmm1, xmm4, xmm7, 5
-vpcomd xmm2, xmm5, [0], byte 5
+vpcomd xmm1, xmm4, xmm7, 3
+vpcomd xmm2, xmm5, [0], byte 4
 vpcomd xmm3, xmm6, dqword [0], 5
 
-vpcomq xmm1, xmm4, xmm7, 5
-vpcomq xmm2, xmm5, [0], byte 5
-vpcomq xmm3, xmm6, dqword [0], 5
+vpcomq xmm1, xmm4, xmm7, 6
+vpcomq xmm2, xmm5, [0], byte 7
+vpcomq xmm3, xmm6, dqword [0], 0
 
-vpcomub xmm1, xmm4, xmm7, 5
-vpcomub xmm2, xmm5, [0], byte 5
-vpcomub xmm3, xmm6, dqword [0], 5
+vpcomub xmm1, xmm4, xmm7, 1
+vpcomub xmm2, xmm5, [0], byte 2
+vpcomub xmm3, xmm6, dqword [0], 3
 
-vpcomud xmm1, xmm4, xmm7, 5
+vpcomud xmm1, xmm4, xmm7, 4
 vpcomud xmm2, xmm5, [0], byte 5
-vpcomud xmm3, xmm6, dqword [0], 5
+vpcomud xmm3, xmm6, dqword [0], 6
 
-vpcomuq xmm1, xmm4, xmm7, 5
-vpcomuq xmm2, xmm5, [0], byte 5
-vpcomuq xmm3, xmm6, dqword [0], 5
+vpcomuq xmm1, xmm4, xmm7, 7
+vpcomuq xmm2, xmm5, [0], byte 0
+vpcomuq xmm3, xmm6, dqword [0], 1
 
-vpcomuw xmm1, xmm4, xmm7, 5
-vpcomuw xmm2, xmm5, [0], byte 5
-vpcomuw xmm3, xmm6, dqword [0], 5
+vpcomuw xmm1, xmm4, xmm7, 2
+vpcomuw xmm2, xmm5, [0], byte 3
+vpcomuw xmm3, xmm6, dqword [0], 4
 
 vpcomw xmm1, xmm4, xmm7, 5
-vpcomw xmm2, xmm5, [0], byte 5
-vpcomw xmm3, xmm6, dqword [0], 5
+vpcomw xmm2, xmm5, [0], byte 6
+vpcomw xmm3, xmm6, dqword [0], 8
 
 vphaddbd xmm1, xmm2
 vphaddbd xmm1, [0]

@@ -318,7 +318,6 @@ extern const char * ix86_XMMXGr3[];
 extern const char * ix86_3dPrefetchGrp[];
 
 extern const char * ix86_KatmaiGr2Names[];
-extern const char * ix86_KatmaiCmpSuffixes[];
 
 extern const ix86_ExOpcodes* __FASTCALL__ ix86_prepare_flags(const ix86_ExOpcodes *extable,ix86Param *DisP,unsigned char *code,unsigned char *codelen);
 extern char * __FASTCALL__ ix86_getModRM(tBool w,unsigned char mod,unsigned char rm,ix86Param *DisP);
@@ -395,8 +394,10 @@ extern void   __FASTCALL__ ix86_ArgXMMXGr3(char *str,ix86Param *);
 
 extern void   __FASTCALL__ ix86_ArgKatmaiGrp1(char *str,ix86Param *);
 extern void   __FASTCALL__ ix86_ArgKatmaiGrp2(char *str,ix86Param *);
-extern void   __FASTCALL__ ix86_ArgXMMCmp(char *str,ix86Param *);
 extern void   __FASTCALL__ ix86_ArgMovYX(char *str,ix86Param *);
+extern void   __FASTCALL__ arg_simd_cmp(char *str,ix86Param *DisP);
+extern void   __FASTCALL__ arg_xop_cmp(char *str,ix86Param *DisP);
+
 
 extern void   __FASTCALL__ ix86_VMX(char *str,ix86Param *);
 extern void   __FASTCALL__ ix86_0FVMX(char *str,ix86Param *DisP);
