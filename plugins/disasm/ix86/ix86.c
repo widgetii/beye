@@ -5519,7 +5519,7 @@ struct assembler_t
 */
 struct assembler_t assemblers[] = {
   {
-    "yasm -f bin -s -o %1$stmp1 %1$stmp0 >%1$stmp2",
+    "yasm -f bin -s -o %stmp1 %stmp0 >%stmp2",
 #if defined(__MSDOS__) || defined(__OS2__) || defined(__WIN32__)
     "yasm -s --version 2>NUL",
 #else
@@ -5527,7 +5527,7 @@ struct assembler_t assemblers[] = {
 #endif
   },
   {
-    "nasm -f bin -s -o %1$stmp1 %1$stmp0 >%1$stmp2",
+    "nasm -f bin -s -o %stmp1 %stmp0 >%stmp2",
 #if defined(__MSDOS__) || defined(__OS2__) || defined(__WIN32__)
     "nasm -s -version 2>NUL",
 #else
@@ -5678,7 +5678,7 @@ AsmRet __FASTCALL__ ix86Asm(const char *code)
   fclose(asmf);
 
   //Build command line
-  i=sprintf(commandbuffer, assemblers[active_assembler].run_command, home);
+  i=sprintf(commandbuffer, assemblers[active_assembler].run_command, home, home, home);
   if ((i >= FILENAME_MAX) || (i < 0)) goto commandtoolongerror;
 
   //Run external assembler
