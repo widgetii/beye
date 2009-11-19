@@ -1622,11 +1622,45 @@ void __FASTCALL__  arg_simd_cmp(char *str,ix86Param *DisP)
     return ix86_ArgXMMCmp(str,DisP,ix86_KatmaiCmpSuffixes,5,3);
 }
 
+
 static const char *xop_cmp_sfx[] = { "lt", "le", "gt", "ge", "eq", "ne", "false", "true" };
 void __FASTCALL__  arg_xop_cmp(char *str,ix86Param *DisP)
 {
     /*Note: this code suppose that name is vpcomXY?? */
     return ix86_ArgXMMCmp(str,DisP,xop_cmp_sfx,7,5);
+}
+
+static const char *ix86_clmul_sfx[] = { "lqlq", "hqlq", "lqh", "hqh" };
+void __FASTCALL__  arg_simd_clmul(char *str,ix86Param *DisP)
+{
+   char *a;
+   unsigned char suffix;
+   char name[6], realname[10];
+   unsigned long mode=DisP->mode;
+   DisP->mode|=MOD_SSE;
+   ix86_Katmai_buff[0] = 0;
+   arg_cpu_modregrm(ix86_Katmai_buff,DisP);
+   suffix = DisP->RealCmd[DisP->codelen];
+   suffix = (suffix&0x0F)|((suffix&0xF0)>>3);
+   a = NULL;
+   if(suffix < 4)
+   {
+	strncpy(name, str, 8);
+	name[8] = 0;
+	strncpy(realname,name,6);
+	realname[6] = 0;
+	strcat(realname,ix86_clmul_sfx[suffix]);
+	strcat(realname, &name[6]);
+	strcpy(str, realname);
+	TabSpace(str, TAB_POS);
+   }
+   else {
+	a = Get2Digit(suffix);
+   }
+   strcat(str,ix86_Katmai_buff);
+   if(a) ix86_CStile(str,a);
+   DisP->mode = mode;
+   DisP->codelen++;
 }
 
 void   __FASTCALL__ arg_simd_xmm0(char *str,ix86Param *DisP) {

@@ -396,6 +396,7 @@ extern void   __FASTCALL__ ix86_ArgKatmaiGrp1(char *str,ix86Param *);
 extern void   __FASTCALL__ ix86_ArgKatmaiGrp2(char *str,ix86Param *);
 extern void   __FASTCALL__ ix86_ArgMovYX(char *str,ix86Param *);
 extern void   __FASTCALL__ arg_simd_cmp(char *str,ix86Param *DisP);
+extern void   __FASTCALL__ arg_simd_clmul(char *str,ix86Param *DisP);
 extern void   __FASTCALL__ arg_xop_cmp(char *str,ix86Param *DisP);
 
 

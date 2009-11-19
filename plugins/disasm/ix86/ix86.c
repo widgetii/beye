@@ -2770,7 +2770,7 @@ const ix86_ExOpcodes ix86_660F3A_Table[256] =
   /*0x41*/ DECLARE_EX_INSN("dppd", "dppd",arg_simd_imm8,arg_simd_imm8, IX86_P7|INSN_SSE|INSN_VEX_V, K64_ATHLON|INSN_SSE|INSN_VEX_V),
   /*0x42*/ DECLARE_EX_INSN("mpsadbw", "mpsadbw",arg_simd_imm8,arg_simd_imm8, IX86_P7|INSN_SSE|INSN_VEX_V, K64_ATHLON|INSN_SSE|INSN_VEX_V),
   /*0x43*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
-  /*0x44*/ DECLARE_EX_INSN("pclmulqdq", "pclmulqdq",arg_simd_imm8,arg_simd_imm8, IX86_P8|INSN_AVX, INSN_AVX),
+  /*0x44*/ DECLARE_EX_INSN("pclmuldq", "pclmuldq",arg_simd_clmul,arg_simd_clmul, IX86_P8|INSN_AVX, INSN_AVX),
   /*0x45*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
   /*0x46*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
   /*0x47*/ DECLARE_EX_INSN(NULL, NULL, NULL, NULL, IX86_UNKCPU, K64_ATHLON),
