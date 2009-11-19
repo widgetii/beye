@@ -1584,7 +1584,7 @@ void __FASTCALL__ arg_simd_rm_imm8_imm8(char *str,ix86Param *DisP)
   arg_imm8(str,DisP);
 }
 
-static void __FASTCALL__  ix86_ArgXMMCmp(char *str,ix86Param *DisP,const char **sfx,unsigned namlen,unsigned precopy)
+static void __FASTCALL__  ix86_ArgXMMCmp(char *str,ix86Param *DisP,const char **sfx,unsigned nsfx,unsigned namlen,unsigned precopy)
 {
    char *a;
    unsigned char suffix;
@@ -1595,7 +1595,7 @@ static void __FASTCALL__  ix86_ArgXMMCmp(char *str,ix86Param *DisP,const char **
    arg_cpu_modregrm(ix86_Katmai_buff,DisP);
    suffix = DisP->RealCmd[DisP->codelen];
    a = NULL;
-   if(suffix < 8)
+   if(suffix < nsfx)
    {
 	strncpy(name, str, namlen);
 	name[namlen] = 0;
@@ -1616,10 +1616,15 @@ static void __FASTCALL__  ix86_ArgXMMCmp(char *str,ix86Param *DisP,const char **
 }
 
 static const char *ix86_KatmaiCmpSuffixes[] = { "eq", "lt", "le", "unord", "neq", "nlt", "nle", "ord" };
+static const char *vex_cmp_sfx[] = {
+"eq", "lt", "le", "unord", "neq", "nlt", "nle", "ord", "eq_uq", "nge", "ngt", "false", "neq_oq", "ge", "gt",
+"true", "eq_os", "lt_oq", "le_oq", "unord_s", "neq_us", "nlt_uq", "nle_uq", "ord_s", "eq_us" };
 void __FASTCALL__  arg_simd_cmp(char *str,ix86Param *DisP)
 {
     /*Note: this code suppose that name is cmpXY*/
-    return ix86_ArgXMMCmp(str,DisP,ix86_KatmaiCmpSuffixes,5,3);
+    return str[0]=='v'?
+		ix86_ArgXMMCmp(str,DisP,vex_cmp_sfx,0x19,6,4):
+		ix86_ArgXMMCmp(str,DisP,ix86_KatmaiCmpSuffixes,8,5,3);
 }
 
 
@@ -1627,7 +1632,7 @@ static const char *xop_cmp_sfx[] = { "lt", "le", "gt", "ge", "eq", "ne", "false"
 void __FASTCALL__  arg_xop_cmp(char *str,ix86Param *DisP)
 {
     /*Note: this code suppose that name is vpcomXY?? */
-    return ix86_ArgXMMCmp(str,DisP,xop_cmp_sfx,7,5);
+    return ix86_ArgXMMCmp(str,DisP,xop_cmp_sfx,8,7,5);
 }
 
 static const char *ix86_clmul_sfx[] = { "lqlq", "hqlq", "lqh", "hqh" };
@@ -1637,20 +1642,24 @@ void __FASTCALL__  arg_simd_clmul(char *str,ix86Param *DisP)
    unsigned char suffix;
    char name[6], realname[10];
    unsigned long mode=DisP->mode;
+   unsigned namlen,precopy;
    DisP->mode|=MOD_SSE;
    ix86_Katmai_buff[0] = 0;
    arg_cpu_modregrm(ix86_Katmai_buff,DisP);
    suffix = DisP->RealCmd[DisP->codelen];
    suffix = (suffix&0x0F)|((suffix&0xF0)>>3);
+   namlen=8;
+   precopy=6;
+   if(str[0]=='v') { namlen++; precopy++; }
    a = NULL;
    if(suffix < 4)
    {
-	strncpy(name, str, 8);
-	name[8] = 0;
-	strncpy(realname,name,6);
-	realname[6] = 0;
+	strncpy(name, str, namlen);
+	name[namlen] = 0;
+	strncpy(realname,name,precopy);
+	realname[precopy] = 0;
 	strcat(realname,ix86_clmul_sfx[suffix]);
-	strcat(realname, &name[6]);
+	strcat(realname, &name[precopy]);
 	strcpy(str, realname);
 	TabSpace(str, TAB_POS);
    }
