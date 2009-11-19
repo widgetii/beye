@@ -1622,7 +1622,7 @@ static const char *vex_cmp_sfx[] = {
 void __FASTCALL__  arg_simd_cmp(char *str,ix86Param *DisP)
 {
     /*Note: this code suppose that name is cmpXY*/
-    return str[0]=='v'?
+    return (str[0]=='v' && (DisP->pfx&PFX_VEX))?
 		ix86_ArgXMMCmp(str,DisP,vex_cmp_sfx,0x19,6,4):
 		ix86_ArgXMMCmp(str,DisP,ix86_KatmaiCmpSuffixes,8,5,3);
 }
@@ -1650,7 +1650,7 @@ void __FASTCALL__  arg_simd_clmul(char *str,ix86Param *DisP)
    suffix = (suffix&0x0F)|((suffix&0xF0)>>3);
    namlen=8;
    precopy=6;
-   if(str[0]=='v') { namlen++; precopy++; }
+   if(str[0]=='v' && (DisP->pfx&PFX_VEX)) { namlen++; precopy++; }
    a = NULL;
    if(suffix < 4)
    {
