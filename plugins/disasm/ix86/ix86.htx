@@ -876,7 +876,7 @@
 ³ %IThe processor contains 10 execution pipelines: store, load, integer X%i   ³
 ³ %IALU, integer Y ALU, MMX ALU (X), MMX ALU (Y), MMX/3DNow! multiplier,%i    ³
 ³ %I3DNow! ALU, Floating-Point, and Branch.%i                                 ³
-ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ 3DNow! ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
 ³ femms     [0F_0E]             Faster Enter/Exit of MMX or FP state      ³
 ³ pavgusb   [0F_0F/rm/BF]       Average of packed U8                      ³
 ³ pf2id     [0F_0F/rm/1D]       Convert Packed F32 to Packed S32          ³
@@ -925,7 +925,7 @@
 ³ %IAlso AMD Athlon processor contains APIC, MTRRs, Global Paging Extension,%i³
 ³ %IMachine Check Architecture, Conditional Move Instructions, and Page%i     ³
 ³ %IAttribute Table and implements%i %B3DNow! DSP Extensions%b%I:%i                   ³
-ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ 3DNowA! ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
 ³ pf2iw      [0F_0F/rm/1C]      Packed F32 to S16 conv. with sign ext.    ³
 ³ pfnacc     [0F_07/rm/8A]      Packed F32 negative accumulate            ³
 ³ pfpnacc    [0F_0F/rm/8E]      Packed F32 mix. posit./negat. accumulate  ³
@@ -941,7 +941,27 @@
 ³ %Iand add a new set of 128-bit registers. These instructions target%i       ³
 ³ %Iexisting functional units within the architecture as well as the new%i    ³
 ³ %ISIMD-floating-point unit (Single-Instruction, Multiple-Data).%i           ³
-ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ MMX2 ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
+³ maskmovq    [0F_F7/3]               Byte mask write                     ³
+³ movntq      [0F_E7]                 Move 64-bits Non Temporal           ³
+³ pavgb       [0F_E0]                 Packed Average U8                   ³
+³ pavgw       [0F_E3]                 Packed Average U16                  ³
+³ pextrw      [0F_C5:3]               Extract U16                         ³
+³ pinsrw      [0F_C4]                 Insert U16                          ³
+³ pmaxsw      [0F_EE]                 Packed S16 maximum                  ³
+³ pmaxub      [0F_DE]                 Packed U8 maximum                   ³
+³ pminsw      [0F_EA]                 Packed S16 minimum                  ³
+³ pminub      [0F_DA]                 Packed U8 minimum                   ³
+³ pmovmskb    [0F_D7:3]               Move Byte Mask to Integer           ³
+³ pmulhuw     [0F_E4]                 Packed Multiply High U16            ³
+³ prefetchnta [0F_18/0]               Prefetch to L1 cache                ³
+³ prefetcht0  [0F_18/1]               Prefetch to all cache levels        ³
+³ prefetcht1  [0F_18/2]               Prefetch to all cache levels        ³
+³ prefetcht2  [0F_18/3]               Prefetch to L2 cache                ³
+³ psadbw      [0F_F6]                 Packed Sum of Absolute U16 Differenc³
+³ pshufw      [0F_70]                 Packed Shuffle U16                  ³
+³ sfence      [0F_AE/7]               Store Fence                         ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ SSE ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
 ³ addps       [0F_58]                 Packed F32 Add                      ³
 ³ addss       [F3_0F_58]              Scalar F32 Add                      ³
 ³ andps       [0F_54]                 Bitwise Logical And for F32         ³
@@ -978,7 +998,6 @@
 ³ ldmxcsr     [0F_AE/2]               Load SSE control/status register    ³
 ³ maxps       [0F_5F]                 Packed F32 maximum                  ³
 ³ maxss       [F3_0F_5F]              Scalar F32 maximum                  ³
-³ maskmovq    [0F_F7/3]               Byte mask write                     ³
 ³ minps       [0F_5D]                 Packed F32 minimum                  ³
 ³ minss       [F3_0F_5D]              Scalar F32 minimum                  ³
 ³ movaps      [0F_28;0F_29]           Move Aligned Packed F32             ³
@@ -988,33 +1007,15 @@
 ³ movlps      [0F_12;0F_13]           Move Low Packed F32                 ³
 ³ movmskps    [0F_50:3]               Move Mask to Integer                ³
 ³ movntps     [0F_2B]                 Mov Align. Packed F32 non Temporal  ³
-³ movntq      [0F_E7]                 Move 64-bits Non Temporal           ³
 ³ movss       [F3_0F_10;F3_0F_11]     Move Scalar F32                     ³
 ³ movups      [0F_10;0F_11]           Move Unaligned Packed F32           ³
 ³ mulps       [0F_59]                 Packed F32 Multiply                 ³
 ³ mulss       [F3_0F_59]              Scalar F32 Multiply                 ³
 ³ orps        [0F_56]                 Bitwise Logical OR for F32          ³
-³ pavgb       [0F_E0]                 Packed Average U8                   ³
-³ pavgw       [0F_E3]                 Packed Average U16                  ³
-³ pextrw      [0F_C5:3]               Extract U16                         ³
-³ pinsrw      [0F_C4]                 Insert U16                          ³
-³ pmaxsw      [0F_EE]                 Packed S16 maximum                  ³
-³ pmaxub      [0F_DE]                 Packed U8 maximum                   ³
-³ pminsw      [0F_EA]                 Packed S16 minimum                  ³
-³ pminub      [0F_DA]                 Packed U8 minimum                   ³
-³ pmovmskb    [0F_D7:3]               Move Byte Mask to Integer           ³
-³ pmulhuw     [0F_E4]                 Packed Multiply High U16            ³
-³ prefetchnta [0F_18/0]               Prefetch to L1 cache                ³
-³ prefetcht0  [0F_18/1]               Prefetch to all cache levels        ³
-³ prefetcht1  [0F_18/2]               Prefetch to all cache levels        ³
-³ prefetcht2  [0F_18/3]               Prefetch to L2 cache                ³
-³ psadbw      [0F_F6]                 Packed Sum of Absolute U16 Differenc³
-³ pshufw      [0F_70]                 Packed Shuffle U16                  ³
 ³ rcpps       [0F_53]                 Packed F32 Reciprocal               ³
 ³ rcpss       [F3_0F_53]              Scalar F32 Reciprocal               ³
 ³ rsqrtps     [0F_52]                 Packed F32 Square Root Recip.       ³
 ³ rsqrtss     [F3_0F_52]              Scalar F32 Square Root Recip.       ³
-³ sfence      [0F_AE/7]               Store Fence                         ³
 ³ shufps      [0F_C6]                 Shuffle F32                         ³
 ³ sqrtps      [0F_51]                 Packed F32 Square Root              ³
 ³ sqrtss      [F3_0F_51]              Scalar F32 Square Root              ³
@@ -1036,7 +1037,7 @@
 ³ %Iprecision floating point operations. In addition, it has Rapid Execution%i³
 ³ %IEngine, Hyper Pipelined Technology, Advanced Dynamic Execution,%i         ³
 ³ %IInnovative new cache subsystem.%i                                         ³
-ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ SSE2 ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
 ³ addpd       [66_0F_58]              Packed F64 Add                      ³
 ³ addsd       [F2_0F_58]              Scalar F64 Add                      ³
 ³ andpd       [66_0F_54]              Bitwise Logical And for F64         ³
@@ -1184,7 +1185,7 @@
 ³ %BPrescott%b%I is the name for a new (9th in biew terms) generation%i           ³
 ³ %Iof IA32 processors which introduces new instructions (unofficially   %i   ³
 ³ %Inamed as SSE3)%i                                                          ³
-ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ SSE3 ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
 ³ monitor     [0F_01_C8]              Setup monitor address               ³
 ³ mwait       [0F_01_C9]              Monitor wait                        ³
 ³ fistpp      [DB(DD,DF)/1]           Store Int and pop x87 with trunc    ³
@@ -1225,7 +1226,7 @@
 ³ %BXeon5100%b%I is the name for a new (10th in biew terms) generation%i          ³
 ³ %Iof IA32 processors which introduces new instructions (unofficially   %i   ³
 ³ %Inamed as Supplemental SSE3 or SSSE3)%i                                    ³
-ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ SSSE3 ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
 ³ pabsb       [0F_38_1C/r]            Packet Absolute value for mmx S8    ³
 ³ pabsb       [66_0F_38_1C/r]         Packet Absolute value for xmmx S8   ³
 ³ pabsw       [0F_38_1D/r]            Packet Absolute value for mmx S16   ³
@@ -1302,7 +1303,7 @@
 ³ %BXeon5200%b%I is the name for a new (11th in biew terms) generation%i          ³
 ³ %Iof IA32 processors which introduces new instructions (unofficially   %i   ³
 ³ %Inamed as SSE4)%i                                                          ³
-ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ4.1ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ SSE4.1 ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
 ³ blendpd     [66_0F_3A_OD/r/i8]      Blend Packet F64                    ³
 ³ blendps     [66_0F_3A_OC/r/i8]      Blend Packet F32                    ³
 ³ blendvpd    [66_0F_38_15/r]         Variable Blend Packet F64           ³
@@ -1351,23 +1352,24 @@
 ³ roundps     [66_0F_3A_08/r/i8]      Round Packet F32                    ³
 ³ roundsd     [66_0F_3A_0B/r/i8]      Round Scalar F64                    ³
 ³ roundss     [66_0F_3A_0A/r/i8]      Round Scalar F32                    ³
-ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ4.2ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ SSE4.2 ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
 ³ crc32       [F2_0F_38_F0/r]         Accumulate CRC-32 Value (011EDC6F41)³
 ³ crc32       [F2_0F_38_F1/r]         Accumulate CRC-32 Value (011EDC6F41)³
 ³ pcmpestri   [66_0F_3A_61/r/i8]      Pack Cmp Explicit Length String, idx³
 ³ pcmpestrm   [66_0F_3A_60/r/i8]      Pack Cmp Explicit Length String, msk³
 ³ pcmpistri   [66_0F_3A_63/r/i8]      Pack Cmp Implicit Length String, idx³
 ³ pcmpistrm   [66_0F_3A_62/r/i8]      Pack Cmp Implicit Length String, msk³
-³ popcnt      [F3_0F_B8/r]            Count of Number set to 1 bits       ³
-ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄK64 Fam10 sse4aÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ K64 Fam10 sse4a ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
 ³ extrq       [66_0F_78/0/ib/ib]      Extracts from lower U64             ³
 ³ extrq       [66_0F_79/r]            Extracts from lower U64             ³
 ³ insertq     [F2_0F_78/0/ib/ib]      Inserts from lower U64              ³
 ³ insertq     [F2_0F_79/r]            Inserts from lower U64              ³
 ³ movntsd     [F2_0F_2B/r]            Stores Scalar F64 non temporary     ³
 ³ movntss     [F3_0F_79/r]            Stores Scalar F32 non temporary     ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ K64 Fam10 ABM ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
 ³ lzcnt       [F3_0F_BD/r]            Count of Number of leading zeros    ³
-ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄK64 Fam10 SVMÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
+³ popcnt      [F3_0F_B8/r]            Count of Number set to 1 bits       ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ K64 Fam10 SVM ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
 ³ clgi        [0F_01_DD]              Clear global interrupt flag         ³
 ³ invlpga     [0F_01_DF]              Invalidates TLB mapping for vrt.page³
 ³ skinit      [0F_01_DE]              Securely reinit CPU to run VMM      ³
