@@ -5070,14 +5070,17 @@ static DisasmRet __FASTCALL__ ix86Disassembler(__filesize_t ulShift,
  DisP.insn_flags = ix86_table[code].pro_clone;
  if((DisP.pfx&PFX_VEX) && DisP.VEX_m>0 && DisP.VEX_m<4 && !(DisP.pfx&PFX_XOP)) goto fake_0F_opcode;
  if(code==0x0F && (DisP.pfx&(PFX_F2_REPNE|PFX_F3_REP|PFX_66))) {
-    const ix86_ExOpcodes *SSE2_ext=ix86_extable;
+    const ix86_ExOpcodes *SSE2_ext;
     unsigned char ecode;
     const char *nam;
     ix86_method mthd;
     /* for continuing  */
-    unsigned char up_saved = up;
-    ix86Param DisP_saved=DisP;
+    unsigned char up_saved;
+    ix86Param DisP_saved;
     fake_0F_opcode:
+    DisP_saved=DisP;
+    up_saved=up;
+    SSE2_ext=ix86_extable;
     if(DisP.pfx&PFX_F2_REPNE) SSE2_ext=ix86_F20F_PentiumTable;
     else
     if(DisP.pfx&PFX_F3_REP)   SSE2_ext=ix86_F30F_PentiumTable;
