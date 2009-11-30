@@ -4842,7 +4842,6 @@ static void parse_XOP_8F(ix86Param* DisP) {
     parse_VEX_C4(DisP);
     DisP->pfx|=PFX_XOP;
     DisP->XOP_m = DisP->VEX_m;
-    DisP->VEX_m &= 0x1F;
     DisP->VEX_m = 0x01; /* Fake 0Fh opcode*/
 }
 
