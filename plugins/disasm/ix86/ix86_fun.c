@@ -363,30 +363,43 @@ static char * __NEAR__ __FASTCALL__ ConstrSibMod(ix86Param*DisP,char * store,cha
 
 char * __FASTCALL__ ix86_getModRM16(tBool w,unsigned char mod,unsigned char rm,ix86Param *DisP)
 {
- const char *cptr;
  char square[50];
  char new_mode = mod;
  unsigned char clen;
  tBool as_sign,is_disponly,as_rip;
- clen = 2;
- cptr = ix86_A16[rm];
- strcpy(square,cptr);
- mod = new_mode;
- if(mod != 3)
- {
-    strcat(ix86_modrm_ret,ix86_segpref);
-    ix86_segpref[0] = 0;
+ if(!((DisP->flags & __DISF_SIZEONLY) == __DISF_SIZEONLY)) {
+    strcpy(square,ix86_A16[rm]);
+    mod = new_mode;
+    if(mod != 3)
+    {
+	strcat(ix86_modrm_ret,ix86_segpref);
+	ix86_segpref[0] = 0;
+    }
+    is_disponly = False;
+    as_sign = True;
+    as_rip=False;
  }
- is_disponly = False;
- as_sign = True;
- as_rip=False;
- switch(mod)
- {
+ clen = 2;
+ switch(mod) {
+    case 0:
+	if(rm!=6)	clen=0;
+	else		clen=2;
+	break;
+    case 1:
+	clen = 1;
+	break;
+    case 2:
+	clen=2;
+	break;
+    default:
+	clen=0;
+	break;
+ }
+ if(!((DisP->flags & __DISF_SIZEONLY) == __DISF_SIZEONLY)) {
+    switch(mod) {
 	case 0:
-		if(rm != 6) { /* i.e. combine address */
-		    clen = 0;
+		if(rm != 6) /* i.e. combine address */
 		    strcat(ix86_modrm_ret,square);
-		}
 		else { /* i.e. displacement only. fake mod = 2 */
 		    square[0] = 0;
 		    is_disponly = True;
@@ -397,7 +410,6 @@ char * __FASTCALL__ ix86_getModRM16(tBool w,unsigned char mod,unsigned char rm,i
 	case 1:
 		strcat(ix86_modrm_ret,ix86_segpref);
 		ix86_segpref[0] = 0;
-		clen = 1;
 		strcat(ix86_modrm_ret,square);
 		/* The "disp8" nomenclature denotes an 8-bit displacement
 		   following the ModR/M or SIB byte, to be sign-extended
@@ -410,13 +422,12 @@ char * __FASTCALL__ ix86_getModRM16(tBool w,unsigned char mod,unsigned char rm,i
 		ix86_segpref[0] = 0;
 		strcat(ix86_modrm_ret,square);
 		strcat(ix86_modrm_ret,Get4SquareDig(2,DisP,as_sign,is_disponly));
-		clen = 2;
 		}
 		break;
 	default:
-		clen = 0;
 		strcat(ix86_modrm_ret,k64_getREG(DisP,rm,w,0,0));
 		break;
+    }
  }
  if(mod != 3) DisP->codelen += clen;
  return ix86_modrm_ret;
@@ -433,27 +444,47 @@ char * __FASTCALL__ ix86_getModRM32(tBool w,unsigned char mod,unsigned char rm,i
  char new_mode = mod;
  unsigned char clen,tmp;
  tBool as_sign,is_disponly,as_rip;
- clen = 2;
- if(rm == 4)	cptr = ConstrSibMod(DisP,ret1,base,_index,scale,DisP->RealCmd[2],&new_mode);
- else		cptr = k64_DWordRegs[REX_reg(REX_b(K64_REX),rm)];
- strcpy(square,cptr);
- mod = new_mode;
- if(mod != 3)
- {
-    strcat(ix86_modrm_ret,ix86_segpref);
-    ix86_segpref[0] = 0;
+ if(!((DisP->flags & __DISF_SIZEONLY) == __DISF_SIZEONLY)) {
+    if(rm == 4)	cptr = ConstrSibMod(DisP,ret1,base,_index,scale,DisP->RealCmd[2],&new_mode);
+    else	cptr = k64_DWordRegs[REX_reg(REX_b(K64_REX),rm)];
+    strcpy(square,cptr);
+    mod = new_mode;
+    if(mod != 3) {
+	strcat(ix86_modrm_ret,ix86_segpref);
+	ix86_segpref[0] = 0;
+    }
+    is_disponly = False;
+    as_sign = True;
+    as_rip=False;
  }
- is_disponly = False;
- as_sign = True;
- as_rip=False;
- switch(mod)
- {
+ clen = 2;
+ switch(mod) {
+    case 0:
+	if(rm != 5) { /* i.e. combine address */
+	    clen = 0;
+	    if(rm == 4) clen = 1;
+	}
+	else goto __disp_long;
+	break;
+    case 1:
+	if(rm != 4)	clen = 1;
+	else		clen = 2;
+	break;
+    case 2: {
+	    __disp_long:
+	    if(rm != 4)	clen = 4;
+	    else	clen = 5;
+	}		
+	break;
+    default:
+	clen=0;
+	break;
+ }
+ if(!((DisP->flags & __DISF_SIZEONLY) == __DISF_SIZEONLY)) {
+    switch(mod) {
 	case 0:
-		if(rm != 5) { /* i.e. combine address */
-		    clen = 0;
-		    if(rm == 4) clen = 1;
+		if(rm != 5) /* i.e. combine address */
 		    strcat(ix86_modrm_ret,square);
-		}
 		else { /* i.e. displacement only. fake mod = 2 */
 		    square[0] = 0;
 		    is_disponly = True;
@@ -462,8 +493,8 @@ char * __FASTCALL__ ix86_getModRM32(tBool w,unsigned char mod,unsigned char rm,i
 		}
 		break;
 	case 1:
-		if(rm != 4) { tmp = 2; clen = 1; }
-		else        { tmp = 3; clen = 2; }
+		if(rm != 4)	tmp = 2;
+		else		tmp = 3;
 		strcat(ix86_modrm_ret,square);
 		/* The "disp8" nomenclature denotes an 8-bit displacement
 		   following the ModR/M or SIB byte, to be sign-extended
@@ -472,16 +503,16 @@ char * __FASTCALL__ ix86_getModRM32(tBool w,unsigned char mod,unsigned char rm,i
 		break;
 	case 2: {
 		disp_long:
-		if(rm != 4) { tmp = 2; clen = 4; }
-		else        { tmp = 3; clen = 5; }
-		strcat(ix86_modrm_ret,square);
-		strcat(ix86_modrm_ret,Get8SquareDig(tmp,DisP,as_sign,is_disponly,as_rip));
+		    if(rm != 4)	tmp = 2;
+		    else	tmp = 3;
+		    strcat(ix86_modrm_ret,square);
+		    strcat(ix86_modrm_ret,Get8SquareDig(tmp,DisP,as_sign,is_disponly,as_rip));
 		}
 		break;
 	default:
-		clen = 0;
 		strcat(ix86_modrm_ret,k64_getREG(DisP,rm,w,0,0));
 		break;
+    }
  }
  if(mod != 3) DisP->codelen += clen;
  return ix86_modrm_ret;
@@ -498,27 +529,47 @@ char * __FASTCALL__ ix86_getModRM64(tBool w,unsigned char mod,unsigned char rm,i
  char new_mode = mod;
  unsigned char clen,tmp;
  tBool as_sign,is_disponly,as_rip;
- clen = 2;
- if(rm == 4)	cptr = ConstrSibMod(DisP,ret1,base,_index,scale,DisP->RealCmd[2],&new_mode);
- else		cptr = k64_QWordRegs[REX_reg(REX_b(K64_REX),rm)];
- strcpy(square,cptr);
- mod = new_mode;
- if(mod != 3)
- {
-    strcat(ix86_modrm_ret,ix86_segpref);
-    ix86_segpref[0] = 0;
+ if(!((DisP->flags & __DISF_SIZEONLY) == __DISF_SIZEONLY)) {
+    if(rm == 4)	cptr = ConstrSibMod(DisP,ret1,base,_index,scale,DisP->RealCmd[2],&new_mode);
+    else	cptr = k64_QWordRegs[REX_reg(REX_b(K64_REX),rm)];
+    strcpy(square,cptr);
+    mod = new_mode;
+    if(mod != 3) {
+	strcat(ix86_modrm_ret,ix86_segpref);
+	ix86_segpref[0] = 0;
+    }
+    is_disponly = False;
+    as_sign = True;
+    as_rip=False;
  }
- is_disponly = False;
- as_sign = True;
- as_rip=False;
- switch(mod)
- {
+ clen = 2;
+ switch(mod) {
+    case 0:
+	if(rm != 5) { /* i.e. combine address */
+	    clen = 0;
+	    if(rm == 4) clen = 1;
+	}
+	else goto __disp_long;
+	break;
+    case 1:
+	if(rm != 4)	clen = 1;
+	else		clen = 2;
+	break;
+    case 2: {
+	__disp_long:
+	    if(rm != 4)	clen = 4;
+	    else	clen = 5;
+	}
+	break;
+    default:
+	clen=0;
+	break;
+ }
+ if(!((DisP->flags & __DISF_SIZEONLY) == __DISF_SIZEONLY)) {
+    switch(mod) {
 	case 0:
-		if(rm != 5) { /* i.e. combine address */
-		    clen = 0;
-		    if(rm == 4) clen = 1;
+		if(rm != 5) /* i.e. combine address */
 		    strcat(ix86_modrm_ret,square);
-		}
 		else { /* i.e. displacement only. fake mod = 2 */
 		    square[0] = 0;
 		    is_disponly = True;
@@ -527,8 +578,8 @@ char * __FASTCALL__ ix86_getModRM64(tBool w,unsigned char mod,unsigned char rm,i
 		}
 		break;
 	case 1:
-		if(rm != 4) { tmp = 2; clen = 1; }
-		else        { tmp = 3; clen = 2; }
+		if(rm != 4)	tmp = 2;
+		else		tmp = 3;
 		strcat(ix86_modrm_ret,square);
 		/* The "disp8" nomenclature denotes an 8-bit displacement
 		   following the ModR/M or SIB byte, to be sign-extended
@@ -536,28 +587,27 @@ char * __FASTCALL__ ix86_getModRM64(tBool w,unsigned char mod,unsigned char rm,i
 		strcat(ix86_modrm_ret,Get2SquareDig(tmp,DisP,True));
 		break;
 	case 2: {
-		disp_long:
-		if(is_disponly)
-		{
-		    strcat(ix86_modrm_ret,"rip");
-		    as_sign = True;
-		    is_disponly = False;
-		    as_rip=True;
-		}
-		if(rm != 4) { tmp = 2; clen = 4; }
-		else        { tmp = 3; clen = 5; }
-		strcat(ix86_modrm_ret,square);
-		strcat(ix86_modrm_ret,Get8SquareDig(tmp,DisP,as_sign,is_disponly,as_rip));
+		    disp_long:
+		    if(is_disponly) {
+			strcat(ix86_modrm_ret,"rip");
+			as_sign = True;
+			is_disponly = False;
+			as_rip=True;
+		    }
+		    if(rm != 4)	tmp = 2;
+		    else	tmp = 3;
+		    strcat(ix86_modrm_ret,square);
+		    strcat(ix86_modrm_ret,Get8SquareDig(tmp,DisP,as_sign,is_disponly,as_rip));
 		}
 		break;
 	default: {
-		tBool brex, use64;
-		clen = 0;
-		brex = REX_B(K64_REX);
-		use64 = REX_W(K64_REX);
-		strcat(ix86_modrm_ret,k64_getREG(DisP,rm,w,brex,use64));
+		    tBool brex, use64;
+		    brex = REX_B(K64_REX);
+		    use64 = REX_W(K64_REX);
+		    strcat(ix86_modrm_ret,k64_getREG(DisP,rm,w,brex,use64));
 		}
 		break;
+    }
  }
  if(mod != 3) DisP->codelen += clen;
  return ix86_modrm_ret;
@@ -566,20 +616,26 @@ char * __FASTCALL__ ix86_getModRM64(tBool w,unsigned char mod,unsigned char rm,i
 char * __FASTCALL__ ix86_getModRM(tBool w,unsigned char mod,unsigned char rm,ix86Param *DisP)
 {
     char *rval;
-    if(mod!=3)	strcpy(ix86_modrm_ret,"[");
-    else	ix86_modrm_ret[0]=0;
+    if(!((DisP->flags & __DISF_SIZEONLY) == __DISF_SIZEONLY)) {
+	if(mod!=3)	strcpy(ix86_modrm_ret,"[");
+	else		ix86_modrm_ret[0]=0;
+    }
     if((x86_Bitness == DAB_USE16 || x86_Bitness == DAB_USE32) && !USE_WIDE_ADDR) rval = ix86_getModRM16(w,mod,rm,DisP);
     else
     if(x86_Bitness == DAB_USE64 && USE_WIDE_ADDR) rval = ix86_getModRM64(w,mod,rm,DisP);
     else rval = ix86_getModRM32(w,mod,rm,DisP);
-    if(mod!=3)	strcat(ix86_modrm_ret,"]");
+    if(!((DisP->flags & __DISF_SIZEONLY) == __DISF_SIZEONLY)) {
+	if(mod!=3)	strcat(ix86_modrm_ret,"]");
+    }
     return rval;
 }
 
-char * __FASTCALL__ ix86_CStile(char *str,const char *arg2)
+char * __FASTCALL__ ix86_CStile(ix86Param *DisP,char *str,const char *arg2)
 {
-  strcat(str,",");
-  strcat(str,arg2);
+  if(!((DisP->flags & __DISF_SIZEONLY) == __DISF_SIZEONLY)) {
+    strcat(str,",");
+    strcat(str,arg2);
+  }
   return str;
 }
 
@@ -604,10 +660,10 @@ static char * __NEAR__ __FASTCALL__ __buildModRegRm(ix86Param *DisP,tBool w,tBoo
  ends = d ? modrm : regs;
  if((DisP->pfx&PFX_VEX) && (DisP->insn_flags&INSN_VEX_V)) vxx = get_VEX_reg(DisP);
  if(vxx) {
-    ix86_CStile(ix86_dtile,vex_d ? ends : vxx);
-    ix86_CStile(ix86_dtile,vex_d ? vxx : ends);
+    ix86_CStile(DisP,ix86_dtile,vex_d ? ends : vxx);
+    ix86_CStile(DisP,ix86_dtile,vex_d ? vxx : ends);
  }
- else     ix86_CStile(ix86_dtile,ends);
+ else     ix86_CStile(DisP,ix86_dtile,ends);
  return ix86_dtile;
 }
 
@@ -630,9 +686,9 @@ static char * __NEAR__ __FASTCALL__ __buildModRegRmReg(ix86Param *DisP,tBool d,u
  ix86_dtile[0] = 0;
  strcat(ix86_dtile,dest);
  /* add VEX.vvvv field as first source operand */
- if((DisP->pfx&PFX_VEX) && (DisP->insn_flags&INSN_VEX_V)) ix86_CStile(ix86_dtile,get_VEX_reg(DisP));
- ix86_CStile(ix86_dtile,d ? src2 : src1);
- ix86_CStile(ix86_dtile,d ? src1 : src2);
+ if((DisP->pfx&PFX_VEX) && (DisP->insn_flags&INSN_VEX_V)) ix86_CStile(DisP,ix86_dtile,get_VEX_reg(DisP));
+ ix86_CStile(DisP,ix86_dtile,d ? src2 : src1);
+ ix86_CStile(DisP,ix86_dtile,d ? src1 : src2);
  DisP->codelen++;
  return ix86_dtile;
 }
@@ -656,8 +712,7 @@ void __FASTCALL__ arg_cpu_modREGrm(char * str,ix86Param *DisP)
   strcat(str,k64_getREG(DisP,reg,True,brex,wrex));
   DisP->mode=mode;
   DisP->codelen++;
-  if(!((DisP->flags & __DISF_SIZEONLY) == __DISF_SIZEONLY)) strcat(str,",");
-  strcat(str,ix86_getModRM((DisP->insn_flags&INSN_OP_BYTE)?False:True,mod,rm,DisP));
+  ix86_CStile(DisP,str,ix86_getModRM((DisP->insn_flags&INSN_OP_BYTE)?False:True,mod,rm,DisP));
 }
 
 void __FASTCALL__ arg_cpu_mod_rm(char* str,ix86Param *DisP)
@@ -673,13 +728,13 @@ void __FASTCALL__ arg_cpu_mod_rm(char* str,ix86Param *DisP)
 void  __FASTCALL__ arg_cpu_mod_rm_imm(char *str,ix86Param *DisP)
 {
   arg_cpu_mod_rm(str,DisP);
-  ix86_CStile(str,ix86_GetDigitTile(DisP,(DisP->insn_flags&IMM_BYTE)?False:True,0,DisP->codelen));
+  ix86_CStile(DisP,str,ix86_GetDigitTile(DisP,(DisP->insn_flags&IMM_BYTE)?False:True,0,DisP->codelen));
 }
 
 void  __FASTCALL__ arg_cpu_modregrm_imm(char *str,ix86Param *DisP)
 {
   arg_cpu_modregrm(str,DisP);
-  ix86_CStile(str,ix86_GetDigitTile(DisP,(DisP->insn_flags&IMM_BYTE)?False:True,0,DisP->codelen));
+  ix86_CStile(DisP,str,ix86_GetDigitTile(DisP,(DisP->insn_flags&IMM_BYTE)?False:True,0,DisP->codelen));
 }
 
 void __FASTCALL__ arg_cpu_modsegrm(char * str,ix86Param *DisP)
@@ -699,7 +754,7 @@ void __FASTCALL__ arg_cpu_modsegrm(char * str,ix86Param *DisP)
       DisP->pro_clone = IX86_CPU386;
   DisP->mode = mode;
   strcat(str,direct ? sregptr : tileptr);
-  ix86_CStile(str,direct ? tileptr : sregptr);
+  ix86_CStile(DisP,str,direct ? tileptr : sregptr);
 }
 
 void __FASTCALL__ arg_r0_imm(char * str,ix86Param *DisP)
@@ -713,7 +768,7 @@ void __FASTCALL__ arg_r0_imm(char * str,ix86Param *DisP)
      (example: "adc r13, 123456789ABCDEF0").
      TODO: if(use64) w = -1; here */
   strcat(str,k64_getREG(DisP,0,w,0,wrex));
-  ix86_CStile(str,ix86_GetDigitTile(DisP,w,0,1));
+  ix86_CStile(DisP,str,ix86_GetDigitTile(DisP,w,0,1));
 }
 
 void __FASTCALL__ arg_r0rm(char *str,ix86Param *DisP)
@@ -725,7 +780,7 @@ void __FASTCALL__ arg_r0rm(char *str,ix86Param *DisP)
   if(rm==0 && !HAS_REX) strcpy(str,"nop");
   else {
     strcat(str,k64_getREG(DisP,0,True,0,wrex));
-    ix86_CStile(str,k64_getREG(DisP,rm,True,brex,wrex));
+    ix86_CStile(DisP,str,k64_getREG(DisP,rm,True,brex,wrex));
   }
 }
 
@@ -751,7 +806,7 @@ void __FASTCALL__ arg_r0mem(char *str,ix86Param *DisP)
   if(x86_Bitness == DAB_USE64 && !HAS_67_IN64) DisP->codelen = 9;
   else  DisP->codelen = USE_WIDE_ADDR ? 5 : 3;
   strcat(str,d ? ix86_appstr : reg);
-  ix86_CStile(str,d ? reg : ix86_appstr);
+  ix86_CStile(DisP,str,d ? reg : ix86_appstr);
 }
 
 void __FASTCALL__ arg_insnreg(char *str,ix86Param *DisP)
@@ -767,7 +822,7 @@ void __FASTCALL__ arg_insnreg_imm(char * str,ix86Param *DisP)
   char w = (DisP->insn_flags&INSN_OP_BYTE)?0:1;
   arg_insnreg(str,DisP);
   if(x86_Bitness == DAB_USE64 && REX_W(K64_REX) && w) w = -1; /* special case for do64 */
-  ix86_CStile(str,ix86_GetDigitTile(DisP,w,0,1));
+  ix86_CStile(DisP,str,ix86_GetDigitTile(DisP,w,0,1));
 }
 
 void __FASTCALL__ arg_imm(char *str,ix86Param *DisP)
@@ -810,9 +865,8 @@ static void __FASTCALL__ ix86_ArgRmDigit(char *str,ix86Param *DisP,char w,char s
    char mod = MODRM_MOD(DisP->RealCmd[1]);
    char rm = MODRM_RM(DisP->RealCmd[1]);
    strcat(str,ix86_getModRM(w == 2 ? True : w,mod,rm,DisP));
-   strcat(str,",");
    DisP->codelen++;
-   strcat(str,ix86_GetDigitTile(DisP,w == 2 ? 0 : w,s,DisP->codelen));
+   ix86_CStile(DisP,str,ix86_GetDigitTile(DisP,w == 2 ? 0 : w,s,DisP->codelen));
 }
 
 void __FASTCALL__ ix86_ArgOp1(char *str,ix86Param *DisP)
@@ -848,15 +902,18 @@ void __FASTCALL__ ix86_ShOp2(char *str,ix86Param *DisP)
    a1 = ix86_getModRM(w,mod,rm,DisP);
    strcat(str,a1);
    a2 = ix86_GetDigitTile(DisP,0,0,DisP->codelen);
-   ix86_CStile(str,a2);
+   ix86_CStile(DisP,str,a2);
 }
 
 void  __FASTCALL__ ix86_DblShift(char *str,ix86Param *DisP)
 {
     unsigned char code = DisP->RealCmd[0];
     arg_cpu_modregrm(str,DisP);
-    if(code&0x01) ix86_CStile(str,"cl");
-    else { strcat(str,","); arg_imm8(str,DisP); }
+    if(code&0x01) ix86_CStile(DisP,str,"cl");
+    else {
+	if(!((DisP->flags & __DISF_SIZEONLY) == __DISF_SIZEONLY)) strcat(str,",");
+	arg_imm8(str,DisP);
+    }
 }
 
 void __FASTCALL__ ix86_ShOp1(char *str,ix86Param *DisP)
@@ -872,7 +929,7 @@ void __FASTCALL__ ix86_ShOp1(char *str,ix86Param *DisP)
    TabSpace(str,TAB_POS);
    ix86_setModifier(str,ix86_sizes[ix86_calcModifier(DisP,w)]);
    strcat(str,a1);
-   ix86_CStile(str,"1");
+   ix86_CStile(DisP,str,"1");
 }
 
 void __FASTCALL__ ix86_ShOpCL(char *str,ix86Param *DisP)
@@ -888,7 +945,7 @@ void __FASTCALL__ ix86_ShOpCL(char *str,ix86Param *DisP)
    TabSpace(str,TAB_POS);
    ix86_setModifier(str,ix86_sizes[ix86_calcModifier(DisP,w)]);
    strcat(str,a1);
-   ix86_CStile(str,"cl");
+   ix86_CStile(DisP,str,"cl");
 }
 
 void __FASTCALL__ ix86_ArgGrp1(char *str,ix86Param *DisP)
@@ -904,7 +961,7 @@ void __FASTCALL__ ix86_ArgGrp1(char *str,ix86Param *DisP)
    if(!cop) /** test only */
    {
      strcat(str,ix86_getModRM(w,mod,rm,DisP));
-     ix86_CStile(str,ix86_GetDigitTile(DisP,w == 2 ? 0 : w,0,DisP->codelen));
+     ix86_CStile(DisP,str,ix86_GetDigitTile(DisP,w == 2 ? 0 : w,0,DisP->codelen));
    }
    else
    strcat(str,ix86_getModRM(w,mod,rm,DisP));
@@ -968,7 +1025,7 @@ void __FASTCALL__ ix86_InOut(char * str,ix86Param *DisP)
       reg2  = arg;
   }
   strcat(str,reg1);
-  ix86_CStile(str,reg2);
+  ix86_CStile(DisP,str,reg2);
 }
 
 const ix86_ExOpcodes* __FASTCALL__ ix86_prepare_flags(const ix86_ExOpcodes *extable,ix86Param *DisP,unsigned char *code,unsigned char* codelen)
@@ -1270,7 +1327,7 @@ void  __FASTCALL__ ix86_ArgExGr1(char *str,ix86Param *DisP)
 	DisP->pro_clone = K64_FAM10|INSN_CPL0;
 	TabSpace(str,TAB_POS);
 	strcat(str,k64_getREG(DisP,0,True,REX_B(K64_REX),REX_W(K64_REX)));
-	ix86_CStile(str,"ecx");
+	ix86_CStile(DisP,str,"ecx");
 	return;
       }
     }
@@ -1310,7 +1367,7 @@ void  __FASTCALL__ ix86_ArgMovXRY(char *str,ix86Param *DisP)
     DisP->mode|=MOD_WIDE_DATA;
     /* according on intel 30083401.pdf p# 1.4.3 to access cr8-tr15 is used REX.r */
     strcat(str,d ? k64_xry[ridx][xreg|(REX_R(K64_REX)<<3)] : k64_getREG(DisP,reg,True,brex,wrex));
-    ix86_CStile(str,d ? k64_getREG(DisP,reg,True,brex,wrex) : k64_xry[ridx][xreg|(REX_R(K64_REX)<<3)]);
+    ix86_CStile(DisP,str,d ? k64_getREG(DisP,reg,True,brex,wrex) : k64_xry[ridx][xreg|(REX_R(K64_REX)<<3)]);
     DisP->mode=mode;
 }
 
@@ -1341,9 +1398,8 @@ static void __NEAR__ __FASTCALL__ ix86_bridge_cpu_simd(char *str,ix86Param *DisP
       brex = direct?REX_R(K64_REX):REX_B(K64_REX);
       exx = k64_getREG(DisP,direct?MODRM_REG(DisP->RealCmd[1]):MODRM_RM(DisP->RealCmd[1]),True,brex,wrex);
       strcat(str,direct ? exx : mmx);
-      strcat(str,",");
-      if(vxx) { strcat(str, vxx); strcat(str,","); }
-      strcat(str,direct ? mmx : exx);
+      if(vxx) ix86_CStile(DisP,str, vxx);
+      ix86_CStile(DisP,str,direct ? mmx : exx);
       DisP->codelen++;
    }
    DisP->mode=mode;
@@ -1389,8 +1445,7 @@ static void __NEAR__ __FASTCALL__ ix86_bridge_sse_mmx(char *str,ix86Param *DisP,
       brex = REX_B(K64_REX);
       exx = k64_getREG(DisP,MODRM_RM(DisP->RealCmd[1]),True,brex,wrex);
       strcat(str,mmx);
-      strcat(str,",");
-      strcat(str,exx);
+      ix86_CStile(DisP,str,exx);
       DisP->codelen++;
    }
    DisP->mode=mode;
@@ -1433,8 +1488,7 @@ static void __NEAR__ __FASTCALL__ ix86_ArgxMMXGroup(char *str,const char *name,i
   strcat(str,k64_getREG(DisP,MODRM_RM(DisP->RealCmd[1]),True,brex,wrex));
   if(as_xmmx) DisP->mode&=~MOD_SSE;
   else        DisP->mode&=~MOD_MMX;
-  strcat(str,",");
-  strcat(str,Get2Digit(DisP->RealCmd[2]));
+  ix86_CStile(DisP,str,Get2Digit(DisP->RealCmd[2]));
   DisP->codelen++;
   DisP->mode=mode;
 }
@@ -1484,8 +1538,7 @@ void __FASTCALL__ ix86_ArgMovYX(char *str,ix86Param *DisP)
       src = ix86_getModRM(DisP->RealCmd[0] & 0x01,mod,MODRM_RM(DisP->RealCmd[1]),DisP);
       DisP->mode=mode;
       strcat(str,dst);
-      strcat(str,",");
-      strcat(str,src);
+      ix86_CStile(DisP,str,src);
       DisP->codelen++;
 }
 
@@ -1497,8 +1550,7 @@ void __FASTCALL__ ix86_BitGrp(char *str,ix86Param *DisP)
    strcpy(str,ix86_BitGrpNames[cop]);
    TabSpace(str,TAB_POS);
    strcat(str,ix86_getModRM(True,mod,rm,DisP));
-   strcat(str,",");
-   strcat(str,ix86_GetDigitTile(DisP,0,0,DisP->codelen++));
+   ix86_CStile(DisP,str,ix86_GetDigitTile(DisP,0,0,DisP->codelen++));
 }
 
 static const char *ix86_KatmaiGr1Names[] = { "fxsave", "fxrstor", "ldmxcsr", "stmxcsr", "xsave", "xrstor", "???", "???" };
@@ -1554,7 +1606,7 @@ void __FASTCALL__ arg_simd_regrm(char *str,ix86Param *DisP)
   wrex = REX_W(K64_REX);
   DisP->mode|=MOD_SSE;
   strcat(str,k64_getREG(DisP,MODRM_REG(DisP->RealCmd[1]),True,brex,wrex));
-  ix86_CStile(str,k64_getREG(DisP,MODRM_RM(DisP->RealCmd[1]),True,brex,wrex));
+  ix86_CStile(DisP,str,k64_getREG(DisP,MODRM_RM(DisP->RealCmd[1]),True,brex,wrex));
   DisP->mode=mode;
 }
 
@@ -1610,7 +1662,7 @@ static void __FASTCALL__  ix86_ArgXMMCmp(char *str,ix86Param *DisP,const char **
 	a = Get2Digit(suffix);
    }
    strcat(str,ix86_Katmai_buff);
-   if(a) ix86_CStile(str,a);
+   if(a) ix86_CStile(DisP,str,a);
    DisP->mode = mode;
    DisP->codelen++;
 }
@@ -1667,14 +1719,14 @@ void __FASTCALL__  arg_simd_clmul(char *str,ix86Param *DisP)
 	a = Get2Digit(suffix);
    }
    strcat(str,ix86_Katmai_buff);
-   if(a) ix86_CStile(str,a);
+   if(a) ix86_CStile(DisP,str,a);
    DisP->mode = mode;
    DisP->codelen++;
 }
 
 void   __FASTCALL__ arg_simd_xmm0(char *str,ix86Param *DisP) {
    arg_simd(str,DisP);
-   ix86_CStile(str,"xmm0");
+   ix86_CStile(DisP,str,"xmm0");
 }
 
 /* TODO: fix it !!! */
@@ -1694,7 +1746,7 @@ void   __FASTCALL__ arg_fma4_imm8(char *str,ix86Param *DisP) {
     unsigned is4;
     arg_fma4(str,DisP);
     is4=DisP->RealCmd[DisP->codelen-1];
-    ix86_CStile(str,Get2Digit(is4&0x0F));
+    ix86_CStile(DisP,str,Get2Digit(is4&0x0F));
 }
 
 void __FASTCALL__ arg_fma(char *str,ix86Param *DisP)
