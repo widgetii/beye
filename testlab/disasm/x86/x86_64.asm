@@ -10,6 +10,7 @@ global sse4
 global aes
 global avx
 global fma
+global undocumented_nop
 
 [bits 64]
 cpu_asm:
@@ -4630,5 +4631,9 @@ vfmsubadd231pd ymm1, ymm2, [eax]
 vfmsubadd213pd ymm1, ymm2, ymm3
 vfmsubadd213pd ymm1, ymm2, yword [eax]
 vfmsubadd213pd ymm1, ymm2, [eax]
+leave
+retn
+undocumented_nop:
+db 0x66, 0x66, 0x66, 0x66, 0x66, 0x66, 0x2E, 0x0F, 0x1F, 0x84, 0x00, 0x00, 0x00, 0x00, 0x00
 leave
 retn

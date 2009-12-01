@@ -1,8 +1,8 @@
 ;
 ;Disassembler dump of 'x86_32.o'
-;Range :                0H-            4EF0H
-;Written by  Binary Viewer v 6.1.0.pre-x86_64.Linux64 Build: Nov 18 2009 
-;Dumped : Thu Nov 19 17:32:55 2009
+;Range :                0H-            4F20H
+;Written by  Binary Viewer v 6.1.0.pre-x86_64.Linux64 Build: Dec  1 2009 
+;Dumped : Tue Dec  1 20:26:28 2009
 
 ;Format : ELF (Executable and Linking Format)
 
@@ -15,7 +15,7 @@ SEGMENT Unknown0 BYTE PUBLIC USE32 'NoObject'
 resb               40H
 
 SEGMENT .text BYTE PUBLIC USE32 'CODE'
-; size: 18417 bytes
+; size: 18434 bytes
 
 public cpu_asm:
 L00000040: enter     000A,0C			; C80A000C
@@ -1101,6 +1101,7 @@ L00001112: phaddw    xmm0,xmm1			; 660F3801C1
 L00001117: movdqu    [edx],xmm0			; F30F7F02
 L0000111B: retn					; C3
 private :
+private :
 L0000111C: mov	     edx,[esp+04]		; 8B542404
 L00001120: mov	     eax,[esp+08]		; 8B442408
 L00001124: movdqu    xmm0,[edx]			; F30F6F02
@@ -1108,6 +1109,7 @@ L00001128: movdqu    xmm1,[eax]			; F30F6F08
 L0000112C: phaddsw   xmm0,xmm1			; 660F3803C1
 L00001131: movdqu    [edx],xmm0			; F30F7F02
 L00001135: retn					; C3
+private :
 private :
 L00001136: mov	     edx,[esp+04]		; 8B542404
 L0000113A: mov	     eax,[esp+08]		; 8B442408
@@ -1126,7 +1128,6 @@ L0000115E: phsubw    mm0,mm1			; 0F3805C1
 L00001162: movq	     [edx],mm0			; 0F7F02
 L00001165: retn					; C3
 private :
-private :
 L00001166: mov	     edx,[esp+04]		; 8B542404
 L0000116A: mov	     eax,[esp+08]		; 8B442408
 L0000116E: movq	     mm0,[edx]			; 0F6F02
@@ -1134,7 +1135,6 @@ L00001171: movq	     mm1,[eax]			; 0F6F08
 L00001174: phsubsw   mm0,mm1			; 0F3807C1
 L00001178: movq	     [edx],mm0			; 0F7F02
 L0000117B: retn					; C3
-private :
 private :
 L0000117C: mov	     edx,[esp+04]		; 8B542404
 L00001180: mov	     eax,[esp+08]		; 8B442408
@@ -1144,6 +1144,7 @@ L0000118A: phsubd    mm0,mm1			; 0F3806C1
 L0000118E: movq	     [edx],mm0			; 0F7F02
 L00001191: retn					; C3
 private :
+private :
 L00001192: mov	     edx,[esp+04]		; 8B542404
 L00001196: mov	     eax,[esp+08]		; 8B442408
 L0000119A: movdqu    xmm0,[edx]			; F30F6F02
@@ -1151,6 +1152,7 @@ L0000119E: movdqu    xmm1,[eax]			; F30F6F08
 L000011A2: phsubw    xmm0,xmm1			; 660F3805C1
 L000011A7: movdqu    [edx],xmm0			; F30F7F02
 L000011AB: retn					; C3
+private :
 private :
 L000011AC: mov	     edx,[esp+04]		; 8B542404
 L000011B0: mov	     eax,[esp+08]		; 8B442408
@@ -1169,7 +1171,6 @@ L000011D6: phsubd    xmm0,xmm1			; 660F3806C1
 L000011DB: movdqu    [edx],xmm0			; F30F7F02
 L000011DF: retn					; C3
 private :
-private :
 L000011E0: mov	     edx,[esp+04]		; 8B542404
 L000011E4: mov	     eax,[esp+08]		; 8B442408
 L000011E8: movq	     mm0,[edx]			; 0F6F02
@@ -1177,7 +1178,6 @@ L000011EB: movq	     mm1,[eax]			; 0F6F08
 L000011EE: pmulhrsw  mm0,mm1			; 0F380BC1
 L000011F2: movq	     [edx],mm0			; 0F7F02
 L000011F5: retn					; C3
-private :
 private :
 L000011F6: mov	     edx,[esp+04]		; 8B542404
 L000011FA: mov	     eax,[esp+08]		; 8B442408
@@ -1187,6 +1187,7 @@ L00001206: pmulhrsw  xmm0,xmm1			; 660F380BC1
 L0000120B: movdqu    [edx],xmm0			; F30F7F02
 L0000120F: retn					; C3
 private :
+private :
 L00001210: mov	     edx,[esp+04]		; 8B542404
 L00001214: mov	     eax,[esp+08]		; 8B442408
 L00001218: movq	     mm0,[edx]			; 0F6F02
@@ -1194,6 +1195,7 @@ L0000121B: movq	     mm1,[eax]			; 0F6F08
 L0000121E: pmaddubsw mm0,mm1			; 0F3804C1
 L00001222: movq	     [edx],mm0			; 0F7F02
 L00001225: retn					; C3
+private :
 private :
 L00001226: mov	     edx,[esp+04]		; 8B542404
 L0000122A: mov	     eax,[esp+08]		; 8B442408
@@ -1212,7 +1214,6 @@ L0000124E: pshufb    mm0,mm1			; 0F3800C1
 L00001252: movq	     [edx],mm0			; 0F7F02
 L00001255: retn					; C3
 private :
-private :
 L00001256: mov	     edx,[esp+04]		; 8B542404
 L0000125A: mov	     eax,[esp+08]		; 8B442408
 L0000125E: movdqu    xmm0,[edx]			; F30F6F02
@@ -1221,7 +1222,6 @@ L00001266: pshufb    xmm0,xmm1			; 660F3800C1
 L0000126B: movdqu    [edx],xmm0			; F30F7F02
 L0000126F: retn					; C3
 private :
-private :
 L00001270: mov	     edx,[esp+04]		; 8B542404
 L00001274: mov	     eax,[esp+08]		; 8B442408
 L00001278: movq	     mm0,[edx]			; 0F6F02
@@ -1229,6 +1229,7 @@ L0000127B: movq	     mm1,[eax]			; 0F6F08
 L0000127E: palignr   mm0,mm1,03			; 0F3A0FC103
 L00001283: movq	     [edx],mm0			; 0F7F02
 L00001286: retn					; C3
+private :
 private :
 L00001287: mov	     edx,[esp+04]		; 8B542404
 L0000128B: mov	     eax,[esp+08]		; 8B442408
@@ -4130,9 +4131,13 @@ L00004825: vfmsubadd213pd ymm1,ymm2,[eax]	; C4E2EDA708
 L0000482A: vfmsubadd213pd ymm1,ymm2,[eax]	; C4E2EDA708
 L0000482F: leave				; C9
 L00004830: retn					; C3
+public undocumented_nop:
+L00004831: nop	     eax,[cs:eax+eax+00000000]	; 6666666666662E0F1F840000000000
+L00004840: leave				; C9
+L00004841: retn					; C3
 
 SEGMENT Unknown0 BYTE PUBLIC USE32 'NoObject'
-; size: 1727 bytes
+; size: 1758 bytes
 
-; L0000000000004831H-L0000000000004EF0H - no object
-resb              6BFH
+; L0000000000004842H-L0000000000004F20H - no object
+resb              6DEH
