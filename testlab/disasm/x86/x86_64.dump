@@ -1,8 +1,8 @@
 ;
 ;Disassembler dump of 'x86_64.o'
-;Range :                0H-            5E20H
+;Range :                0H-            5E50H
 ;Written by  Binary Viewer v 6.1.0.pre-x86_64.Linux64 Build: Dec  1 2009 
-;Dumped : Tue Dec  1 20:28:50 2009
+;Dumped : Tue Dec  1 20:50:31 2009
 
 ;Format : ELF (Executable and Linking Format)
 
@@ -15,7 +15,7 @@ SEGMENT Unknown0 BYTE PUBLIC USE64 'NoObject'
 resb               40H
 
 SEGMENT .text BYTE PUBLIC USE64 'CODE'
-; size: 21333 bytes
+; size: 21383 bytes
 
 public cpu_asm:
 L00000040: enter     000A,0C			; C80A000C
@@ -4217,12 +4217,16 @@ L0000537C: vfmsubadd213pd ymm1,ymm2,[eax]	; 67C4E2EDA708
 L00005382: leave				; C9
 L00005383: retn					; C3
 public undocumented_nop:
-L00005384: nop	     eax,[cs:rax+rax+00000000]	; 6666666666662E0F1F840000000000
-L00005393: leave				; C9
-L00005394: retn					; C3
+L00005384: nop	     eax,[cs:rax+rax+00000000]	; 66662E0F1F840000000000
+L0000538F: nop	     ax,[cs:rax+rax+00000000]	; 6666662E0F1F840000000000
+L0000539B: nop	     eax,[cs:rax+rax+00000000]	; 666666662E0F1F840000000000
+L000053A8: nop	     ax,[cs:rax+rax+00000000]	; 66666666662E0F1F840000000000
+L000053B6: nop	     eax,[cs:rax+rax+00000000]	; 6666666666662E0F1F840000000000
+L000053C5: leave				; C9
+L000053C6: retn					; C3
 
 SEGMENT Unknown0 BYTE PUBLIC USE64 'NoObject'
-; size: 2699 bytes
+; size: 2697 bytes
 
-; L0000000000005395H-L0000000000005E20H - no object
-resb              A8BH
+; L00000000000053C7H-L0000000000005E50H - no object
+resb              A89H
