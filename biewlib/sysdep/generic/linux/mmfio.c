@@ -27,7 +27,7 @@
 
 /* The lack of this function declaration on some systems and may cause segfault */
 extern void *mremap (void *__addr, size_t __old_len, size_t __new_len,
-		     int __flags, ...) __THROW;
+		     int __flags, ...);
 
 struct mmfRecord
 {
