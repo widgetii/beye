@@ -25,6 +25,10 @@
 #define MREMAP_MAYMOVE 1
 #endif
 
+/* The lack of this function declaration on some systems and may cause segfault */
+extern void *mremap (void *__addr, size_t __old_len, size_t __new_len,
+		     int __flags, ...) __THROW;
+
 struct mmfRecord
 {
   void *    addr;
@@ -63,7 +67,7 @@ mmfHandle          __FASTCALL__ __mmfOpen(const char *fname,int mode)
   struct mmfRecord *mret;
   bhandle_t fhandle;
   fhandle = __OsOpen(fname,mode);
-  if(fhandle != -1)
+  if(((int)fhandle) != -1)
   {
     mret = PMalloc(sizeof(struct mmfRecord));
     if(mret)
@@ -74,7 +78,7 @@ mmfHandle          __FASTCALL__ __mmfOpen(const char *fname,int mode)
       if(length <= PTRDIFF_MAX)
       {
 	addr = mmap(NULL,length,mk_prot(mode),
-                  mk_flags(mode),fhandle,0L);
+                  mk_flags(mode),(int)fhandle,0L);
 	if(addr != (void *)-1)
 	{
 	    mret->fhandle = fhandle;
