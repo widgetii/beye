@@ -10,8 +10,8 @@
 €≤±∞                 ‹‹  ‹‹  ‹‹   ‹‹  ‹   ‹ ‹ ‹ ‹                     ∞±≤€
 €≤±∞                ‹‹‹‹‹‹  ‹‹‹‹ ‹‹‹‹‹‹    ‹   ‹                      ∞±≤€
 €≤±∞                                                                  ∞±≤€
-€≤±∞                           Ver 6.1.0.pre                          ∞±≤€
-€≤±∞                          11 nov 2009.                            ∞±≤€
+€≤±∞                           Ver 6.1.0                              ∞±≤€
+€≤±∞                          12 dec 2009.                            ∞±≤€
 €≤±∞                                                                  ∞±≤€
 €≤±∞                      Written By Nickols_K.                       ∞±≤€
 €≤±∞                                                                  ∞±≤€
@@ -1233,6 +1233,9 @@ v5.0.2        ! Changes:
                   added support for Intel's AES, AVX and AMD's XOP, FMA4, CVT16
                   into x86-disassembler
                 * Fixed some lacks in ./configure script
+6.1.0
+12 dec 2009   ! Changes:
+                * Minor fixes and cleanups
 []======================================================================[]
 []  Thank you for your interest.                                        []
 []  Nickols_K (http://my666.boom.ru/666_en.html).                       []

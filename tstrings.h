@@ -20,7 +20,7 @@
 /** @def BIEW_VERSION
     Ver.SubVer.ExtraVer-ReleaseLevel.Test_FixPak_Level
   */
-#define BIEW_VERSION "6.1.0.pre"
+#define BIEW_VERSION "6.1.0"
 
 extern const char   msgUndef[];
 extern const char   msgFatalError[];
