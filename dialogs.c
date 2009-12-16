@@ -218,7 +218,7 @@ tBool __FASTCALL__ GetJumpDlg( __filesize_t * addr,unsigned long *flags)
  TWindow * hwnd,*ewnd,*using;
  unsigned len = HA_LEN-1,stx = 0;
  tBool ret,update;
- static char str[12] = "";
+ static char str[21] = "";
  char * legals;
  char declegals[13];
  unsigned attr;
