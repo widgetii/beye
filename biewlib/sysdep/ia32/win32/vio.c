@@ -41,7 +41,14 @@ static CONSOLE_CURSOR_INFO win32_init_cci;
 
 void __FASTCALL__ __init_vio(const char *user_cp, unsigned long flg )
 {
+#if 0
   hOut = GetStdHandle(STD_OUTPUT_HANDLE);
+#else
+  /* Fixed redirecting of stdout into file. By Sergey Oblomov <hoopoepg@gmail.com> */
+  hOut = CreateFile( "CONOUT$", GENERIC_READ | GENERIC_WRITE,
+				FILE_SHARE_READ | FILE_SHARE_WRITE,
+				0, OPEN_EXISTING, 0, 0 );
+#endif
   is_winnt = win32_verinfo.dwPlatformId == VER_PLATFORM_WIN32_NT;
   vio_flags = flg;
   /* Added by Olivier Mengu\u00e9 */
