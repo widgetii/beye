@@ -15,10 +15,10 @@ Prefix:		%{prefix}
 Summary:	console hex viewer/editor and disassembler
 Copyright:	GPL
 Group:		Development/Other
-Packager:	Konstantin Boldyshev <konst@linuxassembly.org>
+Packager:	Nickols_k <nickols_k@mail.ru>
 URL:		http://biew.sourceforge.net
 
-Source:		%{name}%{versrc}.tar.bz2
+Source:		%{name}-%{versrc}-src.tar.bz2
 
 %description
 BIEW (Binary vIEW) is a free, portable, advanced file viewer with
@@ -35,7 +35,7 @@ Linux, Unix, QNX, BeOS, DOS, Win32, OS/2 versions are available.
 %setup -q
 
 %build
-./configure
+./configure --prefix=%{prefix}
 make
 make install
 
