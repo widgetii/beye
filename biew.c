@@ -66,7 +66,7 @@ unsigned long biew_kbdFlags = 0L;
 tBool iniSettingsAnywhere = False;
 tBool fioUseMMF = False;
 tBool iniPreserveTime = False;
-tBool iniUseExtProgs = True;
+tBool iniUseExtProgs = False;
 __filesize_t headshift = 0L;
 char *ini_name;
 
@@ -479,7 +479,7 @@ static hIniProfile * __NEAR__ __FASTCALL__ load_ini_info( void )
   if(!__mmfIsWorkable()) fioUseMMF = False;
   biewReadProfileString(ini,"Biew","Setup","PreserveTimeStamp","no",tmp,sizeof(tmp));
   if(stricmp(tmp,"yes") == 0) iniPreserveTime = True;
-  biewReadProfileString(ini,"Biew","Setup","UseExternalProgs","yes",tmp,sizeof(tmp));
+  biewReadProfileString(ini,"Biew","Setup","UseExternalProgs","no",tmp,sizeof(tmp));
   if(stricmp(tmp,"yes") == 0) iniUseExtProgs = True;
   biewReadProfileString(ini,"Biew","Setup","Codepage","CP866",biew_codepage,sizeof(biew_codepage));
   return ini;

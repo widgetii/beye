@@ -5760,7 +5760,7 @@ tmperror:
   goto doneerror;
 
 noassemblererror:
-  result.insn="No assembler available/usable";
+  result.insn="No assembler available/usable or disabled external programs";
   result.err_code=4;
   goto doneerror;
 
