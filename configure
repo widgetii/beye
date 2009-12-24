@@ -686,7 +686,7 @@ echores "$_curses"
 esac
 
 
-echocheck "checking for popen"
+echocheck "popen"
 cat > $TMPC << EOF
 #include <stdio.h>
 int main(void){(void)popen; return 0;}
@@ -696,7 +696,7 @@ cc_check && enable _popen
 enabled _popen && _cdefos="-DHAVE_POPEN=1 $_cdefos"
 echores "$_popen"
 
-echocheck "checking for pclose"
+echocheck "pclose"
 cat > $TMPC << EOF
 #include <stdio.h>
 int main(void){(void)pclose; return 0;}
@@ -706,7 +706,7 @@ cc_check && enable _pclose
 enabled _pclose && _cdefos="-DHAVE_PCLOSE=1 $_cdefos"
 echores "$_pclose"
 
-echocheck "checking for sys/resource.h"
+echocheck "sys/resource.h"
 check_header sys/resource.h
 enabled sys_resource_h && _cdefos="-DHAVE_SYS_RESOURCE=1 $_cdefos"
 echores "$sys_resource_h"
