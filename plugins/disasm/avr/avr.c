@@ -143,7 +143,7 @@ static int avr_operand( unsigned int insn,
 	    case 0x100e: xyz = "-X"; break;
 	    default: xyz = "??"; ok = 0;
 	  }
-	sprintf (buf, xyz);
+	sprintf (buf,"%s", xyz);
 
 	if (AVR_UNDEF_P (insn))
 	  sprintf (comment, _("undefined"));

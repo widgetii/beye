@@ -869,12 +869,12 @@ static int __NEAR__ __FASTCALL__ __ListBox(const char ** names,unsigned nlist,un
                       if(p)
                       {
                         *p = 0;
-                        fprintf(out,names[i]);
+                        fprintf(out,"%s",names[i]);
                         for(j = p - names[i];j < 50;j++) fprintf(out," ");
                         fprintf(out," @%s",p+1);
                         if(p) *p = LB_ORD_DELIMITER;
                       }
-                      else fprintf(out,names[i]);
+                      else fprintf(out,"%s",names[i]);
                       fprintf(out,"\n");
                     }
                     fclose(out);
