@@ -43,7 +43,7 @@ USE_SELECT=y
 # For detail see ../../makefile
 compilation=normal
 
-include ../../makefile.inc
+include ../../config.mak
 
 ###########################################################################
 # TARGET: put name of executable image here                               #
@@ -56,6 +56,7 @@ TARGET = twintest
 
 INCS = -I.
 LIBS = -L./biewlib -lbiew $(OS_LIBS)
+CFLAGS = -D__MACHINE__=$(MACHINE) -D__OS__=$(HOST)
 OBJS = twintest.o
 all: $(TARGET)
 

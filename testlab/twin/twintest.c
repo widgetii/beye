@@ -43,7 +43,7 @@ int main( int argc, char *argv[] )
   }
   need_delay = (int)strtol(argv[1],NULL,10);
   __init_sys();
-  twInit(1,0);
+  twInit(NULL, 1,0);
   if(need_delay) need_delay = __OsSetTimerCallBack(54,TimerCallBack);
   for(i = 0;i < tvioHeight;i++)
   {
