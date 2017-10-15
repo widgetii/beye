@@ -425,6 +425,9 @@ if test "$_target_system" = auto ; then
 	*[Ll]inux*)
 	    _target_system=linux
 	    ;;
+    *Darwin*)
+        _target_system=unix
+        ;;
 	*QNX*)
 	    echo `uname -v` | grep ^42
 	    if test $? -eq 0

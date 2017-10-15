@@ -64,6 +64,7 @@ static termdesc termtab[] = {
 { "beterm",	TERM_XTERM },
 { "vt100",	TERM_VT100 },
 { "ansi",	TERM_ANSI  },
+{ "xterm-256color", TERM_XTERM },
 { NULL,		TERM_UNKNOWN}};
 
 static char _ini_name[FILENAME_MAX + 1];
