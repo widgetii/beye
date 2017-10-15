@@ -270,14 +270,13 @@ inline static int __FASTCALL__ printable(unsigned char c)
 static void gotoxy(int x, int y)
 {
 #ifdef	_SLANG_
-    SLsmg_gotorc(y, x);
+    slang_SetCursorPos(int x, int y);
 #endif
 #ifdef	_CURSES_
-    move(y, x);
+    curses_SetCursorPos(int x, int y);
 #endif
 #ifdef	_VT100_
-    sprintf(vtmp,"\033[%d;%dH", y + 1, x + 1);
-    twrite(vtmp);
+    vt100_SetCursorPos(int x, int y);
 #endif
 }
 
