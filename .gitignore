@@ -1,0 +1,9 @@
+*.o
+beye
+*.a
+config.log
+config.mak
+beye.config
+beye.creator
+beye.files
+beye.includes
