@@ -192,6 +192,9 @@ seq8 = {
 #define SEQ_LEN 10	/**< max sequense length */
 #define SEQ_NUM 9	/**< number of sequence categories */
 
+// arrow down - ESC[B
+// arrow up -
+
 static eseq S[SEQ_NUM] = {
 {'O', 0, 0, (p1seq *)seq0 },
 {'[', 0, 0, (p1seq *)seq1 },
@@ -414,18 +417,18 @@ void __FASTCALL__ ReadNextEvent(void)
     }
     if (key)
     {
-	if(rawkb_mode)
-	{
-	    rawkb_buf[0]=c[0];
-	    rawkb_len=1;
-	}
-	goto place_key;
+        if(rawkb_mode)
+        {
+            rawkb_buf[0]=c[0];
+            rawkb_len=1;
+        }
+        goto place_key;
     }
     for (i = 1; i < SEQ_LEN - 1; i++) if(get(c[i]) < 0) break;
     if(rawkb_mode)
     {
-	memcpy(rawkb_buf,c,i);
-	rawkb_len=i;
+        memcpy(rawkb_buf,c,i);
+        rawkb_len=i;
     }
 
     if (i < 3) {
@@ -455,6 +458,10 @@ void __FASTCALL__ ReadNextEvent(void)
 /*
     translate escape sequence
 */
+
+// всего у нас SEQ_NUM категорий = 9
+// c[0] = ESCAPE?
+
 
 #define S S[i]
     for (i = 0; i < SEQ_NUM && !key; i++) {

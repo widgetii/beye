@@ -190,6 +190,8 @@ extern Console console;
 #define	__vioSetCursorPos	console.SetCursorPos
 #define	__vioGetCursorType	console.GetCursorType
 #define	__vioSetCursorType	console.SetCursorType
+
+#define __vioResizeEvent    console.ResizeEvent
 */
 
 extern void* nls_init(const char *to,const char *from);

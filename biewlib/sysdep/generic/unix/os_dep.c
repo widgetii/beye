@@ -158,6 +158,16 @@ static void cleanup(int sig)
     _exit(EXIT_FAILURE);
 }
 
+// prints error message and exits program
+void die(const char* s) {
+    __term_keyboard();
+    __term_vio();
+    __term_sys();
+    
+    perror(s);
+    exit(EXIT_FAILURE);
+}
+
 /* static struct sigaction sa; */
 
 void __FASTCALL__ __init_sys(void)

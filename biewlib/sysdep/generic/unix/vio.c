@@ -54,7 +54,8 @@ static struct {
 } tp = { 0, {0} };
 
 #ifdef	_SLANG_
-#include <slang.h>
+#include "con_slang.h"
+
 #define _bg(x) ((x) >> 4)
 #define _fg(x) ((x) & 0x0f)
 
@@ -94,7 +95,8 @@ SLSMG_BLOCK_CHAR, SLSMG_BLOCK_CHAR,	SLSMG_BLOCK_CHAR, SLSMG_BLOCK_CHAR
 #endif
 
 #ifdef	_CURSES_
-#include <curses.h>
+#incldue "con_curses.h"
+
 #define _bg(x)	(((x) >> 4) & 7)
 #define _fg(x)	((x) & 7)
 #define _2cpair(x) (_bg(x) * 010 + _fg(x))
@@ -194,6 +196,8 @@ static void *nls_handle;
 
 #ifdef	_VT100_
 
+#include "con_vt100.h"
+
 #include <errno.h>
 #include <stdio.h>
 #include <unistd.h>
@@ -270,13 +274,13 @@ inline static int __FASTCALL__ printable(unsigned char c)
 static void gotoxy(int x, int y)
 {
 #ifdef	_SLANG_
-    slang_SetCursorPos(int x, int y);
+    slang_SetCursorPos(x, y);
 #endif
 #ifdef	_CURSES_
-    curses_SetCursorPos(int x, int y);
+    curses_SetCursorPos(x, y);
 #endif
 #ifdef	_VT100_
-    vt100_SetCursorPos(int x, int y);
+    vt100_SetCursorPos(x, y);
 #endif
 }
 
@@ -529,8 +533,9 @@ void __FASTCALL__ __init_vio(const char *user_cp,unsigned long flags)
     }
     memset(vtmp, 0, VTMP_LEN);
 
-    out_fd = open(ttyname(STDOUT_FILENO), O_WRONLY);
-    if (out_fd < 0) out_fd = STDOUT_FILENO;
+    vt100_initialize();
+
+
 
     ioctl(out_fd, TIOCGWINSZ, &w);
     tvioWidth = w.ws_col;
@@ -580,8 +585,11 @@ void __FASTCALL__ __term_vio(void)
 	twrite("\033[?1001r\033[?1000l");
 	if (transparent) twrite("\033(K");
     }
-    twrite("\033[3l\033[0m\033[2J");
-    close(out_fd);
+    twrite("\033[3l\033[0m");
+
+
+    vt100_terminate();
+
     free(vtmp);
 #endif
     free(viomem);
