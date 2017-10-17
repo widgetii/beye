@@ -17,19 +17,14 @@
 #ifndef __SYS_DEP_H
 #define __SYS_DEP_H 1
 
-#ifdef __TSC__
-   #include "biewlib/sysdep/ia16/__config.h"
-   #include "biewlib/sysdep/ia16/_inlines.h"
-#else
-  #if defined(__WIN32__) && defined(_MSC_VER)
+#if defined(__WIN32__) && defined(_MSC_VER)
     #include "biewlib/sysdep/ia32/__config.h"
     #include "biewlib/sysdep/ia32/_inlines.h"
-  #else
+#else
     #define _INLINES <biewlib/sysdep/__MACHINE__/_inlines.h>
     #define __CONFIG <biewlib/sysdep/__MACHINE__/__config.h>
     #include __CONFIG
     #include _INLINES
-  #endif
 #endif
 
 #ifdef __cplusplus

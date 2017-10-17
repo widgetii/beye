@@ -23,27 +23,6 @@
 #endif
 #include "biewlib/pmalloc.h"
 
-#if !defined( NDEBUG ) && __WORDSIZE == 16 && defined(__TSC__)
-/* 16-bits protected mode it's only way of quality stress test of code */
-#include <tsxlib.h>
-#include <dos.h>
-#define malloc(s)       (MK_FP(AllocSeg(s),0))
-#define realloc(p,s)    (ReallocSeg(s,FP_SEG(p)) ? p : 0)
-#define free(p)         (FreeSeg(FP_SEG(p)))
-extern  unsigned        _MaxReallocHugeSegments;
-#ifdef halloc
-#undef halloc
-#endif
-#define halloc(s)       (MK_FP(HugeAllocSeg((unsigned)s,(unsigned)(s>>16),_MaxReallocHugeSegments),0))
-#ifdef hrealloc
-#undef hrealloc
-#endif
-#define hrealloc(p,s)   (HugeReallocSeg((unsigned)s,(unsigned)(s>>16),FP_SEG(p)) ? p : 0)
-#ifdef hfree
-#undef hfree
-#endif
-#define hfree(p)        (FreeSeg(FP_SEG(p)))
-#endif
 static LowMemCallBack *lmstack = NULL;
 unsigned               lmcount = 0;
 

@@ -16,9 +16,6 @@
 **/
 #include <dos.h>
 #include <string.h>
-#ifdef __TSC__
-#include <tsxlib.h>
-#endif
 
 #include "biewlib/biewlib.h"
 

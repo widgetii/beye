@@ -17,15 +17,11 @@
 #ifndef __CONFIG_H
 #define __CONFIG_H 1
 
-#ifdef __TSC__
-   #include "biewlib/sysdep/ia16/__config.h"
-#else
-  #if defined(__WIN32__) && defined(_MSC_VER)
+#if defined(__WIN32__) && defined(_MSC_VER)
     #include "biewlib/sysdep/ia32/__config.h"
-  #else
+#else
     #define __CONFIG <biewlib/sysdep/__MACHINE__/__config.h>
     #include __CONFIG
-  #endif
 #endif
 
 #endif
