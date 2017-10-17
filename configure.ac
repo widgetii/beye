@@ -41,7 +41,7 @@ AC_ARG_ENABLE(debug,
   [  --enable-debug          build debug versions of the library (default no)])
 
 # Checks for header files.
-AC_CHECK_HEADERS([fcntl.h limits.h malloc.h iconv.h stddef.h stdint.h stdlib.h string.h sys/ioctl.h sys/time.h termios.h unistd.h utime.h])
+AC_CHECK_HEADERS([fcntl.h gpm.h limits.h malloc.h iconv.h stddef.h stdint.h stdlib.h string.h sys/ioctl.h sys/time.h termios.h unistd.h utime.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_INLINE

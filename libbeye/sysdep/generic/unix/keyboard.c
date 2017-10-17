@@ -40,7 +40,7 @@ static const char rcs_id[] = "$Id$";
 char *rawkb_name="Slang";
 unsigned rawkb_size=sizeof(int); /* size of rawkb_buf elements 1,2 or 4*/
 int rawkb_method=0;
-#undef	HAVE_MOUSE
+#undef	HAVE_GPM_H
 #endif
 
 #ifdef	_CURSES_
@@ -48,8 +48,8 @@ int rawkb_method=0;
 char *rawkb_name="Curses";
 unsigned rawkb_size=sizeof(int); /* size of rawkb_buf elements 1,2 or 4*/
 int rawkb_method=0;
-#if defined(NCURSES_MOUSE_VERSION) && !defined(HAVE_MOUSE)
-#define	HAVE_MOUSE
+#if defined(NCURSES_MOUSE_VERSION) && !defined(HAVE_GPM_H)
+#define	HAVE_GPM_H
 #endif
 #endif
 
@@ -207,7 +207,7 @@ static eseq S[SEQ_NUM] = {
 {'[', '2', '^', (p1seq *)seq8 }
 };
 
-#ifdef HAVE_MOUSE
+#ifdef HAVE_GPM_H
 #include <gpm.h>
 static int gpmhandle;
 #endif
@@ -374,7 +374,7 @@ void __FASTCALL__ ReadNextEvent(void)
     int i;
     unsigned char c[SEQ_LEN];
 
-#ifdef HAVE_MOUSE
+#ifdef HAVE_GPM_H
     if (gpmhandle) {
 	fd_set gpmfds;
 	struct timeval t = { 0, 0 };
@@ -546,7 +546,7 @@ void __FASTCALL__ __MsGetPos(tAbsCoord *x, tAbsCoord *y)
 
 int __FASTCALL__ __MsGetBtns(void)
 {
-#ifdef HAVE_MOUSE
+#ifdef HAVE_GPM_H
     ReadNextEvent();
 #endif
     return mouse.pressed ? mouse.buttons : 0;
@@ -610,7 +610,7 @@ void __FASTCALL__ __init_keyboard(const char *user_cp)
     tattr.c_oflag |= OPOST | ONLCR;
     tcsetattr(in_fd, TCSANOW, &tattr);
 
-#ifdef	HAVE_MOUSE
+#ifdef	HAVE_GPM_H
     {
 	Gpm_Connect gc = { ~0, GPM_MOVE|GPM_HARD, 0, 0};
 	gpmhandle = Gpm_Open(&gc, 0);
@@ -637,7 +637,7 @@ void __FASTCALL__ __term_keyboard(void)
 #ifdef	_VT100_
     tcsetattr(in_fd, TCSANOW, &sattr);
     close(in_fd);
-#ifdef	HAVE_MOUSE
+#ifdef	HAVE_GPM_H
     if (gpmhandle) Gpm_Close();
 #endif
 #endif

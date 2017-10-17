@@ -42,7 +42,7 @@ static const char rcs_id[] = "$Id$";
 #include "biewlib/biewlib.h"
 #include "console.h"
 
-#ifdef HAVE_MOUSE
+#ifdef HAVE_GPM_H
 #include <gpm.h>
 static int gpmhandle;
 #endif
@@ -318,7 +318,7 @@ void __FASTCALL__ ReadNextEvent(void)
 	unsigned key = 0;
 	int i;
 
-#ifdef HAVE_MOUSE
+#ifdef HAVE_GPM_H
     if (gpmhandle) {
 	fd_set gpmfds;
 	struct timeval t = { 0, 0 };
@@ -524,7 +524,7 @@ int __FASTCALL__ __kbdGetKey (unsigned long flg)
 
     while (!keybuf.current) {
 	__OsYield();
-#ifdef	HAVE_MOUSE
+#ifdef	HAVE_GPM_H
 	if (gpmhandle) ReadNextEvent();
 #endif
     }
@@ -561,7 +561,7 @@ void __FASTCALL__ __MsGetPos(tAbsCoord *x, tAbsCoord *y)
 
 int __FASTCALL__ __MsGetBtns(void)
 {
-#ifdef	HAVE_MOUSE
+#ifdef	HAVE_GPM_H
     if (gpmhandle) ReadNextEvent();
 #endif
     return mouse.pressed ? mouse.buttons : 0;
@@ -632,7 +632,7 @@ void __FASTCALL__ __init_keyboard(const char *user_cp)
 	ioctl(in_fd, VT_SETMODE, &vt);
     }
 
-#ifdef	HAVE_MOUSE
+#ifdef	HAVE_GPM_H
     {
 	Gpm_Connect gc;
 
@@ -657,7 +657,7 @@ void __FASTCALL__ __term_keyboard(void)
     if (on_console) ioctl(in_fd, KDSKBMODE, K_XLATE);
     tcsetattr(in_fd, TCSANOW, &sattr);
     close(in_fd);
-#ifdef	HAVE_MOUSE
+#ifdef	HAVE_GPM_H
     if (gpmhandle) Gpm_Close();
 #endif
 }
