@@ -36,8 +36,12 @@ AC_ARG_ENABLE(slang,
 AC_ARG_ENABLE(ncurses,
   [  --enable-ncurses        ncurses graphics support (autodetected)])
 
+dnl  conditional builds
+AC_ARG_ENABLE(debug,
+  [  --enable-debug          build debug versions of the library (default no)])
+
 # Checks for header files.
-AC_CHECK_HEADERS([fcntl.h limits.h malloc.h stddef.h stdint.h stdlib.h string.h sys/ioctl.h sys/time.h termios.h unistd.h utime.h])
+AC_CHECK_HEADERS([fcntl.h limits.h malloc.h iconv.h stddef.h stdint.h stdlib.h string.h sys/ioctl.h sys/time.h termios.h unistd.h utime.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_INLINE
@@ -96,6 +100,9 @@ if test "${enable_ncurses}" != "no"; then
   fi
 fi
 
+if test "${enable_debug}" = "yes"; then
+  AC_DEFINE(DEBUG, 1, Define to 1 to activate debug)
+fi
 
 
 AC_OUTPUT

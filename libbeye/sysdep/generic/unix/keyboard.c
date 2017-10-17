@@ -59,7 +59,7 @@ unsigned rawkb_size; /* size of rawkb_buf elements 1,2 or 4*/
 unsigned rawkb_mode=0;
 int rawkb_escape;
 
-#ifdef HAVE_ICONV
+#ifdef HAVE_ICONV_H
 static void *nls_handle;
 static int is_unicode=0;
 #endif
@@ -237,7 +237,7 @@ static tBool	mouse_status = True;	/**< mouse state */
 static void __FASTCALL__ pushEvent(unsigned _event)
 {
     unsigned event=_event;
-#if defined (_VT100_) && defined(HAVE_ICONV)
+#if defined (_VT100_) && defined(HAVE_ICONV_H)
     if(is_unicode) {
 	static unsigned char utf_buff[8];
 	static unsigned utf_ptr=0;
@@ -577,7 +577,7 @@ void __FASTCALL__ __init_keyboard(const char *user_cp)
 #define _MODE_ O_NONBLOCK
 #endif
 
-#ifdef HAVE_ICONV
+#ifdef HAVE_ICONV_H
     {
     const char *screen_cp;
 	screen_cp=nls_get_screen_cp();
@@ -631,7 +631,7 @@ void __FASTCALL__ __init_keyboard(const char *user_cp)
 
 void __FASTCALL__ __term_keyboard(void)
 {
-#ifdef HAVE_ICONV
+#ifdef HAVE_ICONV_H
     nls_term(nls_handle);
 #endif
 #ifdef	_VT100_

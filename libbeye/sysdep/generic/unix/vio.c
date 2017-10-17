@@ -188,7 +188,7 @@ chtype __FASTCALL__ _2ps(unsigned char c)
 
 #endif	/* _CURSES_ */
 
-#ifdef HAVE_ICONV
+#ifdef HAVE_ICONV_H
 static char *screen_cp;
 static unsigned is_unicode=0;
 static void *nls_handle;
@@ -483,7 +483,7 @@ void __FASTCALL__ __init_vio(const char *user_cp,unsigned long flags)
     int i;
 #endif
 
-#ifdef HAVE_ICONV
+#ifdef HAVE_ICONV_H
     screen_cp=nls_get_screen_cp();
     if(strncasecmp(screen_cp,"UTF",3)==0) {
 	is_unicode=1;

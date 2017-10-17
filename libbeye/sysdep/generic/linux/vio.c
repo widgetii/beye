@@ -350,7 +350,7 @@ void __FASTCALL__ __init_vio(const char *user_cp,unsigned long flags)
 	tvioWidth = w.ws_col;
 	tvioHeight = w.ws_row;
     }
-#ifdef HAVE_ICONV
+#ifdef HAVE_ICONV_H
     screen_cp=nls_get_screen_cp();
     if(strncasecmp(screen_cp,"UTF",3)==0 && !on_console) {
 	is_unicode=1;

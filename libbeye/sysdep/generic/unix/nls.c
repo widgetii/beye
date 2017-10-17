@@ -126,7 +126,7 @@ void __FASTCALL__ __nls_CmdlineToOem(unsigned char *buff, unsigned int len)
     UNUSED(buff), UNUSED(len);
 }
 
-#ifdef HAVE_ICONV
+#ifdef HAVE_ICONV_H
 #include <iconv.h>
 #endif
 
@@ -151,7 +151,7 @@ char *nls_get_screen_cp(void)
 }
 
 void* nls_init(const char *to_cp,const char *src_cp) {
-#ifdef HAVE_ICONV
+#ifdef HAVE_ICONV_H
     iconv_t ic;
     errno=0;
     ic=iconv_open(to_cp,src_cp);
@@ -165,7 +165,7 @@ void* nls_init(const char *to_cp,const char *src_cp) {
 }
 
 void nls_term(void* ic) {
-#ifdef HAVE_ICONV
+#ifdef HAVE_ICONV_H
  iconv_close(ic);
 #endif
 }
@@ -173,7 +173,7 @@ void nls_term(void* ic) {
 char *nls_recode2screen_cp(void* ic,const char *srcb,unsigned* len)
 {
     char *obuff;
-#ifdef HAVE_ICONV
+#ifdef HAVE_ICONV_H
     if(ic)
     {
 	static int warned=0;
@@ -215,7 +215,7 @@ char *nls_recode2screen_cp(void* ic,const char *srcb,unsigned* len)
 
 int nls_test(void* ic,const char *srcb,unsigned* len)
 {
-#ifdef HAVE_ICONV
+#ifdef HAVE_ICONV_H
     if(ic)
     {
 	static int warned=0;

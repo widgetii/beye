@@ -249,7 +249,7 @@ static mevent mouse = {0, 0, 0, 0};
 static void __FASTCALL__ pushEvent(unsigned _event)
 {
     unsigned event=_event;
-#if defined (_VT100_) && defined(HAVE_ICONV)
+#if defined (_VT100_) && defined(HAVE_ICONV_H)
     if(is_unicode) {
 	static unsigned char utf_buff[8];
 	static unsigned utf_ptr=0;
@@ -608,7 +608,7 @@ void __FASTCALL__ __init_keyboard(const char *user_cp)
 	on_console = 0;
     }
 
-#ifdef HAVE_ICONV
+#ifdef HAVE_ICONV_H
     {
     const char *screen_cp;
 	screen_cp=nls_get_screen_cp();
@@ -651,7 +651,7 @@ void __FASTCALL__ __init_keyboard(const char *user_cp)
 
 void __FASTCALL__ __term_keyboard(void)
 {
-#ifdef HAVE_ICONV
+#ifdef HAVE_ICONV_H
     nls_term(nls_handle);
 #endif
     if (on_console) ioctl(in_fd, KDSKBMODE, K_XLATE);
