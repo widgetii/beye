@@ -1,6 +1,6 @@
 /**
  * @namespace   biewlib
- * @file        biewlib/biewlib.h
+ * @file        biewlib/beyelib.h
  * @brief       This file contains extensions of standard C library, that needed
  *              for BIEW project.
  * @version     -
@@ -18,19 +18,21 @@
 #ifndef __BIEWLIB_H
 #define __BIEWLIB_H 1
 
+#include "bconfig.h"
+
 typedef enum { False = 0, True = 1 }tBool; /**< This is the data type used to represent boolean objects */
 
 #ifndef __NORECURSIVE
 #ifndef __SYS_DEP_H
-#include "biewlib/sysdep/_sys_dep.h"
+#include "libbeye/sysdep/_sys_dep.h"
 #endif
 
 #ifndef __OS_DEP_H
-#include "biewlib/sysdep/__os_dep.h"
+#include "libbeye/sysdep/__os_dep.h"
 #endif
 
 #ifndef __HRD_INF_H
-#include "biewlib/sysdep/_hrd_inf.h"
+#include "libbeye/sysdep/_hrd_inf.h"
 #endif
 
 #endif

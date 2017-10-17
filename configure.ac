@@ -55,7 +55,10 @@ AC_FUNC_REALLOC
 AC_CHECK_FUNCS([atexit ftruncate memmove memset munmap select strcasecmp strchr strcspn strdup strerror strncasecmp strpbrk strrchr strspn strstr strtol strtoul strtoull sysinfo utime])
 
 
-
+# TODO: make host machine autodetection
+# NOW - just hardcoded
+AC_DEFINE(__MACHINE__, ia32, hardcoded)
+AC_DEFINE(__OS__, unix, hardcoded)
 
 if test "${enable_slang}" != "no"; then
   ac_cv_my_have_slang="no"

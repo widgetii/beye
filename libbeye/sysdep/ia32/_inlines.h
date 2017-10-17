@@ -19,7 +19,7 @@
 #endif
 
 #if !defined(CAN_COMPILE_X86_GAS)
-#include "biewlib/sysdep/generic/_inlines.h"
+#include "libbeye/sysdep/generic/_inlines.h"
 #else
 #ifndef ___INLINES_H
 #define ___INLINES_H 1
@@ -44,7 +44,7 @@
 extern "C" {
 #endif
 
-#include "biewlib/sysdep/ia32/fastcopy.h"
+#include "libbeye/sysdep/ia32/fastcopy.h"
 
                 /** Changes byte order in 16-bit number */
 __inline static tUInt16 __FASTCALL__ __CONSTFUNC__ ByteSwapS(tUInt16 _val)
@@ -198,4 +198,4 @@ extern void (__FASTCALL__ *ShortsToChars_ptr)(tUInt32 limit,
 #endif
 #endif
 #undef ___INLINES_H
-#include "biewlib/sysdep/generic/_inlines.h"
+#include "libbeye/sysdep/generic/_inlines.h"

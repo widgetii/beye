@@ -18,9 +18,9 @@
 #define __CONFIG_H 1
 
 #if defined(__WIN32__) && defined(_MSC_VER)
-    #include "biewlib/sysdep/ia32/__config.h"
+    #include "libbeye/sysdep/ia32/__config.h"
 #else
-    #define __CONFIG <biewlib/sysdep/__MACHINE__/__config.h>
+    #define __CONFIG <libbeye/sysdep/__MACHINE__/__config.h>
     #include __CONFIG
 #endif
 

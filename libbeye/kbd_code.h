@@ -14,18 +14,18 @@
  * @since       1999
  * @note        Development, fixes and improvements
 **/
-#include "biewlib/biewlib.h"
+#include "libbeye/beyelib.h"
 #if __WORDSIZE == 16
  #if defined( __MSDOS__ ) || defined ( __OS2__ ) || defined ( __WINDOWS__ )
-   #include "biewlib/sysdep/ia16/dos/kbd_code.h"
+   #include "libbeye/sysdep/ia16/dos/kbd_code.h"
  #else
    #error Unknown operationg system for IA-16 architecture
  #endif
 #else
   #if defined(__WIN32__) && defined(_MSC_VER)
-    #define __OS_KEYBOARD <biewlib/sysdep/ia32/win32/kbd_code.h>
+    #define __OS_KEYBOARD <libbeye/sysdep/ia32/win32/kbd_code.h>
   #else
-    #define __OS_KEYBOARD <biewlib/sysdep/__MACHINE__/__OS__/kbd_code.h>
+    #define __OS_KEYBOARD <libbeye/sysdep/__MACHINE__/__OS__/kbd_code.h>
   #endif
   #include __OS_KEYBOARD
 #endif

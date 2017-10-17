@@ -17,12 +17,23 @@
 #ifndef __SYS_DEP_H
 #define __SYS_DEP_H 1
 
+// temprary size types hack - change all them to stdint.h in C99
+
+//#include <stdint.h>
+typedef uint8_t tUInt8;
+typedef int8_t tInt8;
+typedef uint32_t tUInt32;
+typedef uint64_t tInt64;
+typedef uint64_t tUInt64;
+
+
+
 #if defined(__WIN32__) && defined(_MSC_VER)
-    #include "biewlib/sysdep/ia32/__config.h"
-    #include "biewlib/sysdep/ia32/_inlines.h"
+    #include "libbeye/sysdep/ia32/__config.h"
+    #include "libbeye/sysdep/ia32/_inlines.h"
 #else
-    #define _INLINES <biewlib/sysdep/__MACHINE__/_inlines.h>
-    #define __CONFIG <biewlib/sysdep/__MACHINE__/__config.h>
+    #define _INLINES <libbeye/sysdep/__MACHINE__/_inlines.h>
+    #define __CONFIG <libbeye/sysdep/__MACHINE__/__config.h>
     #include __CONFIG
     #include _INLINES
 #endif

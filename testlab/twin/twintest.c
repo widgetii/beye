@@ -9,9 +9,9 @@
 #include <stdlib.h>
 #include <stdarg.h>
 
-#include "biewlib/twin.h"
-#include "biewlib/biewlib.h"
-#include "biewlib/kbd_code.h"
+#include "libbeye/twin.h"
+#include "libbeye/beyelib.h"
+#include "libbeye/kbd_code.h"
 
 #define N_WINS 10
 

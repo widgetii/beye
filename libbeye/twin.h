@@ -21,7 +21,7 @@
 #define __TWIN_H 1
 
 #ifndef __BIEWLIB_H
-#include "biewlib/biewlib.h"
+#include "libbeye/beyelib.h"
 #endif
 
 #ifdef __cplusplus
@@ -998,7 +998,7 @@ unsigned char     __FASTCALL__ twGetMappedColor(Color color);
 }
 #endif
 
-#include "biewlib/tw_class.h"
+#include "libbeye/tw_class.h"
 
 #endif
 
