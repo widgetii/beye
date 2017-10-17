@@ -1,4 +1,5 @@
 AC_INIT([beye], [6.1.1.alpha], [dima@doty.ru])
+AC_CONFIG_AUX_DIR([.auto])
 AM_INIT_AUTOMAKE([foreign -Wall -Werror])
 AC_PROG_CC
 AC_CONFIG_HEADERS([config.h])
