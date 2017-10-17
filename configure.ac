@@ -9,7 +9,6 @@ AC_INIT([beye], BEYE_VERSION, [https://github.com/widgetii/beye])
 AC_CONFIG_AUX_DIR([.auto])
 AM_INIT_AUTOMAKE([foreign -Wall -Werror])
 AC_CONFIG_HEADERS([bconfig.h])
-AC_CONFIG_FILES([Makefile])
 
 # Check for programs
 AC_PROG_CC
@@ -105,10 +104,28 @@ if test "${enable_debug}" = "yes"; then
 fi
 
 
+AC_CONFIG_FILES(
+  [Makefile
+   tools/beyehelp/Makefile
+   tools/lzss/Makefile
+   testlab/file_ini/Makefile
+   testlab/twin/Makefile
+
+])
+
 AC_OUTPUT
 
 # include <biewlib/sysdep/__MACHINE__/__config.h
 # __WORDSIZE = 16, 32, 64
+# __CPU_NAME__=ia32
+# __CPU__=386
+# __OS_NAME__='\"DOS$_bitness\"'
+# -D__OS__=\"dos\"
+# __MSDOS__
+# __OS2__
+# __DEFAULT_DISASM=0
+# -DCAN_COMPILE_X86_GAS=0
+# 
 # __WIN32__?
 # __GNUC__?
 # __QNX4__
@@ -116,5 +133,10 @@ AC_OUTPUT
 # __UNIX__
 # DJGPP
 # __WATCOMC__
-
+# DATADIR
 # __BYTE_ORDER = __LITTLE_ENDIAN, 
+#__ENABLE_FASTCALL=1
+#__HAVE_PRAGMA_PACK__=1
+#sys/resource.h - -DHAVE_SYS_RESOURCE=1
+#-DHAVE_POPEN=1
+#-DHAVE_PCLOSE=
