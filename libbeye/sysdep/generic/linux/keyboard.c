@@ -38,9 +38,9 @@ static const char rcs_id[] = "$Id$";
 #include <sys/kd.h>
 #include <sys/vt.h>
 
-#include "biewlib/kbd_code.h"
-#include "biewlib/biewlib.h"
-#include "console.h"
+#include "libbeye/kbd_code.h"
+#include "libbeye/beyelib.h"
+#include "libbeye/sysdep/generic/unix/console.h"
 
 #ifdef HAVE_GPM_H
 #include <gpm.h>
@@ -543,7 +543,7 @@ int __FASTCALL__ __kbdGetKey (unsigned long flg)
     return key | s;
 }
 
-tBool __FASTCALL__ __MsGetState(void)
+bool __FASTCALL__ __MsGetState(void)
 {
     return mouse_status;
 }

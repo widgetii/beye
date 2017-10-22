@@ -95,7 +95,7 @@ mmfHandle          __FASTCALL__ __mmfOpen(const char *fname,int mode)
   return NULL;
 }
 
-tBool              __FASTCALL__ __mmfFlush(mmfHandle mh)
+bool              __FASTCALL__ __mmfFlush(mmfHandle mh)
 {
   struct mmfRecord *mrec = (struct mmfRecord *)mh;
   return msync(mrec->addr,mrec->length,MS_SYNC) ? False : True;
@@ -124,14 +124,14 @@ mmfHandle       __FASTCALL__ __mmfSync(mmfHandle mh)
   return mrec;
 }
 
-tBool              __FASTCALL__ __mmfProtect(mmfHandle mh,int flags)
+bool              __FASTCALL__ __mmfProtect(mmfHandle mh,int flags)
 {
   struct mmfRecord *mrec = (struct mmfRecord *)mh;
   mrec->mode = flags;
   return mprotect(mrec->addr,mrec->length,mk_prot(flags)) ? False : True;
 }
 
-tBool              __FASTCALL__ __mmfResize(mmfHandle mh,long size)
+bool              __FASTCALL__ __mmfResize(mmfHandle mh,long size)
 {
   struct mmfRecord *mrec = (struct mmfRecord *)mh;
   void *new_addr;
@@ -177,6 +177,6 @@ long              __FASTCALL__ __mmfSize(mmfHandle mh)
   return ((struct mmfRecord *)mh)->length;
 }
 
-tBool             __FASTCALL__ __mmfIsWorkable( void ) { return True; }
+bool             __FASTCALL__ __mmfIsWorkable( void ) { return True; }
 
 #endif

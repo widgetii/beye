@@ -69,7 +69,6 @@ AC_CHECK_FUNCS([atexit ftruncate memmove memset munmap select strcasecmp strchr 
 # TODO: make host machine autodetection
 # NOW - just hardcoded
 AC_DEFINE(__MACHINE__, ia32, hardcoded)
-AC_DEFINE(__OS__, unix, hardcoded)
 AC_DEFINE(_VT100_, 1, hardcoded now, but in future we need to check is it unix system)
 AC_DEFINE(__DEFAULT_DISASM, 0, hardcoded now)
 
@@ -117,7 +116,7 @@ case "${host_os}" in
     #
     #   myapplication_bin_LDADD=@GL_LIBS@
         AC_DEFINE([OSX], 1, [Define for the Mac OS X.])
-        opsys=mac
+        opsys=osx
         ;;
     freebsd*)
         AC_DEFINE([BSD], 1, [Define for BSD systems.])
@@ -209,6 +208,8 @@ AM_CONDITIONAL([LINUX], [test x$opsys = xlinux])
 AM_CONDITIONAL([I386], [test x$arch = xi386])
 AM_CONDITIONAL([X86_64], [test x$arch = xx86_64])
 AM_CONDITIONAL([BSD], [test x$opsys = xbsd])
+AM_CONDITIONAL([BSD], [test x$opsys = xosx])
+
 
 
 

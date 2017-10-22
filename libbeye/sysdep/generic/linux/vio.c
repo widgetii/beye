@@ -25,10 +25,6 @@
     $Id$
 */
 
-#ifndef lint
-static const char rcs_id[] = "$Id$";
-#endif
-
 #define _XOPEN_SOURCE 500
 
 #include <ctype.h>
@@ -42,8 +38,8 @@ static const char rcs_id[] = "$Id$";
 #include <sys/types.h>
 #include <sys/ioctl.h>
 #include <sys/vt.h>
-#include "biewlib/biewlib.h"
-#include "console.h"
+#include "libbeye/beyelib.h"
+#include "libbeye/sysdep/generic/unix/console.h"
 
 #if (__GLIBC__ >= 2) && (__GLIBC_MINOR__ >= 1)
 #define	PWRITE pwrite
