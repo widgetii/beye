@@ -261,16 +261,21 @@ if test "${enable_ncurses}" != "no"; then
 fi
 
 if test "${enable_iconv}" != "no"; then
-  ac_cv_my_have_iconv="no"
-  AC_CHECK_HEADERS(iconv.h,
-                   [ac_cv_my_have_iconv="yes"
-                   BEYE_LIBS="${BEYE_LIBS} -liconv"
-                   break])
-  if test "${ac_cv_my_have_iconv}" = "no" -a "${enable_iconv}" = "yes"; then
+  am_cv_func_iconv="no"
+
+  dnl if we're configuring on a system w/out gettext, don't fall over
+  m4_ifndef([AM_ICONV],[m4_define([AM_ICONV],[:])])
+  AM_ICONV
+
+  if test "${am_cv_func_iconv}" = "yes"; then
+    AC_DEFINE(HAVE_ICONV_H, 1, Iconv present)
+  fi
+
+  if test "${am_cv_func_iconv}" = "no" -a "${enable_iconv}" = "yes"; then
     AC_MSG_ERROR([cannot find iconv development files])
   fi
 fi
-
+AC_DEFINE(HAVE_ICONV_H, 1, HARDCODED)
 
 if test "${enable_debug}" = "yes"; then
   AC_DEFINE(DEBUG, 1, Define to 1 to activate debug)

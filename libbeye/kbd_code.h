@@ -14,19 +14,21 @@
  * @since       1999
  * @note        Development, fixes and improvements
 **/
+#include "bconfig.h"
 #include "libbeye/beyelib.h"
-#if __WORDSIZE == 16
- #if defined( __MSDOS__ ) || defined ( __OS2__ ) || defined ( __WINDOWS__ )
-   #include "libbeye/sysdep/ia16/dos/kbd_code.h"
- #else
-   #error Unknown operationg system for IA-16 architecture
- #endif
-#else
-  #if defined(__WIN32__) && defined(_MSC_VER)
-    #define __OS_KEYBOARD <libbeye/sysdep/ia32/win32/kbd_code.h>
-  #else
-    #define __OS_KEYBOARD <libbeye/sysdep/__MACHINE__/__OS__/kbd_code.h>
-  #endif
-  #include __OS_KEYBOARD
+
+#if defined(DOS) || defined(OS2)
+    #define HDR "libbeye/sysdep/generic/dos/kbd_code.h"
+#elif defined(WINDOWS)
+    #define HDR "libbeye/sysdep/generic/windows/kbd_code.h"
+#elif defined(LINUX) || defined(OSX) || defined(BSD)
+    #define HDR "libbeye/sysdep/generic/unix/kbd_code.h"
+#elif defined(QNX4)
+    #define HDR "libbeye/sysdep/ia32/qnx/kbd_code.h"
+#elif defined(QNX6)
+    #define HDR "libbeye/sysdep/ia32/qnxnto/kbd_code.h"
 #endif
+
+#include HDR
+
 
