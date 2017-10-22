@@ -10,11 +10,13 @@
 
 const int VTMP_LEN=100;
 
-#define twrite(x)	write(out_fd, (x), strlen(x))
-
 // static inline twrite?
 
 static int out_fd; 
+
+ssize_t vt100_twrite(const char* ptr) {
+    return write(out_fd, ptr, strlen(ptr));
+}
 
 // VT100 cursor repositioning
 // https://vt100.net/docs/vt100-ug/chapter3.html#CUP
@@ -22,14 +24,14 @@ void vt100_SetCursorPos(int x, int y) {
     char vtmp[VTMP_LEN];
 
     sprintf(vtmp, "\x1b[%d;%dH", y + 1, x + 1);
-    twrite(vtmp);
+    vt100_twrite(vtmp);
 }
 
 static void vt100_clearscreen() {
     // clear screen on exit
-    twrite("\x1b[2J");
+    vt100_twrite("\x1b[2J");
     // set cursor's position to top-left corner
-    twrite("\x1b[H");
+    vt100_twrite("\x1b[H");
 }
 
 static int vt100_getWindowSize(int *rows, int *cols) {

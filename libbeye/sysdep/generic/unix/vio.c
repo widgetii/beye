@@ -129,7 +129,7 @@ static int _color[8] = {
 
 #if defined(NCURSES_VERSION) && defined(NDEBUG)
 
-static unsigned char frames_vt100[0x30] =
+static unsigned char frames_vt100[] =
 "aaaxuuukkuxkjjjkmvwtqnttmlvwtqnvvwwmmllnnjl00000";
 
 #define _2ps(x) acs_map[frames_vt100[x - _PSMIN]]
@@ -224,10 +224,11 @@ static char *vtmp;
 static int out_fd;
 static int _color[8] = {0,4,2,6,1,5,3,7};
 
-static unsigned char frames_vt100[0x30] =
+static unsigned char frames_vt100[] =
 "aaaxuuukkuxkjjjkmvwtqnttmlvwtqnvvwwmmllnnjlaaaaa";
 
-#define twrite(x)	write(out_fd,(x),strlen(x))
+//#define twrite(x)	write(out_fd,(x),strlen(x))
+#define twrite(x) vt100_twrite(x)
 
 /**
     convert vga attrubute to ansi escape sequence
