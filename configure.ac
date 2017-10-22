@@ -7,7 +7,7 @@ m4_define(BEYE_VERSION, [6.1.1.alpha])
 
 AC_INIT([beye], BEYE_VERSION, [https://github.com/widgetii/beye])
 AC_CONFIG_AUX_DIR([.auto])
-AM_INIT_AUTOMAKE([foreign -Wall -Werror subdir-objects])
+AM_INIT_AUTOMAKE([foreign -Wall -Werror subdir-objects dist-bzip2])
 AC_CONFIG_HEADERS([bconfig.h])
 
 # Check for programs
@@ -264,9 +264,38 @@ fi
 if test "${enable_iconv}" != "no"; then
   am_cv_func_iconv="no"
 
-  dnl if we're configuring on a system w/out gettext, don't fall over
-  m4_ifndef([AM_ICONV],[m4_define([AM_ICONV],[:])])
-  AM_ICONV
+  # For OS X, Solaris, HP-UX, etc.: figure out if -liconv is needed.  We'll
+  # accept either iconv_open or libiconv_open, since some include files map
+  # the former to the latter.
+  AC_SEARCH_LIBS(iconv_open, iconv)
+  AC_SEARCH_LIBS(libiconv_open, iconv)
+
+  AC_MSG_CHECKING([for iconv declaration])
+  AC_CACHE_VAL(am_cv_proto_iconv, [
+      AC_TRY_COMPILE([
+  #include <stdlib.h>
+  #include <iconv.h>
+  extern
+  #ifdef __cplusplus
+  "C"
+  #endif
+  #if defined(__STDC__) || defined(__cplusplus)
+  size_t iconv (iconv_t cd, char * *inbuf, size_t *inbytesleft, char * *outbuf, size_t *outbytesleft);
+  #else
+  size_t iconv();
+  #endif
+  ], [], am_cv_proto_iconv_arg1="", am_cv_proto_iconv_arg1="const")
+        am_cv_proto_iconv="extern size_t iconv (iconv_t cd, $am_cv_proto_iconv_arg1 char * *inbuf, size_t *inbytesleft, char * *outbuf, size_t *outbytesleft);"
+        am_cv_func_iconv="yes"])
+      am_cv_proto_iconv=`echo "[$]am_cv_proto_iconv" | tr -s ' ' | sed -e 's/( /(/'`
+  AC_MSG_RESULT([$]{ac_t:-
+           }[$]am_cv_proto_iconv)
+  AC_DEFINE_UNQUOTED(ICONV_CONST, $am_cv_proto_iconv_arg1,
+  		   [Define as const if the declaration of iconv() needs const.])
+
+
+
+
 
   if test "${am_cv_func_iconv}" = "yes"; then
     AC_DEFINE(HAVE_ICONV_H, 1, Iconv present)
@@ -276,7 +305,6 @@ if test "${enable_iconv}" != "no"; then
     AC_MSG_ERROR([cannot find iconv development files])
   fi
 fi
-#AC_DEFINE(HAVE_ICONV_H, 1, HARDCODED)
 
 if test "${enable_debug}" = "yes"; then
   AC_DEFINE(DEBUG, 1, Define to 1 to activate debug)
