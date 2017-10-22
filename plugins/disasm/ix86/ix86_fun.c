@@ -21,10 +21,11 @@
 #include <string.h>
 #include <limits.h>
 #include <stdio.h>
+#include <stdint.h>
 
 #include "plugins/disasm.h"
 #include "plugins/disasm/ix86/ix86.h"
-#include "biewutil.h"
+#include "beyeutil.h"
 #include "bmfile.h"
 #include "codeguid.h"
 #include "reg_form.h"

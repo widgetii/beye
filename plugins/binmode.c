@@ -21,17 +21,17 @@
 
 #include "colorset.h"
 #include "bconsole.h"
-#include "biewutil.h"
-#include "biewhelp.h"
+#include "beyeutil.h"
+#include "beyehelp.h"
 #include "bin_util.h"
 #include "bmfile.h"
 #include "reg_form.h"
 #include "editor.h"
 #include "tstrings.h"
-#include "biewlib/file_ini.h"
-#include "biewlib/kbd_code.h"
-#include "biewlib/biewlib.h"
-#include "biewlib/pmalloc.h"
+#include "libbeye/file_ini.h"
+#include "libbeye/kbd_code.h"
+#include "libbeye/beyelib.h"
+#include "libbeye/pmalloc.h"
 
 static unsigned virtWidthCorr=0;
 

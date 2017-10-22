@@ -23,18 +23,18 @@
 #include <stdio.h>
 #include <errno.h>
 
-#include "biewhelp.h"
+#include "beyehelp.h"
 #include "bmfile.h"
 #include "plugins/disasm.h"
 #include "plugins/disasm/ix86/ix86.h"
-#include "biewutil.h"
+#include "beyeutil.h"
 #include "reg_form.h"
 #include "bconsole.h"
 #include "codeguid.h"
-#include "biewlib/file_ini.h"
-#include "biewlib/kbd_code.h"
-#include "biewlib/pmalloc.h"
-#include "biewlib/biewlib.h"
+#include "libbeye/file_ini.h"
+#include "libbeye/kbd_code.h"
+#include "libbeye/pmalloc.h"
+#include "libbeye/beyelib.h"
 
 #define MAX_IX86_INSN_LEN 15
 

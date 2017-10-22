@@ -18,7 +18,7 @@
 #define __TEXTMODE_H
 
 #ifndef __FILE_INI_RUNTIME_SUPPORT_SYSTEM__
-#include "biewlib/file_ini.h"
+#include "libbeye/file_ini.h"
 #endif
 
 typedef struct tag_REGISTRY_NLS

@@ -29,6 +29,7 @@
 #include <stdlib.h>
 #include <errno.h>
 
+#include "bconfig.h"
 #include "bconsole.h"
 #include "colorset.h"
 #include "bmfile.h"
@@ -37,13 +38,13 @@
 #include "editor.h"
 #include "tstrings.h"
 #include "reg_form.h"
-#include "biewutil.h"
+#include "beyeutil.h"
 #include "search.h"
 #include "setup.h"
-#include "biewlib/file_ini.h"
-#include "biewlib/kbd_code.h"
-#include "biewlib/biewlib.h"
-#include "biewlib/pmalloc.h"
+#include "libbeye/file_ini.h"
+#include "libbeye/kbd_code.h"
+#include "libbeye/beyelib.h"
+#include "libbeye/pmalloc.h"
 
 
 unsigned ArgCount;

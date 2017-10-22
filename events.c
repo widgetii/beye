@@ -16,10 +16,11 @@
 **/
 #include <limits.h>
 #include <string.h>
+#include <stdint.h>
 
 #include "bconsole.h"
-#include "biewlib/kbd_code.h"
-#include "biewlib/biewlib.h"
+#include "libbeye/kbd_code.h"
+#include "libbeye/beyelib.h"
 
 static int KB_Buff[64];
 static size_t KB_freq = 0;

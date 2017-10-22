@@ -1,7 +1,9 @@
 #ifndef __BSWAP_H__
 #define __BSWAP_H__
 
-#include "biewlib/sysdep/__config.h"
+#include "bconfig.h"
+
+#include "libbeye/sysdep/__config.h"
 
 // be2me ... BigEndian to MachineEndian
 // le2me ... LittleEndian to MachineEndian

@@ -21,11 +21,12 @@
 #include <stdio.h>
 #include <ctype.h>
 #include <limits.h>
-#include "biewlib/sysdep/__config.h"
+#include "beyelib.h"
+#include "libbeye/sysdep/__config.h"
 #if __WORDSIZE == 16
 #include <mem.h>
 #endif
-#include "biewlib/pmalloc.h"
+#include "libbeye/pmalloc.h"
 
 tBool __FASTCALL__ isseparate(int ch) { return (isspace(ch) || ispunct(ch)); }
 

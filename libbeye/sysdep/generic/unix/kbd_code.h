@@ -70,6 +70,12 @@
     because of biew dos-dependent key treatment (will be fixed)
 */
 
+// TODO: _SLANG_ and _CURSES_ now manually undefined
+#undef _SLANG_
+#undef _CURSES_
+// TODO: end
+
+
 #ifdef	_SLANG_
 #include <slang.h>
 #define _2B(x)	((((x) & 0xff) << 8) + (((x) & 0xf00) << 4) * 4)

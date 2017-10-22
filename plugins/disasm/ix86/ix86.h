@@ -22,7 +22,7 @@
 #include "plugins/disasm.h"
 
 #ifndef __BIEWLIB_H
-#include "biewlib/biewlib.h"
+#include "libbeye/beyelib.h"
 #endif
 
 #define TAB_POS 10

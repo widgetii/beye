@@ -19,7 +19,7 @@
 #include <stdlib.h>
 
 #include "reg_form.h"
-#include "biewutil.h"
+#include "beyeutil.h"
 #include "bconsole.h"
 
 extern REGISTRY_BIN binTable;

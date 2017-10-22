@@ -18,8 +18,8 @@
 #include "biewlib/sysdep/ia16/dos/mmfio.c"
 #else
 #include <sys/mman.h>
-#include "biewlib/pmalloc.h"
-#include "biewlib/biewlib.h"
+#include "libbeye/pmalloc.h"
+#include "libbeye/beyelib.h"
 
 #ifndef MREMAP_MAYMOVE
 #define MREMAP_MAYMOVE 1

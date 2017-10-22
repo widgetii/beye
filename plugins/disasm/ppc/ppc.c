@@ -22,12 +22,12 @@
 #include "reg_form.h"
 #include "plugins/disasm.h"
 #include "bconsole.h"
-#include "biewhelp.h"
-#include "biewutil.h"
+#include "beyehelp.h"
+#include "beyeutil.h"
 #include "plugins/disasm/ppc/ppc.h"
-#include "biewlib/kbd_code.h"
-#include "biewlib/file_ini.h"
-#include "biewlib/pmalloc.h"
+#include "libbeye/kbd_code.h"
+#include "libbeye/file_ini.h"
+#include "libbeye/pmalloc.h"
 
 #include "ppc.h"
 

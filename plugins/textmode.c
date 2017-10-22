@@ -24,13 +24,13 @@
 #include "colorset.h"
 #include "bmfile.h"
 #include "bin_util.h"
-#include "biewutil.h"
-#include "biewhelp.h"
+#include "beyeutil.h"
+#include "beyehelp.h"
 #include "bconsole.h"
 #include "search.h"
 #include "reg_form.h"
-#include "biewlib/kbd_code.h"
-#include "biewlib/pmalloc.h"
+#include "libbeye/kbd_code.h"
+#include "libbeye/pmalloc.h"
 
 typedef struct tag_shash_s
 {

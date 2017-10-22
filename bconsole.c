@@ -28,12 +28,12 @@
 
 #include "editor.h"
 #include "colorset.h"
-#include "biewutil.h"
+#include "beyeutil.h"
 #include "tstrings.h"
 #include "search.h"
 #include "bconsole.h"
-#include "biewlib/pmalloc.h"
-#include "biewlib/kbd_code.h"
+#include "libbeye/pmalloc.h"
+#include "libbeye/kbd_code.h"
 
 extern TWindow * ErrorWnd;
 

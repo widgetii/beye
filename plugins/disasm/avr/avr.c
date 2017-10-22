@@ -21,17 +21,17 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "biewhelp.h"
+#include "beyehelp.h"
 #include "bmfile.h"
 #include "plugins/disasm.h"
-#include "biewutil.h"
+#include "beyeutil.h"
 #include "reg_form.h"
 #include "bconsole.h"
 #include "codeguid.h"
-#include "biewlib/file_ini.h"
-#include "biewlib/kbd_code.h"
-#include "biewlib/pmalloc.h"
-#include "biewlib/biewlib.h"
+#include "libbeye/file_ini.h"
+#include "libbeye/kbd_code.h"
+#include "libbeye/pmalloc.h"
+#include "libbeye/beyelib.h"
 
 #define _(STR)     STR
 #define _MAX(A,B)  ( (A) > (B) ? (A) : (B) )

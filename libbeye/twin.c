@@ -27,8 +27,8 @@
 #include <unistd.h>
 #endif
 
-#include "biewlib/twin.h"
-#include "biewlib/pmalloc.h"
+#include "libbeye/twin.h"
+#include "libbeye/pmalloc.h"
 
 const char TW_SINGLE_FRAME[8] = { TWC_Sd_Sr, TWC_SH, TWC_Sl_Sd, TWC_SV, TWC_SV, TWC_Su_Sr, TWC_SH, TWC_Sl_Su };
 const char TW_DOUBLE_FRAME[8] = { TWC_Dd_Dr, TWC_DH, TWC_Dl_Dd, TWC_DV, TWC_DV, TWC_Du_Dr, TWC_DH, TWC_Dl_Du };

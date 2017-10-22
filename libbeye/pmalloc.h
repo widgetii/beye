@@ -20,7 +20,7 @@
 #include <stddef.h>
 
 #ifndef __BIEWLIB_H
-#include "biewlib/biewlib.h"
+#include "libbeye/beyelib.h"
 #endif
 
 #ifdef __cplusplus

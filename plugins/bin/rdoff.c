@@ -24,14 +24,14 @@
 #include "bin_util.h"
 #include "bmfile.h"
 #include "codeguid.h"
-#include "biewhelp.h"
-#include "biewutil.h"
+#include "beyehelp.h"
+#include "beyeutil.h"
 #include "bconsole.h"
 #include "tstrings.h"
 #include "plugins/disasm.h"
 #include "plugins/bin/rdoff.h"
-#include "biewlib/pmalloc.h"
-#include "biewlib/kbd_code.h"
+#include "libbeye/pmalloc.h"
+#include "libbeye/kbd_code.h"
 
 struct rdoff_ImpName
 {

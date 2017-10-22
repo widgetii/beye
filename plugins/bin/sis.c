@@ -16,14 +16,15 @@
  * @note        Development, fixes and improvements
 **/
 #include <stddef.h>
+#include <stdint.h>
 
 #include "reg_form.h"
 #include "bmfile.h"
 #include "bconsole.h"
-#include "biewhelp.h"
+#include "beyehelp.h"
 #include "colorset.h"
-#include "biewutil.h"
-#include "biewlib/kbd_code.h"
+#include "beyeutil.h"
+#include "libbeye/kbd_code.h"
 #include "plugins/bin/mmio.h"
 #include "plugins/disasm.h"
 

@@ -22,16 +22,16 @@
 #include "bswap.h"
 #include "bmfile.h"
 #include "bin_util.h"
-#include "biewhelp.h"
+#include "beyehelp.h"
 #include "bconsole.h"
-#include "biewutil.h"
+#include "beyeutil.h"
 #include "reg_form.h"
 #include "tstrings.h"
 #include "plugins/bin/arch.h"
 #include "plugins/disasm.h"
-#include "biewlib/pmalloc.h"
-#include "biewlib/biewlib.h"
-#include "biewlib/kbd_code.h"
+#include "libbeye/pmalloc.h"
+#include "libbeye/beyelib.h"
+#include "libbeye/kbd_code.h"
 
 ar_hdr arch;
 

@@ -16,6 +16,7 @@
  * @note        Development, fixes and improvements
 **/
 #include <stddef.h>
+#include <stdint.h>
 
 #include "reg_form.h"
 #include "plugins/disasm.h"

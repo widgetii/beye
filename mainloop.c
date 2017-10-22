@@ -15,19 +15,20 @@
  * @note        Development, fixes and improvements
 **/
 #include <string.h>
+#include <stdint.h>
 
 #include "colorset.h"
 #include "bmfile.h"
 #include "tstrings.h"
 #include "reg_form.h"
-#include "biewutil.h"
-#include "biewhelp.h"
+#include "beyeutil.h"
+#include "beyehelp.h"
 #include "bconsole.h"
 #include "codeguid.h"
 #include "search.h"
 #include "setup.h"
-#include "biewlib/kbd_code.h"
-#include "biewlib/biewlib.h"
+#include "libbeye/kbd_code.h"
+#include "libbeye/beyelib.h"
 
 extern __filesize_t LastOffset;
 extern unsigned strmaxlen;

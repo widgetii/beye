@@ -22,15 +22,15 @@ extern "C" {
 #endif
 
 #ifndef __TWIN_H
-#include "biewlib/twin.h"
+#include "libbeye/twin.h"
 #endif
 
 #ifndef __BBIO_H
-#include "biewlib/bbio.h"
+#include "libbeye/bbio.h"
 #endif
 
 #ifndef __FILE_INI_RUNTIME_SUPPORT_SYSTEM__
-#include "biewlib/file_ini.h"
+#include "libbeye/file_ini.h"
 #endif
 
 extern char legalchars[];

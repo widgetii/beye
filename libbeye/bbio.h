@@ -17,9 +17,9 @@
 #ifndef __BBIO_H
 #define __BBIO_H 1
 
-#ifndef __BIEWLIB_H
-#include "biewlib/biewlib.h"
-#endif
+#include "libbeye/sysdep/generic/__config.h"
+#include "libbeye/beyelib.h"
+
 /******************************************************************\
 *  Buffered binary file streams input/output section               *
 *  Helpful for read/write small size objects from/to file          *

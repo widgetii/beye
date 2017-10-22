@@ -31,9 +31,14 @@ static const char rcs_id[] = "$Id$";
 #include <stdlib.h>
 #include <string.h>
 
-#include "biewlib/kbd_code.h"
-#include "biewlib/biewlib.h"
+#include "libbeye/kbd_code.h"
+#include "libbeye/beyelib.h"
 #include "console.h"
+
+// TODO: just harcoded only VT100 because of old define's
+#undef _SLANG_
+#undef _CURSES_
+// TODO: end
 
 #ifdef	_SLANG_
 #include <slang.h>
@@ -528,7 +533,7 @@ int __FASTCALL__ __kbdGetKey(unsigned long flg)
 
 */
 
-tBool __FASTCALL__ __MsGetState(void)
+bool __FASTCALL__ __MsGetState(void)
 {
     return mouse_status;
 }

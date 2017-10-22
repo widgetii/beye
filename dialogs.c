@@ -21,12 +21,12 @@
 #include "colorset.h"
 #include "bmfile.h"
 #include "tstrings.h"
-#include "biewhelp.h"
+#include "beyehelp.h"
 #include "bconsole.h"
-#include "biewutil.h"
+#include "beyeutil.h"
 #include "bin_util.h"
-#include "biewlib/kbd_code.h"
-#include "biewlib/twin.h"
+#include "libbeye/kbd_code.h"
+#include "libbeye/twin.h"
 
 tBool __FASTCALL__ Get2DigitDlg(const char *title,const char * text,unsigned char *xx)
 {

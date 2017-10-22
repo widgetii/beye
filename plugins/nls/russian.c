@@ -20,7 +20,7 @@
 
 #include "plugins/textmode.h"
 #include "bconsole.h"
-#include "biewutil.h"
+#include "beyeutil.h"
 
 #define TXT_CURRCP      0
 #define TXT_CP866       1

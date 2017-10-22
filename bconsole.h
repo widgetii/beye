@@ -20,12 +20,14 @@
 #ifndef __BCONSOLE__H
 #define __BCONSOLE__H
 
+#include <stdint.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #ifndef __TWIN_H
-#include "biewlib/twin.h"
+#include "libbeye/twin.h"
 #endif
 
 extern TWindow *MainWnd,*HelpWnd,*TitleWnd,*CritErrWnd;

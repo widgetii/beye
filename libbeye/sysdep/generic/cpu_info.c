@@ -16,8 +16,9 @@
  * @note        Development, fixes and improvements
 **/
 #include <stdio.h>
+#include <stdint.h>
 
-#include "biewlib/biewlib.h"
+#include "libbeye/beyelib.h"
 
 void __FillCPUInfo(char *buff,unsigned cbBuff,void (*func)(int))
 {

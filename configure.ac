@@ -7,12 +7,14 @@ m4_define(BEYE_VERSION, [6.1.1.alpha])
 
 AC_INIT([beye], BEYE_VERSION, [https://github.com/widgetii/beye])
 AC_CONFIG_AUX_DIR([.auto])
-AM_INIT_AUTOMAKE([foreign -Wall -Werror])
+AM_INIT_AUTOMAKE([foreign -Wall -Werror subdir-objects])
 AC_CONFIG_HEADERS([bconfig.h])
 
 # Check for programs
 AC_PROG_CC
+AC_PROG_RANLIB
 AC_PROG_INSTALL
+AM_PROG_AR
 
 dnl This is for stuff that absolutely must end up in pyconfig.h.
 dnl Please use pyport.h instead, if possible.
@@ -34,13 +36,16 @@ AC_ARG_ENABLE(slang,
   [  --enable-slang          slang graphics support (autodetected)])
 AC_ARG_ENABLE(ncurses,
   [  --enable-ncurses        ncurses graphics support (autodetected)])
+AC_ARG_ENABLE(iconv,
+  [  --enable-iconv          iconv library support (autodetected)])
+
 
 dnl  conditional builds
 AC_ARG_ENABLE(debug,
-  [  --enable-debug          build debug versions of the library (default no)])
+  [  --enable-debug          build debug version of the program (default no)])
 
 # Checks for header files.
-AC_CHECK_HEADERS([fcntl.h gpm.h limits.h malloc.h iconv.h stddef.h stdint.h stdlib.h string.h sys/ioctl.h sys/time.h termios.h unistd.h utime.h])
+AC_CHECK_HEADERS([fcntl.h gpm.h limits.h malloc.h stddef.h stdint.h stdlib.h string.h sys/ioctl.h sys/time.h termios.h unistd.h utime.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_INLINE
@@ -52,13 +57,160 @@ AC_FUNC_MALLOC
 AC_FUNC_MKTIME
 AC_FUNC_MMAP
 AC_FUNC_REALLOC
-AC_CHECK_FUNCS([atexit ftruncate memmove memset munmap select strcasecmp strchr strcspn strdup strerror strncasecmp strpbrk strrchr strspn strstr strtol strtoul strtoull sysinfo utime])
+AC_CHECK_FUNCS([atexit ftruncate memmove memset munmap select strcasecmp strchr strcspn strdup strerror stricmp strncasecmp strpbrk strlwr strrchr strspn strstr strtol strtoul strtoull strupr sysinfo utime])
 
 
 # TODO: make host machine autodetection
 # NOW - just hardcoded
 AC_DEFINE(__MACHINE__, ia32, hardcoded)
 AC_DEFINE(__OS__, unix, hardcoded)
+AC_DEFINE(_VT100_, 1, hardcoded now, but in future we need to check is it unix system)
+AC_DEFINE(__DEFAULT_DISASM, 0, hardcoded now)
+
+# Checking the size of int type
+AC_CHECK_SIZEOF(int)
+#if test $ac_cv_sizeof_int = "4"; then
+ #...
+ # or AC_DEFINE([__WORD], $ac_cv_sizeof_int, description)
+#fi
+
+# Broken?
+#AC_CHECK_HEADERS([endian.h],
+# AC_TRY_COMPILE([#include ], [switch (1) { case __LITTLE_ENDIAN: break; case __BYTE_ORDER: break; } ],[is_little_endian=0], [is_little_endian=1]),
+# AC_MSG_ERROR([Can't Determine Endianess])
+#)
+#if test $is_little_endian = 1 ; then
+ #all are happy
+#fi
+
+
+#
+# Platform specific setup
+#
+#############################
+AC_CANONICAL_HOST
+
+# Detect the target system
+AC_MSG_CHECKING([for supported operating system])
+case "${host_os}" in
+    linux*)
+        opsys=linux
+        AC_DEFINE([LINUX], 1, [Define for the Linux operating system.])
+        ;;
+    cygwin*|mingw*)
+        opsys=windows
+        AC_DEFINE([WINDOWS], 1, [Define for the Windows operating system.])
+        ;;
+    darwin*)
+    #   CFLAGS="$CFLAGS something"
+    #   PASSING A VARIABLE FROM CONFIGURE.AC TO MAKEFILE.AM
+    #   GL_LIBS="-lGLU -lGL"
+    #   AC_SUBST(GL_LIBS)
+    #
+    #   Then in Makefile.am put:
+    #
+    #   myapplication_bin_LDADD=@GL_LIBS@
+        AC_DEFINE([OSX], 1, [Define for the Mac OS X.])
+        opsys=mac
+        ;;
+    freebsd*)
+        AC_DEFINE([BSD], 1, [Define for BSD systems.])
+        opsys=bsd
+        ;;
+    *)
+        AC_MSG_ERROR(["OS $host_os is not supported"])
+        ;;
+esac
+
+AC_MSG_CHECKING([for supported architecture])
+case "$host_cpu" in
+i[[3456]]86|pentium)
+	arch=i386
+	AC_DEFINE([I386], 1, [Define for the i386 architecture.])
+	;;
+ia64)
+	arch=ia64
+	AC_DEFINE([IA64], 1, [Define for the IA64 architecture.])
+	;;
+m68k)
+	arch=m68k
+	AC_DEFINE([M68K], 1, [Define for the m68k architecture.])
+	;;
+sparc64*)
+	arch=sparc64
+	AC_DEFINE([SPARC64], 1, [Define for the SPARC64 architecture.])
+	;;
+sparc*)
+	arch=sparc
+	AC_DEFINE([SPARC], 1, [Define for the SPARC architecture.])
+	;;
+mips*)
+	arch=mips
+	AC_DEFINE([MIPS], 1, [Define for the MIPS architecture.])
+	;;
+alpha*)
+	arch=alpha
+	AC_DEFINE([ALPHA], 1, [Define for the Alpha architecture.])
+	;;
+powerpc*)
+	arch=powerpc
+	AC_DEFINE([POWERPC], 1, [Define for the PowerPC architecture.])
+	;;
+arm*)
+	arch=arm
+	AC_DEFINE([ARM], 1, [Define for the ARM architecture.])
+	;;
+s390)
+	arch=s390
+	AC_DEFINE([S390], 1, [Define for the S390 architecture.])
+	;;
+s390x)
+	arch=s390x
+	AC_DEFINE([S390X], 1, [Define for the S390x architecture.])
+	;;
+hppa*|parisc*)
+	arch=hppa
+	AC_DEFINE([HPPA], 1, [Define for the HPPA architecture.])
+	;;
+sh)
+	arch=sh
+	AC_DEFINE([SH], 1, [Define for the SH architecture.])
+	;;
+sh64)
+	arch=sh64
+	AC_DEFINE([SH64], 1, [Define for the SH64 architecture.])
+	;;
+x86?64*)
+	arch=x86_64
+	AC_DEFINE([X86_64], 1, [Define for the AMD x86-64 architecture.])
+	;;
+*)
+	AC_MSG_RESULT([NO!])
+	AC_MSG_ERROR([architecture $host_cpu is not supported])
+	;;
+esac
+AC_MSG_RESULT($arch)
+
+# Define $(opsys) in Makefile
+AC_SUBST(opsys)
+AC_SUBST(arch)
+
+AC_DEFINE_UNQUOTED([__OS_NAME__],["$host_os"],[os name])
+AC_DEFINE_UNQUOTED([__CPU_NAME__],["$arch"],[CPU name])
+
+# Pass the conditionals to automake
+AM_CONDITIONAL([LINUX], [test x$opsys = xlinux])
+AM_CONDITIONAL([I386], [test x$arch = xi386])
+AM_CONDITIONAL([X86_64], [test x$arch = xx86_64])
+AM_CONDITIONAL([BSD], [test x$opsys = xbsd])
+
+
+
+
+# check slang and ncurses only for unices
+#if test x$opsys != xlinux; then
+#AC_CHECK_LIB(nsl, main)
+#fi
 
 if test "${enable_slang}" != "no"; then
   ac_cv_my_have_slang="no"
@@ -102,13 +254,27 @@ if test "${enable_ncurses}" != "no"; then
   fi
 fi
 
+if test "${enable_iconv}" != "no"; then
+  ac_cv_my_have_iconv="no"
+  AC_CHECK_HEADERS(iconv.h,
+                   [ac_cv_my_have_iconv="yes"
+                   BEYE_LIBS="${BEYE_LIBS} -liconv"
+                   break])
+  if test "${ac_cv_my_have_iconv}" = "no" -a "${enable_iconv}" = "yes"; then
+    AC_MSG_ERROR([cannot find iconv development files])
+  fi
+fi
+
+
 if test "${enable_debug}" = "yes"; then
   AC_DEFINE(DEBUG, 1, Define to 1 to activate debug)
 fi
 
+AC_SUBST(BEYE_LIBS)
 
 AC_CONFIG_FILES(
   [Makefile
+   libbeye/Makefile
    tools/beyehelp/Makefile
    tools/lzss/Makefile
    testlab/file_ini/Makefile
@@ -143,3 +309,4 @@ AC_OUTPUT
 #sys/resource.h - -DHAVE_SYS_RESOURCE=1
 #-DHAVE_POPEN=1
 #-DHAVE_PCLOSE=
+

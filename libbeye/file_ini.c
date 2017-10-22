@@ -22,9 +22,9 @@
 #include <ctype.h>
 #include <limits.h>
 
-#include "biewlib/bbio.h"
-#include "biewlib/file_ini.h"
-#include "biewlib/pmalloc.h"
+#include "libbeye/bbio.h"
+#include "libbeye/file_ini.h"
+#include "libbeye/pmalloc.h"
 
 #define rewind_ini(h) (bioSeek(h,0L,BIO_SEEK_SET))
 

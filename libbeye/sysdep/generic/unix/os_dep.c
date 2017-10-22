@@ -40,7 +40,7 @@ static const char rcs_id[] = "$Id$";
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#include "biewlib/biewlib.h"
+#include "libbeye/beyelib.h"
 #include "console.h"
 
 #ifndef	PREFIX
@@ -51,7 +51,7 @@ static const char rcs_id[] = "$Id$";
 #define DATADIR	PREFIX"/share/biew"
 #endif
 
-tBool break_status = False;	/**< CTRL+BREAK flag */
+bool break_status = False;	/**< CTRL+BREAK flag */
 
 termdesc *terminal = NULL;
 
@@ -126,7 +126,7 @@ char * __FASTCALL__ __get_rc_dir(const char *progname)
 }
 
 
-tBool __FASTCALL__ __OsGetCBreak(void)
+bool __FASTCALL__ __OsGetCBreak(void)
 {
 #ifndef	__ENABLE_SIGIO
     ReadNextEvent();

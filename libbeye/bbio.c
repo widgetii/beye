@@ -23,8 +23,8 @@
 #include <errno.h>
 #include <limits.h>
 
-#include "biewlib/bbio.h"
-#include "biewlib/pmalloc.h"
+#include "libbeye/bbio.h"
+#include "libbeye/pmalloc.h"
 
 #define MK_FPTR(x) (x)
 

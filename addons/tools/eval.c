@@ -49,11 +49,11 @@
 
 #include "colorset.h"
 #include "reg_form.h"
-#include "biewutil.h"
+#include "beyeutil.h"
 #include "bconsole.h"
-#include "biewlib/biewlib.h"
-#include "biewlib/kbd_code.h"
-#include "biewlib/pmalloc.h"
+#include "libbeye/beyelib.h"
+#include "libbeye/kbd_code.h"
+#include "libbeye/pmalloc.h"
 
 
 #define LAST_CHAR(string) (((char *)string)[strlen(string)-1])

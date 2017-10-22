@@ -17,12 +17,14 @@
 #ifndef __BMFILE_INC
 #define __BMFILE_INC
 
+#include "libbeye/sysdep/generic/__config.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #ifndef __BBIO_H
-#include "biewlib/bbio.h"
+#include "libbeye/bbio.h"
 #endif
 
 #define HA_LEN ((BMFileFlags&BMFF_USE64)?18:10)

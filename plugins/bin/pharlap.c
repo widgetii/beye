@@ -21,15 +21,15 @@
 #include "colorset.h"
 #include "bconsole.h"
 #include "bin_util.h"
-#include "biewutil.h"
-#include "biewhelp.h"
+#include "beyeutil.h"
+#include "beyehelp.h"
 #include "tstrings.h"
 #include "bmfile.h"
 #include "reg_form.h"
 #include "plugins/bin/pharlap.h"
 #include "plugins/disasm.h"
-#include "biewlib/biewlib.h"
-#include "biewlib/kbd_code.h"
+#include "libbeye/beyelib.h"
+#include "libbeye/kbd_code.h"
 
 static newPharLap nph;
 

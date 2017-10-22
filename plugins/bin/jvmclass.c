@@ -19,10 +19,11 @@
 #include <limits.h>
 #include <string.h>
 #include <stdio.h>
+#include <stdint.h>
 
 #include "bconsole.h"
-#include "biewhelp.h"
-#include "biewutil.h"
+#include "beyehelp.h"
+#include "beyeutil.h"
 #include "bin_util.h"
 #include "bmfile.h"
 #include "colorset.h"
@@ -30,8 +31,8 @@
 #include "reg_form.h"
 #include "tstrings.h"
 #include "plugins/disasm.h"
-#include "biewlib/kbd_code.h"
-#include "biewlib/pmalloc.h"
+#include "libbeye/kbd_code.h"
+#include "libbeye/pmalloc.h"
 
 #define CONSTANT_UTF8		1
 #define CONSTANT_INTEGER	3

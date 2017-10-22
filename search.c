@@ -24,13 +24,13 @@
 #include "bmfile.h"
 #include "tstrings.h"
 #include "search.h"
-#include "biewhelp.h"
-#include "biewutil.h"
+#include "beyehelp.h"
+#include "beyeutil.h"
 #include "bconsole.h"
 #include "reg_form.h"
-#include "biewlib/kbd_code.h"
-#include "biewlib/pmalloc.h"
-#include "biewlib/bbio.h"
+#include "libbeye/kbd_code.h"
+#include "libbeye/pmalloc.h"
+#include "libbeye/bbio.h"
 
 static TWindow *prcntswnd;
 extern void ReReadFile( int );

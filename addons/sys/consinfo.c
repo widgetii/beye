@@ -16,13 +16,14 @@
 **/
 #include <string.h>
 #include <stddef.h>
+#include <stdint.h>
 
 #include "colorset.h"
 #include "bconsole.h"
-#include "biewutil.h"
+#include "beyeutil.h"
 #include "reg_form.h"
-#include "biewlib/biewlib.h"
-#include "biewlib/kbd_code.h"
+#include "libbeye/beyelib.h"
+#include "libbeye/kbd_code.h"
 
 extern char biew_scheme_name[];
 

@@ -20,17 +20,18 @@
 #include <string.h>
 #include <stdio.h>
 #include <limits.h>
+#include <stdint.h>
 
 #include "bmfile.h"
-#include "biewutil.h"
+#include "beyeutil.h"
 #include "plugins/disasm.h"
 #include "bconsole.h"
 #include "codeguid.h"
 #include "reg_form.h"
-#include "biewlib/biewlib.h"
-#include "biewlib/twin.h"
-#include "biewlib/pmalloc.h"
-#include "biewlib/kbd_code.h"
+#include "libbeye/beyelib.h"
+#include "libbeye/twin.h"
+#include "libbeye/pmalloc.h"
+#include "libbeye/kbd_code.h"
 
 #define BACK_ADDR_SIZE 256
 #define GO_ADDR_SIZE   37

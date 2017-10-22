@@ -20,7 +20,7 @@
 #define __FILE_INI_RUNTIME_SUPPORT_SYSTEM__ 1
 
 #ifndef __BBIO_H
-#include "biewlib/bbio.h"
+#include "libbeye/bbio.h"
 #endif
 
 /**

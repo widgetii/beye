@@ -22,11 +22,11 @@
 #include <limits.h>
 
 #include "bconsole.h"
-#include "biewutil.h"
+#include "beyeutil.h"
 #include "reg_form.h"
-#include "biewlib/biewlib.h"
-#include "biewlib/kbd_code.h"
-#include "biewlib/pmalloc.h"
+#include "libbeye/beyelib.h"
+#include "libbeye/kbd_code.h"
+#include "libbeye/pmalloc.h"
 
 static TWindow *pwnd;
 

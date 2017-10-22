@@ -21,8 +21,8 @@
 #include "bswap.h"
 #include "reg_form.h"
 #include "plugins/disasm.h"
-#include "biewhelp.h"
-#include "biewutil.h"
+#include "beyehelp.h"
+#include "beyeutil.h"
 #include "plugins/disasm/arm/arm.h"
 
 #define ARM_USE_SP	0x00100000UL

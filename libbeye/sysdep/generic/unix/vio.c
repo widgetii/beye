@@ -30,7 +30,7 @@ static const char rcs_id[] = "$Id$";
 #include <fcntl.h>
 #include <errno.h>
 
-#include "biewlib/biewlib.h"
+#include "libbeye/beyelib.h"
 #include "console.h"
 
 #define VMAX_X __TVIO_MAXSCREENWIDTH
@@ -52,6 +52,13 @@ static struct {
     unsigned char last;
     unsigned char color[0x10];
 } tp = { 0, {0} };
+
+// TODO: hardcoded _SLANG_ and _CURSES_ undef
+#undef _SLANG_
+#undef _CURSES_
+//
+//
+//
 
 #ifdef	_SLANG_
 #include "con_slang.h"
@@ -95,7 +102,7 @@ SLSMG_BLOCK_CHAR, SLSMG_BLOCK_CHAR,	SLSMG_BLOCK_CHAR, SLSMG_BLOCK_CHAR
 #endif
 
 #ifdef	_CURSES_
-#incldue "con_curses.h"
+#include "con_curses.h"
 
 #define _bg(x)	(((x) >> 4) & 7)
 #define _fg(x)	((x) & 7)

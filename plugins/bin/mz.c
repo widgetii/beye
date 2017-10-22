@@ -21,14 +21,14 @@
 
 #include "bconsole.h"
 #include "bmfile.h"
-#include "biewhelp.h"
+#include "beyehelp.h"
 #include "bin_util.h"
 #include "colorset.h"
 #include "codeguid.h"
 #include "reg_form.h"
 #include "tstrings.h"
-#include "biewlib/kbd_code.h"
-#include "biewlib/pmalloc.h"
+#include "libbeye/kbd_code.h"
+#include "libbeye/pmalloc.h"
 #include "plugins/disasm.h"
 #include "plugins/bin/mz.h"
 

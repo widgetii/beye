@@ -15,10 +15,10 @@
  * @note        Development, fixes and improvements
  * @warning     We must have own version of included files for posibility to build project under any development systems.
 **/
-#ifndef ____CONFIG_H
-#define ____CONFIG_H 1
+//#ifndef ____CONFIG_H
+//#define ____CONFIG_H 1
 
 /*#include "biewlib/sysdep/ia16/endian.h" deprecated */
 /*#include "biewlib/sysdep/ia32/stdint.h" use C99 standart */
 
-#endif
+//#endif

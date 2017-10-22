@@ -16,20 +16,23 @@
 **/
 #include <stdio.h>
 #include <string.h>
+#include <stdint.h>
+
+#include "libbeye/sysdep/generic/__config.h"
 
 #include "bswap.h"
 #include "colorset.h"
 #include "bmfile.h"
-#include "biewutil.h"
+#include "beyeutil.h"
 #include "bin_util.h"
-#include "biewhelp.h"
+#include "beyehelp.h"
 #include "bconsole.h"
 #include "reg_form.h"
 #include "plugins/disasm.h"
 #define ARCH_SIZE 32
 #include "plugins/bin/aout64.h"
-#include "biewlib/kbd_code.h"
-#include "biewlib/biewlib.h"
+#include "libbeye/kbd_code.h"
+#include "libbeye/beyelib.h"
 
 static char is_msbf=0; /* is most significand byte first */
 static char is_64bit=0;

@@ -20,12 +20,12 @@
 // temprary size types hack - change all them to stdint.h in C99
 
 //#include <stdint.h>
-typedef uint8_t tUInt8;
+/*typedef uint8_t tUInt8;
 typedef int8_t tInt8;
 typedef uint32_t tUInt32;
 typedef uint64_t tInt64;
 typedef uint64_t tUInt64;
-
+CHANGE LATER*/
 
 
 #if defined(__WIN32__) && defined(_MSC_VER)
@@ -65,11 +65,19 @@ extern void __FASTCALL__ memupr(void *buffer,unsigned cb_buffer);
                     **/
 extern void __FASTCALL__ memlwr(void *buffer,unsigned cb_buffer);
 
-#if defined(__GLIBC__) || defined (__UNIX__)
+
+#ifndef HAVE_STRUPR
 #define strupr(s) memupr(s,strlen(s)) /**< C library of *nix systems lacks strupr function */
+#endif
+
+#ifndef HAVE_STRLWR
 #define strlwr(s) memlwr(s,strlen(s)) /**< C library of *nix systems lacks strlwr function */
+#endif
+
+#ifndef HAVE_STRICMP
 #define stricmp strcasecmp            /**< Alias of stricmp for *nix systems */
 #endif
+
 #if (defined( __GNUC__ ) && !defined(__WIN32__)) || defined(__GLIBC__)
                    /** Converts the long integer to a NULL terminated ASCII string.
                      * @return                pointer to received buffer

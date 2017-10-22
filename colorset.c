@@ -21,8 +21,8 @@
 
 #include "colorset.h"
 #include "bconsole.h"
-#include "biewlib/file_ini.h"
-#include "biewlib/biewlib.h"
+#include "libbeye/file_ini.h"
+#include "libbeye/beyelib.h"
 
 extern char biew_scheme_name[];
 char last_skin_error[50];

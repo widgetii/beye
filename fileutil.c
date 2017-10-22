@@ -28,13 +28,13 @@
 #include "tstrings.h"
 #include "plugins/hexmode.h"
 #include "plugins/disasm.h"
-#include "biewutil.h"
+#include "beyeutil.h"
 #include "bconsole.h"
 #include "reg_form.h"
-#include "biewlib/pmalloc.h"
-#include "biewlib/bbio.h"
-#include "biewlib/twin.h"
-#include "biewlib/kbd_code.h"
+#include "libbeye/pmalloc.h"
+#include "libbeye/bbio.h"
+#include "libbeye/twin.h"
+#include "libbeye/kbd_code.h"
 
 extern tBool fioUseMMF;
 

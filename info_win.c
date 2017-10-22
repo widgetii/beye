@@ -19,16 +19,17 @@
 **/
 #include <stdio.h>
 #include <string.h>
+#include <stdint.h>
 
 #include "colorset.h"
 #include "bmfile.h"
 #include "tstrings.h"
 #include "reg_form.h"
 #include "bconsole.h"
-#include "biewutil.h"
-#include "biewhelp.h"
-#include "biewlib/kbd_code.h"
-#include "biewlib/biewlib.h"
+#include "beyeutil.h"
+#include "beyehelp.h"
+#include "libbeye/kbd_code.h"
+#include "libbeye/beyelib.h"
 
 static void __NEAR__ __FASTCALL__ ShowFunKey(const char * key,const char * text)
 {

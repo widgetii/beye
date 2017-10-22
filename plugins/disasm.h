@@ -22,11 +22,11 @@
 #endif
 
 #ifndef __TWIN_H
-#include "biewlib/twin.h"
+#include "libbeye/twin.h"
 #endif
 
 #ifndef __FILE_INI_RUNTIME_SUPPORT_SYSTEM__
-#include "biewlib/file_ini.h"
+#include "libbeye/file_ini.h"
 #endif
 
 /** List of CPU platform. */

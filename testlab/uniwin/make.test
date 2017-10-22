@@ -1,0 +1,5 @@
+CFLAGS = -I../.. -g -O0 -g -O0
+GENERIC = ../../libbeye/sysdep/generic/unix/
+
+uniwin: uniwin.c $(GENERIC)con_vt100.c $(GENERIC)console.c
+

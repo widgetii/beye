@@ -18,7 +18,7 @@
 #define __NE_INC
 
 #ifndef __BIEWUTIL__H
-#include "biewutil.h"
+#include "beyeutil.h"
 #endif
 
 #ifndef __BBIO_H

@@ -57,14 +57,14 @@
 #include "bin_util.h"
 #include "codeguid.h"
 #include "bmfile.h"
-#include "biewhelp.h"
+#include "beyehelp.h"
 #include "tstrings.h"
-#include "biewutil.h"
+#include "beyeutil.h"
 #include "bconsole.h"
 #include "reg_form.h"
-#include "biewlib/biewlib.h"
-#include "biewlib/pmalloc.h"
-#include "biewlib/kbd_code.h"
+#include "libbeye/beyelib.h"
+#include "libbeye/pmalloc.h"
+#include "libbeye/kbd_code.h"
 
 static char is_msbf; /* is most significand byte first */
 static char is_64bit;

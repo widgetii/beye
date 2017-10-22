@@ -18,12 +18,12 @@
 #include <stdlib.h>
 
 #include "bconsole.h"
-#include "biewutil.h"
+#include "beyeutil.h"
 #include "colorset.h"
 #include "reg_form.h"
-#include "biewlib/biewlib.h"
-#include "biewlib/biewlib.h"
-#include "biewlib/kbd_code.h"
+#include "libbeye/beyelib.h"
+#include "libbeye/beyelib.h"
+#include "libbeye/kbd_code.h"
 
 static int __NEAR__ __FASTCALL__ GetFullBin(tUIntMax value,char * buff)
 {

@@ -4,13 +4,15 @@
 #include <sys/ioctl.h>
 #include <fcntl.h>
 
-#define VTMP_LEN 100
-
 #ifndef STDOUT_FILENO
 #define STDOUT_FILENO 1
 #endif
 
+const int VTMP_LEN=100;
+
 #define twrite(x)	write(out_fd, (x), strlen(x))
+
+// static inline twrite?
 
 static int out_fd; 
 

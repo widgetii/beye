@@ -25,13 +25,13 @@
 #include "colorset.h"
 #include "bmfile.h"
 #include "bconsole.h"
-#include "biewhelp.h"
+#include "beyehelp.h"
 #include "search.h"
 #include "setup.h"
 #include "tstrings.h"
-#include "biewlib/biewlib.h"
-#include "biewlib/kbd_code.h"
-#include "biewlib/pmalloc.h"
+#include "libbeye/beyelib.h"
+#include "libbeye/kbd_code.h"
+#include "libbeye/pmalloc.h"
 
 #include "tools/lzss/lzssutil.c"
 

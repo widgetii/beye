@@ -22,7 +22,7 @@ extern "C" {
 #endif
 
 #ifndef __TWIN_H
-#include "biewlib/twin.h"
+#include "libbeye/twin.h"
 #endif
 
 #define BIEW_HELP_VER "BIEW_HLP v6.1.0"

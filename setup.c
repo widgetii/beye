@@ -16,14 +16,15 @@
 **/
 #include <string.h>
 #include <stdio.h>
+#include <stdint.h>
 
-#include "biewhelp.h"
+#include "beyehelp.h"
 #include "colorset.h"
 #include "setup.h"
 #include "bconsole.h"
-#include "biewutil.h"
-#include "biewlib/twin.h"
-#include "biewlib/kbd_code.h"
+#include "beyeutil.h"
+#include "libbeye/twin.h"
+#include "libbeye/kbd_code.h"
 
 extern char biew_help_name[];
 extern char biew_skin_name[];

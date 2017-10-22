@@ -15,9 +15,10 @@
  * @note        Development, fixes and improvements
 **/
 #include <stddef.h>
+#include <stdint.h>
 
 #include "bconsole.h"
-#include "biewutil.h"
+#include "beyeutil.h"
 #include "reg_form.h"
 
 extern REGISTRY_SYSINFO AsciiTable;

@@ -16,18 +16,19 @@
 **/
 #include <string.h>
 #include <errno.h>
+#include <stdint.h>
 
 #include "colorset.h"
 #include "bmfile.h"
 #include "tstrings.h"
 #include "plugins/disasm.h"
 #include "bconsole.h"
-#include "biewutil.h"
-#include "biewhelp.h"
+#include "beyeutil.h"
+#include "beyehelp.h"
 #include "editor.h"
-#include "biewlib/biewlib.h"
-#include "biewlib/kbd_code.h"
-#include "biewlib/pmalloc.h"
+#include "libbeye/beyelib.h"
+#include "libbeye/kbd_code.h"
+#include "libbeye/pmalloc.h"
 
 __fileoff_t edit_cp = 0;
 struct tag_emem EditorMem;

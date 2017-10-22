@@ -22,17 +22,17 @@
 #include "plugins/hexmode.h"
 #include "colorset.h"
 #include "bconsole.h"
-#include "biewutil.h"
-#include "biewhelp.h"
+#include "beyeutil.h"
+#include "beyehelp.h"
 #include "bmfile.h"
 #include "bin_util.h"
 #include "reg_form.h"
 #include "codeguid.h"
 #include "editor.h"
 #include "tstrings.h"
-#include "biewlib/file_ini.h"
-#include "biewlib/biewlib.h"
-#include "biewlib/kbd_code.h"
+#include "libbeye/file_ini.h"
+#include "libbeye/beyelib.h"
+#include "libbeye/kbd_code.h"
 
 static unsigned virtWidthCorr=0;
 

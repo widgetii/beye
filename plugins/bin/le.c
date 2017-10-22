@@ -24,13 +24,13 @@
 #include "plugins/bin/lx_le.h"
 #include "bin_util.h"
 #include "bmfile.h"
-#include "biewhelp.h"
+#include "beyehelp.h"
 #include "tstrings.h"
-#include "biewutil.h"
+#include "beyeutil.h"
 #include "bconsole.h"
 #include "reg_form.h"
-#include "biewlib/biewlib.h"
-#include "biewlib/kbd_code.h"
+#include "libbeye/beyelib.h"
+#include "libbeye/kbd_code.h"
 
 extern BGLOBAL lx_cache;
 

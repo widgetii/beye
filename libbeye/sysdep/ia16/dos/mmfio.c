@@ -16,7 +16,7 @@
 **/
 #include <errno.h>
 #include <stdlib.h>
-#include "biewlib/biewlib.h"
+#include "libbeye/beyelib.h"
 
 #ifndef ENOSYS
 #define ENOSYS -1
@@ -30,7 +30,7 @@ mmfHandle          __FASTCALL__ __mmfOpen(const char *fname,int mode)
   return NULL;
 }
 
-tBool              __FASTCALL__ __mmfFlush(mmfHandle mh)
+bool              __FASTCALL__ __mmfFlush(mmfHandle mh)
 {
   UNUSED(mh);
   errno = ENOSYS;
@@ -43,7 +43,7 @@ mmfHandle     __FASTCALL__ __mmfSync(mmfHandle mh)
   return NULL;
 }
 
-tBool          __FASTCALL__ __mmfProtect(mmfHandle mh,int flags)
+bool          __FASTCALL__ __mmfProtect(mmfHandle mh,int flags)
 {
   UNUSED(mh);
   UNUSED(flags);
@@ -51,7 +51,7 @@ tBool          __FASTCALL__ __mmfProtect(mmfHandle mh,int flags)
   return False;
 }
 
-tBool              __FASTCALL__ __mmfResize(mmfHandle mh,long size)
+bool              __FASTCALL__ __mmfResize(mmfHandle mh,long size)
 {
   UNUSED(mh);
   UNUSED(size);
@@ -77,4 +77,4 @@ long              __FASTCALL__ __mmfSize(mmfHandle mh)
   return 0L;
 }
 
-tBool             __FASTCALL__ __mmfIsWorkable( void ) { return False; }
+bool             __FASTCALL__ __mmfIsWorkable( void ) { return False; }

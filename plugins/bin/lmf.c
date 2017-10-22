@@ -19,18 +19,19 @@
 #include <stddef.h>
 #include <string.h>
 #include <stdio.h>
+#include <stdint.h>
 
 #include "reg_form.h"
 #include "bin_util.h"
 #include "bmfile.h"
-#include "biewhelp.h"
-#include "biewutil.h"
+#include "beyehelp.h"
+#include "beyeutil.h"
 #include "bconsole.h"
 #include "plugins/disasm.h"
 #include "plugins/bin/lmf.h"
-#include "biewlib/biewlib.h"
-#include "biewlib/kbd_code.h"
-#include "biewlib/pmalloc.h"
+#include "libbeye/beyelib.h"
+#include "libbeye/kbd_code.h"
+#include "libbeye/pmalloc.h"
 
 #define MAXREC			200
 #define MINREC			20

@@ -22,10 +22,10 @@
 
 #include "bconsole.h"
 #include "reg_form.h"
-#include "biewutil.h"
+#include "beyeutil.h"
 #include "colorset.h"
-#include "biewlib/biewlib.h"
-#include "biewlib/kbd_code.h"
+#include "libbeye/beyelib.h"
+#include "libbeye/kbd_code.h"
 
 static TWindow * __NEAR__ __FASTCALL__ CreatePanelNF(tAbsCoord x1,tAbsCoord y1,tAbsCoord x2,tAbsCoord y2)
 {

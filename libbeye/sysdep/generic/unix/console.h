@@ -24,24 +24,13 @@
 #ifndef	__CONSOLE_H
 #define	__CONSOLE_H
 
-/*
-    sanity checks
-*/
+// TODO - change to beyelib.h
+#include "bconfig.h"
+#include <stdbool.h>
+#include <stddef.h>
+#define __FASTCALL__ 
 
-#ifdef	_SLANG_
-#undef	_CURSES_
-#undef	_VT100_
-#endif
-
-#ifdef	_CURSES_
-#undef	_SLANG_
-#undef	_VT100_
-#endif
-
-#ifdef	_VT100_
-#undef	_SLANG_
-#undef	_CURSES_
-#endif
+// TODO - change to beyelib.h
 
 /*
     can we use SIGIO?
@@ -139,7 +128,7 @@ typedef struct {
 } termdesc;
 
 extern int on_console, output_7, transparent, do_nls;
-extern tBool break_status;
+extern bool break_status;
 extern termdesc *terminal;
 
 extern void __FASTCALL__ ReadNextEvent(void);
@@ -148,7 +137,7 @@ extern void __FASTCALL__ ReadNextEvent(void);
     console plugin
 */
 
-/*
+
 typedef struct {
 	unsigned long flags;
 	unsigned width;
@@ -175,9 +164,16 @@ typedef struct {
 
 } Console;
 
-extern Console console;
+typedef struct {
+	/* "VT100", "SLang", "NCurses" and so on */
+	const char* driverName;
+	const Console* driver;
+} ConsoleDriver;
 
-#define	__init_vio		console.initialize
+//extern Console console;
+//extern ConsoleDriver consoleDriver;
+
+/*#define	__init_vio		console.initialize
 #define	__term_vio		console.terminate
 
 #define	__init_keyboard()
@@ -193,6 +189,9 @@ extern Console console;
 
 #define __vioResizeEvent    console.ResizeEvent
 */
+
+void consoleInitialize();
+bool consoleDriversList(char* buf, size_t nSize);
 
 extern void* nls_init(const char *to,const char *from);
 extern void  nls_term(void*);

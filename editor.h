@@ -18,7 +18,7 @@
 #define __EDITOR__H
 
 #ifndef __TWIN_H
-#include "biewlib/twin.h"
+#include "libbeye/twin.h"
 #endif
 
 #ifdef __cplusplus

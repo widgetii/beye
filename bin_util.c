@@ -22,7 +22,7 @@
 
 #include "bin_util.h"
 #include "reg_form.h"
-#include "biewutil.h"
+#include "beyeutil.h"
 #include "bmfile.h"
 #include "bconsole.h"
 #include "tstrings.h"

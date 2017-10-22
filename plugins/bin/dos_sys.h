@@ -18,7 +18,7 @@
 #define __DOS_SYS_INC
 
 #ifndef __BIEWUTIL__H
-#include "biewutil.h"
+#include "beyeutil.h"
 #endif
 
 #ifdef __HAVE_PRAGMA_PACK__

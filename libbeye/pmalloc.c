@@ -17,11 +17,12 @@
 #include <stdlib.h>
 #include <string.h>
 #include <limits.h>
-#include "biewlib/sysdep/__config.h"
+#include "beyelib.h"
+#include "libbeye/sysdep/__config.h"
 #if __WORDSIZE == 16
 #include <malloc.h>
 #endif
-#include "biewlib/pmalloc.h"
+#include "libbeye/pmalloc.h"
 
 static LowMemCallBack *lmstack = NULL;
 unsigned               lmcount = 0;

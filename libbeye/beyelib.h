@@ -1,8 +1,8 @@
 /**
- * @namespace   biewlib
- * @file        biewlib/beyelib.h
+ * @namespace   libbeye
+ * @file        libbeye/beyelib.h
  * @brief       This file contains extensions of standard C library, that needed
- *              for BIEW project.
+ *              for BEYE project.
  * @version     -
  * @remark      this source file is part of Binary vIEW project (BIEW).
  *              The Binary vIEW (BIEW) is copyright (C) 1995 Nickols_K.
@@ -15,12 +15,13 @@
  * @since       1995
  * @note        Development, fixes and improvements
 **/
-#ifndef __BIEWLIB_H
-#define __BIEWLIB_H 1
-
-#include "bconfig.h"
+#ifndef __BEYELIB_H
+#define __BEYELIB_H 1
 
 typedef enum { False = 0, True = 1 }tBool; /**< This is the data type used to represent boolean objects */
+#include "libbeye/sysdep/generic/__config.h"
+
+#include "bconfig.h"
 
 #ifndef __NORECURSIVE
 #ifndef __SYS_DEP_H

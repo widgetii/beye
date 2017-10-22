@@ -15,6 +15,7 @@
  * @note        Development, fixes and improvements
 **/
 #include <string.h>
+#include <stdint.h>
 
 #include "plugins/disasm.h"
 #include "plugins/bin/rdoff2.h"
@@ -22,8 +23,8 @@
 #include "bin_util.h"
 #include "bmfile.h"
 #include "bconsole.h"
-#include "biewhelp.h"
-#include "biewlib/kbd_code.h"
+#include "beyehelp.h"
+#include "libbeye/kbd_code.h"
 
 static __filesize_t __FASTCALL__ rdoff2_ShowHeader( void )
 {

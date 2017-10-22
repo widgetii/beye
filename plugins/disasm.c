@@ -27,22 +27,24 @@
 #include <errno.h>
 #include <ctype.h>
 
+#include "bconfig.h"
+
 #include "colorset.h"
 #include "bmfile.h"
 #include "bin_util.h"
 #include "plugins/hexmode.h"
 #include "plugins/disasm.h"
-#include "biewutil.h"
+#include "beyeutil.h"
 #include "reg_form.h"
 #include "bconsole.h"
 #include "editor.h"
 #include "codeguid.h"
 #include "search.h"
 #include "tstrings.h"
-#include "biewlib/file_ini.h"
-#include "biewlib/biewlib.h"
-#include "biewlib/pmalloc.h"
-#include "biewlib/kbd_code.h"
+#include "libbeye/file_ini.h"
+#include "libbeye/beyelib.h"
+#include "libbeye/pmalloc.h"
+#include "libbeye/kbd_code.h"
 
 extern REGISTRY_DISASM ix86_Disasm;
 extern REGISTRY_DISASM Null_Disasm;

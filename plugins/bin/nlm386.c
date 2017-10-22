@@ -29,11 +29,11 @@
 #include "bconsole.h"
 #include "reg_form.h"
 #include "tstrings.h"
-#include "biewutil.h"
-#include "biewhelp.h"
-#include "biewlib/pmalloc.h"
-#include "biewlib/biewlib.h"
-#include "biewlib/kbd_code.h"
+#include "beyeutil.h"
+#include "beyehelp.h"
+#include "libbeye/pmalloc.h"
+#include "libbeye/beyelib.h"
+#include "libbeye/kbd_code.h"
 
 static Nlm_Internal_Fixed_Header nlm;
 

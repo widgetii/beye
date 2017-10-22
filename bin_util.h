@@ -23,11 +23,11 @@ extern "C" {
 #endif
 
 #ifndef __BBIO_H
-#include "biewlib/bbio.h"
+#include "libbeye/bbio.h"
 #endif
 
 #ifndef __BIEWUTIL__H
-#include "biewutil.h"
+#include "beyeutil.h"
 #endif
 
 #if __BYTE_ORDER == __LITTLE_ENDIAN

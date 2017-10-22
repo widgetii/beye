@@ -11,8 +11,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include "biewlib/biewlib.h"
-#include "biewlib/kbd_code.h"
+#include "libbeye/beyelib.h"
+#include "libbeye/kbd_code.h"
 
 extern char rawkb_buf[];
 extern int  rawkb_escape;

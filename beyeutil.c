@@ -22,11 +22,11 @@
 #include <stdarg.h>
 
 #include "bmfile.h"
-#include "biewutil.h"
+#include "beyeutil.h"
 #include "bconsole.h"
 #include "tstrings.h"
-#include "biewlib/biewlib.h"
-#include "biewlib/pmalloc.h"
+#include "libbeye/beyelib.h"
+#include "libbeye/pmalloc.h"
 
 tBool DumpMode = False;
 tBool EditMode = False;

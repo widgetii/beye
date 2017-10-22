@@ -17,13 +17,14 @@
 **/
 #include <limits.h>
 #include <stdio.h>
+#include <stdint.h>
 #include <string.h>
 #include <errno.h>
 
 #include "bmfile.h"
 #include "bconsole.h"
 #include "tstrings.h"
-#include "biewlib/bbio.h"
+#include "libbeye/bbio.h"
 
 unsigned BMFileFlags=0;
 extern tBool fioUseMMF;

@@ -22,13 +22,13 @@
 #include "reg_form.h"
 #include "plugins/disasm.h"
 #include "bconsole.h"
-#include "biewhelp.h"
-#include "biewutil.h"
+#include "beyehelp.h"
+#include "beyeutil.h"
 #include "bin_util.h"
 #include "bmfile.h"
 #include "reg_form.h"
-#include "biewlib/file_ini.h"
-#include "biewlib/pmalloc.h"
+#include "libbeye/file_ini.h"
+#include "libbeye/pmalloc.h"
 
 #define TAB_POS 10
 

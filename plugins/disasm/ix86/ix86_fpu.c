@@ -18,7 +18,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "biewutil.h"
+#include "beyeutil.h"
 #include "reg_form.h"
 #include "plugins/disasm/ix86/ix86.h"
 

@@ -17,14 +17,15 @@
 #include <string.h>
 #include <stdio.h>
 #include <stddef.h>
+#include <stdint.h>
 
 #include "bconsole.h"
 #include "bmfile.h"
-#include "biewhelp.h"
+#include "beyehelp.h"
 #include "colorset.h"
 #include "reg_form.h"
-#include "biewlib/kbd_code.h"
-#include "biewlib/pmalloc.h"
+#include "libbeye/kbd_code.h"
+#include "libbeye/pmalloc.h"
 #include "plugins/disasm.h"
 #include "plugins/bin/dos_sys.h"
 

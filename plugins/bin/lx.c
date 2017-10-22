@@ -26,14 +26,14 @@
 #include "plugins/bin/ne.h"
 #include "bin_util.h"
 #include "bmfile.h"
-#include "biewhelp.h"
+#include "beyehelp.h"
 #include "tstrings.h"
-#include "biewutil.h"
+#include "beyeutil.h"
 #include "bconsole.h"
 #include "reg_form.h"
-#include "biewlib/kbd_code.h"
-#include "biewlib/biewlib.h"
-#include "biewlib/pmalloc.h"
+#include "libbeye/kbd_code.h"
+#include "libbeye/beyelib.h"
+#include "libbeye/pmalloc.h"
 
 union LX_LE lxe;
 int LXType;

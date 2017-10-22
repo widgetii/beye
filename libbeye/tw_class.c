@@ -16,7 +16,7 @@
 **/
 #include <string.h>
 #include <stdlib.h>
-#include "biewlib/twin.h"
+#include "libbeye/twin.h"
 
 static linearArray *class_set = NULL;
 

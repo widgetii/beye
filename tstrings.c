@@ -14,8 +14,9 @@
  * @since       1995
  * @note        Development, fixes and improvements
 **/
+#include "stdint.h"
 #include "tstrings.h"
-#include "biewlib/biewlib.h" /* for INT64_C */
+#include "libbeye/beyelib.h" /* for INT64_C */
 /**   English release for all messages */
 
 const char msgAboutText[] =

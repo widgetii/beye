@@ -26,12 +26,12 @@
 #include "bconsole.h"
 #include "bin_util.h"
 #include "bmfile.h"
-#include "biewutil.h"
-#include "biewhelp.h"
+#include "beyeutil.h"
+#include "beyehelp.h"
 #include "plugins/bin/coff386.h"
 #include "plugins/disasm.h"
-#include "biewlib/kbd_code.h"
-#include "biewlib/pmalloc.h"
+#include "libbeye/kbd_code.h"
+#include "libbeye/pmalloc.h"
 
 #define COFF_WORD(cval)  ((tUInt16)(*(const tUInt16 *)(const tUInt8 *)cval))
 #define COFF_DWORD(cval) ((tUInt32)(*(const tUInt32 *)(const tUInt8 *)cval))

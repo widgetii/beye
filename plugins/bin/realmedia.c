@@ -18,12 +18,12 @@
 #include <stddef.h>
 
 #include "bconsole.h"
-#include "biewhelp.h"
+#include "beyehelp.h"
 #include "colorset.h"
-#include "biewutil.h"
+#include "beyeutil.h"
 #include "reg_form.h"
 #include "bmfile.h"
-#include "biewlib/kbd_code.h"
+#include "libbeye/kbd_code.h"
 #include "plugins/disasm.h"
 #include "plugins/bin/mmio.h"
 
