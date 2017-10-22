@@ -276,7 +276,7 @@ if test "${enable_iconv}" != "no"; then
     AC_MSG_ERROR([cannot find iconv development files])
   fi
 fi
-AC_DEFINE(HAVE_ICONV_H, 1, HARDCODED)
+#AC_DEFINE(HAVE_ICONV_H, 1, HARDCODED)
 
 if test "${enable_debug}" = "yes"; then
   AC_DEFINE(DEBUG, 1, Define to 1 to activate debug)

@@ -14,7 +14,7 @@ beye_plugins_bin_h = plugins/bin/aout64.h plugins/bin/arch.h plugins/bin/coff386
 beye_plugins_nls = plugins/nls/russian.c
 beye_plugins_disasm = plugins/disasm/null_da.c plugins/disasm/arm/arm.c plugins/disasm/arm/arm16.c plugins/disasm/arm/arm32.c plugins/disasm/arm/arm.h plugins/disasm/avr/avr.c plugins/disasm/avr/avr.h plugins/disasm/ix86/ix86.c plugins/disasm/ix86/ix86_fpu.c plugins/disasm/ix86/ix86_fun.c plugins/disasm/ix86/ix86.h plugins/disasm/java/java.c plugins/disasm/ppc/ppc.c plugins/disasm/ppc/ppc.h
 
-LDADD = libbeye/libbeye.a $(BEYE_LIBS)
+LDADD = libbeye/libbeye.a $(BEYE_LIBS) @LIBICONV@ 
 AM_CPPFLAGS = -I$(srcdir)/libbeye
 
 bin_PROGRAMS = beye
