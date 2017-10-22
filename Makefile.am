@@ -1,3 +1,5 @@
+SUBDIRS = libbeye
+
 beye_src = addendum.c bconsole.c beye.c beyehelp.c beyeutil.c bin_util.c bmfile.c codeguid.c colorset.c dialogs.c editors.c events.c fileutil.c info_win.c mainloop.c refs.c search.c setup.c sysinfo.c tstrings.c
 
 beye_headers = bbconfig.h console.h beyehelp.h beyeutil.h bin_util.h bmfile.h bswap.h codeguid.h colorset.h editor.h reg_form.h search.h setup.h tstrings.h
@@ -13,6 +15,7 @@ beye_plugins_nls = plugins/nls/russian.c
 beye_plugins_disasm = plugins/disasm/null_da.c plugins/disasm/arm/arm.c plugins/disasm/arm/arm16.c plugins/disasm/arm/arm32.c plugins/disasm/arm/arm.h plugins/disasm/avr/avr.c plugins/disasm/avr/avr.h plugins/disasm/ix86/ix86.c plugins/disasm/ix86/ix86_fpu.c plugins/disasm/ix86/ix86_fun.c plugins/disasm/ix86/ix86.h plugins/disasm/java/java.c plugins/disasm/ppc/ppc.c plugins/disasm/ppc/ppc.h
 
 LDADD = libbeye/libbeye.a $(BEYE_LIBS)
+AM_CPPFLAGS = -I$(srcdir)/libbeye
 
 bin_PROGRAMS = beye
 beye_SOURCES = $(beye_src) $(beye_headers) $(beye_addons_sys) $(beye_addons_tools) $(beye_plugins) $(beye_plugins_h) $(beye_plugins_bin) $(beye_plugins_bin_h) $(beye_plugins_nls) $(beye_plugins_disasm) 
