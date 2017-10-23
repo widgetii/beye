@@ -10,6 +10,9 @@ AC_CONFIG_AUX_DIR([.auto])
 AM_INIT_AUTOMAKE([foreign -Wall -Werror subdir-objects dist-bzip2])
 AC_CONFIG_HEADERS([bconfig.h])
 
+# Don't use default -O2 -g flags
+: ${CFLAGS=""}
+
 # Check for programs
 AC_PROG_CC
 AC_PROG_RANLIB
@@ -302,6 +305,10 @@ fi
 
 if test "${enable_debug}" = "yes"; then
   AC_DEFINE(DEBUG, 1, Define to 1 to activate debug)
+  CFLAGS="$CFLAGS -g -O0 -ggdb"
+else
+  AC_DEFINE(NDEBUG, 1, Release build)
+  CFLAGS="$CFLAGS -O2"
 fi
 
 AC_SUBST(BEYE_LIBS)
@@ -327,7 +334,6 @@ AH_BOTTOM([
 
 AC_OUTPUT
 
-# __WORDSIZE = 16, 32, 64
 # __CPU__=386
 # -D__OS__=\"dos\"
 # __MSDOS__
@@ -339,7 +345,6 @@ AC_OUTPUT
 # __GNUC__?
 # __QNX4__
 # __GLIBC__
-# __UNIX__
 # DJGPP
 # __WATCOMC__
 # DATADIR
