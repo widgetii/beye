@@ -74,10 +74,9 @@ AC_DEFINE(__DEFAULT_DISASM, 0, hardcoded now)
 
 # Checking the size of int type
 AC_CHECK_SIZEOF(int)
-#if test $ac_cv_sizeof_int = "4"; then
- #...
- # or AC_DEFINE([__WORD], $ac_cv_sizeof_int, description)
-#fi
+if test x$ac_cv_sizeof_int != x; then
+  AC_DEFINE_UNQUOTED([__WORDSIZE], $ac_cv_sizeof_int*8, description)
+fi
 
 # Broken?
 #AC_CHECK_HEADERS([endian.h],
@@ -118,7 +117,7 @@ case "${host_os}" in
         AC_DEFINE([OSX], 1, [Define for the Mac OS X.])
         opsys=osx
         ;;
-    freebsd*)
+    freebsd*|openbsd*|netbsd*)
         AC_DEFINE([BSD], 1, [Define for BSD systems.])
         opsys=bsd
         ;;
@@ -208,7 +207,7 @@ AM_CONDITIONAL([LINUX], [test x$opsys = xlinux])
 AM_CONDITIONAL([I386], [test x$arch = xi386])
 AM_CONDITIONAL([X86_64], [test x$arch = xx86_64])
 AM_CONDITIONAL([BSD], [test x$opsys = xbsd])
-AM_CONDITIONAL([BSD], [test x$opsys = xosx])
+AM_CONDITIONAL([OSX], [test x$opsys = xosx])
 AM_CONDITIONAL([WINDOWS], [test x$opsys = xwindows])
 
 
@@ -325,11 +324,8 @@ AC_CONFIG_FILES(
 
 AC_OUTPUT
 
-# include <biewlib/sysdep/__MACHINE__/__config.h
 # __WORDSIZE = 16, 32, 64
-# __CPU_NAME__=ia32
 # __CPU__=386
-# __OS_NAME__='\"DOS$_bitness\"'
 # -D__OS__=\"dos\"
 # __MSDOS__
 # __OS2__

@@ -14,6 +14,10 @@ if BSD
   modules = $(modules_unix_common) $(modules_unix)
 endif
 
+if OSX
+  modules = $(modules_unix_common) $(modules_unix)
+endif
+
 if WINDOWS
   modules = $(modules_windows)
 endif

@@ -25,10 +25,6 @@
     $Id$
 */
 
-#ifndef lint
-static const char rcs_id[] = "$Id$";
-#endif
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
