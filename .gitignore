@@ -1,5 +1,7 @@
 *.o
 beye
+beye.ini
+beye.exe
 *.a
 config.log
 config.mak

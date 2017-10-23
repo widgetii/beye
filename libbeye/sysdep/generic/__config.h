@@ -23,12 +23,10 @@
 
 #include <sys/types.h>
 
-#ifdef	__GLIBC__
-
-#include <endian.h>
+// if endian present in all systems?
+//#include <endian.h>
+// if stdint.h present in all systems?
 #include <stdint.h>
-
-#endif
 
 #define tInt8		int8_t
 #define tInt16		int16_t

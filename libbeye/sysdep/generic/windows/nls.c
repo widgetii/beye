@@ -19,7 +19,7 @@
 #define _OLE2_H
 #include <windows.h>
 
-#include "biewlib/biewlib.h"
+#include "libbeye/beyelib.h"
 
 tBool win32_use_ansi;
 

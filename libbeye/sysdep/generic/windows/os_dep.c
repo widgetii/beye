@@ -27,7 +27,7 @@
 #include <stdlib.h>
 #include <process.h>
 
-#include "biewlib/biewlib.h"
+#include "libbeye/beyelib.h"
 
 #if __WORDSIZE > 32
 /* Note: Vista-64 requires porting for MMF file handling */
@@ -60,7 +60,7 @@ static BOOL MyHandler( DWORD type )
   }
 }
 
-tBool __FASTCALL__ __OsGetCBreak( void )
+bool __FASTCALL__ __OsGetCBreak( void )
 {
   return __c__break;
 }

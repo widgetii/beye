@@ -209,6 +209,7 @@ AM_CONDITIONAL([I386], [test x$arch = xi386])
 AM_CONDITIONAL([X86_64], [test x$arch = xx86_64])
 AM_CONDITIONAL([BSD], [test x$opsys = xbsd])
 AM_CONDITIONAL([BSD], [test x$opsys = xosx])
+AM_CONDITIONAL([WINDOWS], [test x$opsys = xwindows])
 
 
 

@@ -24,7 +24,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
-#include "biewlib/biewlib.h"
+#include "libbeye/beyelib.h"
 
 tAbsCoord tvioWidth,tvioHeight;
 unsigned tvioNumColors;

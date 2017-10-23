@@ -24,7 +24,7 @@
 #include <stdio.h>
 #include <time.h>
 #include <errno.h>
-#include "biewlib/biewlib.h"
+#include "libbeye/beyelib.h"
 
 static char f_buff[FILENAME_MAX+1];
 
@@ -205,14 +205,14 @@ __fileoff_t __FASTCALL__ __FileLength(bhandle_t handle)
 
 __fileoff_t __FASTCALL__ __OsTell(bhandle_t handle) { return __OsSeek(handle,0L,SEEKF_CUR); }
 
-tBool __FASTCALL__ __IsFileExists(const char *name)
+bool __FASTCALL__ __IsFileExists(const char *name)
 {
    bhandle_t handle = __OsOpen(name,FO_READONLY | SO_DENYNONE);
    if(handle != NULL_HANDLE) __OsClose(handle);
    return handle != NULL_HANDLE;
 }
 
-tBool      __FASTCALL__ __OsGetFTime(const char *name,FTime *data)
+bool      __FASTCALL__ __OsGetFTime(const char *name,FTime *data)
 {
   tBool ret = False;
   FILETIME ct,at,mt;
@@ -255,7 +255,7 @@ tBool      __FASTCALL__ __OsGetFTime(const char *name,FTime *data)
    return ret;
 }
 
-tBool      __FASTCALL__ __OsSetFTime(const char *name,const FTime *data)
+bool      __FASTCALL__ __OsSetFTime(const char *name,const FTime *data)
 {
   tBool ret = False;
   FILETIME at,mt;

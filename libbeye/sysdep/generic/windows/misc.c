@@ -13,7 +13,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "biewlib/biewlib.h"
+#include "libbeye/beyelib.h"
 
 extern HANDLE hIn;
 

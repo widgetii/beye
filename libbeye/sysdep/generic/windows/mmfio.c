@@ -15,15 +15,15 @@
 #define _OLE_H
 #define _OLE2_H
 #ifdef __DISABLE_MMF
-#include "biewlib/sysdep/ia16/dos/mmfio.c"
+#include "libbeye/sysdep/ia16/dos/mmfio.c"
 #else
 #ifndef __DISABLE_LOWLEVEL_MMF
 #include <string.h>
 #include <stdlib.h>
 #include <errno.h>
 #include <windows.h>
-#include "biewlib/pmalloc.h"
-#include "biewlib/biewlib.h"
+#include "libbeye/pmalloc.h"
+#include "libbeye/beyelib.h"
 
 /*
    Using standard file-mapping technique of Win32 (CreateFileMapping, 
@@ -304,7 +304,7 @@ mmfHandle          __FASTCALL__ __mmfOpen(const char *fname,int mode)
     return pMMF;
 }
 
-tBool              __FASTCALL__ __mmfFlush(mmfHandle mh)
+bool              __FASTCALL__ __mmfFlush(mmfHandle mh)
 {
   PMMF mrec = (PMMF)mh;
   return DosUpdateMMF(mrec,mrec->ulSize) ? True : False;
@@ -327,14 +327,14 @@ mmfHandle     __FASTCALL__ __mmfSync(mmfHandle mh)
   return mrec;
 }
 
-tBool              __FASTCALL__ __mmfProtect(mmfHandle mh,int flags)
+bool              __FASTCALL__ __mmfProtect(mmfHandle mh,int flags)
 {
   PMMF mrec = (PMMF)mh;
   mrec->ulFlags = flags | MMF_USEDENTRY;
   return True;
 }
 
-tBool              __FASTCALL__ __mmfResize(mmfHandle mh,long size)
+bool              __FASTCALL__ __mmfResize(mmfHandle mh,long size)
 {
   PMMF mrec = (PMMF)mh;
   ADRSIZE old_length;
@@ -387,7 +387,7 @@ long              __FASTCALL__ __mmfSize(mmfHandle mh)
   return ((PMMF)mh)->ulSize;
 }
 
-tBool             __FASTCALL__ __mmfIsWorkable( void ) { return True; }
+bool             __FASTCALL__ __mmfIsWorkable( void ) { return True; }
 #else
 /*
    WARNING! This implementation of program logic is not fully compatible
@@ -476,7 +476,7 @@ mmfHandle          __FASTCALL__ __mmfOpen(const char *fname,int mode)
   return NULL;
 }
 
-tBool              __FASTCALL__ __mmfFlush(mmfHandle mh)
+bool              __FASTCALL__ __mmfFlush(mmfHandle mh)
 {
   struct mmfRecord *mrec = (struct mmfRecord *)mh;
   return FlushViewOfFile(mrec->addr,mrec->length) ? True : False;
@@ -508,7 +508,7 @@ mmfHandle     __FASTCALL__ __mmfSync(mmfHandle mh)
   return NULL;
 }
 
-tBool              __FASTCALL__ __mmfProtect(mmfHandle mh,int flags)
+bool              __FASTCALL__ __mmfProtect(mmfHandle mh,int flags)
 {
   DWORD oldProt;
   struct mmfRecord *mrec = (struct mmfRecord *)mh;
@@ -516,7 +516,7 @@ tBool              __FASTCALL__ __mmfProtect(mmfHandle mh,int flags)
   return VirtualProtect(mrec->addr,mrec->length,mk_prot(flags),&oldProt) ? True : False;
 }
 
-tBool              __FASTCALL__ __mmfResize(mmfHandle mh,long size)
+bool              __FASTCALL__ __mmfResize(mmfHandle mh,long size)
 {
   /** @bug  This implementation does not change size of file.
             Sorry! It is not possible under win32 without changing logic of
@@ -558,6 +558,6 @@ long              __FASTCALL__ __mmfSize(mmfHandle mh)
   return ((struct mmfRecord *)mh)->length;
 }
 
-tBool             __FASTCALL__ __mmfIsWorkable( void ) { return True; }
+bool             __FASTCALL__ __mmfIsWorkable( void ) { return True; }
 #endif
 #endif

@@ -17,11 +17,10 @@
 #ifndef __CONFIG_H
 #define __CONFIG_H 1
 
-#if defined(__WIN32__) && defined(_MSC_VER)
-    #include "libbeye/sysdep/ia32/__config.h"
-#else
-    #define __CONFIG <libbeye/sysdep/__MACHINE__/__config.h>
-    #include __CONFIG
-#endif
+#include "bconfig.h"
+
+// ia16?
+#define __CONFIG <libbeye/sysdep/generic/__config.h>
+#include __CONFIG
 
 #endif

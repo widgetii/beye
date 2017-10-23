@@ -17,7 +17,7 @@
 #ifndef __BBIO_H
 #define __BBIO_H 1
 
-#include "libbeye/sysdep/generic/__config.h"
+#include "libbeye/sysdep/__config.h"
 #include "libbeye/beyelib.h"
 
 /******************************************************************\

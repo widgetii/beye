@@ -23,7 +23,7 @@
 #include <limits.h>
 #include <string.h>
 
-#include "biewlib/biewlib.h"
+#include "libbeye/beyelib.h"
 
 static tBool ms_visible = False;
 tAbsCoord win32_mx = 0,win32_my = 0;
@@ -47,7 +47,7 @@ void __FASTCALL__ __term_mouse( void )
   SetConsoleMode(GetStdHandle(STD_INPUT_HANDLE),ENABLE_MOUSE_INPUT);
 }
 
-tBool __FASTCALL__ __MsGetState( void )
+bool __FASTCALL__ __MsGetState( void )
 {
   return ms_visible;
 }

@@ -21,7 +21,7 @@
 #include <stddef.h>
 #include <stdlib.h>
 
-#include "biewlib/biewlib.h"
+#include "libbeye/beyelib.h"
 
 #if defined(__GNUC__) && !defined(_MMSYSTEM_H) && __MACHINE__!=x86_64
 /****************************************************************\

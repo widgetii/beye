@@ -18,10 +18,9 @@
 #ifndef __BEYELIB_H
 #define __BEYELIB_H 1
 
-typedef enum { False = 0, True = 1 }tBool; /**< This is the data type used to represent boolean objects */
-#include "libbeye/sysdep/generic/__config.h"
+#include "libbeye/sysdep/__config.h"
 
-#include "bconfig.h"
+typedef enum { False = 0, True = 1 }tBool; /**< This is the data type used to represent boolean objects */
 
 #ifndef __NORECURSIVE
 #ifndef __SYS_DEP_H
