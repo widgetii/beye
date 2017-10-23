@@ -22,15 +22,6 @@ AH_TOP([
 #ifndef Beye_CONFIG_H
 #define Beye_CONFIG_H
 ])
-AH_BOTTOM([
-/* Define the macros needed if on a UnixWare 7.x system. */
-#if defined(__USLC__) && defined(__SCO_VERSION__)
-#define STRICT_SYSV_CURSES /* Don't use ncurses extensions */
-#endif
-
-#endif /*Beye_CONFIG_H*/
-])
-
 dnl  output driver features
 AC_ARG_ENABLE(slang,
   [  --enable-slang          slang graphics support (autodetected)])
@@ -73,9 +64,12 @@ AC_DEFINE(_VT100_, 1, hardcoded now, but in future we need to check is it unix s
 AC_DEFINE(__DEFAULT_DISASM, 0, hardcoded now)
 
 # Checking the size of int type
-AC_CHECK_SIZEOF(int)
-if test x$ac_cv_sizeof_int != x; then
-  AC_DEFINE_UNQUOTED([__WORDSIZE], $ac_cv_sizeof_int*8, description)
+AC_CHECK_SIZEOF(size_t)
+if test x$ac_cv_sizeof_size_t != x; then
+  AC_DEFINE_UNQUOTED([__WORDSIZE__], $ac_cv_sizeof_size_t * 8, description)
+  AH_BOTTOM([#ifndef __WORDSIZE
+  #define __WORDSIZE __WORDSIZE__
+  #endif])
 fi
 
 # Broken?
@@ -320,6 +314,15 @@ AC_CONFIG_FILES(
    testlab/file_ini/Makefile
    testlab/twin/Makefile
 
+])
+
+AH_BOTTOM([
+/* Define the macros needed if on a UnixWare 7.x system. */
+#if defined(__USLC__) && defined(__SCO_VERSION__)
+#define STRICT_SYSV_CURSES /* Don't use ncurses extensions */
+#endif
+
+#endif /*Beye_CONFIG_H*/
 ])
 
 AC_OUTPUT
