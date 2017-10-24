@@ -195,10 +195,11 @@ chtype __FASTCALL__ _2ps(unsigned char c)
 
 #endif	/* _CURSES_ */
 
-#ifdef HAVE_ICONV_H
-static char *screen_cp;
 static unsigned is_unicode=0;
 static void *nls_handle;
+
+#ifdef HAVE_ICONV_H
+static char *screen_cp;
 #endif
 
 #ifdef	_VT100_
