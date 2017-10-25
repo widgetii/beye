@@ -22,7 +22,6 @@
 /*
     Copyright (C) 1999-2002 Konstantin Boldyshev <konst@linuxassembly.org>
 
-    $Id$
 */
 
 #include <stdio.h>
@@ -35,6 +34,7 @@
 #include <pwd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <assert.h>
 
 #include "libbeye/beyelib.h"
 #include "console.h"
@@ -44,14 +44,14 @@
 #endif
 
 #ifndef	DATADIR
-#define DATADIR	PREFIX"/share/biew"
+#define DATADIR	PREFIX"/share/beye"
 #endif
 
 bool break_status = False;	/**< CTRL+BREAK flag */
 
-termdesc *terminal = NULL;
+const termdesc *terminal = NULL;
 
-static termdesc termtab[] = {
+static const termdesc termtab[] = {
 { "linux",	TERM_LINUX },
 { "console",	TERM_LINUX },
 { "xterm",	TERM_XTERM },
@@ -76,18 +76,23 @@ The trailing '/' is included in the returned string.
 */
 char * __FASTCALL__ __get_home_dir(const char *progname)
 {
-    char *p;
+    const char *p;
 
-    if (_home_dir_name[0]) return _home_dir_name; //Already computed
+    if (_home_dir_name[0]) {
+        return _home_dir_name; //Already computed
+    }
 
     p = getenv("HOME");
     if (p == NULL || strlen(p) < 2) {
-	struct passwd *psw = getpwuid(getuid());
-	if (psw != NULL) p = psw->pw_dir;
+        struct passwd *psw = getpwuid(getuid());
+        if (psw != NULL) {
+            p = psw->pw_dir;
+        }
     }
 
-    if (p == NULL || strlen(p) > FILENAME_MAX - (strlen(progname) + 10))
-	p = "/tmp";
+    if (p == NULL || strlen(p) > FILENAME_MAX - (strlen(progname) + 10)) {
+        p = "/tmp";
+    }
 
     strcpy(_home_dir_name, p);
     strcat(_home_dir_name, "/");

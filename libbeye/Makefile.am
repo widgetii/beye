@@ -1,3 +1,4 @@
+AM_CPPFLAGS = -DDATADIR='"$(datadir)"' -DPREFIX='"$(prefix)"'
 
 modules_unix_common = sysdep/generic/posix/fileio.c sysdep/generic/unix/con_vt100.c sysdep/generic/unix/os_dep.c sysdep/generic/unix/nls.c sysdep/generic/cpu_info.c sysdep/generic/unix/console.c
 
