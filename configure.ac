@@ -111,6 +111,7 @@ case "${host_os}" in
     #   Then in Makefile.am put:
     #
     #   myapplication_bin_LDADD=@GL_LIBS@
+        AC_DEFINE([__DISABLE_SIGIO], 1, [We have problems on BSD systems with console input and segfaults on OS X])
         AC_DEFINE([OSX], 1, [Define for the Mac OS X.])
         opsys=osx
         ;;
@@ -347,7 +348,6 @@ AC_OUTPUT
 # __GLIBC__
 # DJGPP
 # __WATCOMC__
-# DATADIR
 # __BYTE_ORDER = __LITTLE_ENDIAN, 
 #__ENABLE_FASTCALL=1
 #__HAVE_PRAGMA_PACK__=1

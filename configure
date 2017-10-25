@@ -627,6 +627,10 @@ ac_subst_vars='am__EXEEXT_FALSE
 am__EXEEXT_TRUE
 LTLIBOBJS
 BEYE_LIBS
+WINDOWS_FALSE
+WINDOWS_TRUE
+OSX_FALSE
+OSX_TRUE
 BSD_FALSE
 BSD_TRUE
 X86_64_FALSE
@@ -3158,6 +3162,9 @@ fi
 ac_config_headers="$ac_config_headers bconfig.h"
 
 
+# Don't use default -O2 -g flags
+: ${CFLAGS=""}
+
 # Check for programs
 ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
@@ -4465,8 +4472,6 @@ esac
 
 
 
-
-
 # Check whether --enable-slang was given.
 if test "${enable_slang+set}" = set; then :
   enableval=$enable_slang;
@@ -5669,9 +5674,6 @@ done
 $as_echo "#define __MACHINE__ ia32" >>confdefs.h
 
 
-$as_echo "#define __OS__ unix" >>confdefs.h
-
-
 $as_echo "#define _VT100_ 1" >>confdefs.h
 
 
@@ -5683,39 +5685,43 @@ $as_echo "#define __DEFAULT_DISASM 0" >>confdefs.h
 # version HP92453-01 B.11.11.23709.GP, which incorrectly rejects
 # declarations like `int a3[[(sizeof (unsigned char)) >= 0]];'.
 # This bug is HP SR number 8606223364.
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking size of int" >&5
-$as_echo_n "checking size of int... " >&6; }
-if ${ac_cv_sizeof_int+:} false; then :
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking size of size_t" >&5
+$as_echo_n "checking size of size_t... " >&6; }
+if ${ac_cv_sizeof_size_t+:} false; then :
   $as_echo_n "(cached) " >&6
 else
-  if ac_fn_c_compute_int "$LINENO" "(long int) (sizeof (int))" "ac_cv_sizeof_int"        "$ac_includes_default"; then :
+  if ac_fn_c_compute_int "$LINENO" "(long int) (sizeof (size_t))" "ac_cv_sizeof_size_t"        "$ac_includes_default"; then :
 
 else
-  if test "$ac_cv_type_int" = yes; then
+  if test "$ac_cv_type_size_t" = yes; then
      { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
 $as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
-as_fn_error 77 "cannot compute sizeof (int)
+as_fn_error 77 "cannot compute sizeof (size_t)
 See \`config.log' for more details" "$LINENO" 5; }
    else
-     ac_cv_sizeof_int=0
+     ac_cv_sizeof_size_t=0
    fi
 fi
 
 fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_sizeof_int" >&5
-$as_echo "$ac_cv_sizeof_int" >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_sizeof_size_t" >&5
+$as_echo "$ac_cv_sizeof_size_t" >&6; }
 
 
 
 cat >>confdefs.h <<_ACEOF
-#define SIZEOF_INT $ac_cv_sizeof_int
+#define SIZEOF_SIZE_T $ac_cv_sizeof_size_t
 _ACEOF
 
 
-#if test $ac_cv_sizeof_int = "4"; then
- #...
- # or AC_DEFINE([__WORD], $ac_cv_sizeof_int, description)
-#fi
+if test x$ac_cv_sizeof_size_t != x; then
+
+cat >>confdefs.h <<_ACEOF
+#define __WORDSIZE__ $ac_cv_sizeof_size_t * 8
+_ACEOF
+
+
+fi
 
 # Broken?
 #AC_CHECK_HEADERS([endian.h],
@@ -5829,11 +5835,14 @@ $as_echo "#define WINDOWS 1" >>confdefs.h
     #
     #   myapplication_bin_LDADD=@GL_LIBS@
 
+$as_echo "#define __DISABLE_SIGIO 1" >>confdefs.h
+
+
 $as_echo "#define OSX 1" >>confdefs.h
 
-        opsys=mac
+        opsys=osx
         ;;
-    freebsd*)
+    freebsd*|openbsd*|netbsd*)
 
 $as_echo "#define BSD 1" >>confdefs.h
 
@@ -5993,6 +6002,23 @@ else
   BSD_TRUE='#'
   BSD_FALSE=
 fi
+
+ if test x$opsys = xosx; then
+  OSX_TRUE=
+  OSX_FALSE='#'
+else
+  OSX_TRUE='#'
+  OSX_FALSE=
+fi
+
+ if test x$opsys = xwindows; then
+  WINDOWS_TRUE=
+  WINDOWS_FALSE='#'
+else
+  WINDOWS_TRUE='#'
+  WINDOWS_FALSE=
+fi
+
 
 
 
@@ -6199,36 +6225,206 @@ done
 fi
 
 if test "${enable_iconv}" != "no"; then
-  ac_cv_my_have_iconv="no"
-  for ac_header in iconv.h
-do :
-  ac_fn_c_check_header_mongrel "$LINENO" "iconv.h" "ac_cv_header_iconv_h" "$ac_includes_default"
-if test "x$ac_cv_header_iconv_h" = xyes; then :
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_ICONV_H 1
+  am_cv_func_iconv="no"
+
+  # For OS X, Solaris, HP-UX, etc.: figure out if -liconv is needed.  We'll
+  # accept either iconv_open or libiconv_open, since some include files map
+  # the former to the latter.
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for library containing iconv_open" >&5
+$as_echo_n "checking for library containing iconv_open... " >&6; }
+if ${ac_cv_search_iconv_open+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_func_search_save_LIBS=$LIBS
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char iconv_open ();
+int
+main ()
+{
+return iconv_open ();
+  ;
+  return 0;
+}
 _ACEOF
- ac_cv_my_have_iconv="yes"
-                   BEYE_LIBS="${BEYE_LIBS} -liconv"
-                   break
+for ac_lib in '' iconv; do
+  if test -z "$ac_lib"; then
+    ac_res="none required"
+  else
+    ac_res=-l$ac_lib
+    LIBS="-l$ac_lib  $ac_func_search_save_LIBS"
+  fi
+  if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_search_iconv_open=$ac_res
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext
+  if ${ac_cv_search_iconv_open+:} false; then :
+  break
+fi
+done
+if ${ac_cv_search_iconv_open+:} false; then :
+
+else
+  ac_cv_search_iconv_open=no
+fi
+rm conftest.$ac_ext
+LIBS=$ac_func_search_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_search_iconv_open" >&5
+$as_echo "$ac_cv_search_iconv_open" >&6; }
+ac_res=$ac_cv_search_iconv_open
+if test "$ac_res" != no; then :
+  test "$ac_res" = "none required" || LIBS="$ac_res $LIBS"
+
 fi
 
-done
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for library containing libiconv_open" >&5
+$as_echo_n "checking for library containing libiconv_open... " >&6; }
+if ${ac_cv_search_libiconv_open+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_func_search_save_LIBS=$LIBS
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
 
-  if test "${ac_cv_my_have_iconv}" = "no" -a "${enable_iconv}" = "yes"; then
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char libiconv_open ();
+int
+main ()
+{
+return libiconv_open ();
+  ;
+  return 0;
+}
+_ACEOF
+for ac_lib in '' iconv; do
+  if test -z "$ac_lib"; then
+    ac_res="none required"
+  else
+    ac_res=-l$ac_lib
+    LIBS="-l$ac_lib  $ac_func_search_save_LIBS"
+  fi
+  if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_search_libiconv_open=$ac_res
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext
+  if ${ac_cv_search_libiconv_open+:} false; then :
+  break
+fi
+done
+if ${ac_cv_search_libiconv_open+:} false; then :
+
+else
+  ac_cv_search_libiconv_open=no
+fi
+rm conftest.$ac_ext
+LIBS=$ac_func_search_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_search_libiconv_open" >&5
+$as_echo "$ac_cv_search_libiconv_open" >&6; }
+ac_res=$ac_cv_search_libiconv_open
+if test "$ac_res" != no; then :
+  test "$ac_res" = "none required" || LIBS="$ac_res $LIBS"
+
+fi
+
+
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for iconv declaration" >&5
+$as_echo_n "checking for iconv declaration... " >&6; }
+  if ${am_cv_proto_iconv+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+
+      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+  #include <stdlib.h>
+  #include <iconv.h>
+  extern
+  #ifdef __cplusplus
+  "C"
+  #endif
+  #if defined(__STDC__) || defined(__cplusplus)
+  size_t iconv (iconv_t cd, char * *inbuf, size_t *inbytesleft, char * *outbuf, size_t *outbytesleft);
+  #else
+  size_t iconv();
+  #endif
+
+int
+main ()
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
+  am_cv_proto_iconv_arg1=""
+else
+  am_cv_proto_iconv_arg1="const"
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+        am_cv_proto_iconv="extern size_t iconv (iconv_t cd, $am_cv_proto_iconv_arg1 char * *inbuf, size_t *inbytesleft, char * *outbuf, size_t *outbytesleft);"
+        am_cv_func_iconv="yes"
+fi
+
+      am_cv_proto_iconv=`echo "$am_cv_proto_iconv" | tr -s ' ' | sed -e 's/( /(/'`
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: ${ac_t:-
+           }$am_cv_proto_iconv" >&5
+$as_echo "${ac_t:-
+           }$am_cv_proto_iconv" >&6; }
+
+cat >>confdefs.h <<_ACEOF
+#define ICONV_CONST $am_cv_proto_iconv_arg1
+_ACEOF
+
+
+
+
+
+
+  if test "${am_cv_func_iconv}" = "yes"; then
+
+$as_echo "#define HAVE_ICONV_H 1" >>confdefs.h
+
+  fi
+
+  if test "${am_cv_func_iconv}" = "no" -a "${enable_iconv}" = "yes"; then
     as_fn_error $? "cannot find iconv development files" "$LINENO" 5
   fi
 fi
-
 
 if test "${enable_debug}" = "yes"; then
 
 $as_echo "#define DEBUG 1" >>confdefs.h
 
+  CFLAGS="$CFLAGS -g -O0 -ggdb"
+else
+
+$as_echo "#define NDEBUG 1" >>confdefs.h
+
+  CFLAGS="$CFLAGS -O2"
 fi
 
 
 
 ac_config_files="$ac_config_files Makefile libbeye/Makefile tools/beyehelp/Makefile tools/lzss/Makefile testlab/file_ini/Makefile testlab/twin/Makefile"
+
+
 
 
 cat >confcache <<\_ACEOF
@@ -6378,6 +6574,14 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${BSD_TRUE}" && test -z "${BSD_FALSE}"; then
   as_fn_error $? "conditional \"BSD\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${OSX_TRUE}" && test -z "${OSX_FALSE}"; then
+  as_fn_error $? "conditional \"OSX\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${WINDOWS_TRUE}" && test -z "${WINDOWS_FALSE}"; then
+  as_fn_error $? "conditional \"WINDOWS\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 
@@ -7707,11 +7911,7 @@ $as_echo "$as_me: WARNING: unrecognized options: $ac_unrecognized_opts" >&2;}
 fi
 
 
-# include <biewlib/sysdep/__MACHINE__/__config.h
-# __WORDSIZE = 16, 32, 64
-# __CPU_NAME__=ia32
 # __CPU__=386
-# __OS_NAME__='\"DOS$_bitness\"'
 # -D__OS__=\"dos\"
 # __MSDOS__
 # __OS2__
@@ -7722,10 +7922,8 @@ fi
 # __GNUC__?
 # __QNX4__
 # __GLIBC__
-# __UNIX__
 # DJGPP
 # __WATCOMC__
-# DATADIR
 # __BYTE_ORDER = __LITTLE_ENDIAN,
 #__ENABLE_FASTCALL=1
 #__HAVE_PRAGMA_PACK__=1
