@@ -1,12 +1,8 @@
 #include <assert.h>
 #include <string.h>
-#include "libbeye/sysdep/generic/unix/console.h"
-
-// TODO - remove all - use only libbeye.h
-#include "bconfig.h"
 #include <stdio.h>
-#include <stdbool.h>
-// TODO - remove all
+#include "libbeye/beyelib.h"
+#include "libbeye/sysdep/generic/unix/console.h"
 
 static size_t consoleDriversNum = 0;
 
@@ -24,8 +20,8 @@ const ConsoleDriver drivers[] = {
     {.driverName = "VT100", .driver = NULL},
 #endif
 
-    // Anybody knows how to elegancy construct such structure?
-    {.driverName = "dumb", .driver = NULL}
+    // End of data
+    {.driverName = NULL, .driver = NULL}
 
 };
 
@@ -37,8 +33,9 @@ void consoleInitialize() {
         // because dumb driver we need to dec num
         - 1;
 
-    assert(sizeof(drivers) > 0);
-    printf("We have %zu console drivers included\n", consoleDriversNum);
+#ifndef NDEBUG
+    fprintf(stderr, "We have %zu console drivers included\n", consoleDriversNum);
+#endif
 
 }
 
