@@ -183,7 +183,7 @@ void __FASTCALL__ __init_sys(void)
 #ifdef _VT100_
     if (terminal->type == TERM_UNKNOWN) {
         printm("Sorry, I can't handle terminal type '%s'.\nIf you are sure it is vt100 compatible, try setting TERM to vt100:\n\n$ TERM=vt100 biew filename\n\nIf you will not succeed, use slang/curses version of BIEW.\n\n", t);
-        exit(2);
+        exit(EXIT_FAILURE);
     }
 #endif
 	
