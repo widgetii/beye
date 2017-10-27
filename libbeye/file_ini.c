@@ -129,7 +129,7 @@ void __FASTCALL__ FiAError(int nError,int row,const char *addinfo)
 {
  int eret = 0;
  if(FiError) eret = (*FiError)(nError,row,addinfo);
- if(eret == __FI_EXITPROC) exit(255);
+ if(eret == __FI_EXITPROC) exit(EXIT_FAILURE);
 }
 
 void __FASTCALL__ FiAErrorCL(int nError) { FiAError(nError,FinCurrString[FiFilePtr-1],NULL); }
