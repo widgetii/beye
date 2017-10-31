@@ -43,8 +43,8 @@
 #define	PREFIX	"/usr/local"
 #endif
 
-#ifndef	DATADIR
-#define DATADIR	PREFIX"/share/beye"
+#ifndef	PDATADIR
+#define PDATADIR  PREFIX"/share/beye"
 #endif
 
 bool break_status = False;	/**< CTRL+BREAK flag */
@@ -121,7 +121,7 @@ char * __FASTCALL__ __get_rc_dir(const char *progname)
 {
     if (_rc_dir_name[0]) return _rc_dir_name; //Already computed
 
-    strcpy(_rc_dir_name, DATADIR);
+    strcpy(_rc_dir_name, PDATADIR);
     /*strcat(_rc_dir_name, progname);*/
     return strcat(_rc_dir_name, "/");
 }
