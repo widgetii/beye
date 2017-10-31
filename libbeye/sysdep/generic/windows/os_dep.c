@@ -31,7 +31,7 @@
 
 #if __WORDSIZE > 32
 /* Note: Vista-64 requires porting for MMF file handling */
-#define __DISABLE_MMF 1
+//#define __DISABLE_MMF 1
 #endif
 
 OSVERSIONINFO win32_verinfo;
