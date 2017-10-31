@@ -3,7 +3,7 @@ dnl * Please run autoreconf to test your changes! *
 dnl ***********************************************
 
 # Set VERSION so we only need to edit in one place (i.e., here)
-m4_define(BEYE_VERSION, [6.1.1.alpha])
+m4_define(BEYE_VERSION, [6.1.1.1.pre])
 
 AC_INIT([beye], BEYE_VERSION, [https://github.com/widgetii/beye])
 AC_CONFIG_AUX_DIR([.auto])
