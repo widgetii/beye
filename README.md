@@ -3,7 +3,7 @@
 This repository was created from original [CVS
 repository](https://sourceforge.net/projects/beye/) of BEYE program
 
-![Build status](https://travis-ci.org/widgetii/MovingHelper.svg?branch=master)
+[![Build Status](https://travis-ci.org/widgetii/beye.svg?branch=master)](https://travis-ci.org/widgetii/beye)
 
 ![Screenshot from Wikipedia](https://upload.wikimedia.org/wikipedia/commons/b/b6/Biew_ss.png)
 
