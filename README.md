@@ -1,8 +1,15 @@
-This repository was created from original CVS repository of BEYE program in https://sourceforge.net/projects/beye/
+# Binary EYE
+
+This repository was created from original [CVS
+repository](https://sourceforge.net/projects/beye/) of BEYE program
+
+![Build status](https://travis-ci.org/widgetii/MovingHelper.svg?branch=master)
+
+![Screenshot from Wikipedia](https://upload.wikimedia.org/wikipedia/commons/b/b6/Biew_ss.png)
 
 TODO:
 
-    - [ ] replace hand-written configure to Autoconf tools
+    - [X] replace hand-written configure to Autoconf tools
     - [ ] make tests in Linux32/64, Darwin, Win32/64, Raspbian, NetBSD 
     - [ ] find bugs which lead to crashes
 
@@ -17,5 +24,4 @@ Building Beye:
         --enable-ncurses: support for the ncurses library
         --enable-slang: support for the SLang library
         --enable-iconv: support for the Iconv library
-
 

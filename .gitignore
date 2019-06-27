@@ -13,6 +13,9 @@ Makefile
 .dirstamp
 .deps
 *.dSYM
+bconfig.h.in
+config.status
+.auto/
 
 # http://www.gnu.org/software/automake
 
