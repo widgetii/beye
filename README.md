@@ -16,7 +16,7 @@ TODO:
 Building Beye:
 
     o   If you are using a Git checkout, you need to run the
-        bootstrap script in order to generate configure. This is not
+        `bootstrap` script in order to generate configure. This is not
         necessary for official tarballs.
 
     o   Run configure the make. Useful configure flags are:

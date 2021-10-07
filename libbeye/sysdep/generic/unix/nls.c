@@ -31,6 +31,7 @@ static const char copyright[] = "$Id$";
 #endif
 #include <errno.h>
 #include <stdlib.h>
+#include <strings.h>
 #include <stddef.h>
 #include "libbeye/beyelib.h"
 

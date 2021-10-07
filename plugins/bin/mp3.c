@@ -17,6 +17,7 @@
 **/
 #include <stddef.h>
 #include <stdint.h>
+#include <string.h>
 
 #include "bswap.h"
 #include "bconsole.h"
